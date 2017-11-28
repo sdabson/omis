@@ -1,0 +1,43 @@
+#
+# Files and folders to exclude from versioning.
+#
+# Author: Stephen Abson
+#
+
+# Excludes Maven settings
+.settings/
+
+# Excludes builds
+target/
+
+# Excludes test output
+test-output/
+
+# Exclude Eclipse project and classpath
+.classpath
+.project
+
+# Excludes compiled classes and libraries for web app
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/WEB-INF/lib/
+
+# Excludes dev, test, prod and preprod environments - these configurations are
+# organization specific and should not be available in a public repository
+src/main/webapp/WEB-INF/config/env/dev/
+src/main/webapp/WEB-INF/config/env/test/
+src/main/webapp/WEB-INF/config/env/prod-common/
+src/main/webapp/WEB-INF/config/env/prod/
+src/main/webapp/WEB-INF/config/env/preprod/
+
+# Excludes Derby log
+# TODO - Configure Derby log to be located outside of the project, remove this
+derby.log
+
+# Excludes SVN files
+# TODO - Switch to Git, remove this
+.svn/
+
+# Excludes potentially proprietary content
+# TODO - Replace proprietary content, remove this
+src/main/webapp/resources/common/images/
+src/main/webapp/resources/3rdparty/
