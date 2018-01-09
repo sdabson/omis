@@ -64,6 +64,12 @@
 			<form:input path="paroleEligibilityStatusDate" class="date"/>
 			<form:errors path="paroleEligibilityStatusDate" cssClass="error"/>
 		</span>
+	<c:if test="${!paroleEligibilityForm.showStatusFields}">
+		<c:set var="statusFieldsClassList" value="hidden" />	
+	</c:if>
+	<form:input path="showStatusFields" type="hidden"/>
+	
+	<div id="statusFields" class="${statusFieldsClassList}">
 		<span class="fieldGroup">
 			<form:label path="eligibilityStatusReason" class="fieldLabel">
 				<fmt:message key="eligibilityStatusReasonLabel"/></form:label>
@@ -85,6 +91,8 @@
 			<form:input path="reviewDate" class="date"/>
 			<form:errors path="reviewDate" cssClass="error"/>
 		</span>
+	</div>
+	
 	</fieldset>
 	<fieldset>
 		<legend><fmt:message key="offenderEligibilityNotesLabel"/></legend>

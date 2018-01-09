@@ -199,14 +199,23 @@ public class ManageParoleEligibilityController {
 			return prepareRedisplayEditMav(offender, paroleEligibilityForm, 
 					result);
 		}
+		EligibilityStatusReason statusReason = null;
+		String statusComment = null;
+		Date reviewDate = null;
+		if (EligibilityStatusCategory.INELIGIBLE.equals(paroleEligibilityForm
+				.getEligibilityStatusCategory()) || EligibilityStatusCategory
+				.WAIVED.equals(paroleEligibilityForm
+						.getEligibilityStatusCategory())) {
+			statusReason = paroleEligibilityForm.getEligibilityStatusReason();
+			statusComment = paroleEligibilityForm.getStatusReasonComment();
+			reviewDate = paroleEligibilityForm.getReviewDate();
+		}
 		ParoleEligibility eligibility = this.paroleEligibilityService.create(
 				offender, paroleEligibilityForm.getHearingEligibilityDate(), 
 				paroleEligibilityForm.getAppearanceCategory(), 
 				paroleEligibilityForm.getEligibilityStatusCategory(), 
 				paroleEligibilityForm.getParoleEligibilityStatusDate(), 
-				paroleEligibilityForm.getEligibilityStatusReason(), 
-				paroleEligibilityForm.getStatusReasonComment(), 
-				paroleEligibilityForm.getReviewDate());
+				statusReason, statusComment, reviewDate);
 		this.processParoleEligibilityNoteItems(paroleEligibilityForm
 				.getParoleEligibilityNoteItems(), eligibility);
 		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
@@ -230,14 +239,17 @@ public class ManageParoleEligibilityController {
 				.getHearingEligibilityDate());
 		paroleEligibilityForm.setAppearanceCategory(paroleEligibility
 				.getAppearanceCategory());
-		paroleEligibilityForm.setEligibilityStatusCategory(paroleEligibility
+		if (paroleEligibility.getStatus() != null) {
+			paroleEligibilityForm.setEligibilityStatusCategory(paroleEligibility
 				.getStatus().getCategory());
-		paroleEligibilityForm.setParoleEligibilityStatusDate(paroleEligibility
-				.getStatus().getDate());
-		paroleEligibilityForm.setEligibilityStatusReason(paroleEligibility
-				.getStatus().getReason());
-		paroleEligibilityForm.setStatusReasonComment(paroleEligibility
-				.getStatus().getComment());
+			paroleEligibilityForm.setEligibilityStatusReason(paroleEligibility
+					.getStatus().getReason());
+			paroleEligibilityForm.setStatusReasonComment(paroleEligibility
+					.getStatus().getComment());
+			paroleEligibilityForm.setParoleEligibilityStatusDate(paroleEligibility
+					.getStatus().getDate());
+			
+		}
 		paroleEligibilityForm.setReviewDate(paroleEligibility.getReviewDate());
 		List<ParoleEligibilityNote> eligibilityNotes 
 			= this.paroleEligibilityService
@@ -284,15 +296,24 @@ public class ManageParoleEligibilityController {
 			return prepareRedisplayEditMav(eligibility.getOffender(),
 					paroleEligibilityForm, result);
 		}
+		EligibilityStatusReason statusReason = null;
+		String statusComment = null;
+		Date reviewDate = null;
+		if (EligibilityStatusCategory.INELIGIBLE.equals(paroleEligibilityForm
+				.getEligibilityStatusCategory()) || EligibilityStatusCategory
+				.WAIVED.equals(paroleEligibilityForm
+						.getEligibilityStatusCategory())) {
+			statusReason = paroleEligibilityForm.getEligibilityStatusReason();
+			statusComment = paroleEligibilityForm.getStatusReasonComment();
+			reviewDate = paroleEligibilityForm.getReviewDate();
+		}
 		ParoleEligibility paroleEligibility = this.paroleEligibilityService
 				.update(eligibility,
 						paroleEligibilityForm.getHearingEligibilityDate(),
 						paroleEligibilityForm.getAppearanceCategory(),
 						paroleEligibilityForm.getEligibilityStatusCategory(),
 						paroleEligibilityForm.getParoleEligibilityStatusDate(),
-						paroleEligibilityForm.getEligibilityStatusReason(),
-						paroleEligibilityForm.getStatusReasonComment(),
-						paroleEligibilityForm.getReviewDate());
+						statusReason, statusComment, reviewDate);
 		this.processParoleEligibilityNoteItems(
 				paroleEligibilityForm.getParoleEligibilityNoteItems(),
 				paroleEligibility);
@@ -406,6 +427,16 @@ public class ManageParoleEligibilityController {
 					.size());
 		} else {
 			mav.addObject(PAROLE_ELIGIBILITY_NOTE_ITEM_INDEX_MODEL_KEY, 0);
+		}
+		if (paroleEligibilityForm.getEligibilityStatusCategory() != null){
+			if (EligibilityStatusCategory.WAIVED.equals(paroleEligibilityForm
+					.getEligibilityStatusCategory())
+					|| EligibilityStatusCategory.INELIGIBLE.equals(
+					paroleEligibilityForm.getEligibilityStatusCategory())) {
+				paroleEligibilityForm.setShowStatusFields(true);
+			} else {
+				paroleEligibilityForm.setShowStatusFields(false);
+			}
 		}
 		mav.addObject(APPEARANCE_CATEGORIES_MODEL_KEY, 
 				this.paroleEligibilityService.findAppearanceCategories());

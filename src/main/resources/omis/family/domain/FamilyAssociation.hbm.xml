@@ -13,7 +13,7 @@
 			</generator>
 		</id>
 		<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`"
-			cascade="save-update" entity-name="omis.relationship.domain.Relationship"/>
+			entity-name="omis.relationship.domain.Relationship"/>
 		<component name="dateRange">
 			<property name="startDate" column="`START_DATE`" not-null="false" type="java.util.Date"/>
 			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
