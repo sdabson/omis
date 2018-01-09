@@ -1,0 +1,162 @@
+/*
+ * Home styling.
+ *
+ * Author: Stephen Abson
+ * Author: Ryan Johns
+ */
+
+span.contentHeading {
+	display: block;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    text-align: center;
+    vertical-align: bottom;
+    width: 100%;
+}
+
+ul.content {
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    list-style-type: none;
+    min-height: 211px;
+    width: 98%;
+    text-align: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+ul.content > li {
+	padding: 5px;
+	margin: 4px;
+	display:inline-block;
+	margin-bottom: 22px;
+}
+
+ul.content > li {
+	list-style: none;
+}
+
+ul.content li.last {
+	/*border-bottom: none;*/
+}
+
+ul.content #caseLoadItem {
+	height: 200px;
+}
+
+ul.content #linksItem {
+	height: 25px;
+}
+
+.searchResultsContainer {
+    margin: 0;
+    width: 99%;
+    
+}
+
+.searchResultsContainer > .dataTables_wrapper {
+	height:305px;
+}
+
+.searchResultsContainer > span {
+    display: inline-block;
+    float: right;
+    height: 200px;
+    overflow-y: scroll;
+    width: 49%;
+}
+
+span.banner {
+  position: relative;
+  width: 125px;
+  height: 175px;
+/*   background: #A3BAE0; */
+  
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-right: 25px;
+  margin-left: 50px;
+  margin: 0px;
+  display: inline-block;  
+}
+
+span.banner img, span.banner input {
+	position:absolute;
+	padding: 0px;
+}
+
+span.banner img {
+	left:17px;
+	top: 15px;
+}
+
+span.banner input {
+	top: 60px;
+	left: 5px;
+}
+
+span.banner span.label {
+    padding-top: 90px;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    text-align: center;
+    width: 100%;
+    color: #2A4E81;
+    margin: auto;
+}
+
+span.banner:before, span.banner:hover:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 175px;
+  width: 100%;
+  height: 21px;
+  background-size: 18px 40px;
+}
+
+.banner:hover {
+  position: relative;
+  width: 125px;
+  height: 175px; 
+  margin: 0px;  
+}
+
+.left_arrow:before {
+ 	content: url('../images/lrgArrowLeft.png');
+}
+
+.left_arrow {
+	cursor:pointer;
+	padding-top: 60px;
+	margin:0px;
+	overflow:hidden;
+	float:left;
+} 
+
+.right_arrow:before {
+ 	content: url('../images/lrgArrowRight.png');
+}
+
+.right_arrow {
+	cursor:pointer;
+	padding-top: 60px;
+	margin:0px;
+	overflow:hidden;
+	float:right;
+}
+
+.searching {
+	display: table-cell; 
+  	padding-left: 200px; 
+}
+
+form.editForm fieldset span.fieldGroup.formErrors {
+	margin-left: 22%;
+}
+form.editForm fieldset span.fieldGroup.formErrors span.error {
+	
+}

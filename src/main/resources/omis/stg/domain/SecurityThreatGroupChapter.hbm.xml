@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<class	entity-name="omis.stg.domain.SecurityThreatGroupChapter"
+			proxy="omis.stg.domain.SecurityThreatGroupChapter"
+			name="omis.stg.domain.impl.SecurityThreatGroupChapterImpl"
+			table="`STG_CHAPTER`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STG_CHAPTER_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueSecurityThreatGroupChapter">
+			<property name="name" type="string" not-null="true" column="`NAME`"/>
+			<many-to-one name="group" entity-name="omis.stg.domain.SecurityThreatGroup" not-null="true" column="`GROUP_ID`"/>
+		</properties>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>		   
+	</class>
+	<query name="findSecurityThreatGroupChapters"><![CDATA[
+		select securityThreatGroupChapter
+		from omis.stg.domain.SecurityThreatGroupChapter securityThreatGroupChapter
+		order by securityThreatGroupChapter.name
+	]]></query>
+	<query name="findSecurityThreatGroupChapter"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupChapter securityThreatGroupChapter
+		where
+			securityThreatGroupChapter.name = :name
+		and
+			securityThreatGroupChapter.group = :securityThreatGroup
+	]]></query>
+	<query name="findSecurityThreatGroupChapterExcluding"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupChapter securityThreatGroupChapter
+		where
+			securityThreatGroupChapter.name = :name
+		and
+			securityThreatGroupChapter.group = :securityThreatGroup
+		and
+			securityThreatGroupChapter <> :excludedChapter
+	]]></query>
+	<query name="findSecurityThreatGroupChaptersByGroup"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupChapter securityThreatGroupChapter
+		where
+			securityThreatGroupChapter.group = :securityThreatGroup
+		order by securityThreatGroupChapter.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Queries for contacts.
+  -
+  - Author: Stephen Abson 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.contact.report">
+
+	<!--
+	  - Summarizes contact by person.
+	  -
+	  - Params:
+	  -     person - person for whom to summarize contact
+	  -->
+	<query name="summarizeContactByPerson"><![CDATA[
+	  select new omis.contact.report.ContactSummary(
+	        contact,
+	        person,
+	        personName,
+	        personIdentity,
+	        mailingAddress,
+	        contact.poBox,
+	        (
+	          select telephoneNumber
+	          from omis.contact.domain.TelephoneNumber telephoneNumber
+	          where telephoneNumber.contact = contact
+	            and telephoneNumber.primary = true
+	        ),
+	        (
+	          select onlineAccount
+	          from omis.contact.domain.OnlineAccount onlineAccount
+	          where onlineAccount.contact = contact
+	            and onlineAccount.primary = true
+	        ))
+	    from omis.contact.domain.Contact contact
+	      right outer join contact.person person
+	      left outer join person.name personName
+	      left outer join person.identity personIdentity
+	      left outer join contact.mailingAddress mailingAddress
+	    where
+	      person = :person 
+	]]></query>
+</hibernate-mapping>

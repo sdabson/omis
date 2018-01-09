@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+
+	<!-- Service -->
+	<bean id="detainerService"
+		class="omis.detainernotification.service.impl.DetainerServiceImpl">
+		<constructor-arg name="detainerDelegate" ref="detainerDelegate" />
+		<constructor-arg name="detainerAgencyDelegate" ref="detainerAgencyDelegate" />
+		<constructor-arg name="interstateAgreementDetainerDelegate"
+			ref="interstateAgreementDetainerDelegate" />
+		<constructor-arg name="detainerWarrantProcessStatusDelegate"
+			ref="detainerWarrantProcessStatusDelegate" />
+		<constructor-arg name="interstateDetainerActivityDelegate" ref="interstateDetainerActivityDelegate" />
+		<constructor-arg name="detainerActivityCategoryDelegate" ref="detainerActivityCategoryDelegate" />
+		<constructor-arg name="addressDelegate" ref="addressDelegate" />
+		<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate" />
+		<constructor-arg name="addressUnitDesignatorDelegate"
+			ref="addressUnitDesignatorDelegate" />
+		<constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate" />
+		<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+		<constructor-arg name="stateDao" ref="stateDao" />
+		<constructor-arg name="cityDelegate" ref="cityDelegate" />
+		<constructor-arg name="detainerTypeDao" ref="detainerTypeDao" />
+		<constructor-arg name="documentDelegate" ref="documentDelegate" />
+		<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
+		<constructor-arg name="detainerNoteDelegate" ref="detainerNoteDelegate"/>
+		<constructor-arg name="detainerNoteDao" ref="detainerNoteDao"/>
+		<constructor-arg name="unitDao" ref="unitDao"/>
+		<constructor-arg name="complexDao" ref="complexDao"/>
+	</bean>
+	
+
+	<!-- Daos -->
+	<bean id="detainerDao"
+		class="omis.detainernotification.dao.impl.hibernate.DetainerDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.Detainer" />
+	</bean>
+
+	<bean id="detainerAgencyDao"
+		class="omis.detainernotification.dao.impl.hibernate.DetainerAgencyDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerAgency" />
+	</bean>
+
+	<bean id="detainerTypeDao"
+		class="omis.detainernotification.dao.impl.hibernate.DetainerTypeDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerType" />
+	</bean>
+
+	<bean id="detainerWarrantProcessingStatusDao"
+		class="omis.detainernotification.dao.impl.hibernate.DetainerWarrantProcessingStatusDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerWarrantProcessingStatus" />
+	</bean>
+
+	<bean id="interstateAgreementDetainerDao"
+		class="omis.detainernotification.dao.impl.hibernate.InterstateAgreementDetainerDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.InterstateAgreementDetainer" />
+	</bean>
+
+	<bean id="interstateDetainerActivityDao" class="omis.detainernotification.dao.impl.hibernate.InterstateDetainerActivityDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.InterstateDetainerActivity" />
+	</bean>
+	
+	<bean id="detainerActivityCategoryDao" class="omis.detainernotification.dao.impl.hibernate.DetainerActivityCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerActivityCategory" />
+	</bean>
+
+	<bean id="detainerNoteDao" class="omis.detainernotification.dao.impl.hibernate.DetainerNoteDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerNote" />
+	</bean> 
+
+	<!-- Service Delegates -->
+
+	<bean id="detainerDelegate"
+		class="omis.detainernotification.service.delegate.DetainerDelegate">
+		<constructor-arg name="detainerDao" ref="detainerDao" />
+		<constructor-arg name="detainerInstanceFactory" ref="detainerInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+
+	<bean id="detainerAgencyDelegate"
+		class="omis.detainernotification.service.delegate.DetainerAgencyDelegate">
+		<constructor-arg name="detainerAgencyDao" ref="detainerAgencyDao" />
+		<constructor-arg name="detainerAgencyInstanceFactory"
+			ref="detainerAgencyInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+
+	<bean id="detainerWarrantProcessStatusDelegate"
+		class="omis.detainernotification.service.delegate.DetainerWarrantProcessStatusDelegate">
+		<constructor-arg name="detainerWarrantProcessingStatusDao"
+			ref="detainerWarrantProcessingStatusDao" />
+		<constructor-arg name="detainerWarrantProcessStatusInstanceFactory"
+			ref="detainerWarrantProcessStatusInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+
+	<bean id="interstateAgreementDetainerDelegate"
+		class="omis.detainernotification.service.delegate.InterstateAgreementDetainerDelegate">
+		<constructor-arg name="interstateAgreementDetainerDao"
+			ref="interstateAgreementDetainerDao" />
+		<constructor-arg name="interstateAgreementDetainerInstanceFactory"
+			ref="interstateAgreementDetainerInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="interstateDetainerActivityDelegate" class="omis.detainernotification.service.delegate.InterstateDetainerActivityDelegate">
+		<constructor-arg name="interstateDetainerActivityDao" ref="interstateDetainerActivityDao" />
+		<constructor-arg name="interstateDetainerActivityInstanceFactory" ref="interstateDetainerActivityInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="detainerActivityCategoryDelegate" class="omis.detainernotification.service.delegate.DetainerActivityCategoryDelegate">
+		<constructor-arg name="detainerActivityCategoryDao" ref="detainerActivityCategoryDao" />
+	</bean>
+	
+	<bean id="detainerNoteDelegate" class="omis.detainernotification.service.delegate.DetainerNoteDelegate">
+		<constructor-arg name="detainerNoteDao" ref="detainerNoteDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		<constructor-arg name="detainerNoteInstanceFactory" ref="detainerNoteInstanceFactory" />
+	</bean>
+	
+	
+
+	<!-- Instance factories -->
+	<bean id="detainerInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.Detainer" />
+	</bean>
+
+	<bean id="detainerAgencyInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerAgency" />
+	</bean>
+
+	<bean id="detainerWarrantProcessStatusInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerWarrantProcessingStatus" />
+	</bean>
+
+	<bean id="interstateAgreementDetainerInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.InterstateAgreementDetainer" />
+	</bean>
+
+	<bean id="interstateDetainerActivityInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.InterstateDetainerActivity" />
+	</bean>
+	
+	<bean id="detainerActivityCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerActivityCategory" />
+	</bean>
+	
+	<bean id="detainerTypeInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerType" />
+	</bean>
+
+	<bean id="detainerNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerNote" />
+	</bean>
+
+	<!-- Property editor factories -->
+	<bean id="detainerPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="detainerDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.Detainer" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="detainerAgencyPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="detainerAgencyDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerAgency" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="detainerTypePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="detainerTypeDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerType" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="detainerWarrantProcessStatusPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao"
+			ref="detainerWarrantProcessingStatusDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerWarrantProcessingStatus" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="interstateAgreementDetainerPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="detainerDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.InterstateAgreementDetainer" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="interstateDetainerActivityPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="interstateDetainerActivityDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.InterstateDetainerActivity" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="detainerActivityCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="detainerActivityCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.detainernotification.domain.DetainerActivityCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="detainerNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="detainerNoteDao"/>
+			<constructor-arg name="entityName" value="omis.detainernotification.domain.DetainerNote"/>
+			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<!-- Document Beans -->
+		
+	<bean id="detainerNotificationDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+		<constructor-arg name="fileLocator" ref="detainerNotificationDocumentLocator"/>
+	</bean>
+
+	<bean id="detainerNotificationDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+		<constructor-arg name="fileLocator" ref="detainerNotificationDocumentLocator"/>
+		<constructor-arg name="defaultFilename" value="notFound"/>
+	</bean>
+
+	<bean id="detainerNotificationDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+		<constructor-arg name="path" value="${application.resource.path}\Documents\DetainerNotificationDocuments"/>
+	</bean>
+	
+	<bean id="detainerNotificationDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+		<constructor-arg name="fileLocator" ref="detainerNotificationDocumentLocator"/>
+	</bean>
+
+</beans>

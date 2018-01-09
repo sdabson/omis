@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping and queries for task template groups.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.task.domain">
+	<class entity-name="omis.task.domain.TaskTemplateGroup"
+	       proxy="omis.task.domain.TaskTemplateGroup"
+	       name="omis.task.domain.impl.TaskTemplateGroupImpl"
+	       table="`TASK_TEMPLATE_GROUP`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TASK_TEMPLATE_GROUP_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueTaskTemplateGroup">
+			<property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+		</properties>
+	</class>
+	<query name="findTaskTemplateGroup"><![CDATA[
+	  select taskTemplateGroup
+	  from omis.task.domain.TaskTemplateGroup taskTemplateGroup
+	  where taskTemplateGroup.name = :name
+	]]></query>
+	<query name="findTaskTemplateGroupExcluding"><![CDATA[
+	  select taskTemplateGroup
+	  from omis.task.domain.TaskTemplateGroup taskTemplateGroup
+	  where taskTemplateGroup.name = :name
+	    and taskTemplateGroup not in (:excludedTaskTemplateGroups)
+	]]></query>
+</hibernate-mapping>

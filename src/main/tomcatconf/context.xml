@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Embedded Tomcat context.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE xml>
+
+<Context>
+	<Resource auth="Container" driverClassName="org.apache.derby.jdbc.EmbeddedDriver" maxActive="20" maxIdle="10" maxWait="-1" name="jdbc/StandaloneDS" password="omis" type="javax.sql.DataSource" url="jdbc:derby:OMIS;create=true" username="OMIS"/>
+</Context>

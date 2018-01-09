@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.need.domain">	
+	<query name="findCasePlanObjectivesByDomain"><![CDATA[
+		select new omis.need.report.CasePlanObjectiveSummary(
+			objective.id,
+			objective.name, 
+			objective.source,
+			objective.identificationDate,
+			domain.name
+		)
+		from
+			omis.need.domain.CasePlanObjective objective
+			inner join objective.domain domain
+		where
+			objective.offender = :offender
+		and
+			objective.domain = :needDomain
+		order by
+			objective.identificationDate desc
+	]]></query>
+	<query name="findCasePlanObjectivesByOffender"><![CDATA[
+		select new omis.need.report.CasePlanObjectiveSummary(
+			objective.id,
+			objective.name, 
+			objective.source,
+			objective.identificationDate,
+			domain.name
+		)
+		from
+			omis.need.domain.CasePlanObjective objective
+			inner join objective.domain domain
+		where
+			objective.offender = :offender
+		order by
+			objective.identificationDate desc
+	]]></query>
+</hibernate-mapping>

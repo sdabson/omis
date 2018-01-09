@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping and queries for tasks.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.task.domain">
+	<class entity-name="omis.task.domain.Task"
+	       proxy="omis.task.domain.Task"
+	       name="omis.task.domain.impl.TaskImpl"
+	       table="`TASK`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TASK_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueTask">
+			<property name="controllerName" type="java.lang.String" not-null="true" column="`CONTROLLER_NAME`"/>
+			<property name="methodName" type="java.lang.String" not-null="true" column="`METHOD_NAME`"/>
+			<many-to-one name="sourceAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`SOURCE_ACCOUNT_ID`"/>
+			<property name="description" type="java.lang.String" not-null="true" column="`DESCRIPTION`"/>
+		</properties>
+		<property name="originationDate" type="java.util.Date" not-null="true" column="`ORIGINATION_DATE`"/>
+		<property name="completionDate" type="java.util.Date" not-null="false" column="`COMPLETION_DATE`"/>
+	</class>
+	<query name="findTask"><![CDATA[
+		select task
+		from omis.task.domain.Task task
+		where task.controllerName = :controllerName
+		  and task.methodName = :methodName
+		  and task.description = :description
+		  and task.sourceAccount = :sourceAccount
+		  and task.originationDate = :originationDate
+	]]></query>
+	<query name="findTaskExcluding"><![CDATA[
+		select task
+		from omis.task.domain.Task task
+		where task.controllerName = :controllerName
+		  and task.methodName = :methodName
+		  and task.description = :description
+		  and task.sourceAccount = :sourceAccount
+		  and task.originationDate = :originationDate
+		  and task not in (:excludedTasks)
+	]]></query>
+	<query name="findTasksByTaskTemplate"><![CDATA[
+		select task
+		from omis.task.domain.Task task
+		where task.controllerName = :controllerName
+		  and task.methodName = :methodName
+	]]></query>
+</hibernate-mapping>

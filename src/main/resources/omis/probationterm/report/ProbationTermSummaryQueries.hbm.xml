@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Queries to summary probation terms.
+  -
+  - Author: Josh Divine
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.prisonterm.domain">
+	<query name="findProbationTermSummaryByOffender"><![CDATA[
+		select new omis.probationterm.report.ProbationTermSummary(
+				probationTerm.id,
+				offenderName.lastName,
+				offenderName.firstName,
+				offenderName.middleName,
+				offenderName.suffix,
+				offender.offenderNumber,
+				courtCase.docket.value,
+				probationTerm.term.years,
+				probationTerm.term.months,
+				probationTerm.term.days,
+				probationTerm.startDate,
+				probationTerm.terminationDate,
+				probationTerm.expirationDate,
+				probationTerm.jailCredit,
+				probationTerm.sentenceDays
+			)
+		from omis.probationterm.domain.ProbationTerm as probationTerm
+		  inner join probationTerm.offender as offender
+		  inner join offender.name as offenderName
+		  inner join probationTerm.courtCase courtCase
+		where 
+			probationTerm.offender = :offender
+		and
+			probationTerm.startDate <= :effectiveDate
+		and (probationTerm.terminationDate >= :effectiveDate
+			 or probationTerm.terminationDate is null)
+		order by offender, courtCase, probationTerm.startDate
+	]]></query>
+	<query name="findProbationTermSummaryByCourtCase"><![CDATA[
+		select new omis.probationterm.report.ProbationTermSummary(
+				probationTerm.id,
+				offenderName.lastName,
+				offenderName.firstName,
+				offenderName.middleName,
+				offenderName.suffix,
+				offender.offenderNumber,
+				courtCase.docket.value,
+				probationTerm.term.years,
+				probationTerm.term.months,
+				probationTerm.term.days,
+				probationTerm.startDate,
+				probationTerm.terminationDate,
+				probationTerm.expirationDate,
+				probationTerm.jailCredit,
+				probationTerm.sentenceDays
+			)
+		from omis.probationterm.domain.ProbationTerm as probationTerm
+		  inner join probationTerm.offender as offender
+		  inner join offender.name as offenderName
+		  inner join probationTerm.courtCase courtCase
+		where 
+			courtCase = :courtCase
+		order by offender, courtCase, probationTerm.startDate
+	]]></query>
+	<query name="findProbationTermSummaryItemByOffender"><![CDATA[
+		select new omis.probationterm.report.ProbationTermSummary(
+			max(probationTerm.expirationDate)
+		)
+		from omis.probationterm.domain.ProbationTerm probationTerm
+			inner join probationTerm.offender offender
+		where 
+			probationTerm.offender = :offender
+		and
+			(probationTerm.terminationDate >= :effectiveDate
+			or
+			probationTerm.terminationDate is null))
+		group by offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Queries for health facilities.
+ -
+ - Health facilities are facilities that have providers assigned to them
+ -
+ - These queries, and the report services that use them, should be updated to
+ - return facility summaries rather than facilities.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.report">
+	<query name="findHealthFacilitiesForStaffMemberOnDate"><![CDATA[
+		 select facility
+		 from omis.facility.domain.Facility facility
+		         inner join facility.location location
+		         inner join location.organization organization,
+		       omis.staff.domain.StaffAssignment staffAssignment
+		 where staffAssignment.staffMember = :staffMember
+		   and (staffAssignment.dateRange.startDate < :date
+		       or staffAssignment.dateRange.startDate is null)
+		   and (staffAssignment.dateRange.endDate is null
+		       or staffAssignment.dateRange.endDate > :date)
+		   and organization = staffAssignment.supervisoryOrganization
+		   and exists (select providerAssignment
+		               from omis.health.domain.ProviderAssignment providerAssignment
+		               where providerAssignment.facility = facility)
+		 order by facility.name
+	]]></query>
+	<query name="findHealthFacilities"><![CDATA[
+		 select facility
+		 from omis.facility.domain.Facility facility
+		         inner join facility.location location
+		         inner join location.organization organization
+		 where exists (select providerAssignment
+		               from omis.health.domain.ProviderAssignment providerAssignment
+		               where providerAssignment.facility = facility)
+		 order by facility.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Queries to summarize grievances.
+  -
+  - Author: Stephen Abson 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<query name="summarizeGrievancesByOffender"><![CDATA[
+		select new omis.grievance.report.GrievanceSummary(
+		    grievance.id,
+		    offender.id,
+		    offenderName.lastName,
+		    offenderName.firstName,
+		    offenderName.middleName,
+		    offenderName.suffix,
+		    offender.offenderNumber,
+		    grievance.grievanceNumber,
+		    grievance.openedDate,
+		    subject.name,
+		    (select status.name
+		     from omis.grievance.domain.GrievanceDisposition disposition
+		       inner join disposition.status status
+		     where disposition.grievance = grievance
+		       and disposition.level = 'COORDINATOR'),
+		    (select status.name
+		     from omis.grievance.domain.GrievanceDisposition disposition
+		       inner join disposition.status status
+		     where disposition.grievance = grievance
+		       and disposition.level = 'WARDEN'),
+		    (select status.name
+		     from omis.grievance.domain.GrievanceDisposition disposition
+		       inner join disposition.status status
+		     where disposition.grievance = grievance
+		       and disposition.level = 'FHA'),
+		    (select status.name
+		     from omis.grievance.domain.GrievanceDisposition disposition
+		       inner join disposition.status status
+		     where disposition.grievance = grievance
+		       and disposition.level = 'DIRECTOR'),
+		     grievance.description,
+		    cast(:effectiveDate as timestamp))
+		from omis.grievance.domain.Grievance as grievance
+		  inner join grievance.offender as offender
+		  inner join offender.name as offenderName
+		  inner join grievance.subject subject
+		where
+		  offender = :offender
+		order by grievance.openedDate desc, grievance.grievanceNumber
+	]]></query>
+	<query name="summarizeGrievancesByLocation"><![CDATA[
+	  select new omis.grievance.report.GrievanceSummary(
+	      grievance,
+	      offender,
+	      offenderName,
+	      subject,
+	      (select disposition
+		   from omis.grievance.domain.GrievanceDisposition disposition
+		   where disposition.grievance = grievance
+		     and disposition.level = 'COORDINATOR'),
+		  (select disposition
+		   from omis.grievance.domain.GrievanceDisposition disposition
+		   where disposition.grievance = grievance
+		     and disposition.level = 'WARDEN'),
+		  (select disposition
+		   from omis.grievance.domain.GrievanceDisposition disposition
+		   where disposition.grievance = grievance
+		     and disposition.level = 'FHA'),
+		  (select disposition
+		   from omis.grievance.domain.GrievanceDisposition disposition
+		   where disposition.grievance = grievance
+		     and disposition.level = 'DIRECTOR'),
+	      cast(:effectiveDate as timestamp))
+	   from omis.grievance.domain.Grievance grievance
+	     inner join grievance.offender as offender
+	     inner join offender.name as offenderName
+	     inner join grievance.location as location
+	     inner join grievance.subject as subject
+	   where
+	     location = :location
+	   order by grievance.openedDate desc, grievance.grievanceNumber
+	]]></query>
+</hibernate-mapping>

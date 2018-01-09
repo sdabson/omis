@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Josh Divine
+  - Version: 0.1.0 (Jan 13, 2017)
+  - Since: OMIS 3.0 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.communitysupervision.domain">
+	<class entity-name="omis.communitysupervision.domain.CommunitySupervisionOffice"
+	       proxy="omis.communitysupervision.domain.CommunitySupervisionOffice"
+	       name="omis.communitysupervision.domain.impl.CommunitySupervisionOfficeImpl"
+		   table="`COMMUNITY_SUP_OFF`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`COMMUNITY_SUP_OFF_SEQ`</param>
+        </generator>
+	  </id>
+	  <properties name="uniqueCommunitySupervisionOffice">
+	  	<many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+      	<property name="name" type="string" not-null="true" column="`NAME`"/>
+      </properties>
+      <property name="telephoneNumber" type="java.lang.Long" not-null="false" column="`TELEPHONE_NUMBER`"/>
+	</class>
+	<query name="findCommunitySupervisionOffice"><![CDATA[
+		from
+			omis.communitysupervision.domain.CommunitySupervisionOffice as communitySupervisionOffice
+		where
+			communitySupervisionOffice.location = :location
+		and
+			communitySupervisionOffice.name = :name
+		and
+			communitySupervisionOffice.telephoneNumber = :telephoneNumber
+	]]></query>
+	<query name="findCommunitySupervisionOfficeExcluding"><![CDATA[
+		from
+			omis.communitysupervision.domain.CommunitySupervisionOffice as communitySupervisionOffice
+		where
+			communitySupervisionOffice.location = :location
+		and
+			communitySupervisionOffice.name = :name
+		and
+			communitySupervisionOffice.telephoneNumber = :telephoneNumber
+		and
+			communitySupervisionOffice <> :excludedCommunitySupervisionOffice
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="chargeService" class="omis.courtcase.service.impl.ChargeServiceImpl">
+    <constructor-arg name="chargeDelegate" ref="chargeDelegate"/>
+    <constructor-arg name="offenseDelegate" ref="offenseDelegate"/>
+    <constructor-arg name="convictionDelegate" ref="convictionDelegate"/>
+  </bean>
+  
+  <bean id="courtCaseService" class="omis.courtcase.service.impl.CourtCaseServiceImpl">
+    <constructor-arg name="courtCaseDelegate" ref="courtCaseDelegate"/>
+    <constructor-arg name="chargeDelegate" ref="chargeDelegate"/>
+    <constructor-arg name="courtDelegate" ref="courtDelegate"/>
+    <constructor-arg name="courtCaseNoteDelegate" ref="courtCaseNoteDelegate"/>
+    <constructor-arg name="convictionDelegate" ref="convictionDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  	<constructor-arg name="docketDelegate" ref="docketDelegate"/>
+  	<constructor-arg name="offenseDelegate" ref="offenseDelegate"/>
+  	<constructor-arg name="judgeTermDelegate" ref="judgeTermDelegate"/>
+  </bean>
+  
+  
+  <!--  Report Services -->
+  
+  <bean id="courtCaseSummaryReportService" 
+ 	class="omis.courtcase.report.impl.hibernate.CourtCaseSummaryReportServiceImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean> 
+
+	<bean id="courtCaseProfileItemService" class="omis.courtcase.report.impl.hibernate.CourtCaseProfileItemServiceImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	</bean>
+
+  <bean id="chargeSummaryReportService" 
+ 	class="omis.courtcase.report.impl.hibernate.ChargeSummaryReportServiceImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="chargeProfileItemService" class="omis.courtcase.report.impl.hibernate.ChargeProfileItemServiceImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  	
+  <!-- Helpers -->
+
+  <bean id="chargeDelegate" class="omis.courtcase.service.delegate.ChargeDelegate">
+    <constructor-arg name="chargeDao" ref="chargeDao"/>
+    <constructor-arg name="chargeInstanceFactory" ref="chargeInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+
+  <bean id="courtCaseDelegate" class="omis.courtcase.service.delegate.CourtCaseDelegate">
+  	<constructor-arg name="courtCaseDao" ref="courtCaseDao"/>
+  	<constructor-arg name="courtCaseInstanceFactory" ref="courtCaseInstanceFactory"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="courtCaseNoteDelegate" class="omis.courtcase.service.delegate.CourtCaseNoteDelegate">
+  	<constructor-arg name="courtCaseNoteDao" ref="courtCaseNoteDao"/>
+  	<constructor-arg name="courtCaseNoteInstanceFactory" ref="courtCaseNoteInstanceFactory"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Instance Factories -->
+  
+  <bean id="courtCaseInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCase"/>
+  </bean>
+
+  <bean id="chargeInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.Charge"/>
+  </bean>
+  
+  <bean id="courtCaseNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCaseNote"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="courtCaseDao" class="omis.courtcase.dao.impl.hibernate.CourtCaseDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCase"/>
+  </bean>
+  
+  <bean id="chargeDao" class="omis.courtcase.dao.impl.hibernate.ChargeDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.Charge"/>
+  </bean>
+  
+   <bean id="courtCaseNoteDao" class="omis.courtcase.dao.impl.hibernate.CourtCaseNoteDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCaseNote"/>
+  </bean>
+
+  <!-- Property editor factories -->
+  
+  <bean id="courtCasePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCase"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="courtCaseDao"/>
+  </bean>
+
+  <bean id="chargePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcase.domain.Charge"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="chargeDao"/>
+  </bean>
+  
+  <bean id="courtCaseNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcase.domain.CourtCaseNote"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="courtCaseNoteDao"/>
+  </bean>
+  
+</beans>

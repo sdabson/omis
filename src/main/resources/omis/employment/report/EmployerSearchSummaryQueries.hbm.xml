@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  <hibernate-mapping package="omis.offender.report">
+  <query name="findEmployerCitiesByState"><![CDATA[
+  	select cities
+  		from omis.region.domain.City cities
+  		inner join cities.state state
+  		where 
+  			state = :state
+  		order by cities.name, state.name
+  ]]></query>
+  <query name="findAllStates"><![CDATA[
+ 	select states
+ 		from omis.region.domain.State states
+		order by states.name  
+  ]]></query>
+  <query name="searchForEmployer"><![CDATA[
+  	select new omis.employment.report.EmployerSearchSummary(
+  		employerLocationOrganization.name, locationAddress, (select count(*)
+  					from omis.employment.domain.EmploymentTerm term
+  					right outer join term.job.employer termEmployer    							
+  					where termEmployer = employer	
+  					and ((term.dateRange.startDate is null or term.dateRange.startDate <= :effectiveDate)
+					and (term.dateRange.endDate is null or term.dateRange.endDate > :effectiveDate))
+  					group by term.offender)		
+  	)
+  		from
+  			omis.employment.domain.Employer employer
+  			inner join employer.location location
+  			inner join location.organization employerLocationOrganization
+  			inner join location.address locationAddress
+  			inner join locationAddress.zipCode zipCode
+  			inner join zipCode.city employerCity
+  			inner join employerCity.state employerState  					
+  		where
+  			((upper(employerLocationOrganization.name) 
+  				like upper(:employerLocationOrganizationName || '%' ) 
+  					or :employerLocationOrganizationName is null)
+  			and (employerCity = :city or :city is null)
+  			and ((employerState = :state  and :city is null) or :state is null)))			
+  ]]></query>
+  </hibernate-mapping>

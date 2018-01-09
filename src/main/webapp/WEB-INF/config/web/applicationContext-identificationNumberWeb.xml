@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Web configuration for identification numbers.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+	
+	
+	<bean id="identificationNumberCategorySummaryReportService"
+		class="omis.identificationnumber.report.impl.hibernate.IdentificationNumberCategorySummaryReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- Validators -->
+	
+	<bean id="identificationNumberFormValidator" class="omis.identificationnumber.web.validator.IdentificationNumberFormValidator">
+		<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+	</bean>
+	
+	<bean id="identificationNumberCategoryFormValidator" class="omis.identificationnumber.web.validator.IdentificationNumberCategoryFormValidator" />
+	
+	<!-- Component scanner -->
+	
+	<context:component-scan base-package="omis.identificationnumber.web.controller"/>
+	
+	<!-- Transaction configurations -->
+
+	<aop:config>
+		<aop:pointcut id="manageIdentificationNumberControllerOperation" expression="execution(* omis.identificationnumber.web.controller.ManageIdentificationNumberController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageIdentificationNumberControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="reportIdentificationNumberControllerOperation" expression="execution(* omis.identificationnumber.web.controller.ReportIdentificationNumberController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportIdentificationNumberControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="manageIdentificationNumberCategoryControllerOperation" expression="execution(* omis.identificationnumber.web.controller.ManageIdentificationNumberCategoryController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageIdentificationNumberCategoryControllerOperation"/>
+	</aop:config>
+	
+	<!-- Profile items -->
+	
+	<bean id="identificationNumberProfileItem" class="omis.identificationnumber.web.profile.IdentificationNumberProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>ADMIN</value>
+				<value>IDENTIFICATION_NUMBER_LIST</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/identificationNumber/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="identificationNumbers"/>
+		<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+		<constructor-arg name="identificationNumberProfileItemReportService" ref="identificationNumberProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${identificationNumberProfileItemEnabled}"/>
+	</bean>
+	
+	<!-- Summary Item -->
+	<bean id="identificationNumberSummaryItem"
+		class="omis.identificationnumber.web.summary.IdentificationNumberSummaryItem">
+		<constructor-arg name="identificationNumberSummaryItemReportService" ref="identificationNumberSummaryItemReportService"/>
+		<constructor-arg name="summaryItemRegistry" ref="identificationNumbersSummaryItemRegistry"/>
+		<constructor-arg name="includedPageName" value="/WEB-INF/views/identificationNumber/summary/includes/summaryItem.jsp"/>
+		<constructor-arg name="order" value="0"/>
+		<constructor-arg name="enabled" value="${identificationNumberSummaryItemEnabled}"/>
+	</bean>
+
+</beans>

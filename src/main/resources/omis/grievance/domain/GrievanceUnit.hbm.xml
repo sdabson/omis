@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<class entity-name="omis.grievance.domain.GrievanceUnit"
+		proxy="omis.grievance.domain.GrievanceUnit"
+		name="omis.grievance.domain.impl.GrievanceUnitImpl"
+		table="`GRIEVANCE_UNIT`">
+		<cache usage="transactional" region="grievance"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`GRIEVANCE_UNIT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+	</class>
+	<query name="findGrievanceUnits" cacheable="true" cache-region="grievance"><![CDATA[
+		from
+			omis.grievance.domain.GrievanceUnit unit
+		where
+			unit.valid = true
+		order by unit.sortOrder
+	]]></query>
+	<query name="findGrievanceUnit" cacheable="true" cache-region="grievance"><![CDATA[
+		select unit
+		from omis.grievance.domain.GrievanceUnit unit
+		where unit.name = :name
+	]]></query>
+</hibernate-mapping>

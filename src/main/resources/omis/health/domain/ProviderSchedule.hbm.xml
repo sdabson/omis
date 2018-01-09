@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderSchedule"
+		proxy="omis.health.domain.ProviderSchedule"
+		name="omis.health.domain.impl.ProviderScheduleImpl"
+		table="`PROVIDER_SCHEDULE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROVIDER_SCHEDULE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ProviderAssignment" unique="true"/>
+		<component name="sundayTimeRange">
+					<property name="startDate" column="`SUNDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`SUNDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="mondayTimeRange">
+					<property name="startDate" column="`MONDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`MONDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="tuesdayTimeRange">
+					<property name="startDate" column="`TUESDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`TUESDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="wednesdayTimeRange">
+					<property name="startDate" column="`WEDNESDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`WEDNESDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="thursdayTimeRange">
+					<property name="startDate" column="`THURSDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`THURSDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="fridayTimeRange">
+					<property name="startDate" column="`FRIDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`FRIDAY_END_TIME`" not-null="false"/>
+		</component>
+		<component name="saturdayTimeRange">
+					<property name="startDate" column="`SATURDAY_START_TIME`" not-null="false"/>
+					<property name="endDate" column="`SATURDAY_END_TIME`" not-null="false"/>
+		</component>
+	</class>
+	<query name="findProviderSchedule"><![CDATA[
+		from
+			omis.health.domain.ProviderSchedule schedule
+		where
+			schedule.providerAssignment = :providerAssignment
+	]]></query>
+</hibernate-mapping>

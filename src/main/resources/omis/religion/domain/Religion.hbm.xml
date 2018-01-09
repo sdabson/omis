@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.religion.domain">
+	<class entity-name="omis.religion.domain.Religion"
+	       proxy="omis.religion.domain.Religion"
+	       name="omis.religion.domain.impl.ReligionImpl"
+	       table="`RELIGION`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`RELIGION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+		<many-to-one name="group" entity-name="omis.religion.domain.ReligionGroup" not-null="true" column="`GROUP_ID`"/>
+	</class>
+	<query name="findReligions"><![CDATA[
+		select religion from omis.religion.domain.Religion religion
+		order by religion.sortOrder, religion.name
+	]]></query>
+	<query name="findReligion"><![CDATA[
+		select religion 
+		from omis.religion.domain.Religion religion
+		where
+			religion.name = :name
+		and
+			religion.group = :group
+	]]></query>
+	<query name="findReligionExcluding"><![CDATA[
+		select religion 
+		from omis.religion.domain.Religion religion
+		where
+			religion.name = :name
+		and
+			religion.group = :group
+		and
+			religon <> :excludedReligion
+	]]></query>
+</hibernate-mapping>

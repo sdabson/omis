@@ -1,0 +1,24 @@
+#toolBoxItems {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+}
+
+#toolBoxItems>li {
+	border: solid 2px;
+	margin: 0px;
+	padding: 0px;
+}
+
+.toolBoxItemLink {
+	border-bottom: solid 1px;
+	display: block;
+}
+
+.toolBoxItemLink:hover {
+	text-decoration: none;
+}
+
+.toolBoxItemContent {
+	
+}

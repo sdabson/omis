@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.IntakePhysical"
+		proxy="omis.health.domain.IntakePhysical"
+		name="omis.health.domain.impl.IntakePhysicalImpl"
+		table="`INTAKE_PHYSICAL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INTAKE_PHYSICAL_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offenderAppointmentAssociation" column="`OFFENDER_APPT_ASSOC_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.OffenderAppointmentAssociation" unique="false"/>
+		<property name="kept" column="`KEPT`" not-null="false" type="yes_no"/>
+		<property name="timeKept" column="`TIME_KEPT`" not-null="false" type="date"/>
+		<property name="rescheduleRequired" column="`RESCHEDULE_REQUIRED`" not-null="false" type="yes_no"/>
+		<property name="notes" column="`NOTES`" not-null="false" type="string"/>
+		<many-to-one name="actionRequest" column="`ACTION_REQUEST_ID`" cascade="none" not-null="false"
+			entity-name="omis.health.domain.HealthRequest" unique="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+</hibernate-mapping>

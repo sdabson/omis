@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.conviction.domain">
+	<class	entity-name="omis.conviction.domain.Conviction"
+			proxy="omis.conviction.domain.Conviction"
+			name="omis.conviction.domain.impl.ConvictionImpl"
+			table="`CONVICTION`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`CONVICTION_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<properties name="uniqueConviction">
+			<many-to-one name="offense" column="`OFFENSE_ID`" not-null="true"
+		             entity-name="omis.offense.domain.Offense"/>
+			<many-to-one name="courtCase" column="`COURT_CASE_ID`" not-null="true"
+		          entity-name="omis.courtcase.domain.CourtCase"/>
+		</properties>
+		<property name="counts" column="`COUNTS`" not-null="true"/>
+		<property name="date" column="`DATE`" not-null="true"/>
+		<property name="severity" column="`SEVERITY`" not-null="false">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.conviction.domain.OffenseSeverity</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<component name="flags" class="omis.conviction.domain.component.ConvictionFlags">
+			<property name="violentOffense" column="`VIOLENT_OFFENSE`" not-null="true" type="yes_no"/>
+			<property name="sexualOffense" column="`SEXUAL_OFFENSE`" not-null="true" type="yes_no"/>
+			<property name="paroleIneligible" column="`PAROLE_INELIGIBLE`" not-null="true" type="yes_no"/>
+			<property name="supervisedReleaseIneligible" column="`SUPERVISED_RELEASE_INELIGIBLE`" not-null="true" type="yes_no"/>
+		</component>
+	</class>
+	<query name="findConvictionsByCourtCase"><![CDATA[
+		select conviction from omis.conviction.domain.Conviction conviction
+		where conviction.courtCase = :courtCase
+		order by conviction.date, conviction.offense.name, conviction.counts
+	]]></query>
+	<query name="countConvictionsByCourtCase"><![CDATA[
+		select count(conviction)
+		from omis.conviction.domain.Conviction as conviction
+		where conviction.courtCase = :courtCase
+	]]></query>
+	<query name="findConviction"><![CDATA[
+		from omis.conviction.domain.Conviction conviction
+		where 
+			conviction.courtCase = :courtCase
+		and
+			conviction.offense = :offense
+	]]></query>	
+	<query name="findConvictionExcluding"><![CDATA[
+		from omis.conviction.domain.Conviction conviction
+		where 
+			conviction.courtCase = :courtCase
+		and
+			conviction.offense = :offense
+		and 
+			conviction <> :excludedConviction
+	]]></query>	
+</hibernate-mapping>

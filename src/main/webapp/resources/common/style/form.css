@@ -1,0 +1,325 @@
+/*
+ * Form styling.
+ *
+ * Author: Ryan Johns, Stephen Abson, Joel Norris
+ * Version: 0.1.1 (May 21, 2015)
+ */
+
+/* Container for all edit screen elements. */
+div.editScreenContainer {
+	position: relative;
+	padding: 0px;
+}
+
+
+div.editScreenContainer h1 {
+	margin: 0px;
+}
+
+/* Form. */
+form.editForm {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 25px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-top: 0px;
+	border-width: 0px;
+}
+
+/* Field sets. */
+form.editForm fieldset {
+	padding: 23px;
+	margin: 2px;
+	border-width: 2px;
+	border-style: solid;
+	margin-bottom: 12px;
+	clear: left;
+	
+}
+
+form.editForm fieldset legend {
+	padding: 5px;
+	padding-left: 9px;
+	padding-right: 9px;
+}
+
+/* Form labels and values. */
+form.editForm span.fieldGroup label.fieldLabel,
+form.editForm span.fieldGroup input.fieldOption {
+  float: left;
+  clear: both;
+  text-align: right;
+}
+
+form.editForm span.fieldGroup label.fieldLabel {
+  width: 20%;
+  margin-right: 2%;
+}
+
+form.editForm span.fieldGroup input.fieldOption {
+  width: 6%;
+  margin-left: 16%;
+}
+
+form.editForm input.offender_autocomplete {
+	width: 250px;
+}
+
+form.editForm input,
+form.editForm select,
+form.editForm textarea {
+	vertical-align: top;
+}
+
+form.editForm span.fieldGroup input,
+form.editForm span.fieldGroup select,
+form.editForm span.fieldGroup textarea {
+	float: left;
+	max-width: 60%;
+}
+
+/* Edit form value labels (for checkboxs, radio buttons, etc) */
+form.editForm span.fieldGroup label.fieldValueLabel {
+	float: left;
+}
+form.editForm span.fieldGroup label.fieldLabel {
+	display: inline-block;
+}
+form.editForm span.fieldGroup input[type=radio].fieldValue + label,
+form.editForm span.fieldGroup input[type=checkbox].fieldValue + label {
+	float:left;
+}
+/* Edit form values (inputs, textareas, etc) */
+form.editForm span.fieldGroup textarea {
+  height: 4em;
+}
+form.editForm span.fieldGroup textarea {
+  width: 54em;
+}
+
+form.editForm span.fieldGroup input.addressValue {
+	width: 28em;
+} 
+
+/* form.editForm table.editTable thead.notes tr th.note tbody tr.supervisionHistoryNoteItemRow {
+  width: 96em;
+}
+ */
+/* These should be moved to module specific styling (SA - Feb 22, 2013) */
+form.editForm input.phone{
+	width:11ex;
+}
+form.editForm input.areaCode {
+	width:4ex;
+}
+form.editForm input.state {
+	width:3ex;
+}
+form.editForm input.zipCode{
+	width:6ex;
+}
+
+/* Form elements groups by containers (spans and ps). */
+form.editForm span.nowrap {
+	white-space: nowrap;
+}
+
+form.editForm span.fieldGroup span.checkbox > span:first-child {
+	display: block;
+	width:  100%;
+	clear: right;
+	margin-left: 5px;
+}
+		
+form.editForm span.fieldGroup span.checkbox > span  {
+	display: inline-block;
+	margin: 0px;
+	padding: 0px;
+	min-width: 150px;
+}
+form.editForm span.fieldGroup, form.editForm p.buttons {
+	display: inline-block;
+	width: 100%;
+}
+
+form.editForm span.fieldGroup.hidden {
+	display: none;
+}
+
+p.buttons > button[type="submit"], p.buttons > input[type="submit"] {
+    float: right;
+    margin-right: 20px;
+}
+
+/* Text input sizes. */
+form.editForm input[type=text].date, input[type=text].date,
+form.editForm input[type=text].time, input[type=text].time {
+	width: 6em;
+}
+
+form.editForm input[type=text].noteDate, input[type=text].date {
+	width: 10em;
+}
+
+form.editForm input[type=text].dateTime, input[type=text].dateTime {
+	width: 14em;
+}
+form.editForm input[type=text].small, input[type=text].small {
+	width: 12em;
+}
+form.editForm input[type=text].medium, input[type=text].medium {
+	width: 24em;
+}
+form.editForm input[type=text].large, input[type=text].large {
+	width: 32em;
+}
+form.editForm input[type=text].veryShortNumber {
+	width: 4em;
+}
+form.editForm input[type=text].shortNumber {
+	width: 6em;
+}
+form.editForm input[type=text].mediumNumber {
+	width: 11em;
+}
+form.editForm input[type=text].longNumber {
+	width: 14em;
+}
+
+/* Errors. */
+form.editForm span.groupError {
+	display: block;
+	width: 320px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+form.editForm span.error {
+	float: left;
+}
+
+/* Tables in forms. */
+form.editForm table.editTable {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+form.editForm table.editTable thead tr th {
+	text-align: left;
+}
+
+form.editForm table.editTable thead.notes tr th.date {
+	width: 56px;
+}
+
+form.editForm table.editTable thead tr th.operations {
+	width: 64px;
+}
+
+form.editForm table.editTable td, form.editForm table.editTable tr,
+form.editForm table.editTable th, form.editForm table.editTable {
+	border-width: 0px;
+	border-style: solid;
+	padding: 2px;
+	margin: 0px;
+	text-align:left;
+}
+
+/* Links for fields. */
+form.editForm a.fieldLink {
+	float: left;
+}
+
+/* Edit table. */
+form.editForm table.editTable span.editTableFieldGroup {
+	display: inline-block;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+form.editForm table.editTable span.editTableFieldGroup label.fieldLabel {
+	float: left;
+	clear: both;
+	width: 40%;
+}
+
+form.editForm table.editTable span.editTableFieldGroup label.fieldValueLabel {
+	float: left;
+}
+
+form.editForm table.editTable span.editTableFieldGroup span.error {
+	float: left;
+	clear: both;
+	padding-left: 40%;
+}
+
+form.editForm table.editTable span.editTableFieldGroup input,
+form.editForm table.editTable span.editTableFieldGroup select,
+form.editForm table.editTable span.editTableFieldGroup textarea {
+	float: left; 
+}
+
+form.editForm table.editTable span.editTableFieldGroup textarea,
+form.editForm table.editTable span.editTableFieldGroup span.error {
+	width: 98%;
+}
+
+form.editForm table.editTable tbody tr.removeRow, form.editForm fieldset div.removeSection {
+	background: hsla(355, 100%, 50%, 0.3);
+}
+
+form.editForm table.editTable tbody td.threeColumn {
+	width: 32%;
+	vertical-align: top;
+}
+
+form.editForm table.editTable tbody td.twoColumn {
+	width: 49%;
+	vertical-align: top;
+}
+
+form.editForm table.editTable tbody tr td textarea {
+	width: 95%;
+}
+
+form.editForm p.information {
+	margin: 2px;
+	padding: 2px;
+}
+
+form.editForm p.information span.fieldLabel {
+	width: 20%;
+	margin-right: 2%;
+	float: left;
+	text-align: right;
+}
+
+form.editForm select, form select {
+    padding-right: 22px;
+    min-width: 90px;      
+    text-indent: 0.01px;
+    text-overflow: ""; 
+}
+
+form select::-ms-expand {
+	display:none;
+}
+
+form.editForm span.characterCounter{
+	display: inline-block;
+}
+
+/* jQuery UI styling */
+ul.ui-autocomplete {
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+div.actionList {
+	max-height: 200px;
+	overflow-y: arrow;
+}

@@ -1,0 +1,36 @@
+/*
+ * Bed placement summary styling.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (December 12, 2017)
+ * Since: OMIS 3.0
+ */
+ 
+ span.summarySection {
+ 	display: block;
+ }
+ 
+ span.summarySection span.summarySubSection {
+	display: inline-block;
+  	vertical-align: top;
+  	width: 24.5%;
+  	margin: 3px 0px 3px 0px;
+  	word-wrap: break-word;
+ }
+ 
+ span.summarySection span.subSectionLine {
+ 	display: block;
+ }
+ 
+ span.summarySection span.subSectionLine span.lineCell {
+ 	display: inline-block;
+  	vertical-align: top;
+  	width: 24.5%;
+  	margin: 3px 0px 3px 0px;
+  	word-wrap: break-word;
+ }
+ 
+ span.summarySection label.subSectionLabel {
+ 	display: block;
+ 	font-weight: bold;
+ }

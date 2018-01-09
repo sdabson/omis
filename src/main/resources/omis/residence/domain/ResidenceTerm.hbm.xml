@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.residence.domain">
+	<typedef name="residenceCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.residence.domain.ResidenceCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<typedef name="residenceStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.residence.domain.ResidenceStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.residence.domain.ResidenceTerm"
+		proxy="omis.residence.domain.ResidenceTerm"
+		name="omis.residence.domain.impl.ResidenceTermImpl"
+		table="`RESIDENCE_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`RESIDENCE_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" column="`PERSON_ID`" not-null="true" entity-name="omis.person.domain.Person" unique="false"/>
+		<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" not-null="false" type="java.util.Date"/>
+				<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<many-to-one name="address" column="`ADDRESS_ID`" not-null="true" entity-name="omis.address.domain.Address" unique="false"/>
+		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="boolean"/>
+		<property name="category" column="`CATEGORY`" not-null="true" type="residenceCategory"/>
+		<property name="status" column="`STATUS`" not-null="true" type="residenceStatus"/>
+		<property name="notes" column="`NOTES`" not-null="false" type="text"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<component name="verificationSignature" class="omis.audit.domain.VerificationSignature">
+			<property name="result" type="yes_no" not-null="false" column="`VERIFICATION_RESULT`"/>
+			<many-to-one name="method" entity-name="omis.audit.domain.VerificationMethod" not-null="false" column="`VERIFICATION_METHOD_ID`"/>
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
+		</component>
+	</class>
+
+<!-- find resdienceTerm by person -->
+	<query name="findResidenceTerm"><![CDATA[
+	select residenceTerm
+	from 
+		omis.residence.domain.ResidenceTerm residenceTerm
+	where 
+		residenceTerm.person = :person
+	and
+		(residenceTerm.dateRange.startDate = :startDate
+		or
+		(residenceTerm.dateRange.startDate is null and :startDate is null))
+	and 
+		(residenceTerm.dateRange.endDate = :endDate
+		or
+		(residenceTerm.dateRange.endDate is null and :endDate is null))	
+	and
+		residenceTerm.address = :address
+	and 
+		residenceTerm.category = :category
+	and
+		residenceTerm.status = :status
+	
+	]]></query>
+<!-- 	find residenceTerm by person excluding the one in view -->
+	<query name="findResidenceTermExcluding"><![CDATA[
+	select residenceTerm
+	from omis.residence.domain.ResidenceTerm residenceTerm
+	where 
+		residenceTerm.person = :person
+	and 
+		(residenceTerm.dateRange.startDate = :startDate
+		or
+		(residenceTerm.dateRange.startDate is null and :startDate is null))
+	and 
+		(residenceTerm.dateRange.endDate = :endDate
+		or
+		(residenceTerm.dateRange.endDate is null and :endDate is null))
+	and 
+		residenceTerm.address = :address	
+	and 
+		residenceTerm.category = :category	
+	and 
+		residenceTerm.status = :status
+	and
+		residenceTerm != :residenceTerm	
+	]]></query>
+<!-- 	find locations within dateRange of this residenceTerm excluding the one in view -->
+<!-- 	 select the locations from this residence term where this residence term's
+		location is within the date range of this residence terms date range 
+		excluding the residence term being passed in -->
+ 	<query name="findRTLocationsWithinDateRangeExcluding"><![CDATA[
+	select location
+		from omis.location.domain.Location location,
+		 	omis.residence.domain.ResidenceTerm residenceTerm
+		 	join location.address lAddress
+		 	join residenceTerm.address rtAddress
+		where
+			lAddress = :rtAddress
+		and
+			((residenceTerm.dateRange.startDate >= :startDate
+			and
+				(residenceTerm.dateRange.startDate <= :endDate
+				or 
+				:endDate is null))
+		or
+			((residenceTerm.dateRange.startDate <= :startDate)
+			and
+				(:startDate <= residenceTerm.dateRange.endDate
+				or
+				residenceTerm.dateRange.endDate is null)))	
+		and residenceTerm != :residenceTerm
+	]]></query>
+<!--	find locations within dateRange of this residenceTerm
+	 select the locations from this residence term where this residence term's
+		location is within the date range of this residence terms date range -->
+	<query name="findRTLocationsWithinDateRange"><![CDATA[
+	select location
+		from omis.location.domain.Location location,
+			omis.residence.domain.ResidenceTerm residenceTerm
+			join location.address lAddress
+			join residenceTerm.address rtAddress		
+		where
+			lAddress = :rtAddress
+		and
+			((residenceTerm.dateRange.startDate >= :startDate
+			and
+				(residenceTerm.dateRange.startDate <= :endDate
+				or 
+				:endDate is null))
+		or
+			((residenceTerm.dateRange.startDate <= :startDate)
+			and
+				(:startDate <= residenceTerm.dateRange.endDate
+				or
+				residenceTerm.dateRange.endDate is null)))	
+	]]></query>	
+<!--	find list of residenceTerms by person -->
+	<query name="findResidenceTermsByPerson"><![CDATA[
+	from
+		omis.residence.domain.ResidenceTerm residenceTerm
+	where
+		residenceTerm.person = :person
+	and
+			(residenceTerm.dateRange.startDate <= :endDate
+			or
+			residenceTerm.dateRange.endDate is null or :endDate is null)
+	and
+			(residenceTerm.dateRange.endDate > :startDate
+			or
+			residenceTerm.dateRange.endDate is null or :startDate is null)
+	]]></query>
+<!--	find list of residenceTerms by person and dateRange, excluding the one in view -->
+	<query name="findResidenceTermsByPersonExcluding"><![CDATA[
+	from
+		omis.residence.domain.ResidenceTerm residenceTerm
+	where
+		residenceTerm.person = :person 
+	and
+			(residenceTerm.dateRange.startDate <= :endDate
+			or
+			residenceTerm.dateRange.endDate is null)
+	and
+			(residenceTerm.dateRange.endDate > :startDate
+			or
+			residenceTerm.dateRange.endDate is null or :startDate is null)
+	and residenceTerm.address = :address
+	and 
+		residenceTerm != :residenceTerm		
+	]]></query>
+	 <query name="findResidenceTermByPersonOnDate"><![CDATA[
+		from
+			omis.residence.domain.ResidenceTerm residenceTerm
+		where
+			residenceTerm.person = :person
+		and
+			residenceTerm.category = :category
+		and
+			residenceTerm.dateRange.startDate <= :date
+		and
+			(residenceTerm.dateRange.endDate > :date
+			or
+			residenceTerm.dateRange.endDate is null)
+	]]></query>
+<!--	find residence term based on status, category, and effective date -->
+	<query name="findResidenceTermByEffectiveDate"><![CDATA[
+		select residenceTerm
+		from 
+			omis.residence.domain.ResidenceTerm residenceTerm
+		where
+			residenceTerm.person = :person
+		and 
+			residenceTerm.category = :category
+		and 
+			residenceTerm.status = :status
+		and 
+			((residenceTerm.dateRange.startDate is null or residenceTerm.dateRange.startDate <= :effectiveDate)
+ 			and (residenceTerm.dateRange.endDate is null or residenceTerm.dateRange.endDate > :effectiveDate))
+ 		order by residenceTerm.dateRange.endDate			
+	]]></query> 
+	<query name="findResidenceTermsAssociatedWithPerson"><![CDATA[
+		from 
+			omis.residence.domain.ResidenceTerm residenceTerm
+		where
+			residenceTerm.person = :person
+		and
+				(residenceTerm.dateRange.startDate <= :endDate
+				or
+				residenceTerm.dateRange.startDate is null or :endDate is null)
+		and
+				(residenceTerm.dateRange.endDate > :startDate
+				or
+				residenceTerm.dateRange.endDate is null or :startDate is null)
+	]]></query>
+	<query name="findResidenceCountByOffenderAndDate"><![CDATA[
+		select count(residenceTerm.id)
+		  from omis.residence.domain.ResidenceTerm residenceTerm
+		 where residenceTerm.person = :offender
+		   and ((residenceTerm.dateRange.startDate <= :effectiveDate
+		       or residenceTerm.dateRange.startDate is null)
+		   and (residenceTerm.dateRange.endDate > :effectiveDate
+		       or residenceTerm.dateRange.endDate is null))
+	]]></query>
+	<query name="findResidenceTermsByOffender"><![CDATA[
+		from omis.residence.domain.ResidenceTerm term
+			where
+				term.person = :offender
+				and 
+				(term.dateRange.startDate <= :date
+				and (term.dateRange.endDate > :date
+				or term.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Joel Norris, Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<typedef name="healthRequestCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.HealthRequestCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<typedef name="healthRequestStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.HealthRequestStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.health.domain.HealthRequest"
+		proxy="omis.health.domain.HealthRequest"
+		name="omis.health.domain.impl.HealthRequestImpl"
+		table="`HEALTH_REQUEST`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`HEALTH_REQUEST_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="unqiueHealthRequest">
+		  <many-to-one name="facility" entity-name="omis.facility.domain.Facility" not-null="true" column="`FACILITY_ID`"/>
+		  <many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			    entity-name="omis.offender.domain.Offender" unique="false"/>
+	      <property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+	      <property name="category" column="`CATEGORY`" not-null="true" type="healthRequestCategory"/>
+	      <property name="status" column="`STATUS`" not-null="true" type="healthRequestStatus"/>
+		</properties>
+		<property name="labsRequired" column="`LABS_REQUIRED`" not-null="false" type="yes_no"/>
+		<property name="asap" column="`ASAP`" not-null="true" type="yes_no"/>
+		<many-to-one name="providerLevel" column="`PROVIDER_LEVEL_ID`" not-null="false" entity-name="omis.health.domain.ProviderLevel"/>
+		<property name="notes" column="`NOTES`" type="java.lang.String" not-null="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findHealthRequest"><![CDATA[
+	  select healthRequest from omis.health.domain.HealthRequest healthRequest
+	   where healthRequest.offender = :offender
+	     and healthRequest.facility = :facility
+	     and healthRequest.date = :date
+	     and healthRequest.category = :category
+	     and healthRequest.status = :status
+	]]></query>
+		<query name="findHealthRequestExcluding"><![CDATA[
+	  select healthRequest from omis.health.domain.HealthRequest healthRequest
+	   where healthRequest.offender = :offender
+	     and healthRequest.facility = :facility
+	     and healthRequest.date = :date
+	     and healthRequest.category = :category
+	     and healthRequest.status = :status
+	     and healthRequest <> :excludedHealthRequest
+	]]></query>
+</hibernate-mapping>

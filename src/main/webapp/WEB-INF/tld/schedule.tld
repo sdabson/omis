@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Scheduling tags.
+  -
+  - Author: Stephen Abspm
+  - Version: 0.1.0 (Oct 30, 2013)
+  - Since: OMIS 3.0 
+  -->
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+				http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+		version="2.0">
+	<tlib-version>1.0</tlib-version>
+	<short-name>omis-schedule</short-name>
+	<tag>
+		<description>
+			HTML schedule allowing custom control over the displaying
+			of the events.
+		</description>
+		<name>calendar</name>
+		<tag-class>omis.schedule.web.taglib.CalendarTag</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<description>
+				ID of calendar
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Class of calendar
+			</description>
+			<name>className</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Event variable name
+			</description>
+			<name>var</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Event items to display in calendar
+			</description>
+			<name>items</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Date range to display (daily view type only)
+			</description>
+			<name>dateRange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>omis.datatype.DateRange</type>
+		</attribute>
+		<attribute>
+			<description>
+				In hourly (daily and weekly) views, range of time to display
+			</description>
+			<name>timeRange</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>omis.datatype.DateRange</type>
+		</attribute>
+		<attribute>
+			<description>
+				Current date of calendar
+			</description>
+			<name>date</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.util.Date</type>
+		</attribute>
+		<attribute>
+			<description>
+				View type as which to display calendar
+			</description>
+			<name>viewType</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Pattern for dates, date labels and date headers
+			</description>
+			<name>datePattern</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Pattern for times, time labels and time headers
+			</description>
+			<name>timePattern</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Class for times, time labels and time headers
+			</description>
+			<name>timeClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Class for dates, date labels and date headers 
+			</description>
+			<name>dateClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Class for data content
+			</description>
+			<name>dataClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>
+				Interval
+			</description>
+			<name>interval</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>

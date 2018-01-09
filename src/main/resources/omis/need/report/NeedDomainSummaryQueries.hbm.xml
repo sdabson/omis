@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.need.domain">	
+	<query name="summarizeNeedDomainsByOffender"><![CDATA[
+		select new omis.need.report.NeedDomainSummary(
+				needDomain.id,
+				needDomain.name,
+			 	sum(case
+			 		when
+			 			offender = :offender
+			 		then
+			 			1
+			 		else
+			 			0
+			 	end),
+			 	'',
+			 	needDomain.criminogenic
+		)
+		from
+			omis.need.domain.CasePlanObjective objective
+			right outer join objective.offender offender
+			right outer join objective.domain needDomain
+		group by
+			needDomain.id, needDomain.name, needDomain.criminogenic 
+		order by
+			needDomain.name
+	]]></query>
+</hibernate-mapping>

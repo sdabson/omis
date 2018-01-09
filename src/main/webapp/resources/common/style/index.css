@@ -1,0 +1,75 @@
+/*
+ * Home/index page styling.
+ * Author: Stephen Abson, Ryan Johns
+ * Version: 0.1.1 (Feb 14, 2013)
+ */
+
+/* Set minimum width for body. Should fit roughly on a 1024x768 screen. */
+body {
+	min-width: 1016px;
+}
+
+/* Header. */
+div.header {
+    border-radius: 5px 5px 5px 5px;
+    height: 24px;
+    margin: 0px;
+    padding: 0px;
+}
+
+div.menu {
+	border-radius: 0px 0px 5px 5px;
+	margin: 0px;
+  padding: 0px;
+  top: 0px;
+}
+
+/* Special application toolbar. */
+ul.applicationToolbar {
+	padding: 1px;
+	top:9px;
+  left: 10px;
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+}
+
+ul.applicationToolbar li {
+	display: inline;
+	padding: 2px;
+}
+
+ul.applicationToolbar li a {
+	border-width: 1px;
+	border-style: solid;
+}
+
+/* Current user. */
+div.user {
+  position:absolute;
+  text-align: right;
+  right: 32px;
+  margin: 0px;
+  padding: 0px;
+}
+
+span#userDetails {
+	vertical-align: bottom;
+}
+
+/* Toolbar icons */
+a.logoutLink:before {
+	content: url('../images/logout.png');
+}
+
+a.offenderProfile:before {
+	content: url('../images/offenderProfile.png');
+}
+
+a.logoutLink:before, a.offenderProfile:before {
+	vertical-align: -50%;
+}
+
+input.offenderSearch {
+	width:  74px;
+}

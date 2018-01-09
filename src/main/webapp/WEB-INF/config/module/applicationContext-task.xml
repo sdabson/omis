@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Task configuration.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+	<!-- Services -->
+
+	<bean id="taskInvocationService" class="omis.task.service.impl.TaskInvocationServiceImpl">
+		<constructor-arg name="taskParameterValueDelegate" ref="taskParameterValueDelegate"/>
+	</bean>
+	
+	<!-- Report services -->
+	
+	<bean id="taskReportService" class="omis.task.report.impl.hibernate.TaskReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- Delegates -->
+	
+	<bean id="taskParameterValueDelegate" class="omis.task.service.delegate.TaskParameterValueDelegate">
+		<constructor-arg name="taskParameterValueInstanceFactory" ref="taskParameterValueInstanceFactory"/>
+		<constructor-arg name="taskParameterValueDao" ref="taskParameterValueDao"/>
+	</bean>
+
+	<bean id="taskAssignmentDelegate" class="omis.task.service.delegate.TaskAssignmentDelegate">
+		<constructor-arg name="taskAssignmentInstanceFactory" ref="taskAssignmentInstanceFactory"/>
+		<constructor-arg name="taskAssignmentDao" ref="taskAssignmentDao"/>
+	</bean>
+
+	<bean id="taskDelegate" class="omis.task.service.delegate.TaskDelegate">
+		<constructor-arg name="taskInstanceFactory" ref="taskInstanceFactory"/>
+		<constructor-arg name="taskDao" ref="taskDao"/>
+	</bean>
+	
+	<bean id="taskTemplateDelegate" class="omis.task.service.delegate.TaskTemplateDelegate">
+		<constructor-arg name="taskTemplateDao" ref="taskTemplateDao" />
+		<constructor-arg name="taskTemplateInstanceFactory" ref="taskTemplateInstanceFactory" />
+	</bean>
+	
+	<bean id="taskTemplateParameterValueDelegate" class="omis.task.service.delegate.TaskTemplateParameterValueDelegate">
+		<constructor-arg name="taskTemplateParameterValueInstanceFactory" ref="taskTemplateParameterValueInstanceFactory"/>
+		<constructor-arg name="taskTemplateParameterValueDao" ref="taskTemplateParameterValueDao"/>
+	</bean>
+	
+	<bean id="taskTemplateGroupDelegate" class="omis.task.service.delegate.TaskTemplateGroupDelegate">
+		<constructor-arg name="taskTemplateGroupDao" ref="taskTemplateGroupDao" />
+		<constructor-arg name="taskTemplateGroupInstanceFactory" ref="taskTemplateGroupInstanceFactory" />
+	</bean>
+	
+	<!-- Data access objects -->
+	
+	<bean id="taskParameterValueDao" class="omis.task.dao.impl.hibernate.TaskParameterValueDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskParameterValue"/>
+	</bean>
+	
+	<bean id="taskAssignmentDao" class="omis.task.dao.impl.hibernate.TaskAssignmentDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskAssignment"/>
+	</bean>
+
+	<bean id="taskDao" class="omis.task.dao.impl.hibernate.TaskDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.task.domain.Task"/>
+	</bean>
+	
+	<bean id="taskTemplateDao" class="omis.task.dao.impl.hibernate.TaskTemplateDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplate" />
+	</bean>
+	
+	<bean id="taskTemplateParameterValueDao" class="omis.task.dao.impl.hibernate.TaskTemplateParameterValueDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplateParameterValue"/>
+	</bean>
+	
+	<bean id="taskTemplateGroupDao" class="omis.task.dao.impl.hibernate.TaskTemplateGroupDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplateGroup" />
+	</bean>
+	
+	<!-- Instance factories -->
+	
+	<bean id="taskInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.task.domain.Task"/>
+	</bean>
+
+	<bean id="taskParameterValueInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskParameterValue"/>
+	</bean>
+	
+	<bean id="taskAssignmentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskAssignment"/>
+	</bean>
+	
+	<bean id="taskTemplateInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplate" />
+	</bean>
+
+	<bean id="taskTemplateParameterValueInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplateParameterValue"/>
+	</bean>
+	
+	<bean id="taskTemplateGroupInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.task.domain.TaskTemplateGroup" />
+	</bean>
+	
+	<!-- Property editor factories -->
+	
+	<bean id="taskPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="taskDao"/>
+		<constructor-arg name="entityName" value="omis.task.domain.Task"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<bean id="taskAssignmentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="taskAssignmentDao" />
+			<constructor-arg name="entityName"
+				value="omis.task.domain.TaskAssignment" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+	
+</beans>

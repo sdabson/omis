@@ -1,0 +1,15 @@
+/*
+ * Styling for court cases.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (July 7, 2013)
+ * Since: OMIS 3.0
+ */
+
+a.sentenceLink:before {
+	content: url('../../sentence/images/sentence.png');
+}
+
+a.offenseDetailsLink {
+	display: inline-block;
+}

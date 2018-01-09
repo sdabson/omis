@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+ <!-- DAOs -->
+  
+  <bean name="employmentTermDao" class="omis.employment.dao.impl.hibernate.EmploymentTermDaoHibernateImpl">
+ 	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentTerm"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="employmentNoteDao" class="omis.employment.dao.impl.hibernate.EmploymentNoteDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentNote"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="employmentChangeReasonDao" class="omis.employment.dao.impl.hibernate.EmploymentChangeReasonDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentChangeReason"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="employerDao" class="omis.employment.dao.impl.hibernate.EmployerDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.employment.domain.Employer"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="employerDelegate"
+        class="omis.employment.service.delegate.EmployerDelegate">
+    <constructor-arg name="employerDao" ref="employerDao"/>
+    <constructor-arg name="employerInstanceFactory" ref="employerInstanceFactory"/>
+  </bean>
+  
+  <bean id="employmentTermDelegate"
+        class="omis.employment.service.delegate.EmploymentTermDelegate">
+    <constructor-arg name="employmentTermDao" ref="employmentTermDao"/>
+    <constructor-arg name="employmentTermInstanceFactory" ref="employmentTermInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="employmentChangeReasonDelegate"
+        class="omis.employment.service.delegate.EmploymentChangeReasonDelegate">
+    <constructor-arg name="employmentChangeReasonDao" ref="employmentChangeReasonDao"/>
+    <constructor-arg name="employmentChangeReasonInstanceFactory" ref="employmentChangeReasonInstanceFactory"/>
+  </bean>
+        
+  <bean id="employmentNoteDelegate"
+        class="omis.employment.service.delegate.EmploymentNoteDelegate">
+    <constructor-arg name="employmentNoteDao" ref="employmentNoteDao"/>
+    <constructor-arg name="employmentNoteInstanceFactory" ref="employmentNoteInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+ <!-- Property editor factories -->
+    <bean id="employmentTermPropertyEditorFactory"
+    	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    	<constructor-arg name="dao" ref="employmentTermDao"/>
+    	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentTerm"/>
+    	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    </bean>
+ 
+	<bean id="employmentNotePropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="employmentNoteDao"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentNote"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+     <bean id="employmenChangeReasonPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="employmentChangeReasonDao"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentChangeReason"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+     <bean id="employerPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="employerDao"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.Employer"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+
+<!-- Employment related services -->
+ 
+ <bean id="employmentService"
+ 		class="omis.employment.service.impl.EmploymentServiceImpl">
+   		<constructor-arg name="employmentTermDelegate" ref="employmentTermDelegate"/>
+   		<constructor-arg name="employmentNoteDelegate" ref="employmentNoteDelegate"/>
+   		<constructor-arg name="endReasonDelegate" ref="employmentChangeReasonDelegate"/>
+   		<constructor-arg name="employerDelegate" ref="employerDelegate"/>
+   		<constructor-arg name="organizationDelegate" ref="organizationDelegate"/>
+   		<constructor-arg name="locationDelegate" ref="locationDelegate"/>
+   		<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+   		<constructor-arg name="verificationMethodDelegate" ref="verificationMethodDelegate"/>
+   		<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+   		<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+   		<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+   		<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+ </bean>
+ 
+ <bean id="changeEmployerService"
+ 		class="omis.employment.service.impl.ChangeEmployerServiceImpl">
+   		<constructor-arg name="employmentTermDelegate" ref="employmentTermDelegate"/>
+   		<constructor-arg name="employerDelegate" ref="employerDelegate"/>
+   		<constructor-arg name="organizationDelegate" ref="organizationDelegate"/>
+   		<constructor-arg name="locationDelegate" ref="locationDelegate"/>
+   		<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+   		<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+   		<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+   		<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+   		<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+ </bean>
+ 
+ <bean id="employmentReportService" class="omis.employment.report.impl.hibernate.EmploymentReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <bean id="employerReportService" class="omis.employment.report.impl.hibernate.EmployerReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <!-- Report Services -->
+ <bean id="employmentProfileItemReportService" class="omis.employment.report.impl.hibernate.EmploymentProfileItemReportServiceHibernateImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <bean id="employmentSummaryItemReportService" class="omis.employment.report.impl.hibernate.EmploymentSummaryItemReportServiceHibernateImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <bean id="employerSummaryReportService" class="omis.employment.report.impl.hibernate.EmployerSearchSummaryReportServiceHibernateImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+  
+  <!-- Instance factories -->
+  <bean name="employmentTermInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentTerm"/>
+  </bean>
+  
+  <bean name="employmentNoteInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentNote"/>
+  </bean>
+  
+  <bean name="endReasonInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentChangeReason"/>
+  </bean>
+  
+  <bean name="employerInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.Employer"/>
+  </bean>
+  
+  <bean name="employmentChangeReasonInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.employment.domain.EmploymentChangeReason"/>
+  </bean>
+	
+</beans>

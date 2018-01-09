@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Mapping and queries for relationship notes.
+  -
+  - Author: Stephen Abson
+  - Author: Yidong Li
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.relationship.domain">
+
+	<!-- Maps class. -->
+	<class entity-name="omis.relationship.domain.RelationshipNote"
+		proxy="omis.relationship.domain.RelationshipNote"
+		name="omis.relationship.domain.impl.RelationshipNoteImpl"
+		table="`RELATIONSHIP_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`RELATIONSHIP_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueRelationshipNote">
+			<many-to-one name="relationship" entity-name="omis.relationship.domain.Relationship" not-null="true" column="`RELATIONSHIP_ID`"/>
+			<many-to-one name="category" entity-name="omis.relationship.domain.RelationshipNoteCategory" not-null="true" column="CATEGORY_ID"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+	</class>
+	
+	<!-- Returns relationship note by business key. -->
+	<query name="findRelationshipNote"><![CDATA[
+      select note
+      from omis.relationship.domain.RelationshipNote note
+      where note.relationship = :relationship
+        and note.category = :category
+        and note.date = :date
+        and note.value = :value
+	]]></query>
+	
+	<!-- Returns relationship note by business key with notes excluded. -->
+	<query name="findRelationshipNoteExcluding"><![CDATA[
+      select note
+      from omis.relationship.domain.RelationshipNote note
+      where note.relationship = :relationship
+        and note.category = :category
+        and note.date = :date
+        and note.value = :value
+        and note not in (:excludedNotes)
+	]]></query>
+	
+	<query name="findRelationshipNotesByRelationship"><![CDATA[
+      select note
+      from omis.relationship.domain.RelationshipNote note
+      where note.relationship = :relationship
+		order by note.date
+	]]></query>
+</hibernate-mapping>

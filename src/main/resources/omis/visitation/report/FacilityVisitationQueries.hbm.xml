@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.visitation.report">
+	
+	<query name="findVisitingOffendersByLocationOnDate"><![CDATA[
+		select
+			distinct offender
+		from
+			omis.visitation.domain.Visit visit
+			inner join visit.visitationAssociation va
+			inner join va.relationship relationship
+			inner join relationship.firstPerson offender
+			inner join visit.location location
+		where
+			location = :location
+		and
+			trunc(visit.dateRange.startDate) = trunc(:date)
+	]]></query>
+	
+	<query name="findMugShotIdByOffender"><![CDATA[
+		select photo.id
+		from omis.offenderphoto.domain.OffenderPhotoAssociation association
+		right outer join association.person person
+ 		left outer join association.photo photo
+           where person = :offender
+             and association.profile = 'Y'
+	]]></query>
+</hibernate-mapping>

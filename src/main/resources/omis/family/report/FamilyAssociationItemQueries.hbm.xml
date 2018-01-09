@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Yidong Li
+ - Date:   June 22, 2015
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.family.report">
+	<query name="findFamilyAssociationSummaryByOffender"><![CDATA[
+    select new omis.family.report.FamilyAssociationSummary(
+    	familyAssociation,
+    	(
+		    select mailingAddress
+		    from omis.contact.domain.Contact contact
+		      inner join contact.mailingAddress mailingAddress
+		    where contact.person = familyMember
+		  ),
+		  (
+		    select telephoneNumber
+		    from omis.contact.domain.TelephoneNumber telephoneNumber
+		      inner join telephoneNumber.contact contact
+		    where contact.person = familyMember and telephoneNumber.primary = true
+		  ),
+		  (
+		    select offender
+		    from omis.offender.domain.Offender offender
+		    where offender = familyMember
+		  )
+		)
+    from
+    	omis.family.domain.FamilyAssociation familyAssociation
+    	left outer join familyAssociation.relationship relationship
+    	left outer join relationship.secondPerson familyMember
+    where relationship.firstPerson = :offender
+    order by familyMember.name.lastName, familyMember.name.firstName
+	]]></query>
+	<query name="findFamilyCountByOffenderAndDate"><![CDATA[
+		select count(familyAssociation.id)
+		  from omis.family.domain.FamilyAssociation familyAssociation
+		  left outer join familyAssociation.relationship relationship
+		  where relationship.firstPerson = :offender
+		   and ((familyAssociation.dateRange.startDate is null 
+		   		or familyAssociation.dateRange.startDate <= :effectiveDate)
+		   		and (familyAssociation.dateRange.endDate is null
+		   		or familyAssociation.dateRange.endDate >= :effectiveDate))
+	]]></query>
+</hibernate-mapping>

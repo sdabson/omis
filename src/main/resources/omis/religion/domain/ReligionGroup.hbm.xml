@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.religion.domain">
+	<class entity-name="omis.religion.domain.ReligionGroup"
+	       proxy="omis.religion.domain.ReligionGroup"
+	       name="omis.religion.domain.impl.ReligionGroupImpl"
+	       table="`RELIGION_GROUP`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`RELIGION_GROUP_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+	</class>
+	<query name="findReligionGroup"><![CDATA[
+		select religionGroup
+		from omis.religion.domain.ReligionGroup religionGroup
+		where
+			religionGroup.name = :name
+	]]></query>
+	<query name="findReligionGroupExcluding"><![CDATA[
+		select religionGroup
+		from omis.religion.domain.ReligionGroup religionGroup
+		where
+			religionGroup.name = :name
+		and
+			religionGroup <> :excludedReligionGroup
+	]]></query>
+</hibernate-mapping>

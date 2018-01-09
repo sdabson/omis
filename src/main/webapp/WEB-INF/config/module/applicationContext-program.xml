@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    
+    <!-- Services -->
+    
+    <bean id="programPlacementService" class="omis.program.service.impl.ProgramPlacementServiceImpl">
+    	<constructor-arg name="programPlacementDelegate" ref="programPlacementDelegate"/>
+    	<constructor-arg name="placementTermDelegate" ref="placementTermDelegate"/>
+    	<constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
+    	<constructor-arg name="programDelegate" ref="programDelegate"/>
+    </bean>
+    
+    <!-- Report services -->
+    
+    <bean id="programPlacementReportService" class="omis.program.report.impl.hibernate.ProgramPlacementReportServiceHibernateImpl">
+      <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <bean id="programPlacementProfileItemService" class="omis.program.report.impl.hibernate.ProgramPlacementProfileItemServiceImpl">
+      <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	</bean>
+    
+	<!-- Delegates -->
+	
+	<bean id="programPlacementDelegate"
+	      class="omis.program.service.delegate.ProgramPlacementDelegate">
+	  <constructor-arg name="programPlacementInstanceFactory" ref="programPlacementInstanceFactory"/>
+	  <constructor-arg name="programPlacementDao" ref="programPlacementDao"/>
+	  <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+	
+	<bean id="programSupervisoryOrganizationOfferDelegate"
+	      class="omis.program.service.delegate.ProgramSupervisoryOrganizationOfferDelegate">
+      <constructor-arg name="programSupervisoryOrganizationOfferDao" ref="programSupervisoryOrganizationOfferDao"/>
+    </bean>
+	
+	<bean id="programLocationOfferDelegate"
+	      class="omis.program.service.delegate.ProgramLocationOfferDelegate">
+      <constructor-arg name="programLocationOfferDao" ref="programLocationOfferDao"/>
+    </bean>
+	
+	<bean id="programDelegate"
+	      class="omis.program.service.delegate.ProgramDelegate">
+	  <constructor-arg name="programDao" ref="programDao"/>
+	  <constructor-arg name="programInstanceFactory" ref="programInstanceFactory"/>
+	</bean>
+	
+	<!-- Instance factories. -->
+	
+	<bean id="programPlacementInstanceFactory"
+	      class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	  <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.ProgramPlacement"/>
+	</bean>
+	
+	<bean id="programInstanceFactory"
+	      class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	  <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.Program"/>
+	</bean>
+	
+	<!-- Data access objects -->
+	
+	<bean id="programPlacementDao"
+	      class="omis.program.dao.impl.hibernate.ProgramPlacementDaoHibernateImpl">
+	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.ProgramPlacement"/>
+	</bean>
+	
+	<bean id="programDao"
+	      class="omis.program.dao.impl.hibernate.ProgramDaoHibernateImpl">
+	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.Program"/>
+	</bean>
+	
+	<bean id="programSupervisoryOrganizationOfferDao"
+	      class="omis.program.dao.impl.hibernate.ProgramSupervisoryOrganizationOfferDaoHibernateImpl">
+	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.ProgramSupervisoryOrganizationOffer"/>
+	</bean>
+	
+	<bean id="programLocationOfferDao"
+	      class="omis.program.dao.impl.hibernate.ProgramLocationOfferDaoHibernateImpl">
+	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  <constructor-arg name="entityName" value="omis.program.domain.ProgramLocationOffer"/>
+	</bean>
+    
+    <!-- Property editor factories -->
+    
+    <bean id="programPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+   		<constructor-arg name="dao" ref="programDao"/>
+   		<constructor-arg name="entityName" value="omis.program.domain.Program"/>
+   		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    </bean>
+
+    <bean id="programPlacementPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+   		<constructor-arg name="dao" ref="programPlacementDao"/>
+   		<constructor-arg name="entityName" value="omis.program.domain.ProgramPlacement"/>
+   		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    </bean>
+    
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.physicalfeature.domain">
+	<class entity-name="omis.physicalfeature.domain.PhysicalFeature"
+		proxy="omis.physicalfeature.domain.PhysicalFeature"
+		name="omis.physicalfeature.domain.impl.PhysicalFeatureImpl"
+		table="`PHYSICAL_FEATURE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PHYSICAL_FEATURE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="featureClassification" not-null="true" column="`CLASSIFICATION_ID`"
+			entity-name="omis.physicalfeature.domain.FeatureClassification" />
+		<property name="name" not-null="true" column="`NAME`"
+			type="java.lang.String"/>
+		<property name="valid" column="`VALID`"
+			type="yes_no" not-null="false"/>
+	</class>
+	<query name="findPhysicalFeatureByClassification"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeature feature
+		where
+			feature.featureClassification = :featureClassification
+		and
+			feature.valid = true
+		order by
+			name asc
+	]]></query>
+	<query name="findPhysicalFeatures"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeature feature
+		where
+			feature.valid = true
+		order by
+			featureClassification.name asc, name asc
+	]]></query>
+	<query name="findPhysicalFeatureCountByOffender"><![CDATA[
+		 select count(feature.id)
+		   from omis.physicalfeature.domain.PhysicalFeatureAssociation physicalFeatureAssociation
+left outer join physicalFeatureAssociation.feature feature
+		  where physicalFeatureAssociation.offender = :offender
+	]]></query>
+</hibernate-mapping>

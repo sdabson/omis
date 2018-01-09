@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substancetest.domain">
+	<class entity-name="omis.substancetest.domain.LabResult"
+			proxy="omis.substancetest.domain.LabResult"
+			name="omis.substancetest.domain.impl.LabResultImpl"
+			table="`LAB_RESULT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`LAB_RESULT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="substance" column="`SUBSTANCE_ID`"
+				not-null="true" />
+			<many-to-one name="substanceTest" column="`SUBSTANCE_TEST_ID`"
+				not-null="true" />
+			<many-to-one name="value" column="`VALUE_ID`"
+				not-null="true" />
+	</class>
+	<query name="findLabResultBySubstanceTest"><![CDATA[
+		from
+			omis.substancetest.domain.LabResult result
+		where
+			result.substanceTest = :substanceTest
+	]]></query>
+	<query name="removeLabResultBySubstanceTestExcluding"><![CDATA[
+		delete 
+			LabResult result 
+		where 
+			result.substanceTest = :substanceTest
+		and
+			result not in (:results)
+	]]></query>
+	<query name="findLabResult"><![CDATA[
+		from
+			omis.substancetest.domain.LabResult result
+		where
+			result.substanceTest = :substanceTest
+		and
+			result.substance = :substance
+	]]></query>
+	<query name="findLabResultExcluding"><![CDATA[
+		from
+			omis.substancetest.domain.LabResult result
+		where
+			result.substanceTest = :substanceTest
+		and
+			result.substance = :substance
+		and
+			result <> :labResult
+	]]></query>
+	<query name="removeLabResultsBySubstanceTest"><![CDATA[
+		delete 
+			LabResult result 
+		where 
+			result.substanceTest = :substanceTest
+	]]></query>
+</hibernate-mapping>

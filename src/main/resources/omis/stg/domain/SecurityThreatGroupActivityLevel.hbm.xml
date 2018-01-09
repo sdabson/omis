@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<class	entity-name="omis.stg.domain.SecurityThreatGroupActivityLevel"
+			proxy="omis.stg.domain.SecurityThreatGroupActivityLevel"
+			name="omis.stg.domain.impl.SecurityThreatGroupActivityLevelImpl"
+			table="`STG_ACTIVITY_LEVEL`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STG_ACTIVITY_LEVEL_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="string" not-null="true" unique="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>		   
+	</class>
+	<query name="findSecurityThreatGroupActivityLevels"><![CDATA[
+		select securityThreatGroupActivityLevel
+		from omis.stg.domain.SecurityThreatGroupActivityLevel securityThreatGroupActivityLevel
+		order by securityThreatGroupActivityLevel.name
+	]]></query>
+	<query name="findSecurityThreatGroupActivityLevel"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupActivityLevel securityThreatGroupActivityLevel
+		where
+			securityThreatGroupActivityLevel.name = :name
+	]]></query>
+	<query name="findSecurityThreatGroupActivityLevelExcluding"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupActivityLevel securityThreatGroupActivityLevel
+		where
+			securityThreatGroupActivityLevel.name = :name
+		and
+			securityThreatGroupActivityLevel <> :excludedActivityLevel
+	]]></query>
+</hibernate-mapping>

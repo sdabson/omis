@@ -1,0 +1,37 @@
+#feeRequirementsListTable tr:nth-child(even) td {
+	background-color: #B7DDE8;
+}
+
+#feeRequirementsListTable tr:nth-child(odd) td {
+	background-color: #FFFFFF;
+} 
+
+#feeRequirementsListTable th {
+	font-style: italic;
+}
+
+#feeRequirementsListTable td {	
+	font-size: 11px;
+}
+
+#feeRequirementsListTable tr:hover td {
+	background-color: #E6E6FA;
+}
+
+#feeRequirementsListTable th.reason {
+	text-align: left;
+	table-layout: fixed;
+	width: 25rem;
+}
+
+#feeRequirementsListTable th.authority {
+	text-align: left;
+	table-layout: fixed;
+	width: 15rem;
+}
+
+#monthlySupervisionFeeListTable td.comment {
+	text-wrap: normal;
+	table-layout: fixed;
+	width: 25rem;
+}

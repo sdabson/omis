@@ -1,0 +1,10 @@
+/*
+ * Styling for convictions.
+ *
+ * Author: Josh Divine
+ * Version: 0.1.0 (June 8, 2017)
+ * Since: OMIS 3.0
+ */
+a.offenseDetailsLink {
+	display: inline-block;
+}

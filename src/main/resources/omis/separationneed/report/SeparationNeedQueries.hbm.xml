@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Joel Norris
+ - Author: Stephen Abson
+ - Version: 0.1.1  (May 4, 2017)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.separationneed.domain">
+
+<query name="summarizeSeparationNeedsByOffenderOnDate"><![CDATA[
+	select new omis.separationneed.report.SeparationNeedSummary(
+		separationNeed.id,
+		secondPerson.id,
+		firstPerson.id,
+		(select concat(bp.bed.room.facility.name, ' ', bp.bed.room.unit.name) from omis.bedplacement.domain.BedPlacement bp
+			where
+				bp.offender = secondPerson
+			and 
+				(bp.dateRange.startDate < :date and (bp.dateRange.endDate is null or bp.dateRange.endDate > :date))),
+		(select concat(bp.bed.room.facility.name, ' ', bp.bed.room.unit.name) from omis.bedplacement.domain.BedPlacement bp
+			where
+				bp.offender = firstPerson
+			and 
+				(bp.dateRange.startDate < :date and (bp.dateRange.endDate is null or bp.dateRange.endDate > :date))),
+  	secondPersonName.firstName,
+    secondPersonName.lastName,
+    substring(secondPersonName.middleName, 0, 1),
+    (select targetOffender.offenderNumber from omis.offender.domain.Offender targetOffender
+     where targetOffender.id = secondPerson.id),
+    firstPersonName.firstName,
+    firstPersonName.lastName,
+    substring(firstPersonName.middleName, 0, 1),
+    (select subjectOffender.offenderNumber from omis.offender.domain.Offender subjectOffender
+     where subjectOffender.id = firstPerson.id),
+    separationNeed.date,
+    separationNeed.removal.date,
+    case
+		when
+				
+				((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
+                                    from omis.offender.domain.Offender firstOffender
+                                   where firstOffender = firstPerson)) as string) = 'SEC')
+				and (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
+                                    from omis.offender.domain.Offender secondOffender
+                                   where secondOffender = secondPerson)) as string) = 'SEC'))                                  
+		then
+			true
+		else
+			false
+		end,
+    separationNeed.creationComment)
+  from omis.separationneed.domain.SeparationNeed separationNeed
+    left join separationNeed.relationship relationship
+    left join relationship.firstPerson firstPerson
+    left join firstPerson.name firstPersonName
+    left join relationship.secondPerson secondPerson
+    left join secondPerson.name secondPersonName
+  where firstPerson = :offender
+  or secondPerson = :offender
+  order by separationNeed.date
+]]></query>
+</hibernate-mapping>

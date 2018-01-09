@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearing.report">
+	<query name="findHearingProfileItemSummaryByOffender"><![CDATA[
+		select new omis.hearing.report.HearingProfileItemSummary(
+			sum(case
+					when
+						(status.category = 'HELD' or status.category = 'DISMISSED'
+						or status.category = 'UPHELD' or status.category = 'MODIFIED')
+					then
+						1
+					else
+						0
+				end),
+			sum(case
+					when
+						(status.category = 'PENDING' or status.category = 'DELAYED')
+					then
+						1
+					else
+						0
+				end))
+		from
+			omis.hearing.domain.HearingStatus status
+		right outer join
+			status.hearing.subject.offender offender
+		where
+			status.date =
+			(select
+				max(status2.date)
+			from
+				omis.hearing.domain.HearingStatus status2
+			where
+				status2.hearing = status.hearing
+			group by
+				status2.hearing)
+		and
+			offender = :offender
+	]]></query>
+</hibernate-mapping>

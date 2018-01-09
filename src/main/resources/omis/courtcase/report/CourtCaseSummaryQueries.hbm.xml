@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcase.report">
+	<query name="findCourtCaseByDefendant"><![CDATA[
+		 select new omis.courtcase.report.CourtCaseSummary(
+			    courtCase.id,
+			    defendant.id,
+			    defendantName.firstName,
+			    defendantName.lastName,
+			    defendantName.middleName,
+			    defendantName.suffix,
+			    case when (select count(*) from omis.offender.domain.Offender offender where offender = defendant) > 0 then true else false end as defendantOffender,
+			    (select offender.offenderNumber from omis.offender.domain.Offender offender where offender = defendant) as defendantOffenderNumber,
+			    state,
+			    courtCase.interStateNumber,
+			    court.name,
+			    courtCase.docket.value,
+			    courtCase.pronouncementDate,
+			    courtCase.sentenceReviewDate,
+			    case when judge.id is not null then true else false end as judge,
+			    judge.id,
+			    judgeName.firstName,
+			    judgeName.lastName,
+			    judgeName.middleName,
+			    judgeName.suffix,
+			    courtCase.personnel.defenseAttorneyName,
+			    courtCase.personnel.prosecutingAttorneyName,
+			    courtCase.jurisdictionAuthority,
+			    courtCase.dangerDesignator,
+			    courtCase.flags.criminallyConvictedYouth,
+			    courtCase.flags.youthTransfer,
+			    courtCase.flags.dismissed,
+			    courtCase.flags.convictionOverturned,
+			    courtCase.comments,
+			    (select count(charge.id) from omis.courtcase.domain.Charge charge where charge.courtCase = courtCase) as charges,
+			    (select count(conviction.id) from omis.conviction.domain.Conviction conviction where conviction.courtCase = courtCase) as convictions)
+		 from omis.courtcase.domain.CourtCase courtCase
+		 left outer join courtCase.docket.person defendant
+		 left outer join defendant.name defendantName
+		 left outer join courtCase.personnel.judge judge
+		 left outer join judge.name judgeName
+		 left outer join courtCase.docket.court court
+		 left outer join courtCase.interState state
+		 where courtCase.docket.person = :defendant
+		 order by courtCase.pronouncementDate, courtCase.docket.value 
+	]]></query>
+</hibernate-mapping>

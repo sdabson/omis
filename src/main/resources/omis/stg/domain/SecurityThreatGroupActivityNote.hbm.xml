@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+<class entity-name="omis.stg.domain.SecurityThreatGroupActivityNote"
+		proxy="omis.stg.domain.SecurityThreatGroupActivityNote"
+		name="omis.stg.domain.impl.SecurityThreatGroupActivityNoteImpl"
+		table="`STG_ACTIVITY_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`STG_ACTIVITY_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="value" column="`VALUE`" not-null="true" type="string"/>
+		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+		<many-to-one name="activity" column="`ACTIVITY_ID`" cascade="none" not-null="true"
+			entity-name="omis.stg.domain.SecurityThreatGroupActivity" unique="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+ 	<query name="findActivityNotes"><![CDATA[
+ 		from 
+ 			omis.stg.domain.SecurityThreatGroupActivityNote activityNote 
+ 		where 
+ 			activityNote.activity = :activity 
+ 	]]></query> 
+ 	<query name="findActivityNote"><![CDATA[
+ 		from 
+ 			omis.stg.domain.SecurityThreatGroupActivityNote activityNote 
+ 		where 
+ 			activityNote.activity = :activity
+ 		and
+ 			activityNote.date = :date 
+ 		and 
+ 			activityNote.value = :value
+ 	]]></query> 
+ 	<query name="findExcludingActivityNote"><![CDATA[ 
+ 		from 
+ 			omis.stg.domain.SecurityThreatGroupActivityNote activityNote 
+ 		where 
+ 			activityNote.date = :date 
+ 		and 
+ 			activityNote.value = :value 
+ 		and 
+ 			activityNote <> :excludedNote 
+ 	]]></query> 
+	</hibernate-mapping>

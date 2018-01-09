@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Queries to summary offender relationships.
+ - 
+ - Author: Joel Norris
+ - Author: Stephen Abson
+ - Author: Yidong Li
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offenderrelationship.report">
+	<query name="summarizeCriminalAssociationsByOffender"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipsSummary(
+			association.id,
+			secondPerson.id,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			category.name,
+			'',
+			'')
+		from
+			omis.criminalassociation.domain.CriminalAssociation association
+			left outer join association.criminalAssociationCategory category
+			left outer join association.relationship relationship
+			left outer join relationship.secondPerson secondPerson
+			left outer join secondPerson.name name
+		where
+			relationship.firstPerson = :offender
+	]]></query>
+	<query name="summarizeFamilyAssociationsByOffender"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipsSummary(
+			association.id,
+			secondPerson.id,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			category.name,
+			'',
+			'')
+		from
+			omis.family.domain.FamilyAssociation association
+			left outer join association.category category
+			left outer join association.relationship relationship
+			left outer join relationship.secondPerson secondPerson
+			left outer join secondPerson.name name
+		where
+			relationship.firstPerson = :offender
+	]]></query>
+	<query name="summarizeVictimAssociationsByOffender"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipsSummary(
+			association.id,
+			secondPerson.id,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			'',
+			'',
+			'')
+		from
+			omis.victim.domain.VictimAssociation association
+			left outer join association.relationship relationship
+			left outer join relationship.secondPerson secondPerson
+			left outer join secondPerson.name name
+		where
+			relationship.firstPerson = :offender
+	]]></query>
+	<query name="summarizeVisitationAssociationsByOffender"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipsSummary(
+			association.id,
+			secondPerson.id,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			category.name,
+			'',
+			'')
+		from
+			omis.visitation.domain.VisitationAssociation association
+			left outer join association.category category
+			left outer join association.relationship relationship
+			left outer join relationship.secondPerson secondPerson
+			left outer join secondPerson.name name
+		where
+			relationship.firstPerson = :offender
+	]]></query>
+	<!--
+	  - Leave the following in when OffenderRelationshipsSummary and related
+	  - queries are removed - SA
+	  -->
+	<query name="summarizeOffenderRelationshipsByFirstNameLastNameExact"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		where upper(personName.lastName) like upper(:lastName || '%')
+			and upper(personName.firstName) like upper(:firstName || '%')
+		order by personName.lastName, personName.firstName
+	]]></query>
+	<query name="summarizeOffenderRelationshipsByOffenderNumber"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			offender,
+			offender,
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = offender
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = offender
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = offender
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = offender
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = offender
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = offender
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = offender
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.offender.domain.Offender as offender
+			inner join offender.name as offenderName
+			left outer join offender.identity as offenderIdentity
+		where offender.offenderNumber = :offenderNumber
+		order by offenderName.lastName, offenderName.firstName, offenderIdentity.birthDate
+	]]></query>
+	<query name="summarizeOffenderRelationshipsBySocialSecurityNumber"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			inner join person.identity as personIdentity
+		where personIdentity.socialSecurityNumber = :socialSecurityNumber
+		order by personName.lastName, personName.firstName, personIdentity.birthDate
+	]]></query>
+	<query name="summarizeOffenderRelationshipsByBirthDate"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			inner join person.identity as personIdentity
+		where personIdentity.birthDate = :birthDate
+		order by personName.lastName, personName.firstName, personIdentity.birthDate
+	]]></query>
+	<query name="findOffenderRelationSummaryByOffender"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationSummary(
+			firstPerson,
+			secondPerson,
+			(select familyAssociation
+				from omis.family.domain.FamilyAssociation as familyAssociation
+				inner join familyAssociation.relationship as familyAssociationRelationship
+				where familyAssociationRelationship = relationship
+				and ((familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is null)
+				  		or (familyAssociation.dateRange.startDate is not null and familyAssociation.dateRange.startDate<=:effectiveDate
+				  			and familyAssociation.dateRange.endDate is not null and familyAssociation.dateRange.endDate>=:effectiveDate)  
+				  		or (familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is not null
+				  			and familyAssociation.dateRange.endDate >=:effectiveDate)  
+				  		or (familyAssociation.dateRange.endDate is null and familyAssociation.dateRange.startDate is not null
+				  			and familyAssociation.dateRange.startDate <=:effectiveDate))
+			),
+			(select victimAssociation
+				from omis.victim.domain.VictimAssociation as victimAssociation
+				inner join victimAssociation.relationship as victimAssociationRelationship
+				where victimAssociationRelationship = relationship
+			),
+			(select visitationAssociation
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+				inner join visitationAssociation.relationship as visitationAssociationRelationship
+				where (visitationAssociationRelationship = relationship
+				and ((visitationAssociation.dateRange.startDate is null and visitationAssociation.dateRange.endDate is null)
+				  		or (visitationAssociation.dateRange.startDate is not null and visitationAssociation.dateRange.startDate<=:effectiveDate
+				  			and visitationAssociation.dateRange.endDate is not null and visitationAssociation.dateRange.endDate>=:effectiveDate)  
+				  		or (visitationAssociation.dateRange.startDate is null and visitationAssociation.dateRange.endDate is not null
+				  			and visitationAssociation.dateRange.endDate >=:effectiveDate)  
+				  		or (visitationAssociation.dateRange.endDate is null and visitationAssociation.dateRange.startDate is not null
+				  			and visitationAssociation.dateRange.startDate <=:effectiveDate))
+					)
+			),	
+			(select offender from omis.offender.domain.Offender offender where offender = secondPerson),
+			relationship
+		)
+		from omis.relationship.domain.Relationship relationship
+			inner join relationship.firstPerson firstPerson
+			inner join firstPerson.name firstPersonName
+			inner join relationship.secondPerson secondPerson
+			inner join secondPerson.name secondPersonName
+			left outer join firstPerson.identity as firstPersonIdentity
+			left outer join secondPerson.identity as secondPersonIdentity
+			where firstPerson = :offender
+		order by secondPersonName.lastName, secondPersonName.firstName, secondPersonIdentity.birthDate
+	]]></query>
+		
+	<query name="countApproximateByFirstNameAndLastName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		WHERE (utl_match.JARO_WINKLER_SIMILARITY(upper(personName.lastName), upper(:lastName)) >= 75
+		   AND utl_match.JARO_WINKLER_SIMILARITY(upper(personName.firstName), upper(:firstName)) >= 75)
+	]]></query>
+	
+	<query name="countExactByFirstNameAndLastName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		where upper(personName.lastName) like upper( :lastName || '%')
+			and upper(personName.firstName) like upper( :firstName || '%')
+		]]></query>
+	
+	<query name="summarizeOffenderRelationshipsByFirstNameLastNameAppropximate"><![CDATA[
+	select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		WHERE (utl_match.JARO_WINKLER_SIMILARITY(upper(personName.lastName), upper(:lastName)) >= 75
+		   AND utl_match.JARO_WINKLER_SIMILARITY(upper(personName.firstName), upper(:firstName)) >= 75)
+		order by personName.lastName, personName.firstName
+	]]></query>
+	
+	<query name="countApproximateByLastName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(personName.lastName), upper(:lastName)) >= 75
+	]]></query>
+	
+	<query name="countApproximateByFirstName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(personName.firstName), upper(:firstName)) >= 75
+	]]></query>
+	
+	<query name="countExactByFirstName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		where upper(personName.firstName) like upper( :firstName || '%')
+	]]></query>
+	
+	<query name="countExactByLastName"><![CDATA[
+		select count(person)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+		where upper(personName.lastName) like upper( :lastName || '%')
+	]]></query>
+	
+	<query name="summarizeOffenderRelationshipsByFirstNameExact"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		where upper(personName.firstName) like upper(:firstName || '%')
+		order by personName.lastName, personName.firstName
+	]]></query>
+	
+	<query name="summarizeOffenderRelationshipsByLastNameExact"><![CDATA[
+		select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		where upper(personName.lastName) like upper(:lastName || '%')
+		order by personName.lastName, personName.firstName
+	]]></query>
+	
+	<query name="summarizeOffenderRelationshipsByFirstNameAppropximate"><![CDATA[
+	select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(personName.firstName), upper(:firstName)) >= 75
+		order by personName.lastName, personName.firstName 
+	]]></query>
+	
+	<query name="summarizeOffenderRelationshipsByLastNameAppropximate"><![CDATA[
+	select new omis.offenderrelationship.report.OffenderRelationshipSummary(
+			person.id, personName.lastName, personName.firstName, personName.middleName,
+			personName.suffix, personIdentity.birthDate, personIdentity.sex, 
+			personIdentity.socialSecurityNumber,
+			(
+				select offender.offenderNumber from
+				omis.offender.domain.Offender as offender
+				where offender = person
+			),
+			(
+				select count(offenderRelationship)
+				from omis.relationship.domain.Relationship as offenderRelationship
+					inner join offenderRelationship.firstPerson as offenderRelationshipFirstPerson
+					inner join offenderRelationship.secondPerson as offenderRelationshipSecondPerson,
+					omis.offender.domain.Offender as offenderRelationshipOffender
+				where offenderRelationshipFirstPerson = offenderRelationshipOffender
+					and offenderRelationshipSecondPerson = person
+			),
+			(
+				select count(criminalAssociation)
+				from omis.criminalassociation.domain.CriminalAssociation as criminalAssociation
+					inner join criminalAssociation.relationship as criminalAssociationRelationship
+					inner join criminalAssociationRelationship.firstPerson as criminalAssociate
+				where criminalAssociate = person
+					and (criminalAssociation.dateRange.endDate is null 
+						or criminalAssociation.dateRange.endDate > :effectiveDate)
+		 			and (criminalAssociation.dateRange.startDate is null 
+			 			or criminalAssociation.dateRange.startDate <= :effectiveDate)
+
+			),
+			(
+				select count(familyAssociation)
+				from omis.family.domain.FamilyAssociation as familyAssociation
+					inner join familyAssociation.relationship as familyAssociationRelationship
+					inner join familyAssociationRelationship.firstPerson as familyMember
+				where familyMember = person
+					and (familyAssociation.dateRange.endDate is null 
+						or familyAssociation.dateRange.endDate > :effectiveDate)
+		 			and (familyAssociation.dateRange.startDate is null 
+			 			or familyAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select count(victimAssociation)
+				from omis.victim.domain.VictimAssociation as victimAssociation
+					inner join victimAssociation.relationship as victimAssociationRelationship
+					inner join victimAssociationRelationship.firstPerson as victim
+				where victim = person
+			),
+			(
+				select count(visitationAssociation)
+				from omis.visitation.domain.VisitationAssociation as visitationAssociation
+					inner join visitationAssociation.relationship as visitationAssociationRelationship
+					inner join visitationAssociationRelationship.firstPerson as visitor
+				where visitor = person
+					and (visitationAssociation.dateRange.endDate is null 
+						or visitationAssociation.dateRange.endDate > :effectiveDate)
+		 			and (visitationAssociation.dateRange.startDate is null 
+			 			or visitationAssociation.dateRange.startDate <= :effectiveDate)
+			),
+			(
+				select mailingAddress
+				from omis.contact.domain.Contact contact
+				where contact.person = person
+			),
+			(
+				select telephoneNumber
+				from omis.contact.domain.TelephoneNumber telephoneNumber
+				inner join telephoneNumber.contact contact
+				where contact.person = person
+				  and telephoneNumber.primary = true
+			)
+		)
+		from omis.person.domain.Person as person
+			inner join person.name as personName
+			left outer join person.identity as personIdentity
+		WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(personName.lastName), upper(:lastName)) >=75
+		order by personName.lastName, personName.firstName
+	]]></query>
+</hibernate-mapping>

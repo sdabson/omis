@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+  - Mapping and queries for allowed supervisory organization rule.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+	
+	<!-- Mapping for allowed supervisory organization rule. -->
+	<class entity-name="omis.supervision.domain.AllowedSupervisoryOrganizationRule"
+	       proxy="omis.supervision.domain.AllowedSupervisoryOrganizationRule"
+	       name="omis.supervision.domain.impl.AllowedSupervisoryOrganizationRuleImpl"
+	       table="`ALLOWED_SUP_ORG_RULE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ALLOWED_SUP_ORG_RULE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueAllowedSupervisoryOrganizationRule">
+			<many-to-one name="supervisoryOrganization" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="true" column="`SUPERVISORY_ORGANZTN_ID`"/>
+			<many-to-one name="correctionalStatus" entity-name="omis.supervision.domain.CorrectionalStatus" not-null="true" column="`CORRECTIONAL_STATUS_ID`"/>
+		</properties>
+	</class>
+	
+	<!-- Finds allowed supervisory organization rule. -->
+	<query name="findAllowedSupervisoryOrganizationRule"><![CDATA[
+		select allowedSupervisoryOrganizationRule
+		from omis.supervision.domain.AllowedSupervisoryOrganizationRule allowedSupervisoryOrganizationRule
+		where allowedSupervisoryOrganizationRule.correctionalStatus = :correctionalStatus
+		  and allowedSupervisoryOrganizationRule.supervisoryOrganization = :supervisoryOrganization
+	]]></query>
+</hibernate-mapping>

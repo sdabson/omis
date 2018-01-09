@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Program supervisory organization offer mapping and queries.
+ -
+ - Author: Stephen Abson 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.program.domain">
+	<class entity-name="omis.program.domain.ProgramSupervisoryOrganizationOffer"
+	       proxy="omis.program.domain.ProgramSupervisoryOrganizationOffer"
+	       name="omis.program.domain.impl.ProgramSupervisoryOrganizationOfferImpl"
+		   table="`PROGRAM_SUP_ORG_OFFER`">
+		<cache usage="transactional" region="program"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROGRAM_SUP_ORG_OFFER_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueProgramSupervisoryOrganizationOffer">
+		  <many-to-one name="program" entity-name="omis.program.domain.Program" not-null="true" column="`PROGRAM_ID`"/>
+		  <many-to-one name="supervisoryOrganization" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="true" column="`SUPERVISORY_ORGANIZATION_ID`"/>
+		</properties>
+	</class>
+	<query name="findProgramSupervisoryOrganizationOffers" cacheable="true" cache-region="program"><![CDATA[
+		select programSupervisoryOrganizationOffer
+		from omis.program.domain.ProgramSupervisoryOrganizationOffer
+			programSupervisoryOrganizationOffer
+	      inner join programSupervisoryOrganizationOffer.program program
+		order by program.name
+	]]></query>
+</hibernate-mapping>

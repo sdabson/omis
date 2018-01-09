@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.need.domain">
+	<typedef name="objectiveSource" class="org.hibernate.type.EnumType">
+       <param name="enumClass">omis.need.domain.ObjectiveSource</param>
+       <param name="useNamed">true</param>
+       <param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.need.domain.CasePlanObjective"
+		proxy="omis.need.domain.CasePlanObjective"
+		name="omis.need.domain.impl.CasePlanObjectiveImpl"
+		table="`CASE_PLAN_OBJECTIVE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CASE_PLAN_OBJECTIVE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		
+		<many-to-one name="priority" column="`PRIORITY_ID`" cascade="none" not-null="true"
+			entity-name="omis.need.domain.ObjectivePriority" unique="false"/>
+		<property name="source" column="`SOURCE`" not-null="false" type="objectiveSource"/>
+		<many-to-one name="domain" column="`DOMAIN_ID`" cascade="none" not-null="true"
+			entity-name="omis.need.domain.NeedDomain" unique="false"/>
+		<many-to-one name="staffMember" column="`STAFF_MEMBER_ID`" cascade="none" not-null="false"
+			entity-name="omis.person.domain.Person" unique="false"/>
+			
+		<property name="identificationDate" column="`IDENTIFICATION_DATE`" not-null="true" type="java.util.Date"/>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<property name="comment" column="`COMMENT`" not-null="true" type="string"/>
+		<property name="offenderAgrees" column="`OFFENDER_AGREES`" not-null="false" type="yes_no"/>
+		
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+		<query name="findCasePlanObjective">
+	<![CDATA[
+		from omis.need.domain.CasePlanObjective objective
+		where objective.offender = :offender
+	    and objective.name = :name
+	    and objective.domain = :domain
+	]]></query>
+	<query name="findCasePlanObjectiveExcluding">
+	<![CDATA[
+		from omis.need.domain.CasePlanObjective objective
+		where objective.offender = :offender
+	    and objective.name = :name
+	    and objective.domain = :domain
+	    and objective != :objective
+	]]></query>
+	<query name="findCasePlanObjectiveCountByOffender"><![CDATA[
+		select count(objective.id)
+		  from omis.need.domain.CasePlanObjective objective
+		 where objective.offender = :offender
+	]]></query>
+</hibernate-mapping>

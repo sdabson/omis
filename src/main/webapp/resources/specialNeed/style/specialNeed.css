@@ -1,0 +1,15 @@
+/*
+ * Special need module styling
+ *
+ * Author: Sheronda Vaughn, Josh Divine
+ */
+
+.remove{
+	background-color: hsla(355, 100%, 50%, 0.3)
+}
+
+.specialNeedDocument {
+	display: inline-block;
+	width: 100%;
+	margin: 0 0 5px 0;
+}

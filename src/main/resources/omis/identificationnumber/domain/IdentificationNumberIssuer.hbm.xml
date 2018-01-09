@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Mappings and query for identification number issuers.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.identificationnumber.domain">
+	<class entity-name="omis.identificationnumber.domain.IdentificationNumberIssuer"
+	       proxy="omis.identificationnumber.domain.IdentificationNumberIssuer"
+	       name="omis.identificationnumber.domain.impl.IdentificationNumberIssuerImpl"
+	       table="`IDENTIFICATION_NUM_ISSUER`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`IDENTIFICATION_NUM_ISSUER_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" column="`NAME`" unique="true" not-null="true"/>
+		<property name="valid" type="yes_no" column="`VALID`" not-null="true"/>
+	</class>
+	<query name="findIdentificationNumberIssuer"><![CDATA[
+		select identificationNumberIssuer
+		from omis.identificationnumber.domain.IdentificationNumberIssuer identificationNumberIssuer
+		where identificationNumberIssuer.name = :name
+	]]></query>
+	<query name="findIdentificationNumberIssuerExcluding"><![CDATA[
+		select identificationNumberIssuer
+		from omis.identificationnumber.domain.IdentificationNumberIssuer identificationNumberIssuer
+		where identificationNumberIssuer.name = :name
+		  and identificationNumberIssuer not in (:excludedIdentificationNumbers)
+	]]></query>
+	<query name="findIdentificationNumberIssuers"><![CDATA[
+		select identificationNumberIssuer
+		from omis.identificationnumber.domain.IdentificationNumberIssuer identificationNumberIssuer
+		where identificationNumberIssuer.valid = true
+		order by identificationNumberIssuer.name
+	]]></query>
+</hibernate-mapping>

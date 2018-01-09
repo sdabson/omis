@@ -1,0 +1,13 @@
+p.buttons > input[type="checkbox"], p.buttons > label.fieldValueLabel{
+	display: block;
+    float: right;
+    margin-right: 20px;
+}
+
+p.buttons > button[type="submit"], p.buttons > input[type="submit"] {
+    clear: both;
+}
+
+form.editForm span.fieldGroup textarea#summary{
+  height: 15em;
+}

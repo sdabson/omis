@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Ryan Johns
+ - Version: 0.1.0 (Apr 8, 2014)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">	
+<hibernate-mapping package="omis.health.report">
+	<query name="findHealthProvidersByFacilityDateRange"><![CDATA[
+		select new omis.health.report.ProviderSummary(pa.id,
+			pa.provider.name.firstName,
+			pa.provider.name.lastName,
+			pa.provider.name.middleName,
+			pa.title.name,
+			pa.title.abbreviation,
+			pa.title.category,
+			pa.dateRange.startDate,
+			pa.dateRange.endDate,
+			mf.name,
+			pa.facility.name,
+			address,
+			pa.contracted)
+	 	from omis.health.domain.ProviderAssignment pa
+	 	left join pa.medicalFacility as mf
+	 	left join pa.facility.location.address as address
+		where pa.facility = :facility
+		and (((:startDate > pa.dateRange.startDate
+		     or pa.dateRange.startDate is null)
+	     	 and (:startDate < pa.dateRange.endDate or pa.dateRange.endDate is null))
+	      or ((:endDate > pa.dateRange.startDate
+	          or pa.dateRange.startDate is null) 
+	          and (:endDate < pa.dateRange.endDate or pa.dateRange.endDate is null))
+	      or ((pa.dateRange.startDate > :startDate
+	         and (pa.dateRange.startDate < :endDate or :endDate is null))
+	         or pa.dateRange.startDate is null))
+	      or (pa.dateRange.endDate > :startDate
+	     and (pa.dateRange.endDate < :endDate or :endDate is null)))
+	]]></query>
+	<query name="findHealthProvidersByFacilityDate"><![CDATA[
+		select new omis.health.report.ProviderSummary(pa.id,
+			pa.provider.name.firstName,
+			pa.provider.name.lastName,
+			pa.provider.name.middleName,
+			pa.title.name,
+			pa.title.abbreviation,
+			pa.title.category,
+			pa.dateRange.startDate,
+			pa.dateRange.endDate,
+			mf.name,
+			pa.facility.name,
+			address,
+			pa.contracted)
+	 	from omis.health.domain.ProviderAssignment pa
+	 	left join pa.medicalFacility as mf
+	 	left join pa.facility.location.address as address
+	 	where pa.facility = :facility
+	 	and (pa.dateRange.startDate <= :date
+	 	 or pa.dateRange.startDate is null)
+		and (pa.dateRange.endDate >= :date
+		 or pa.dateRange.endDate is null)
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtdocument.domain">
+	<class entity-name="omis.courtdocument.domain.CourtCaseDocumentAssociation"
+		proxy="omis.courtdocument.domain.CourtCaseDocumentAssociation"
+		name="omis.courtdocument.domain.impl.CourtCaseDocumentAssociationImpl"
+		table="`COURT_DOCUMENT_ASSOCIATION`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COURT_DOCUMENT_ASSOCIATION_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="courtCase" 
+			entity-name="omis.courtcase.domain.CourtCase"
+			column="`COURT_CASE_ID`"/>
+		<property name="date" type="java.util.Date" not-null="true" 
+			column="`DATE`"/>
+		<many-to-one name="category" 
+			entity-name="omis.courtdocument.domain.CourtDocumentCategory" 
+			not-null="true" column="`COURT_DOCUMENT_CATEGORY_ID`"/>
+		<many-to-one name="document" 
+			entity-name="omis.document.domain.Document" not-null="true" 
+			column="`DOCUMENT_ID`"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" 
+				not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+				not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findCourtDocumentAssociationsByDocumentAndCourtCase"><![CDATA[
+		select courtCaseDocumentAssociation
+		  from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
+		 where courtCaseDocumentAssociation.courtCase = :courtCase
+		   and courtCaseDocumentAssociation.document = :document
+	]]></query>
+	<query name="findCourtDocumentAssociationsByDocumentAndCourtCaseExcluding"><![CDATA[
+		select courtCaseDocumentAssociation
+		  from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
+		 where courtCaseDocumentAssociation.courtCase = :courtCase
+		   and courtCaseDocumentAssociation.document = :document
+		   and courtCaseDocumentAssociation not in (:excluding)
+	]]></query>
+	<query name="findCourtDocumentAssociationByOffender"><![CDATA[
+		 select count(courtCaseDocumentAssociation.id)
+		   from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
+left outer join courtCaseDocumentAssociation.courtCase courtCase
+          where courtCase.docket.person = :offender
+	]]></query>
+	
+</hibernate-mapping>

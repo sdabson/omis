@@ -1,0 +1,44 @@
+#
+# Directory of users and roles.
+#
+# Author: Stephen Abson
+#
+dn: dc=omis
+objectclass: top
+objectclass: domain
+objectclass: extensibleObject
+dc: springframework
+
+dn: ou=groups,dc=omis
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=omis
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+dn: uid=admin,ou=people,dc=omis
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: System Administrator
+sn: Administrator
+uid: ADMIN
+userPassword: password
+
+dn: cn=Admin,ou=groups,dc=omis
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: Admin
+ou: Admin
+uniqueMember: uid=ADMIN,ou=people,dc=omis
+
+dn: cn=User,ou=groups,dc=omis
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: User
+ou: User
+uniqueMember: uid=ADMIN,ou=people,dc=omis

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+  - Mapping and queries for task template parameter values.
+  -
+  - Author: Stephen Abson
+  - Author: Josh Divine
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.task.domain">
+	<class entity-name="omis.task.domain.TaskTemplateParameterValue"
+	       proxy="omis.task.domain.TaskTemplateParameterValue"
+	       name="omis.task.domain.impl.TaskTemplateParameterValueImpl"
+	       table="`TASK_TEMPLATE_PARAM_VAL`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TASK_TEMPLATE_PARAM_VAL_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueTaskTemplateParameterValue">
+			<many-to-one name="template" entity-name="omis.task.domain.TaskTemplate" not-null="true" column="`TEMPLATE_ID`"/>
+			<property name="typeName" type="java.lang.String" not-null="true" column="`TYPE_NAME`"/>
+			<property name="order" type="java.lang.Short" not-null="true" column="`ORDER`"/>
+		</properties>
+	</class>
+	<query name="findTaskTemplateParameterValue"><![CDATA[
+	  select taskTemplateParameterValue
+	  from omis.task.domain.TaskTemplateParameterValue taskTemplateParameterValue
+	  where taskTemplateParameterValue.template = :template
+	    and taskTemplateParameterValue.typeName = :typeName
+	    and taskTemplateParameterValue.order = :order
+	]]></query>
+	<query name="findTaskTemplateParameterValueExcluding"><![CDATA[
+	  select taskTemplateParameterValue
+	  from omis.task.domain.TaskTemplateParameterValue taskTemplateParameterValue
+	  where taskTemplateParameterValue.template = :template
+	    and taskTemplateParameterValue.typeName = :typeName
+	    and taskTemplateParameterValue.order = :order
+	    and taskTemplateParameterValue not in (:excludedTaskTemplateParameterValues)
+	]]></query>
+	<query name="findTaskTemplateParameterValuesByTaskTemplate"><![CDATA[
+	  select taskTemplateParameterValue
+	  from omis.task.domain.TaskTemplateParameterValue taskTemplateParameterValue
+	  where taskTemplateParameterValue.template = :template
+	]]></query>
+</hibernate-mapping>

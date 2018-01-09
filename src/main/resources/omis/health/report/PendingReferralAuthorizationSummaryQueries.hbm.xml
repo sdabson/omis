@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.report">
+	<query name="findPendingExternalReferralAuthorizationsByFacility"><![CDATA[
+      select new omis.health.report.PendingReferralAuthorizationSummary(
+          request.id,
+          offenderName.lastName,
+          offenderName.firstName,
+          offenderName.middleName,
+          offender.offenderNumber,
+          medicalFacility.name,
+          case when primaryProviderAssignment is not null then true else false end,
+          primaryProviderAssignmentName.lastName,
+          primaryProviderAssignmentName.firstName,
+          primaryProviderAssignmentTitle.name,
+          primaryProviderAssignmentTitle.abbreviation,
+          reason.name,
+          request.reasonNotes,
+          case when referredByProviderAssignment is not null then true else false end,
+          referredByProviderAssignmentName.lastName,
+          referredByProviderAssignmentName.firstName,
+          referredByProviderAssignmentTitle.name,
+          referredByProviderAssignmentTitle.abbreviation,
+          request.referredDate,
+          'EXTERNAL_MEDICAL'
+        )
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
+        inner join request.offender offender
+        inner join offender.name offenderName
+        inner join request.medicalFacility medicalFacility
+        inner join request.reason reason
+        left outer join request.providerAssignment primaryProviderAssignment
+        left outer join primaryProviderAssignment.provider primaryProviderAssignmentProvider
+        left outer join primaryProviderAssignmentProvider.name primaryProviderAssignmentName
+        left outer join primaryProviderAssignment.title primaryProviderAssignmentTitle
+        left outer join request.referredByProviderAssignment referredByProviderAssignment
+        left outer join referredByProviderAssignment.provider referredByProviderAssignmentProvider
+        left outer join referredByProviderAssignmentProvider.name referredByProviderAssignmentName
+        left outer join referredByProviderAssignment.title referredByProviderAssignmentTitle
+        where (not exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request)
+          or exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request
+              and externalReferralAuthorization.status = 'PANEL_REVIEW_REQUIRED'
+              and externalReferralAuthorization.panelReviewDecision.status is null))
+          and request.facility = :facility
+	]]></query>
+	<query name="findPendingExternalReferralAuthorizationsByOffender"><![CDATA[
+      select new omis.health.report.PendingReferralAuthorizationSummary(
+          request.id,
+          offenderName.lastName,
+          offenderName.firstName,
+          offenderName.middleName,
+          offender.offenderNumber,
+          medicalFacility.name,
+          case when primaryProviderAssignment is not null then true else false end,
+          primaryProviderAssignmentName.lastName,
+          primaryProviderAssignmentName.firstName,
+          primaryProviderAssignmentTitle.name,
+          primaryProviderAssignmentTitle.abbreviation,
+          reason.name,
+          request.reasonNotes,
+          case when referredByProviderAssignment is not null then true else false end,
+          referredByProviderAssignmentName.lastName,
+          referredByProviderAssignmentName.firstName,
+          referredByProviderAssignmentTitle.name,
+          referredByProviderAssignmentTitle.abbreviation,
+          request.referredDate,
+          'EXTERNAL_MEDICAL'
+        )
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
+        inner join request.offender offender
+        inner join offender.name offenderName
+        inner join request.medicalFacility medicalFacility
+        inner join request.reason reason
+        left outer join request.providerAssignment primaryProviderAssignment
+        left outer join primaryProviderAssignment.provider primaryProviderAssignmentProvider
+        left outer join primaryProviderAssignmentProvider.name primaryProviderAssignmentName
+        left outer join primaryProviderAssignment.title primaryProviderAssignmentTitle
+        left outer join request.referredByProviderAssignment referredByProviderAssignment
+        left outer join referredByProviderAssignment.provider referredByProviderAssignmentProvider
+        left outer join referredByProviderAssignmentProvider.name referredByProviderAssignmentName
+        left outer join referredByProviderAssignment.title referredByProviderAssignmentTitle
+        where (not exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request)
+          or exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request
+              and externalReferralAuthorization.status = 'PANEL_REVIEW_REQUIRED'
+              and externalReferralAuthorization.panelReviewDecision.status is null))
+          and request.offender = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  
+  <!-- Services -->
+  
+  <bean id="staffTitleService" class="omis.staff.service.impl.StaffTitleServiceImpl">
+    <constructor-arg name="staffTitleDelegate" ref="staffTitleDelegate"/>
+  </bean>
+  
+  <bean id="staffSearchSummaryReportServce" class="omis.staff.report.impl.hibernate.StaffSearchSummaryReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Delegates -->
+  
+   <bean id="staffTitleDelegate" class="omis.staff.service.delegate.StaffTitleDelegate">
+    <constructor-arg name="staffTitleDao" ref="staffTitleDao"/>
+    <constructor-arg name="staffTitleInstanceFactory" ref="staffTitleInstanceFactory"/>
+  </bean>
+  
+  <bean id="staffAssignmentDelegate" class="omis.staff.service.delegate.StaffAssignmentDelegate">
+    <constructor-arg name="staffAssignmentDao" ref="staffAssignmentDao"/>
+    <constructor-arg name="staffAssignmentInstanceFactory" ref="staffAssignmentInstanceFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+    <bean id="staffTitleInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
+  </bean>
+  
+  <bean id="staffAssignmentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.staff.domain.StaffAssignment" />
+	</bean>
+  
+  <!-- Data access objects -->
+    
+  <bean id="staffAssignmentDao"
+      	class="omis.staff.dao.impl.hibernate.StaffAssignmentDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.staff.domain.StaffAssignment"/>
+  </bean>
+
+  <bean id="staffTitleDao"
+      	class="omis.staff.dao.impl.hibernate.StaffTitleDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
+  </bean>
+  
+    <!-- Property editor factories -->
+  
+  <bean id="staffTitlePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="staffTitleDao"/>
+    <constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>  
+  
+  <bean id="staffAssignmentPropertyEditorFactory"
+	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="staffAssignmentDao" />
+		<constructor-arg name="entityName"
+			value="omis.staff.domain.StaffAssignment" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+</beans>

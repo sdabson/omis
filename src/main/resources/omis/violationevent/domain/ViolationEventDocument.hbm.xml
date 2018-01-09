@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.violationevent.domain">
+	<class entity-name="omis.violationevent.domain.ViolationEventDocument"
+			proxy="omis.violationevent.domain.ViolationEventDocument"
+			name="omis.violationevent.domain.impl.ViolationEventDocumentImpl"
+			table="`VIOLATION_EVENT_DOCUMENT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`VIOLATION_EVENT_DOCUMENT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<many-to-one name="violationEvent" column="`VIOLATION_EVENT_ID`" entity-name="omis.violationevent.domain.ViolationEvent" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findViolationEventDocument"><![CDATA[
+		select violationEventDocument
+		from
+			omis.violationevent.domain.ViolationEventDocument violationEventDocument
+		where
+			violationEventDocument.document = :document
+		and
+			violationEventDocument.violationEvent = :violationEvent
+	]]></query>
+	<query name="findViolationEventDocumentExcluding"><![CDATA[
+		select violationEventDocument
+		from
+			omis.violationevent.domain.ViolationEventDocument violationEventDocument
+		where
+			violationEventDocument.document = :document
+		and
+			violationEventDocument.violationEvent = :violationEvent
+		and
+			violationEventDocument != :violationEventDocument
+	]]></query>
+	<query name="findViolationEventDocumentsByViolationEvent"><![CDATA[
+		select violationEventDocument
+		from
+			omis.violationevent.domain.ViolationEventDocument violationEventDocument
+		where
+			violationEventDocument.violationEvent = :violationEvent
+	]]></query>
+</hibernate-mapping>

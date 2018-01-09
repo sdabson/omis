@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.religion.domain">
+	<class entity-name="omis.religion.domain.ReligiousAccommodationAuthorization"
+	       proxy="omis.religion.domain.ReligiousAccommodationAuthorization"
+	       name="omis.religion.domain.impl.ReligiousAccommodationAuthorizationImpl"
+	       table="`RELIGIOUS_ACCOMM_AUTHZN`">
+	  <id name="id" column="`ID`">
+	    <generator class="sequence">
+	      <param name="sequence">`RELIGIOUS_ACCOMM_AUTHZN_SEQ`</param>
+	    </generator>
+	  </id>
+	  <properties name="uniqueReligiousAccommodationAuthorization">
+	    <many-to-one name="preference" entity-name="omis.religion.domain.ReligiousPreference" not-null="true" column="`PREFERENCE_ID`"/>
+	    <many-to-one name="accommodation" entity-name="omis.religion.domain.ReligiousAccommodation" not-null="true" column="`ACCOMMODATION_ID`"/>
+	  </properties>
+	  <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+        <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+        <property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+        <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+        <property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+	</class>
+	<query name="findReligiousAccommodationAuthorization"><![CDATA[
+		select religiousAccommodationAuthorization
+		from omis.religion.domain.ReligiousAccommodationAuthorization religiousAccommodationAuthorization
+		where religiousAccommodationAuthorization.preference = :preference
+		  and religiousAccommodationAuthorization.accommodation = :accommodation
+	]]></query>
+	<query name="deleteReligiousAccommodationAuthorizationsByPreference"><![CDATA[
+		delete from omis.religion.domain.ReligiousAccommodationAuthorization religiousAccommodationAuthorization
+		where religiousAccommodationAuthorization.preference = :preference
+	]]></query>
+</hibernate-mapping>

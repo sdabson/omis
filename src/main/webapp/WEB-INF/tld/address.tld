@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Address tag.
+  -
+  - Author: Joel Norris
+  - Version: 0.1.0 (March 19, 2015)
+  - Since: OMIS 3.0 
+  -->
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+				http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+		version="2.0">
+	<tlib-version>1.0</tlib-version>
+	<short-name>address</short-name>
+	<tag>
+		<description>
+			HTML format allowing for custom display of address.
+		</description>
+		<name>formatSummary</name>
+		<tag-class>omis.address.web.taglib.AddressFormatSummaryTag</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<description>
+				Summary object to be formatted
+			</description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>omis.address.report.AddressSummarizable</type>
+		</attribute>
+		<attribute>
+			<description>
+				What type of format is to be used for display
+			</description>
+			<name>format</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>

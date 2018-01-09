@@ -1,0 +1,23 @@
+/*
+ * Search styling.
+ *
+ * Author: Stephen Abson
+ */
+
+/* Results form. */
+
+form.searchForm p.buttons {
+	align: right;
+}
+
+/* Results table. */
+
+table.searchResults {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table.searchResults, table.searchResults tr td, table.searchResults tr th {
+	border-style: solid;
+	border-width: 1px;
+}

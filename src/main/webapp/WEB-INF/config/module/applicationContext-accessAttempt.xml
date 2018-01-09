@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!--  Instance factories. -->
+  
+  <bean id="accessAttemptInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.security.domain.AccessAttempt"/>
+  </bean>
+  
+  <!-- Services -->
+  
+  <bean id="accessAttemptService"
+        class="omis.security.service.impl.AccessAttemptServiceImpl">
+    <constructor-arg name="accessAttemptDao" ref="accessAttemptDao"/>
+  </bean>
+  
+  <!-- Helpers -->
+  
+  <bean id="accessAttemptDelegate" class="omis.security.service.delegate.AccessAttemptDelegate">
+    <constructor-arg name="accessAttemptDao" ref="accessAttemptDao"/>
+  </bean>
+  
+  <!-- Data access objects -->
+  
+  <bean id="accessAttemptDao"
+        class="omis.security.dao.impl.hibernate.AccessAttemptDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.security.domain.AccessAttempt"/>
+  </bean>
+  
+</beans>

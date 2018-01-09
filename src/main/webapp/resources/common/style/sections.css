@@ -1,0 +1,14 @@
+/**
+ * Divides pages into logical sections.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (May 8, 2013)
+ * Since: OMIS 3.0
+ */
+
+div.sectionHeader {
+	border: 1px solid;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	padding: 2px;
+}

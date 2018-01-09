@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.visitation.domain">
+	<class entity-name="omis.visitation.domain.VisitationAssociationCategory"
+		proxy="omis.visitation.domain.VisitationAssociationCategory"
+		name="omis.visitation.domain.impl.VisitationAssociationCategoryImpl"
+		table="`VISITATION_ASSOC_CAT`">
+		<cache usage="transactional" region="visitation"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VISITATION_ASSOC_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="short"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findVisitationAssociationCategories" cacheable="true" cache-region="visitation"><![CDATA[
+		from
+			omis.visitation.domain.VisitationAssociationCategory category
+		where
+			category.valid = true
+		order by
+			category.sortOrder
+	]]></query>
+	<query name="findVisitationAssociationCategoryByName"><![CDATA[
+		from
+			omis.visitation.domain.VisitationAssociationCategory category
+		where
+			category.valid = true
+		and
+			category.name = :name
+		order by
+			category.sortOrder
+	]]></query>
+</hibernate-mapping>

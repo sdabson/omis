@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote"
+			proxy="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote"
+			name="omis.presentenceinvestigation.domain.impl.ChemicalUseSectionSummaryNoteImpl"
+			table="`CHEMICAL_USE_SECTN_SMRY_NT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`CHEMICAL_USE_SECTN_SMRY_NT_SEQ`</param>
+				</generator>
+			</id>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<many-to-one name="chemicalUseSectionSummary" column="`CHEMICAL_USE_SECTN_SMRY_ID`" entity-name="omis.presentenceinvestigation.domain.ChemicalUseSectionSummary" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findChemicalUseSectionSummaryNote"><![CDATA[
+		select chemicalUseSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote chemicalUseSectionSummaryNote
+		where
+			chemicalUseSectionSummaryNote.description = :description
+		and
+			chemicalUseSectionSummaryNote.date = :date
+		and
+			chemicalUseSectionSummaryNote.chemicalUseSectionSummary = :chemicalUseSectionSummary
+	]]></query>
+	<query name="findChemicalUseSectionSummaryNoteExcluding"><![CDATA[
+		select chemicalUseSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote chemicalUseSectionSummaryNote
+		where
+			chemicalUseSectionSummaryNote.description = :description
+		and
+			chemicalUseSectionSummaryNote.date = :date
+		and
+			chemicalUseSectionSummaryNote.chemicalUseSectionSummary = :chemicalUseSectionSummary
+		and
+			chemicalUseSectionSummaryNote != :chemicalUseSectionSummaryNote
+	]]></query>
+	<query name="findChemicalUseSectionSummaryNotesByChemicalUseSectionSummary"><![CDATA[
+		select chemicalUseSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote chemicalUseSectionSummaryNote
+		where
+			chemicalUseSectionSummaryNote.chemicalUseSectionSummary = :chemicalUseSectionSummary
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.region.domain">
+	<class entity-name="omis.region.domain.State"
+	       proxy="omis.region.domain.State"
+	       name="omis.region.domain.impl.StateImpl"
+	       table="`STATE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STATE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true"/>
+		<property name="abbreviation" column="`ABBREVIATION`" not-null="true"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<property name="home" column="`HOME`" not-null="true" type="yes_no"/>
+ 		<many-to-one name="country" column="`COUNTRY_ID`" not-null="true"
+		             entity-name="omis.country.domain.Country"/>
+	</class>
+	<query name="findStates"><![CDATA[
+		select state
+		from omis.region.domain.State as state
+			left outer join state.country as country
+		order by state.name, country.name
+	]]></query>
+	<query name="findStatesByCountry"><![CDATA[
+		select state
+		from omis.region.domain.State as state
+			left outer join state.country as country
+		where state.country = :country
+		order by state.name, country.name
+	]]></query>
+	<query name="findHomeState"><![CDATA[
+		select 
+			state
+		from
+			omis.region.domain.State state
+		where
+			state.home = true
+	]]></query>
+<!-- 	finding states associated with the home country being passed in -->
+	<query name="findStatesInHomeCountry"><![CDATA[
+		select state
+		from
+			omis.region.domain.State homeState,
+			omis.region.domain.State state
+		inner join state.country country
+		where
+			homeState.home = true
+			and
+			homeState.country = country
+		order by state.name
+	]]></query>
+	<query name="countStatesByCountry"><![CDATA[
+		select count(state) from omis.region.domain.State state
+		where state.country = :country
+	]]></query>
+	<query name="findState"><![CDATA[
+		select state
+		from omis.region.domain.State state
+		where state.name = :name
+		  and state.country = :country
+	]]></query>
+</hibernate-mapping>

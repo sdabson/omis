@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleeligibility.domain">
+	<class entity-name="omis.paroleeligibility.domain.EligibilityStatusReason"
+		proxy="omis.paroleeligibility.domain.EligibilityStatusReason"
+		name="omis.paroleeligibility.domain.impl.EligibilityStatusReasonImpl"
+		table="`PAROLE_ELIGIBILITY_STTS_RSN`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PAROLE_ELIGIBILITY_STTS_RSN_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="java.lang.String"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findEligibilityStatusReason"><![CDATA[
+		select statusReason
+		from
+			omis.paroleeligibility.domain.EligibilityStatusReason statusReason
+		where
+			statusReason.name = :name
+	]]></query>
+	<query name="findEligibilityStatusReasons"><![CDATA[
+		select statusReason
+		from
+			omis.paroleeligibility.domain.EligibilityStatusReason statusReason
+		where
+			statusReason.valid = true
+	]]></query>
+	<query name="findEligibilityStatusReasonExcluding"><![CDATA[
+		select statusReason
+		from
+			omis.paroleeligibility.domain.EligibilityStatusReason statusReason
+		where
+			statusReason.name = :name
+		and
+			statusReason <> :excludedReason
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.trackeddocument.domain">
+	<class entity-name="omis.trackeddocument.domain.TrackedDocumentReceival"
+		proxy="omis.trackeddocument.domain.TrackedDocumentReceival"
+		name="omis.trackeddocument.domain.impl.TrackedDocumentReceivalImpl"
+		table="`TRACKED_DOC_RECEIVAL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`TRACKED_DOC_RECEIVAL_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="docket" column="`DOCKET_ID`" cascade="none" not-null="true"
+			entity-name="omis.docket.domain.Docket" unique="false"/>
+		<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true"
+			entity-name="omis.trackeddocument.domain.TrackedDocumentCategory" unique="false"/>
+		<many-to-one name="receivedByUserAccount" column="`RECEIVED_BY_ACCOUNT_ID`" cascade="none" not-null="true"
+			entity-name="omis.user.domain.UserAccount" unique="false"/>
+		<property name="receivedDate" column="`RECEIVED_DATE`" type="java.util.Date" not-null="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`CREATE_DATE`" not-null="true" />
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`UPDATE_DATE`" not-null="true" />
+		</component>
+	</class>
+	<query name="findExistingTrackedDocumentReceival"><![CDATA[
+		select receival
+		from
+			omis.trackeddocument.domain.TrackedDocumentReceival receival
+		where
+			receival.docket = :docket
+			and receival.category = :category
+			and receival.receivedDate = :receivedDate
+		order by receival.receivedDate
+	]]></query>
+	
+	<query name="findTrackedDocumentReceivalsByDocket"><![CDATA[
+		select receival
+		from
+			omis.trackeddocument.domain.TrackedDocumentReceival receival
+		where
+			receival.docket = :docket
+		order by receival.receivedDate
+	]]></query>
+</hibernate-mapping>

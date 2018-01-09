@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+  <!-- Validator -->
+  
+  <bean id="locationTermFormValidator"
+        class="omis.locationterm.web.validator.LocationTermFormValidator"/>
+        
+  <bean id="locationReasonTermFormValidator"
+        class="omis.locationterm.web.validator.LocationReasonTermFormValidator"/>
+
+  <!-- Property editor factories -->
+  
+  <bean id="locationTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="locationTermDao"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="locationReasonTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="locationReasonTermDao"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReasonTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="locationReasonPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="locationReasonDao"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReason"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="locationTermChangeActionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="locationTermChangeActionDao"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTermChangeAction"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="allowedLocationChangePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="allowedLocationChangeDao"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.AllowedLocationChange"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <!-- Web controller packages -->
+  
+  <context:component-scan base-package="omis.locationterm.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="locationTermControllerOperation" expression="execution(* omis.locationterm.web.controller.LocationTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="locationTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="locationReasonTermControllerOperation" expression="execution(* omis.locationterm.web.controller.LocationReasonTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="locationReasonTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="locationTermProfileControllerOperation" expression="execution(* omis.locationterm.web.controller.LocationTermProfileController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="locationTermProfileControllerOperation"/>
+  </aop:config>
+  
+  <!-- Profile Item -->
+  
+  <bean id="locationTermProfileItem" class="omis.locationterm.web.profile.LocationTermProfileItem">
+  		 <constructor-arg name="requiredAuthorizations">
+ 			<set>
+ 				<value>LOCATION_TERM_LIST</value>
+ 				<value>ADMIN</value>
+ 			</set>
+ 		</constructor-arg>
+  		<constructor-arg name="includePage" value="/WEB-INF/views/locationTerm/profile/includes/profileItem.jsp"/>
+  		<constructor-arg name="name" value="locationTerm"/>
+  		<constructor-arg name="profileItemRegistry" ref="placementProfileItemRegistry"/>
+  		<constructor-arg name="locationTermProfileItemReportService" ref="locationTermProfileItemReportService"/>
+  		<constructor-arg name="enabled" value="${locationTermProfileItemEnabled}"/>
+  </bean>
+  
+</beans>

@@ -1,0 +1,274 @@
+/* Ascension Layout Classes
+*/
+
+#search {
+	position:absolute;
+	left:0px;
+	bottom:0px;
+	margin:0px;
+	right:0px;
+	padding:0px;
+}
+
+#search p {
+	margin:0px;
+	padding:0px;
+}
+
+#search p input[type=text] {
+	width:90%;
+	margin-left: 6px;	
+}
+
+#applicationLaunchIcon:hover { cursor: pointer; }
+
+#navigationLaunchIcon:hover { cursor: pointer; }
+
+#navigationLaunchIcon { 
+	position: absolute; 	
+	right: 0px;
+}
+
+
+.fullscreen {
+	width:100%;
+	height:100%;
+	position: absolute;
+}
+
+
+div.panel { position:absolute; }
+
+#applicationToolBar {
+	top:0px;
+	height:32px;
+	left:0px;
+	right:0px;
+}
+
+#workArea {
+	top:33px;
+	bottom:49px;
+	left:0px;
+	right:0px;
+}
+
+#leftPanel {
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	width: 32px;
+}
+
+#leftPanel {}
+
+#rightPanel {}
+
+#content {
+	left:33px;
+	right:33px;
+	top: 0px;
+	bottom: 0px;
+	overflow: auto;
+}
+
+#rightPanel {
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	width: 32px;
+}
+
+#navigationBar {
+	height:48px;
+	bottom:0px;
+	left:0px;
+	right: 0px;
+}
+
+#launchMenu {
+	position: absolute;
+	height: 512px;
+	bottom: 48px;
+	left: 0px;
+	width: 512px;
+	display: none;
+	border-top: 1px solid;
+	border-right: 1px solid;
+	border-left: 1px solid;
+	border-radius: 5px 5px 0px 0px;	
+}
+
+#navigationMenu {
+	position: absolute;
+	height: 256px;
+	bottom: 48px;
+	right: 0px;
+	width: 512px;
+	display: none;
+	border-top: 1px solid;
+	border-right: 1px solid;
+	border-left: 1px solid;
+	border-radius: 5px 5px 0px 0px;
+}
+
+#applicationLaunch {
+	position: absolute;
+	left: 0px;
+	width: 96px;
+	bottom: 0px;
+	top: 0px;
+}
+
+#navigationLaunch {
+	position: absolute;
+	right: 0px;
+	width: 96px;
+	bottom: 0px;
+	top: 0px;	
+}
+
+#navigationPanel {
+	position: absolute;
+	left: 96px;
+	right: 0px;
+	bottom: 0px;
+	top: 0px;	
+}
+	
+#navigationMap {
+    height: 100%;
+    position: absolute;
+    right: 0;
+}
+
+.navigationMenuItems {
+	padding:0px;
+	margin:0px;
+	height: 100%;
+}
+
+#applicationLaunch, #navigationPanel {
+	vertical-align: middle;
+}
+
+#navigationItems {
+	margin: 0 17px 0 0;
+	padding: 0 80px 0 0;
+}
+
+#navigationItems li {
+	cursor: pointer;
+}
+
+.boxBorder {
+	border:2px solid;
+	border-radius:6px;
+}
+
+
+.mapItem {
+	height: 100%;
+    width: 100%;
+}
+
+.panelOptions {
+	padding: 0px;
+	margin: 0px;	
+}
+
+.panelOptions li {
+	display: inline;
+	padding: 0px;
+	margin: 0px;
+}
+
+#caseLoadLink:before {
+	content: url('../../../resources/common/images/add.png');	
+}
+
+.panelContent, .panelLinks {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.panelContent ul, .panelLinks ul {
+	display: inline;
+	padding: 0px;
+	margin: 0px;
+	list-style-type: none;
+}
+
+.panelContent ul li, .panelLinks ul li {
+	display: block-inline;
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+}
+
+/* Contents are initially hidden. */
+.panelContent {
+	display: none;
+	width: 161px;
+}
+
+.panelLinks {
+	width: 32px;
+}
+
+#leftPanelContent {
+	left: 0px;
+	border-right: 1px solid;
+}
+
+#rightPanelContent {
+	right: 0px;
+	border-left: 1px solid;
+}
+
+#leftPanelLinks {
+	right: 0px;
+}
+
+#rightPanelLinks {
+	left: 0px;
+}
+
+.expand-up {
+  line-height:normal;
+  overflow:visible;
+}
+
+.expand-up * {
+  	margin:0px';
+	padding :.5%;
+}
+
+.expand-up {
+}
+
+.expand-up li {
+  float:left;
+  list-style-type:none;
+}
+
+.expand-up li  {
+  border:none;
+}
+
+.expand-up li a span {
+  display:none;
+}
+.expand-up li:hover div {
+  position:relative;
+  top:-3px;
+  left:-3px;
+}
+
+.expand-up li:hover div  {
+  width:104%;
+  height:104%;
+}

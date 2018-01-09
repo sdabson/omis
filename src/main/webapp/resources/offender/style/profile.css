@@ -1,0 +1,61 @@
+/*
+ * Styling for offender profile.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Nov 18, 2014)
+ * Since: OMIS 3.0
+ */
+ 
+div.profileContainer {
+    display: inline-block;
+    vertical-align: top;
+    margin:3px;
+    border:1px solid #000;
+}
+
+@media only screen and (max-width:899px) {
+	div.profileContainer {
+		width: calc(100% - 10px);
+	}
+}
+
+@media only screen and (min-width:900px) and (max-width:1199px) {
+	div.profileContainer {
+		width: calc(50% - 10px);
+	}
+}
+
+
+@media only screen and (min-width:1200px ) {
+	div.profileContainer {
+		width: calc(33% - 9px);
+	}
+}
+
+div#profileItems {
+	display: inline-block;
+}
+
+div.profileItem {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+    padding-left:3px;
+}
+
+div.profileItem a {
+	width:96%;
+	margin:1px;
+	padding-left:5px;
+	padding-right:5px;
+	padding-top:1px;
+	padding-bottom:1px;
+	text-decoration:none;
+	display:inline-block;
+}
+div.profileItem:not(.inactive) a:hover {
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-right:4px;
+	padding-left:4px;
+}

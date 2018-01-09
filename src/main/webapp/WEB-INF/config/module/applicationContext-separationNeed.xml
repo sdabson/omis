@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+         <bean id="separationNeedService"
+        	class="omis.separationneed.service.impl.SeparationNeedServiceImpl">
+        	<constructor-arg name="separationNeedDelegate" ref="separationNeedDelegate"/>
+        	<constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+        	<constructor-arg name="separationNeedReasonDelegate" ref="separationNeedReasonDelegate"/>
+        	<constructor-arg name="separationNeedReasonAssociationDelegate" ref="separationNeedReasonAssociationDelegate"/>
+        	<constructor-arg name="separationNeedNoteDelegate" ref="separationNeedNoteDelegate"/>
+        	<constructor-arg name="separationNeedRemovalReasonDelegate" ref="separationNeedRemovalReasonDelegate"/>
+        </bean>
+        
+        <!-- Delegates -->
+        <bean id="legacyLocationLookupDelegate"
+        	class="omis.separationneed.report.delegate.impl.hibernate.LegacyLocationLookupDelegateHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="separationNeedDelegate"
+        	class="omis.separationneed.service.delegate.SeparationNeedDelegate">
+        	<constructor-arg name="separationNeedDao" ref="separationNeedDao"/>
+        	<constructor-arg name="separationNeedInstanceFactory" ref="separationNeedInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="separationNeedNoteDelegate"
+        	class="omis.separationneed.service.delegate.SeparationNeedNoteDelegate">
+        	<constructor-arg name="separationNeedNoteDao" ref="separationNeedNoteDao"/>
+        	<constructor-arg name="separationNeedNoteInstanceFactory" ref="separationNeedNoteInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="separationNeedReasonDelegate"
+        	class="omis.separationneed.service.delegate.SeparationNeedReasonDelegate">
+        	<constructor-arg name="separationNeedReasonDao" ref="separationNeedReasonDao"/>
+        	<constructor-arg name="separationNeedReasonInstanceFactory" ref="separationNeedReasonInstanceFactory"/>
+        </bean>
+        
+        <bean id="separationNeedReasonAssociationDelegate"
+        	class="omis.separationneed.service.delegate.SeparationNeedReasonAssociationDelegate">
+        	<constructor-arg name="separationNeedReasonAssociationDao" ref="separationNeedReasonAssociationDao"/>
+        	<constructor-arg name="separationNeedReasonAssociationInstanceFactory" ref="separationNeedReasonAssociationInstanceFactory"/>
+        </bean>
+        
+        <bean id="separationNeedRemovalReasonDelegate"
+        	class="omis.separationneed.service.delegate.SeparationNeedRemovalReasonDelegate">
+        	<constructor-arg name="separationNeedRemovalReasonDao" ref="separationNeedRemovalReasonDao"/>
+        	<constructor-arg name="separationNeedRemovalReasonInstanceFactory" ref="separationNeedRemovalReasonInstanceFactory"/>
+        </bean>
+        
+        <!-- Report services -->
+        <bean id="separationNeedProfileItemReportService"
+        	class="omis.separationneed.report.impl.hibernate.SeparationNeedProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="separationNeedReportService"
+        	class="omis.separationneed.report.impl.hibernate.SeparationNeedReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="separationNeedDao"
+        	class="omis.separationneed.dao.impl.hibernate.SeparationNeedDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeed"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="separationNeedReasonDao"
+        	class="omis.separationneed.dao.impl.hibernate.SeparationNeedReasonDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReason"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="separationNeedNoteDao"
+        	class="omis.separationneed.dao.impl.hibernate.SeparationNeedNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="separationNeedReasonAssociationDao"
+	  		class="omis.separationneed.dao.impl.hibernate.SeparationNeedReasonAssociationDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReasonAssociation"/>	
+	  	</bean>
+	  	
+	  	<bean id="separationNeedRemovalReasonDao"
+	  		class="omis.separationneed.dao.impl.hibernate.SeparationNeedRemovalReasonDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedRemovalReason"/>	
+	  	</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="separationNeedInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeed"/>
+		</bean>
+		
+		<bean id="separationNeedReasonInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReason"/>
+		</bean>
+		
+		<bean id="separationNeedReasonAssociationInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		    <constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReasonAssociation"/>
+	    </bean>
+        
+        <bean id="separationNeedNoteInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		    <constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedNote"/>
+	    </bean>
+	    
+	    <bean id="separationNeedRemovalReasonInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedRemovalReason"/>
+		</bean>
+        
+        <!--Property editor factories -->
+        
+        <bean id="separationNeedPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeed"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="separationNeedDao"/>
+		</bean>
+		
+		<bean id="separationNeedReasonPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReason"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="separationNeedReasonDao"/>
+		</bean>
+        
+        <bean id="separationNeedNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="separationNeedNoteDao"/>
+		</bean>
+		
+		<bean id="separationNeedReasonAssociationPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="separationNeedReasonAssociationDao"/>
+				<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedReasonAssociation"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="separationNeedRemovalReasonPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="separationNeedRemovalReasonDao"/>
+				<constructor-arg name="entityName" value="omis.separationneed.domain.SeparationNeedRemovalReason"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+</beans>

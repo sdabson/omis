@@ -1,0 +1,28 @@
+/* Styling for document tags.
+ * author: Ryan Johns
+ * version: 0.1.0 (Dec 22, 2015)
+ * since: OMIS 3.0 */
+.tagListLabel {
+	display: inline-block;
+	vertical-align: top;
+	text-align: right;
+    width: 20%;
+}
+
+.documentTagBody {
+	display: inline-block;
+	padding: 0;
+ 	margin: 0;
+ 	list-style: none;
+ 	width: 30%;
+}
+
+li.documentTagRow {
+    margin-left: 15px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+li.documentTagRow span span.error {
+	float:none;
+}

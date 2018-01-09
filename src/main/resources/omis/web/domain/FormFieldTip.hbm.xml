@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.web.domain">
+	<class proxy="omis.web.domain.FormFieldTip"
+	       name="omis.web.domain.impl.FormFieldTipImpl"
+	       entity-name="omis.web.domain.FormFieldTip"
+	       table="`FORM_FIELD_TIP`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FORM_FIELD_TIP_SEQ`</param>
+			</generator>
+		</id>
+		<natural-id>
+			<property name="form" type="string" not-null="true" column="`FORM`"/>
+			<property name="fieldName" type="string" not-null="true" column="`FIELD_NAME`"/>
+		</natural-id>
+		<property name="value" type="string" not-null="true" column="`VALUE`"/>
+	</class>
+	<query name="findFormFieldTipsByForm"><![CDATA[
+	  select formFieldTip from omis.web.domain.FormFieldTip formFieldTip
+	  where formFieldTip.form = :form
+	  order by formFieldTip.fieldName
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+        
+        <context:component-scan base-package="omis.presentenceinvestigation.web.controller"/>
+        
+        
+        <!-- Report services -->
+        <bean id="presentenceInvestigationRequestSummaryReportService"
+			class="omis.presentenceinvestigation.report.impl.hibernate.PresentenceInvestigationRequestSummaryReportServiceHibernateImpl">
+				<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<bean id="presentenceInvestigationRequestProfileItemReportService"
+			class="omis.presentenceinvestigation.report.impl.hibernate.PresentenceInvestigationRequestProfileItemReportServiceHibernateImpl">
+				<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<!-- Controller Delegates -->
+		<bean id="presentenceInvestigationRequestSummaryModelDelegate" class="omis.presentenceinvestigation.web.controller.delegate.PresentenceInvestigationRequestSummaryModelDelegate">
+			<constructor-arg name="presentenceInvestigationRequestSummaryReportService" ref="presentenceInvestigationRequestSummaryReportService"/>
+		</bean>
+		
+		
+		<!-- Validators -->
+		<bean id="presentenceInvestigationRequestFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationRequestFormValidator">
+		</bean>
+		<bean id="presentenceInvestigationAddOffenderFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationAddOffenderFormValidator">
+		</bean>
+		
+		<bean id="presentenceInvestigationHomeFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationHomeFormValidator">
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationTaskFormValidator">
+			<constructor-arg name="taskFieldsValidatorDelegate" ref="taskFieldsValidatorDelegate" />
+		</bean>
+		
+		<bean id="jailAdjustmentSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.JailAdjustmentSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PsychologicalSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="educationSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.EducationSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="offenseSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.OffenseSectionSummaryFormValidator">
+			<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PleaAgreementSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.ChemicalUseSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.OtherPertinentInformationSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="victimSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.VictimSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="healthSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.HealthSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="financialSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.FinancialSectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="supervisionHistorySectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.SupervisionHistorySectionSummaryFormValidator">
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryFormValidator"
+			class="omis.presentenceinvestigation.web.validator.EvaluationRecommendationSectionSummaryFormValidator">
+		</bean>
+		
+		<!-- Property editor factories -->
+		<bean id="presentenceInvestigationRequestPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="presentenceInvestigationRequestDao"/>
+				<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="presentenceInvestigationRequestNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="presentenceInvestigationRequestNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequestNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskGroupPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="presentenceInvestigationTaskGroupDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="presentenceInvestigationTaskAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskSourcePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="presentenceInvestigationTaskSourceDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="presentenceInvestigationCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="presentenceInvestigationCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PresentenceInvestigationCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="jailAdjustmentSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="jailAdjustmentSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="jailAdjustmentSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="jailAdjustmentSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="psychologicalSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PsychologicalSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="psychologicalSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryDocumentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="psychologicalSectionSummaryDocumentDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="educationSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="educationSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.EducationSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="educationSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="educationSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.EducationSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="offenseSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.OffenseSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryAssociableDocumentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="offenseSectionSummaryAssociableDocumentDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="circumstanceOfOffensePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="circumstanceOfOffenseDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.CircumstanceOfOffense" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="pleaAgreementSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="pleaAgreementSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryAssociableDocumentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="pleaAgreementSectionSummaryAssociableDocumentDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryAssociableDocument" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="chemicalUseSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="chemicalUseSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="chemicalUseSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="otherPertinentInformationSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="otherPertinentInformationSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="victimSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.VictimSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="victimSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.VictimSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="healthSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="healthSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.HealthSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="healthSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="healthSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.HealthSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="healthSectionSummaryDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="healthSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="financialSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="financialSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.FinancialSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="financialSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.FinancialSectionSummaryDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="financialSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="financialSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.FinancialSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="supervisionHistorySectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="supervisionHistorySectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="supervisionHistorySectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="supervisionHistoryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.SupervisionHistoryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="evaluationRecommendationSectionSummaryDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummary" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="evaluationRecommendationSectionSummaryNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummaryNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- Pointcut configs -->
+		
+		<aop:config>
+			<aop:pointcut id="presentenceInvestigationRequestControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.PresentenceInvestigationRequestController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="presentenceInvestigationRequestControllerOperation"/>	
+		</aop:config>
+		<aop:config>
+			<aop:pointcut id="presentenceInvestigationHomeControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.PresentenceInvestigationHomeController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="presentenceInvestigationHomeControllerOperation"/>	
+		</aop:config>
+		
+		
+		<aop:config>
+			<aop:pointcut id="presentenceInvestigationTaskControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.PresentenceInvestigationTaskController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="presentenceInvestigationTaskControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="jailAdjustmentSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.JailAdjustmentSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="jailAdjustmentSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="psychologicalSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.PsychologicalSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="psychologicalSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="educationSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.EducationSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="educationSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="offenseSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.OffenseSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenseSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="pleaAgreementSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.PleaAgreementSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="pleaAgreementSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="chemicalUseSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.ChemicalUseSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="chemicalUseSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="otherPertinentInformationSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.OtherPertinentInformationSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="otherPertinentInformationSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="victimSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.VictimSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="victimSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="healthSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.HealthSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="healthSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="financialSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.FinancialSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="financialSectionSummaryControllerOperation"/>
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="supervisionHistorySectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.SupervisionHistorySectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="supervisionHistorySectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="evaluationRecommendationSectionSummaryControllerOperation"
+				expression="execution(* omis.presentenceinvestigation.web.controller.EvaluationRecommendationSectionSummaryController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="evaluationRecommendationSectionSummaryControllerOperation"/>	
+		</aop:config>
+		
+		<!-- Profile Item -->
+		
+		<bean id="presentenceInvestigationRequestProfileItem"
+				class="omis.presentenceinvestigation.web.profile.PresentenceInvestigationRequestProfileItem">
+			<constructor-arg name="requiredAuthorizations">
+				<set>
+					<value>PRESENTENCE_INVESTIGATION_REQUEST_LIST</value>
+					<value>ADMIN</value>
+				</set>
+			</constructor-arg>
+			<constructor-arg name="includePage" value="/WEB-INF/views/presentenceInvestigation/profile/includes/profileItem.jsp"/>
+			<constructor-arg name="name" value="presentenceInvestigationRequest"/>
+			<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+			<constructor-arg name="presentenceInvestigationRequestProfileItemReportService" ref="presentenceInvestigationRequestProfileItemReportService"/>
+			<constructor-arg name="enabled" value="${presentenceInvestigationRequestProfileItemEnabled}"/>
+		</bean> 
+</beans>        

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Service -->
+	<bean id="educationService"
+		class="omis.education.service.impl.EducationServiceImpl">
+		<constructor-arg name="educationTermDelegate" ref="educationTermDelegate" />	
+		<constructor-arg name="educationalAchievementDelegate" ref="educationalAchievementDelegate" />
+		<constructor-arg name="educationNoteDelegate" ref="educationNoteDelegate" />
+		<constructor-arg name="educationalAchievementCategoryDao" ref="educationalAchievementCategoryDao" />
+		<constructor-arg name="instituteCategoryDao" ref="instituteCategoryDao" />
+	</bean>
+	
+	<bean id="educationDocumentService"
+		class="omis.education.service.impl.EducationDocumentServiceImpl">
+		<constructor-arg name="educationAssociableDocumentDelegate" ref="educationAssociableDocumentDelegate" />	
+		<constructor-arg name="educationDocumentCategoryDelegate" ref="educationDocumentCategoryDelegate" />
+		<constructor-arg name="documentDelegate" ref="documentDelegate" />
+		<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+	</bean>
+	
+	
+	<!-- DAOs -->
+	<bean id="educationTermDao"
+		class="omis.education.dao.impl.hibernate.EducationTermDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationTerm" />
+	</bean>
+	
+	<bean id="educationalAchievementDao"
+		class="omis.education.dao.impl.hibernate.EducationalAchievementDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" 
+			value="omis.education.domain.EducationalAchievement" />
+	</bean>
+	
+	<bean id="educationNoteDao"
+		class="omis.education.dao.impl.hibernate.EducationNoteDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationNote" />
+	</bean>
+	
+	<bean id="educationalAchievementCategoryDao"
+		class="omis.education.dao.impl.hibernate.EducationalAchievementCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationalAchievementCategory" />
+	</bean>
+	
+	<bean id="instituteCategoryDao"
+		class="omis.education.dao.impl.hibernate.InstituteCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.InstituteCategory" />
+	</bean>
+	
+	<bean id="educationAssociableDocumentDao" class="omis.education.dao.impl.hibernate.EducationAssociableDocumentDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.education.domain.EducationAssociableDocument" />
+		</bean>
+		
+	<bean id="educationDocumentCategoryDao" class="omis.education.dao.impl.hibernate.EducationDocumentCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.education.domain.EducationDocumentCategory" />
+		</bean>
+	
+	<!-- Delegates -->
+	<bean id="educationTermDelegate"
+		class="omis.education.service.delegate.EducationTermDelegate">
+		<constructor-arg name="educationTermDao" ref="educationTermDao" />
+		<constructor-arg name="educationalAchievementDao" ref="educationalAchievementDao" />
+		<constructor-arg name="educationTermInstanceFactory" ref="educationTermInstanceFactory" />
+		<constructor-arg name="achievementInstanceFactory" ref="educationalAchievementInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="educationalAchievementDelegate"
+		class="omis.education.service.delegate.EducationalAchievementDelegate">
+		<constructor-arg name="educationalAchievementDao" ref="educationalAchievementDao" />
+		<constructor-arg name="educationalAchievementInstanceFactory" ref="educationalAchievementInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="educationNoteDelegate"
+		class="omis.education.service.delegate.EducationNoteDelegate">
+		<constructor-arg name="educationNoteDao" ref="educationNoteDao" />
+		<constructor-arg name="educationNoteInstanceFactory" ref="educationNoteInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="educationalAchievementCategoryDelegate"
+		class="omis.education.service.delegate.EducationalAchievementCategoryDelegate">
+		<constructor-arg name="educationalAchievementCategoryInstanceFactory" ref="educationalAchievementCategoryInstanceFactory" />
+		<constructor-arg name="educationalAchievementCategoryDao" ref="educationalAchievementCategoryDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean> 
+	
+	<bean id="instituteCategoryDelegate"
+		class="omis.education.service.delegate.InstituteCategoryDelegate">
+		<constructor-arg name="instituteCategoryInstanceFactory" ref="instituteCategoryInstanceFactory" />
+		<constructor-arg name="instituteCategoryDao" ref="instituteCategoryDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="educationAssociableDocumentDelegate" class="omis.education.service.delegate.EducationAssociableDocumentDelegate">
+			<constructor-arg name="educationAssociableDocumentDao" ref="educationAssociableDocumentDao" />
+			<constructor-arg name="educationAssociableDocumentInstanceFactory" ref="educationAssociableDocumentInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+	<bean id="educationDocumentCategoryDelegate" class="omis.education.service.delegate.EducationDocumentCategoryDelegate">
+		<constructor-arg name="educationDocumentCategoryDao" ref="educationDocumentCategoryDao" />
+	</bean>
+	
+	<!-- Instance factories -->
+	<bean id="educationTermInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationTerm" />
+	</bean>
+	
+	<bean id="educationalAchievementInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationalAchievement" />
+	</bean>
+	
+	<bean id="educationNoteInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationNote" />
+	</bean>
+	
+	<bean id="educationalAchievementCategoryInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationalAchievementCategory" />
+	</bean>
+	
+	<bean id="instituteCategoryInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.InstituteCategory" />
+	</bean>
+	
+	<bean id="educationAssociableDocumentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.education.domain.EducationAssociableDocument" />
+		</bean>
+	
+	<!-- Property editor factories -->
+	<bean id="educationTermPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="educationTermDao" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationTerm" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="educationalAchievementPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="educationalAchievementDao" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationalAchievement" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="educationNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="educationNoteDao" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationNote" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="educationalAchievementCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="educationalAchievementCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.EducationalAchievementCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="instituteCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="instituteCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.education.domain.InstituteCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="educationAssociableDocumentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="educationAssociableDocumentDao" />
+			<constructor-arg name="entityName"
+				value="omis.education.domain.EducationAssociableDocument" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+	<bean id="educationDocumentCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="educationDocumentCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.education.domain.EducationDocumentCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- Document Beans -->
+		
+		<bean id="educationDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="educationDocumentLocator"/>
+		</bean>
+
+		<bean id="educationDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="educationDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="educationDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\EducationDocuments"/>
+		</bean>
+		
+		<bean id="educationDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="educationDocumentLocator"/>
+		</bean>
+</beans>

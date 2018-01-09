@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Mapping and queries for relationship note category designators.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.relationship.domain">
+
+	<!-- Maps class. -->
+	<class entity-name="omis.relationship.domain.RelationshipNoteCategoryDesignator"
+		proxy="omis.relationship.domain.RelationshipNoteCategoryDesignator"
+		name="omis.relationship.domain.impl.RelationshipNoteCategoryDesignatorImpl"
+		table="`RELATIONSHIP_NOTE_CAT_DES`">
+		<cache usage="transactional" region="relationship"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`RELATIONSHIP_NOTE_CAT_DES_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="category" entity-name="omis.relationship.domain.RelationshipNoteCategory" not-null="true" column="CATEGORY_ID" unique="true"/>
+	</class>
+	
+	<!-- Returns relationship note category designator by business key -->
+	<query name="findRelationshipNoteCategoryDesignator"><![CDATA[
+	  select designator
+	  from omis.relationship.domain.RelationshipNoteCategoryDesignator designator
+	  where designator.category = :category
+	]]></query>
+	
+	<!-- Returns designated relationship note categories. -->
+	<query name="findDesignatedRelationshipNoteCategories" cacheable="true" cache-region="relationship"><![CDATA[
+      select category
+      from omis.relationship.domain.RelationshipNoteCategoryDesignator designator
+        inner join designator.category category
+      order by category.sortOrder, category.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+/*
+ * Styling for alert links.
+ *
+ * Author: Stephen Abson
+ */
+
+.alertLink:before {
+	content: url('../images/alert.png');
+	vertical-align: -50%;
+}
+
+.alertLink {
+	vertical-align: middle;
+}

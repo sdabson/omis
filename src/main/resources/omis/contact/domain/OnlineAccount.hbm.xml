@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.contact.domain">
+	<class entity-name="omis.contact.domain.OnlineAccount"
+		proxy="omis.contact.domain.OnlineAccount"
+		name="omis.contact.domain.impl.OnlineAccountImpl"
+		table="`ONLINE_ACCOUNT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ONLINE_ACCOUNT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="contact" column="`CONTACT_ID`" cascade="none" not-null="true" entity-name="omis.contact.domain.Contact" unique="false"/>
+		<many-to-one name="host" column="`HOST_ID`" cascade="none" not-null="true" entity-name="omis.contact.domain.OnlineAccountHost" unique="false"/>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true" unique="false"/>
+		<property name="active" type="yes_no" not-null="true" column="`ACTIVE`"/>
+		<property name="primary" type="yes_no" not-null="true" column="`PRIMARY`"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	
+	<query name="findOnlineAccount"><![CDATA[
+		select onlineAccount 
+		from omis.contact.domain.OnlineAccount onlineAccount
+		where
+			onlineAccount.contact = :contact
+		and
+			onlineAccount.name = :name
+		and
+			onlineAccount.host = :host
+	]]></query>
+	
+	<query name="findOnlineAccountExcluding"><![CDATA[
+		select onlineAccount 
+		from omis.contact.domain.OnlineAccount onlineAccount
+		where
+			onlineAccount.name = :name
+		and
+			onlineAccount.contact = :contact
+		and
+			onlineAccount.host = :host
+		and
+			onlineAccount <> :excludedOnlineAccount
+	]]></query>
+	
+	<query name="findByContact"><![CDATA[
+		select onlineAccount 
+			from omis.contact.domain.OnlineAccount onlineAccount
+		where
+			onlineAccount.contact = :contact
+		order by onlineAccount.primary desc
+
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+/*
+ * Location term links.
+ *
+ * Author: Stephen Abson
+ */
+
+.locationTermProfileLink:before {
+	content: url('../images/locationTermProfile.png');
+	vertical-align: -50%;
+}
+
+.locationTermProfileLink {
+	vertical-align: middle;
+}

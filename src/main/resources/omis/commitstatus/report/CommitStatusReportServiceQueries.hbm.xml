@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.report">
+	<query name="findCommitStatusSummaryByOffender"><![CDATA[ 
+ 		select new omis.commitstatus.report.CommitStatusTermSummary( 
+ 			term.id,
+ 			offender.offenderNumber,
+ 			name.lastName,
+ 			name.firstName,
+ 			name.middleName,
+ 			name.suffix,
+ 			term.dateRange.startDate,
+ 			term.dateRange.endDate,
+ 			status.name
+ 		)
+ 		from 
+ 			omis.commitstatus.domain.CommitStatusTerm term 
+ 			inner join term.status status
+ 			inner join term.offender offender
+ 			inner join offender.name name
+ 		where 
+ 			offender=:offender
+ 		order by
+ 			term.dateRange.startDate desc
+ 	]]></query>
+</hibernate-mapping>
+
+
+

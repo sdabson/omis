@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.visitation.domain">
+	<class entity-name="omis.visitation.domain.VisitationAssociationNote"
+		proxy="omis.visitation.domain.VisitationAssociationNote"
+		name="omis.visitation.domain.impl.VisitationAssociationNoteImpl"
+		table="`VISITATION_ASSOC_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VISITATION_ASSOC_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="value" column="`VALUE`" not-null="true" type="string"/>
+		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+		<many-to-one name="association" column="`ASSOCIATION_ID`" cascade="none" not-null="true"
+			entity-name="omis.visitation.domain.VisitationAssociation" unique="false"/>
+		<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+					 not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findVisitaitonAssociationNoteByAssociation"><![CDATA[
+		select note
+		from omis.visitation.domain.VisitationAssociationNote note
+		where note.association = :associaiton
+		order by note.date desc
+	]]></query>
+	<query name="findVisitationAssociationNote"><![CDATA[
+		select note
+		from omis.visitation.domain.VisitationAssociationNote note
+		where note.association = :association
+		and note.date = :date
+		and note.value = :value
+		order by note.date desc
+	]]></query>
+	<query name="findVisitationAssociationNoteExcluding"><![CDATA[
+		select note
+		from omis.visitation.domain.VisitationAssociationNote note
+		where note.association = :association
+		and note.date = :date
+		and note.value = :value
+		and note <> :note
+		order by note.date desc
+	]]></query>
+</hibernate-mapping>

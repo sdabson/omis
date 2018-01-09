@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary"
+			proxy="omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary"
+			name="omis.presentenceinvestigation.domain.impl.SupervisionHistorySectionSummaryImpl"
+			table="`SUPERVISION_SECTN_SUMRY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SUPERVISION_SECTN_SUMRY_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="presentenceInvestigationRequest" column="`PRESNTNCE_INVESTIGTN_RQST_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest" not-null="true" />
+			<property name="text" column="`TEXT`" type="java.lang.String" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findSupervisionHistorySectionSummary"><![CDATA[
+		select summary 
+		from
+			omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary summary
+		where
+			summary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findExcludingSupervisionHistorySectionSummary"><![CDATA[
+		select summary 
+		from
+			omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary summary
+		where
+			summary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			summary != :supervisionHistorySectionSummary
+	]]></query>
+</hibernate-mapping>

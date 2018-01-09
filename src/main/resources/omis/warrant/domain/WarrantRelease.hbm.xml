@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.warrant.domain">
+	<class entity-name="omis.warrant.domain.WarrantRelease"
+			proxy="omis.warrant.domain.WarrantRelease"
+			name="omis.warrant.domain.impl.WarrantReleaseImpl"
+			table="`WARRANT_RELEASE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WARRANT_RELEASE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="warrant" column="`WARRANT_ID`" entity-name="omis.warrant.domain.Warrant" not-null="true" />
+			<many-to-one name="county" column="`COUNTY_ID`" entity-name="omis.region.domain.County" not-null="true" />
+			<many-to-one name="facility" column="`FACILITY_ID`" entity-name="omis.facility.domain.Facility" not-null="true" />
+			<property name="releaseTimestamp" column="`RELEASE_DATE`" type="java.util.Date" not-null="true" />
+			<property name="addressee" column="`ADDRESSEE`" type="java.lang.String" not-null="true" />
+			<property name="instructions" column="`OFFENDER_INSTRUCTIONS`" type="java.lang.String" not-null="false" />
+			<component name="clearSignature">
+				<many-to-one name="person" column="`CLEARED_BY_PERSON_ID`" entity-name="omis.person.domain.Person" not-null="true" />
+				<property name="date" column="`CLEARED_BY_DATE`" type="java.util.Date" not-null="true" />
+			</component>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findWarrantRelease"><![CDATA[
+		select warrantRelease
+		from
+			omis.warrant.domain.WarrantRelease warrantRelease
+		where
+			warrantRelease.warrant = :warrant
+	]]></query>
+	<query name="findWarrantReleaseExcluding"><![CDATA[
+		select warrantRelease
+		from
+			omis.warrant.domain.WarrantRelease warrantRelease
+		where
+			warrantRelease.warrant = :warrant
+		and
+			warrantRelease != :warrantRelease
+	]]></query>
+</hibernate-mapping>

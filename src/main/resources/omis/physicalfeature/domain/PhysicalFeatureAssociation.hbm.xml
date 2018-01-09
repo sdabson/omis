@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.physicalfeature.domain">
+	<class entity-name="omis.physicalfeature.domain.PhysicalFeatureAssociation"
+		proxy="omis.physicalfeature.domain.PhysicalFeatureAssociation"
+		name="omis.physicalfeature.domain.impl.PhysicalFeatureAssociationImpl"
+		table="`PHYSICAL_FEATURE_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PHYSICAL_FEATURE_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="feature" not-null="true" column="`FEATURE_ID`"
+			entity-name="omis.physicalfeature.domain.PhysicalFeature"/>
+		<property name="description" not-null="false" column="`DESCRIPTION`"
+			type="java.lang.String"/>
+		<property name="originationDate" column="`ORIGINATION_DATE`" not-null="false" type="java.util.Date"/>
+		<many-to-one name="offender" not-null="true" column="`OFFENDER_ID`"
+			entity-name="omis.offender.domain.Offender" unique="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findPhysicalFeatureAssociation"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeatureAssociation association
+		where
+			association.description = :description
+		and
+			association.feature = :feature
+		and
+			association.offender = :offender
+	]]></query>
+	<query name="findPhysicalFeatureAssociationExcluding"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeatureAssociation association
+		where
+			association.description = :description
+		and
+			association.feature = :feature
+		and
+			association.offender = :offender
+		and
+			association <> :excludedPhysicalFeatureAssociation
+	]]></query>
+	<query name="findOffenderPhysicalFeaturesByOffender"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeatureAssociation pFAssociation
+		where
+			pFAssociation.offender = :offender
+	]]></query>
+</hibernate-mapping>

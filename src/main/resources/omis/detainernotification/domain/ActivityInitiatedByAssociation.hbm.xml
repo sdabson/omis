@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.ActivityInitiatedByAssociation"
+			proxy="omis.detainernotification.domain.ActivityInitiatedByAssociation"
+			name="omis.detainernotification.domain.impl.ActivityInitiatedByAssociationImpl"
+			table="`ACTIVITY_INITIATED_BY_ASSOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`ACTIVITY_INITIATED_BY_ASSOC_SEQ`</param>
+				</generator>
+			</id>
+			<property name="initiatedBy" column="`INITIATED_BY`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.detainernotification.domain.InterstateAgreementInitiatedByCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<many-to-one name="activity" column="`DETAINER_ACTIVITY_ID`" entity-name="omis.detainernotification.domain.DetainerActivityCategory" not-null="true" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- Services -->
+        
+        <bean id="incidentStatementSummaryService"
+        	class="omis.incident.report.impl.hibernate.IncidentStatementSummaryServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="jurisdictionSummaryService"
+        	class="omis.incident.report.impl.hibernate.JurisdictionSummaryServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="incidentStatementService"
+			class="omis.incident.service.impl.IncidentStatementServiceImpl">
+				<constructor-arg name="incidentStatementDao" ref="incidentStatementDao"/>
+				<constructor-arg name="involvedPartyDao" ref="involvedPartyDao"/>
+				<constructor-arg name="incidentStatementNoteDao" ref="incidentStatementNoteDao"/>
+				<constructor-arg name="facilityDao" ref="facilityDao"/>
+				<constructor-arg name="complexDao" ref="complexDao"/>
+				<constructor-arg name="unitDao" ref="unitDao"/>
+				<constructor-arg name="sectionDao" ref="sectionDao"/>
+				<constructor-arg name="levelDao" ref="levelDao"/>
+				<constructor-arg name="roomDao" ref="roomDao"/>
+				<constructor-arg name="jurisdictionDao" ref="jurisdictionDao"/>
+				<constructor-arg name="facilityAreaDao" ref="facilityAreaDao"/>
+				<constructor-arg name="incidentStatementCategoryDao" ref="incidentStatementCategoryDao"/>
+				<constructor-arg name="incidentStatementInstanceFactory" ref="incidentStatementInstanceFactory"/>
+				<constructor-arg name="involvedPartyInstanceFactory" ref="involvedPartyInstanceFactory"/>
+				<constructor-arg name="incidentStatementNoteInstanceFactory" ref="incidentStatementNoteInstanceFactory"/>
+				<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+				<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+		</bean>
+	
+		<bean id="incidentService"
+			class="omis.incident.service.impl.IncidentServiceImpl">
+		</bean>
+	
+    <!-- Data access objects -->
+    	<bean id="incidentStatementCategoryDao"
+    		class="omis.incident.dao.impl.hibernate.IncidentStatementCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatementCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    	</bean>
+    
+        <bean id="involvedPartyDao"
+        	class="omis.incident.dao.impl.hibernate.InvolvedPartyDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.incident.domain.InvolvedParty"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="incidentStatementDao"
+        	class="omis.incident.dao.impl.hibernate.IncidentStatementDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatement"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="incidentStatementNoteDao"
+        	class="omis.incident.dao.impl.hibernate.IncidentStatementNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatementNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="jurisdictionDao"
+        	class="omis.incident.dao.impl.hibernate.JurisdictionDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.incident.domain.Jurisdiction"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  	<!-- Instance factories -->
+  		 
+		<bean id="incidentStatementInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatement"/>
+		</bean>
+		
+		<bean id="incidentStatementNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatementNote"/>
+		</bean>
+		
+		<bean id="involvedPartyInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.incident.domain.InvolvedParty"/>
+		</bean>
+		
+	<!--Property editor factories -->
+        
+         <bean id="incidentStatementCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatementCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="incidentStatementCategoryDao"/>
+		</bean>
+        
+        <bean id="incidentStatementPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatement"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="incidentStatementDao"/>
+		</bean>
+		
+		<bean id="incidentStatementNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.incident.domain.IncidentStatementNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="incidentStatementNoteDao"/>
+		</bean>
+		
+		<bean id="involvedPartyPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.incident.domain.InvolvedParty"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="involvedPartyDao"/>
+		</bean>
+		
+		<bean id="jurisdictionPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.incident.domain.Jurisdiction"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="jurisdictionDao"/>
+		</bean>
+
+	<!-- Locator for offender photos -->
+
+	  <bean id="jurisdictionPhotoLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+	    <constructor-arg name="path" value="${application.resource.path}\Photos\JurisdictionPhotos"/>
+	  </bean>
+	
+	  <!-- Helper classes -->
+		
+	  <bean id="jurisdictionPhotoRetriever"
+		    class="omis.media.io.impl.SimplePhotoRetrieverImpl">
+	    <constructor-arg name="fileLocator" ref="jurisdictionPhotoLocator"/>
+	    <constructor-arg name="defaultFilename" value="NoPhoto.jpg"/>
+	  </bean>
+	
+</beans>

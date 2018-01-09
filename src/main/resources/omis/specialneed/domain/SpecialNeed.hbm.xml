@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.specialneed.domain">
+	<class entity-name="omis.specialneed.domain.SpecialNeed"
+			proxy="omis.specialneed.domain.SpecialNeed"
+			name="omis.specialneed.domain.impl.SpecialNeedImpl"
+			table="`SPECIAL_NEED`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SPECIAL_NEED_SEQ`</param>
+				</generator>
+			</id>
+			<property name="comment" column="`COMMENT`" not-null="false" type="java.lang.String"/>
+			<property name="sourceComment" column="`SOURCE_COMMENT`" not-null="false" type="java.lang.String"/>
+			<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" not-null="false" unique-key="uk"/>
+				<property name="endDate" column="`END_DATE`" not-null="false"/>
+			</component>
+			<many-to-one name="source" column="`SOURCE_ID`"
+					 entity-name="omis.specialneed.domain.SpecialNeedSource" not-null="true"/>
+			<many-to-one name="category" column="`CATEGORY_ID`"
+					 entity-name="omis.specialneed.domain.SpecialNeedCategory" not-null="true" unique-key="uk"/>
+			<many-to-one name="classification" column="`CLASSIFICATION_ID`" not-null="true" 
+				entity-name="omis.specialneed.domain.SpecialNeedClassification" unique-key="uk"/>			
+			<many-to-one name="offender" not-null="true" column="`OFFENDER_ID`"
+				entity-name="omis.offender.domain.Offender" unique-key="uk"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+					 not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findSpecialNeedBySource">
+		from 
+			omis.specialneed.domain.SpecialNeed specialNeed
+		where 
+			specialNeed.source = :source
+	</query>
+	<query name="findspecialNeedByCategory">
+		from 
+			omis.specialneed.domain.SpecialNeed specialNeed
+		where 
+			specialNeed.category = :category
+	</query>
+	<query name="findSpecialNeedCountByOffenderAndDate"><![CDATA[
+		select count(specialNeed.id)
+		  from omis.specialneed.domain.SpecialNeed specialNeed
+		 where specialNeed.offender = :offender
+		   and ((specialNeed.dateRange.startDate <= :effectiveDate
+		    or specialNeed.dateRange.startDate is null)
+		   and (specialNeed.dateRange.endDate > :effectiveDate
+		    or specialNeed.dateRange.endDate is null))
+	]]></query>
+	<query name="findSpecialNeed"><![CDATA[
+		from
+			omis.specialneed.domain.SpecialNeed specialNeed
+		where
+			specialNeed.offender = :offender
+		and
+			specialNeed.dateRange.startDate = :startDate
+		and
+			specialNeed.source = :source
+		and
+			specialNeed.category = :category
+		and 
+			specialNeed.classification = :classification
+	]]></query>
+	<query name="findSpecialNeedExcluding"><![CDATA[
+		from
+			omis.specialneed.domain.SpecialNeed specialNeed
+		where
+			specialNeed.offender = :offender
+		and
+			specialNeed.dateRange.startDate = :startDate
+		and
+			specialNeed.source = :source
+		and
+			specialNeed.category = :category
+		and 
+			specialNeed.classification = :classification
+		and
+			specialNeed <> :specialNeed
+	]]></query>
+</hibernate-mapping>

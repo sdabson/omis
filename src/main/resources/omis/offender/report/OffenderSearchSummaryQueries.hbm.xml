@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  <hibernate-mapping package="omis.offender.report">
+  <query name="searchingForOffender"><![CDATA[
+   		select new omis.offender.report.OffenderSearchSummary(
+	   		offender, name.lastName, name.firstName, name.middleName, name.suffix,
+			   (select supervisoryOrganization.name
+		   		from
+		   			omis.supervision.domain.SupervisoryOrganizationTerm sTerm
+		   			inner join sTerm.offender supervisoryOffender
+		   			inner join sTerm.supervisoryOrganization supervisoryOrganization
+		   		where supervisoryOffender = offender 
+		   		and ((sTerm.dateRange.startDate is null or sTerm.dateRange.startDate <= :effectiveDate)
+				and (sTerm.dateRange.endDate is null or sTerm.dateRange.endDate > :effectiveDate))),
+										   	
+		   		(select correctionalStatus.name
+		   		from
+		   			omis.supervision.domain.CorrectionalStatusTerm cTerm
+		   			inner join cTerm.offender correctionalOffender
+		   			inner join cTerm.correctionalStatus correctionalStatus
+		   		where correctionalOffender = offender),	   
+		   				
+	   		fi.birthDate, fi.sex, (select locationAddress
+						from
+							omis.locationterm.domain.LocationTerm lTerm
+							inner join lTerm.offender locationOffender
+							inner join lTerm.location location
+							inner join location.address locationAddress
+						where
+							((locationOffender = offender)
+							and
+							(location = :location or :location is null))
+							and ((lTerm.dateRange.startDate is null or lTerm.dateRange.startDate <= :effectiveDate)
+							and (lTerm.dateRange.endDate is null or lTerm.dateRange.endDate > :effectiveDate))), 
+							case
+								when 
+									activePlacementTerm is not null				 
+								then
+								 	true
+								else
+									false
+							end)		
+	   	from
+	   		omis.supervision.domain.PlacementTerm activePlacementTerm
+	   		right outer join activePlacementTerm.offender offender	
+   				left outer join offender.name name
+   				left outer join offender.identity fi,
+   			omis.person.domain.PersonName allNames	
+   		where     		
+   			((((activePlacementTerm.dateRange.startDate is null 
+                or 
+                  activePlacementTerm.dateRange.startDate <= :effectiveDate)
+                and
+                  (activePlacementTerm.dateRange.endDate is null 
+                or 
+                  activePlacementTerm.dateRange.endDate > :effectiveDate) 
+                and activePlacementTerm is not null)					
+   			and (:active = true and activePlacementTerm is not null)
+	        or (:active =false)
+	        or (:active is null))	           	
+   			and (offender.offenderNumber = :offenderNumber or :offenderNumber is null)
+   			and (upper(allNames.firstName) like upper(:firstName || '%' ) or :firstName is null)
+ 			and (upper(allNames.lastName) like upper(:lastName || '%' ) or :lastName is null)
+			and (upper(allNames.middleName) like upper(:middleName || '%' ) or :middleName is null)
+			and allNames.person = offender
+			and (fi.sex = :sex or :sex is null)
+			and (fi.birthDate = :dateOfBirth or :dateOfBirth is null)
+			and (fi.socialSecurityNumber = :socialSecurityNumber or :socialSecurityNumber is null)
+			)
+   			order by name.lastName, name.firstName
+   	]]></query>   
+   	 <query name="searchForOffender"><![CDATA[
+   		select new omis.offender.report.OffenderSearchSummary(
+	   		offender, name.lastName, name.firstName, name.middleName, name.suffix,			  
+	   		fi.birthDate, fi.sex)		
+	   	from
+   		 	omis.offender.domain.Offender offender	
+   				left outer join offender.name name
+   				left outer join offender.identity fi
+   		where     		
+   			(offender.offenderNumber = :offenderNumber or :offenderNumber is null)
+			and (fi.sex = :sex or :sex is null)			
+			and (fi.birthDate = :dateOfBirth or :dateOfBirth is null)
+			and (fi.socialSecurityNumber = :socialSecurityNumber or :socialSecurityNumber is null)
+			and offender in (select personNames.person from omis.person.domain.PersonName personNames
+				where (upper(personNames.firstName) like upper(:firstName || '%' ) or :firstName is null)
+	 			and (upper(personNames.lastName) like upper(:lastName || '%' ) or :lastName is null)
+				and (upper(personNames.middleName) like upper(:middleName || '%' ) or :middleName is null))
+   		order by name.lastName, name.firstName
+   	]]></query>
+   	<query name="findAlternateNameSummariesByOffender"><![CDATA[
+   	select new omis.person.report.AlternateNameSummary(person.id, personName.firstName,
+   		personName.middleName, personName.lastName, personName.suffix, category.name)
+   	from
+   		omis.person.domain.AlternativeNameAssociation altName
+   		inner join altName.category category
+   		inner join altName.name personName
+   		inner join personName.person person
+   	where
+   		person = :offender
+   	order by 
+   		personName.lastName, personName.middleName, personName.firstName,
+   		category.name
+	]]></query>  		   	   	
+  </hibernate-mapping>

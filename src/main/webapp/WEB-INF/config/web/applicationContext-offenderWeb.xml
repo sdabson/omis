@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Offender profile item container -->
+  
+  <bean id="basicInformationProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="placementProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="legalProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="caseManagementProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="safetyProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="complianceProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="healthProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+  <bean id="relationshipsProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
+	
+	
+
+	<bean id="offenderDemographicsProfileItem"
+		class="omis.offender.web.profile.OffenderDemographicsProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>OFFENDER_DEMOGRAPHICS_VIEW</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/offender/demographics/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="demographics"/>
+		<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+		<constructor-arg name="enabled" value="${offenderDemographicsProfileItemEnabled}"/>
+	</bean>
+	
+	<bean id="offenderDetailsProfileItem"
+		class="omis.offender.web.profile.OffenderDetailsProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>OFFENDER_VIEW</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="name" value="legalNameIdentity"/>
+		<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+		<constructor-arg name="includePage" value="/WEB-INF/views/offender/personalDetails/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="enabled" value="${offenderDetailsProfileItemEnabled}"/>
+	</bean>
+	
+	<bean id="offenderAlternativeIdentityProfileItem"
+		class="omis.offender.web.profile.OffenderAlternativeIdentityProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>OFFENDER_ALT_IDENTITY_LIST</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/offender/identity/alternative/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+		<constructor-arg name="name" value="alternativeIdentity"/>
+		<constructor-arg name="alternativeOffenderIdentityProfileItemReportService" ref="alternativeOffenderIdentityProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${offenderAlternativeIdentityProfileItemEnabled}"/>
+		
+	</bean>
+
+	<bean id="offenderAlternativeNameProfileItem"
+		class="omis.offender.web.profile.OffenderAlternativeNameProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>OFFENDER_ALT_NAME_LIST</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/offender/name/alternative/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+		<constructor-arg name="name" value="alternativeName"/>
+		<constructor-arg name="alternativeOffenderNameProfileItemReportService" ref="alternativeOffenderNameProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${offenderAlternativeNameProfileItemEnabled}"/>
+	</bean>
+
+  <bean id="offenderSummaryItem"
+  		class="omis.offender.web.summary.OffenderSummaryItem">
+  	<constructor-arg name="offenderReportService" ref="offenderReportService"/>
+  	<constructor-arg name="summaryItemRegistry" ref="basicInformationSummaryItemRegistry"/>
+  	<constructor-arg name="includedPageName" value="/WEB-INF/views/offender/summary/includes/summaryItem.jsp"/>
+  	<constructor-arg name="order" value="1"/>
+  	<constructor-arg name="enabled" value="${offenderSummaryItemEnabled}"/>
+  </bean> 
+  
+	<!-- Offender Summary Item Containers -->
+
+	<bean id="basicInformationSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="offenderFlagSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="communitySupervisionSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="offenderContactSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="placementSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="legacyPlacementSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="identificationNumbersSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="facilitySummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	<bean id="dischargeDataSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+	
+  <!-- Validators -->
+  
+  <bean id="alternativeOffenderIdentityFormValidator"
+        class="omis.offender.web.validator.AlternativeOffenderIdentityFormValidator"/>
+        
+  <bean id="alternativeOffenderNameFormValidator"
+        class="omis.offender.web.validator.AlternativeOffenderNameFormValidator"/>
+        
+  <bean id="offenderPersonalDetailsFormValidator"
+        class="omis.offender.web.validator.OffenderPersonalDetailsFormValidator"/>
+        
+  <bean id="offenderDemographicsFormValidator"
+        class="omis.offender.web.validator.OffenderDemographicsFormValidator"/>
+  
+  <bean id="createOffenderFormValidator"
+        class="omis.offender.web.validator.CreateOffenderFormValidator"/>
+        
+  <bean id="offenderSearchFormValidator" 
+  		class="omis.offender.web.validator.OffenderSearchFormValidator"/>
+  		
+  <bean id="changeOffenderNameFormValidator" 
+  		class="omis.offender.web.validator.ChangeOffenderNameFormValidator"/>
+  
+  <!-- Validator delegates -->
+  
+  <bean id="offenderSearchFieldsValidatorDelegate"
+        class="omis.offender.web.validator.delegate.OffenderSearchFieldsValidatorDelegate"/>
+  
+  <!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.offender.web.controller"/>
+   
+  <context:component-scan base-package="omis.offender.search.web.controller"/>
+  
+  <!-- Web delegates -->
+  
+  <bean id="offenderSummaryModelDelegate" class="omis.offender.web.controller.delegate.OffenderSummaryModelDelegate"/>
+  
+   <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="alternativeOffenderIdentityControllerOperation" expression="execution(* omis.offender.web.controller.AlternativeOffenderIdentityController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="alternativeOffenderIdentityControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="alternativeOffenderNameControllerOperation" expression="execution(* omis.offender.web.controller.AlternativeOffenderNameController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="alternativeOffenderNameControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="createOffenderControllerOperation" expression="execution(* omis.offender.web.controller.CreateOffenderController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="createOffenderControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="offenderDemographicsControllerOperation" expression="execution(* omis.offender.web.controller.OffenderDemographicsController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderDemographicsControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="offenderModuleControllerOperation" expression="execution(* omis.offender.web.controller.OffenderModuleController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderModuleControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="offenderPersonalDetailsControllerOperation" expression="execution(* omis.offender.web.controller.OffenderPersonalDetailsController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderPersonalDetailsControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="offenderProfileControllerOperation" expression="execution(* omis.offender.web.controller.OffenderProfileController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderProfileControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="changeOffenderNameControllerOperation" expression="execution(* omis.offender.web.controller.ChangeOffenderNameController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="changeOffenderNameControllerOperation"/>
+  </aop:config>
+    
+</beans>

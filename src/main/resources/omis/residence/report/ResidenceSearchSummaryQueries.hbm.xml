@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  <hibernate-mapping package="omis.residence.report">
+  	<query name="findResidenceCitiesByState"><![CDATA[
+  		select cities
+		from omis.region.domain.City cities
+			inner join cities.state state
+		where
+			state = :state
+		order by cities.name, state.name
+  	]]></query>
+  	<query name="searchingForResidence"><![CDATA[
+  		select new omis.residence.report.ResidenceSearchSummary(
+  			name.firstName, termPerson.id, term.id, name.lastName, name.middleName, 
+  			term.dateRange.startDate, term.dateRange.endDate, address,
+  			term.confirmed)
+		from omis.residence.domain.ResidenceTerm term	  				
+			inner join term.person termPerson
+			inner join termPerson.name name
+			left outer join term.address address
+			left outer join address.zipCode zipCode
+			left outer join zipCode.city city
+		where 
+			(((term.dateRange.startDate is null or term.dateRange.startDate <= :effectiveDate)
+			and (term.dateRange.endDate is null or term.dateRange.endDate > :effectiveDate))
+			and (address.value like (:value || '%') or :value is null)  					
+			and (city.state = :state or :state is null)
+			and (city = :city or :city is null))
+		order by term.dateRange.endDate	
+  	]]></query>
+  	<query name="findAllResidenceStates"><![CDATA[
+  		select states
+		from omis.region.domain.State states
+		order by states.name
+  	]]></query>
+  </hibernate-mapping>  	

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.Condition"
+	       proxy="omis.condition.domain.Condition"
+	       name="omis.condition.domain.impl.ConditionImpl"
+	       table="`CONDITION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CONDITION_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<many-to-one name="agreement"  class="omis.condition.domain.Agreement" column="`AGREEMENT_ID`" not-null="true"/>
+			<property name="clause" type="java.lang.String" column="`CLAUSE`" not-null="true"></property>
+			<many-to-one name="conditionClause"  class="omis.condition.domain.ConditionClause" column="`CONDITION_CLAUSE_ID`" not-null="true"/>
+			<property name="category" column="`CATEGORY`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.condition.domain.ConditionCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="waived" column="`WAIVED`" type="yes_no" not-null="true" />
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findCondition"><![CDATA[
+	  	select condition 
+	  		from omis.condition.domain.Condition condition
+	  	where 
+	  		condition.agreement = :agreement
+	    and 
+	    	condition.conditionClause = :conditionClause
+	    and 
+	    	condition.clause = :clause
+	]]></query> 
+	<query name="findConditionExcluding"><![CDATA[
+		select condition
+			from omis.condition.domain.Condition condition
+		where 
+	  		condition.agreement = :agreement
+	    and 
+	    	condition.clause = :clause
+	    and 
+	    	condition.conditionClause = :conditionClause
+	    and 
+	    	condition != :condition
+	]]></query>
+	<query name="findConditionsByAgreement"><![CDATA[
+		select condition
+			from omis.condition.domain.Condition condition
+		where 
+			condition.agreement = :agreement
+	]]></query>
+	<query name="findWaivedConditionsByAgreement"><![CDATA[
+		select condition
+			from omis.condition.domain.Condition condition
+		where 
+			condition.agreement = :agreement
+		and
+			condition.waived = true
+	]]></query> 
+	<query name="findConditionsByOffenderAndEffectiveDate"><![CDATA[
+		select condition
+			from omis.condition.domain.Condition condition
+		inner join
+			condition.agreement agreement
+		where 
+			agreement.offender = :offender
+		and
+			(agreement.dateRange.startDate <= :effectiveDate)
+			and (agreement.dateRange.endDate > :effectiveDate
+				or agreement.dateRange.endDate is null)
+		and 
+			condition.waived != true
+	]]></query>
+</hibernate-mapping>

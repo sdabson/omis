@@ -1,0 +1,192 @@
+/*
+ * Referral Center style.
+ * 
+ * Author: Ryan Johns
+ * Author: Stephen Abson
+ * Version: 0.1.1 (June 11, 2014)
+ * Since: OMIS 3.0
+ */
+.header {
+   
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    border: 1px solid #000;
+    border-collapse: collapse;
+    
+
+}
+
+.titleHeader {
+	vertical-align:middle;
+	text-align: center;
+	background-color: hsla(200, 100%, 35%, 1);
+	font-size:1.25em;
+	color: #F0F0F0;
+	font-weight:bold;
+	height: 25px;
+	display:inline-block;
+	width:100%;
+}
+
+#filterControlContainer .titleHeader {
+
+	display: inline-block;
+	
+}
+
+#facilityReferralCenterFilter {
+    bottom: 0;
+    position: absolute;
+    top: 32px;
+    width: 196px;
+    margin:0px;
+    padding:0px;
+    left: 0px;
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+
+#referrals {
+    bottom: 0;
+    left: 201px;
+    position: absolute;
+    right: 0;
+    top: 32px;
+    overflow-y: hidden;
+}
+
+.referralList {
+	max-height: 250px;
+    min-height: 25px;
+	margin-bottom: 15px;
+	border: 1px solid #000;
+	overflow-y: scroll;
+}
+
+.referralList:last-child {
+	margin-bottom: 0px;	
+}
+
+#referralDomainList {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 299px;
+	padding:0px;
+	margin:0px;
+	list-style-type: none;
+}
+#referralDomainList li a {
+	display: block; 
+	font-size: 12px; 
+	text-decoration: none; 
+	border: 1px solid;
+}
+
+#filterControlContainer .titleHeader{
+	cursor:pointer;
+}
+
+#facilityReferralCenterFilterMin{
+	cursor:pointer;
+	bottom: 0;
+	left: -25px;
+	position: absolute;
+	top: 32px;
+	width: 20px;
+	margin:0px;
+	padding:0px;
+	border: 1px solid #000;
+	writing-mode: tb-lr;
+	z-index:-1;
+	background-color:#03436A;
+	font-size:1.25em;
+	color: #F0F0F0;
+	font-weight:bold;
+	width:24px;
+	display:inline-block;
+}
+
+/* Table column widths. */
+
+th.operations {
+	width: 64px;
+}
+
+th.moreOperations {
+	width: 92px;
+}
+
+th.evenMoreOperations {
+	width: 170px;
+	min-width: 90px;
+}
+
+th.appointmentDate, th.requestDate {
+	width: 120px;
+}
+
+th.asap {
+	width: 36px;
+}
+
+th.notes {
+	width: 36px;
+}
+
+th.expanded {
+	width:130px;
+}
+
+#listContainer .listTable th{
+	cursor:pointer;
+}
+
+/* Filter form. */
+
+#filterForm .seperator {
+    display: inline-block;
+	width:100%;
+	background-color: #4682B4;
+	color: #FFFFFF;
+	border-color: #000000;
+	text-align:center;
+	font-weight:bold;
+}
+
+#filterForm label {
+	display: block;
+}
+
+#filterForm .fieldGroup {
+    display: inline-block;
+    padding: 1px;
+	width: 100%;
+}
+
+#filterForm .frameTitle {
+	display: inline-block;
+	width: 100%;
+    background: linear-gradient(#4682B4, #F0F0F0);
+	color: #FFFFFF;
+	border-color: #000000;
+	text-align:center;
+	font-weight:bold;
+	height:24px;
+	vertical-align:center;
+}
+
+#filterForm input.date {
+	width: 8em;
+}
+
+p.buttons {
+	margin: 0px;
+	padding: 1px;
+	text-align: right;
+}

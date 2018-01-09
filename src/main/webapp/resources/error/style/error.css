@@ -1,0 +1,14 @@
+/*
+ * Styling for errors.
+ * Author: Stephen Abson
+ * Version: 0.1.0 (March 1, 2013)
+ * Since: OMIS 3.0
+ */
+
+h1, h2, h3, h4, h5 {
+	background-color: purple;
+	color: white;
+}
+.exception, .stackTraceElements {
+	
+}

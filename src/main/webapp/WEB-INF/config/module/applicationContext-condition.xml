@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="agreementService"
+        class="omis.condition.service.impl.AgreementServiceImpl">
+    <constructor-arg name="agreementDelegate" ref="agreementDelegate"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="agreementDelegate" class="omis.condition.service.delegate.AgreementDelegate">
+    <constructor-arg name="agreementInstanceFactory" ref="agreementInstanceFactory"/>
+    <constructor-arg name="agreementDao" ref="agreementDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="agreementNoteDelegate" class="omis.condition.service.delegate.AgreementNoteDelegate">
+    <constructor-arg name="agreementNoteInstanceFactory" ref="agreementNoteInstanceFactory"/>
+    <constructor-arg name="agreementNoteDao" ref="agreementNoteDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="conditionClauseDelegate" class="omis.condition.service.delegate.ConditionClauseDelegate">
+    <constructor-arg name="conditionClauseDao" ref="conditionClauseDao"/>
+    <constructor-arg name="conditionClauseInstanceFactory" ref="conditionClauseInstanceFactory"/>
+  </bean>
+  
+  <bean id="conditionGroupDelegate" class="omis.condition.service.delegate.ConditionGroupDelegate">
+    <constructor-arg name="conditionGroupInstanceFactory" ref="conditionGroupInstanceFactory"/>
+    <constructor-arg name="conditionGroupDao" ref="conditionGroupDao"/>
+  </bean>
+  
+  <bean id="conditionDelegate" class="omis.condition.service.delegate.ConditionDelegate">
+    <constructor-arg name="conditionInstanceFactory" ref="conditionInstanceFactory"/>
+    <constructor-arg name="conditionDao" ref="conditionDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+   
+   <bean id="conditionTitleDelegate" class="omis.condition.service.delegate.ConditionTitleDelegate">
+		<constructor-arg name="conditionTitleDao" ref="conditionTitleDao" />
+		<constructor-arg name="conditionTitleInstanceFactory" ref="conditionTitleInstanceFactory" />
+	</bean>
+	
+	<bean id="agreementAssociableDocumentDelegate" class="omis.condition.service.delegate.AgreementAssociableDocumentDelegate">
+		<constructor-arg name="agreementAssociableDocumentDao" ref="agreementAssociableDocumentDao" />
+		<constructor-arg name="agreementAssociableDocumentInstanceFactory" ref="agreementAssociableDocumentInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+  
+  <!-- Data access objects -->
+   
+  <bean id="agreementDao"
+        class="omis.condition.dao.impl.hibernate.AgreementDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.condition.domain.Agreement"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="agreementNoteDao"
+        class="omis.condition.dao.impl.hibernate.AgreementNoteDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.condition.domain.AgreementNote"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="conditionGroupDao"
+        class="omis.condition.dao.impl.hibernate.ConditionGroupDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionGroup"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="conditionClauseDao"
+        class="omis.condition.dao.impl.hibernate.ConditionClauseDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionClause"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="conditionDao"
+        class="omis.condition.dao.impl.hibernate.ConditionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.condition.domain.Condition"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="conditionTitleDao" class="omis.condition.dao.impl.hibernate.ConditionTitleDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.condition.domain.ConditionTitle" />
+	</bean>
+	
+		<bean id="agreementAssociableDocumentDao" class="omis.condition.dao.impl.hibernate.AgreementAssociableDocumentDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.condition.domain.AgreementAssociableDocument" />
+		</bean>
+
+  <!-- Instance factories -->
+  
+  <bean id="agreementInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.Agreement"/>
+  </bean>
+  
+  <bean id="agreementNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.AgreementNote"/>
+  </bean>
+  
+  <bean id="conditionGroupInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionGroup"/>
+  </bean>
+  
+  <bean id="conditionClauseInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionClause"/>
+  </bean>
+  
+  <bean id="conditionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.Condition"/>
+  </bean>
+  
+  <bean id="conditionTitleInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.condition.domain.ConditionTitle" />
+	</bean>
+		
+		<bean id="agreementAssociableDocumentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.condition.domain.AgreementAssociableDocument" />
+		</bean>
+		
+		
+  <!-- Property editor factories -->
+  
+  
+  <bean id="conditionGroupPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="conditionGroupDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionGroup"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="agreementNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="agreementNoteDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.AgreementNote"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="agreementPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="agreementDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.Agreement"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="conditionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="conditionDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.Condition"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="conditionClausePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="conditionClauseDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionClause"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="conditionTitlePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="conditionTitleDao"/>
+    <constructor-arg name="entityName" value="omis.condition.domain.ConditionTitle"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+		
+		<bean id="agreementAssociableDocumentPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="agreementAssociableDocumentDao" />
+			<constructor-arg name="entityName"
+				value="omis.condition.domain.AgreementAssociableDocument" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

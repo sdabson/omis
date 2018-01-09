@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+   <!-- Validators -->
+   
+   <bean id="misdemeanorCitationFormValidator" class="omis.citation.web.validator.MisdemeanorCitationFormValidator">
+   </bean>
+   
+   <!-- Web configuration -->
+   
+   <context:component-scan base-package="omis.citation.web.controller"/>
+   
+	<!-- Profile Item -->
+   
+	<bean id="misdemeanorCitationProfileItem"
+          class="omis.citation.web.profile.MisdemeanorCitationProfileItem">
+      <constructor-arg name="requiredAuthorizations">
+          <set>
+              <value>MISDEMEANOR_CITATION_LIST</value>
+              <value>ADMIN</value>
+          </set>
+      </constructor-arg>
+      <constructor-arg name="includePage" value="/WEB-INF/views/citation/profile/includes/profileItem.jsp"/>
+      <constructor-arg name="name" value="misdemeanorCitation"/>
+      <constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	  <constructor-arg name="misdemeanorCitationProfileItemReportService" ref="misdemeanorCitationProfileItemReportService"/>
+  	  <constructor-arg name="enabled" value="${misdemeanorCitationProfileItemEnabled}"/>
+	</bean>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="citationControllerOperation" expression="execution(* omis.citation.web.controller.MisdemeanorCitationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="citationControllerOperation"/>
+  </aop:config>
+  
+</beans>

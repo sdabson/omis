@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.demographics.domain">
+	<class entity-name="omis.demographics.domain.PersonDemographics"
+	       proxy="omis.demographics.domain.PersonDemographics"
+	       name="omis.demographics.domain.impl.PersonDemographicsImpl"
+	       table="`PERSON_DEMOGRAPHICS`" lazy="true">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_DEMOGRAPHICS_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" entity-name="omis.person.domain.Person" unique="true" not-null="true" column="`PERSON_ID`"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<component name="appearance" class="omis.demographics.domain.component.PersonAppearance">
+			<many-to-one name="eyeColor" column="`EYE_COLOR_ID`" not-null="true"/>
+			<many-to-one name="hairColor" column="`HAIR_COLOR_ID`" not-null="true"/>
+			<many-to-one name="complexion" column="`COMPLEXION_ID`" not-null="false"/>
+		</component>
+		<component name="physique" class="omis.demographics.domain.component.PersonPhysique">
+			<component name="height" class="omis.demographics.domain.Height">
+				<property name="feet" column="`HEIGHT_FT`" not-null="true"/>
+				<property name="inches" column="`HEIGHT_IN`" not-null="true"/>
+			</component>
+			<component name="weight" class="omis.demographics.domain.Weight">
+				<property name="pounds" column="`WEIGHT_LB`" not-null="true"/>
+			</component>
+			<many-to-one name="build" column="`BUILD_ID`" not-null="false"/>
+		</component>
+		<many-to-one name="race" entity-name="omis.demographics.domain.Race"
+					 column="`RACE_ID`" not-null="true"/>
+		<property name="hispanicEthnicity" type="yes_no" column="`HISPANIC_ETHNICITY`" not-null="true"/>
+		<many-to-one name="tribe" entity-name="omis.demographics.domain.Tribe"
+					 column="`TRIBE_ID`" not-null="false"/>
+		<many-to-one name="maritalStatus" entity-name="omis.demographics.domain.MaritalStatus"
+					 column="`MARITAL_STATUS_ID`" not-null="true"/>
+		<property name="dominantSide" column="`DOMINANT_SIDE`" type="dominantSide" not-null="false"/>
+	</class>
+	<query name="findPersonDemographics"><![CDATA[
+	  select personDemographics
+	    from omis.demographics.domain.PersonDemographics personDemographics
+	   where personDemographics.person = :person
+	]]></query>
+	<query name="findByDemographics"><![CDATA[
+	  select personDemographics
+	    from omis.demographics.domain.PersonDemographics personDemographics
+	   where personDemographics = :demographics
+	]]></query>
+</hibernate-mapping>

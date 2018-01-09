@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+     <!-- Services -->   
+        
+        <bean id="custodyReviewService"
+        	class="omis.custody.service.impl.CustodyReviewServiceImpl">
+        	<constructor-arg name="custodyReviewDelegate" ref="custodyReviewDelegate" />
+        	<constructor-arg name="custodyOverrideDelegate" ref="custodyOverrideDelegate" />
+        	<constructor-arg name="custodyChangeReasonDelegate" ref="custodyChangeReasonDelegate" />
+        	<constructor-arg name="custodyLevelDelegate" ref="custodyLevelDelegate"	/>
+        </bean>
+        
+    <!--  Delegates -->
+    
+    	<bean id="custodyOverrideDelegate"
+			class="omis.custody.service.delegate.CustodyOverrideDelegate">
+			<constructor-arg name="custodyOverrideInstanceFactory" ref="custodyOverrideInstanceFactory" />
+			<constructor-arg name="custodyOverrideDao" ref="custodyOverrideDao" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="custodyReviewDelegate"
+			class="omis.custody.service.delegate.CustodyReviewDelegate">
+			<constructor-arg name="custodyReviewInstanceFactory" ref="custodyReviewInstanceFactory" />
+			<constructor-arg name="custodyReviewDao" ref="custodyReviewDao" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="custodyChangeReasonDelegate"
+			class="omis.custody.service.delegate.CustodyChangeReasonDelegate">
+			<constructor-arg name="custodyChangeReasonInstanceFactory" ref="custodyChangeReasonInstanceFactory" />
+			<constructor-arg name="custodyChangeReasonDao" ref="custodyChangeReasonDao" />
+		</bean>
+		
+		<bean id="custodyLevelDelegate"
+			class="omis.custody.service.delegate.CustodyLevelDelegate">
+			<constructor-arg name="custodyLevelInstanceFactory" ref="custodyLevelInstanceFactory" />
+			<constructor-arg name="custodyLevelDao" ref="custodyLevelDao" />
+		</bean>
+    	    
+        
+    <!-- Report Services -->    
+    
+        <bean id="custodyReportService"
+        	class="omis.custody.report.impl.hibernate.CustodyReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+         <bean id="custodyReviewSummaryItemService"
+		  	class="omis.custody.report.impl.hibernate.CustodyReviewSummaryItemServiceHibernateImpl">
+		  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		  </bean>
+        
+        <bean id="custodyProfileItemReportService"
+        	class="omis.custody.report.impl.hibernate.CustodyProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>        
+  
+    <!-- Data access objects -->
+    
+    	<bean id="custodyReviewDao"
+        	class="omis.custody.dao.impl.hibernate.CustodyReviewDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.custody.domain.CustodyReview"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="custodyChangeReasonDao"
+        	class="omis.custody.dao.impl.hibernate.CustodyChangeReasonDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.custody.domain.CustodyChangeReason"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="custodyLevelDao"
+        	class="omis.custody.dao.impl.hibernate.CustodyLevelDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.custody.domain.CustodyLevel"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="custodyOverrideDao"
+        	class="omis.custody.dao.impl.hibernate.CustodyOverrideDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.custody.domain.CustodyOverride"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="custodyReviewInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.custody.domain.CustodyReview"/>
+		</bean>
+		
+		<bean id="custodyOverrideInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.custody.domain.CustodyOverride"/>
+		</bean>
+ 		 
+ 		<bean id="custodyChangeReasonInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.custody.domain.CustodyChangeReason"/>
+		</bean>
+ 		 
+ 		<bean id="custodyLevelInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.custody.domain.CustodyLevel"/>
+		</bean>
+ 		 
+        <!--Property editor factories -->
+        
+        <bean id="custodyReviewPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.custody.domain.CustodyReview"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="custodyReviewDao"/>
+		</bean>
+		
+		<bean id="custodyChangeReasonPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.custody.domain.CustodyChangeReason"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="custodyChangeReasonDao"/>
+		</bean>
+		
+		<bean id="custodyLevelPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.custody.domain.CustodyLevel"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="custodyLevelDao"/>
+		</bean>
+		
+		<bean id="custodyOverridePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.custody.domain.CustodyOverride"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="custodyOverrideDao"/>
+		</bean>
+		
+</beans>		

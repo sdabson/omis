@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.citizenship.domain">
+	<class entity-name="omis.citizenship.domain.Citizenship"
+	       proxy="omis.citizenship.domain.Citizenship"
+	       name="omis.citizenship.domain.impl.CitizenshipImpl"
+	       table="`CITIZENSHIP`">
+	  <id name="id" column="`ID`">
+	    <generator class="sequence">
+		  <param name="sequence">`CITIZENSHIP_SEQ`</param>
+	    </generator>
+	  </id>
+      <properties name="uniqueCitizenship">
+		<many-to-one name="country" entity-name="omis.country.domain.Country" not-null="true"
+		             column="`COUNTRY_ID`"/>
+		<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true"
+		             column="`OFFENDER_ID`"/>
+	    <component name="dateRange" class="omis.datatype.DateRange">
+          <property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+          <property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+        </component>
+	  </properties>
+      <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+        <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+        <property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+	</class>
+	<query name="findCitizenshipByOffender"><![CDATA[
+	  select citizenship from omis.citizenship.domain.Citizenship citizenship
+	  where citizenship.offender = :offender
+	]]></query>
+	<query name="findCitizenshipsByCountry"><![CDATA[
+	  select citizenship from omis.citizenship.domain.Citizenship citizenship
+	  where citizenship.country = :country
+	  order by citizenship.offender.name.lastName,
+	           citizenship.offender.name.firstName,
+	           citizenship.offender.offenderNumber,
+	           citizenship.dateRange.startDate,
+	           citizenship.dateRange.endDate
+	]]></query>
+</hibernate-mapping>

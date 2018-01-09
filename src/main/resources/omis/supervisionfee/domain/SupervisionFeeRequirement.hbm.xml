@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+		"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervisionfee.domain">
+	<class entity-name="omis.supervisionfee.domain.SupervisionFeeRequirement"
+		proxy="omis.supervisionfee.domain.SupervisionFeeRequirement"
+		name="omis.supervisionfee.domain.impl.SupervisionFeeRequirementImpl"
+		table="`SUPERVISION_FEE_REQ`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SUPERVISION_FEE_REQ_SEQ`</param>
+			</generator>
+		</id>
+		<property name="fee" column="`FEE`" not-null="true" unique="false"/>
+		<many-to-one name="monthlySupervisionFee" column="`MONTHLY_SUPERVISION_FEE_ID`" entity-name="omis.supervisionfee.domain.MonthlySupervisionFee" not-null="true"/>
+		<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" not-null="true" type="java.util.Date"/>
+				<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<property name="comment" column="`COMMENT`" not-null="false" type="string"/>
+		<many-to-one name="reason" column="`REASON_ID`" entity-name="omis.supervisionfee.domain.SupervisionFeeRequirementReason" not-null="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<many-to-one name="officer" column="`OFFICER_ID`" entity-name="omis.person.domain.Person" not-null="true"/>		
+		<many-to-one name="court" column="`COURT_ID`" entity-name="omis.court.domain.Court" not-null="true"/>
+	</class>
+	<query name="findSupervisionFeeRequirementsByMonthlySupervisionFee"><![CDATA[
+			select feeRequirement
+			from omis.supervisionfee.domain.SupervisionFeeRequirement feeRequirement
+			where feeRequirement.monthlySupervisionFee = :monthlySupervisionFee
+			order by feeRequirement.dateRange.endDate desc
+	]]></query>
+	<!-- Find supervision fee requirement associated with monthly supervision fee in view excluding the requirement being edited. -->
+	<query name="findSupervisionFeeRequirementByDateRangeExcluding"><![CDATA[
+	select feeRequirement
+			from omis.supervisionfee.domain.SupervisionFeeRequirement feeRequirement
+		where 
+			feeRequirement.monthlySupervisionFee = :monthlySupervisionFee
+		and 
+				((feeRequirement.dateRange.startDate >= :startDate
+			and 
+				(feeRequirement.dateRange.startDate <= :endDate
+			or 
+				:endDate is null))	
+		or
+				((feeRequirement.dateRange.startDate <= :startDate)
+			and 
+				(:startDate <= feeRequirement.dateRange.endDate 
+			or 
+				feeRequirement.dateRange.endDate is null)))
+		and 
+				feeRequirement != :feeRequirement	
+			
+	]]></query>
+	<!-- Find supervision fee requirement by date range associated with the monthly supervision fee in view.  -->
+	<query name="findSupervisionFeeRequirementByDateRange"><![CDATA[
+	select feeRequirement
+			from omis.supervisionfee.domain.SupervisionFeeRequirement feeRequirement
+		where 
+			feeRequirement.monthlySupervisionFee = :monthlySupervisionFee
+		and 
+				((feeRequirement.dateRange.startDate >= :startDate
+			and 
+				(feeRequirement.dateRange.startDate <= :endDate
+			or 
+				:endDate is null))	
+		or
+				((feeRequirement.dateRange.startDate <= :startDate)
+			and 
+				(:startDate <= feeRequirement.dateRange.endDate 
+			or 
+				feeRequirement.dateRange.endDate is null)))
+	]]></query>
+	<query name="findSupervisionFeeRequirementWithinMonthlySupervisionFeeDateRange"><![CDATA[
+	select feeRequirement
+			from omis.supervisionfee.domain.SupervisionFeeRequirement feeRequirement
+		where 
+			feeRequirement.monthlySupervisionFee = :monthlySupervisionFee
+		and
+				(feeRequirement.monthlySupervisionFee.dateRange.startDate > :endDate
+			or
+				feeRequirement.monthlySupervisionFee.dateRange.endDate < :startDate
+			or	
+				feeRequirement.monthlySupervisionFee.dateRange.startDate > :startDate
+			or
+				feeRequirement.monthlySupervisionFee.dateRange.endDate < :endDate
+			or (:endDate is null
+				and 
+				feeRequirement.monthlySupervisionFee.dateRange.endDate	!= null))
+	]]></query>
+</hibernate-mapping>

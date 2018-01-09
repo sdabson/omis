@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+	<!-- Validators. -->
+  	<bean id="courtCaseDocumentAssociationFormValidator" class="omis.courtdocument.validator.CourtCaseDocumentAssociationFormValidator"/>
+  
+  	<!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.courtdocument.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="courtCaseDocumentControllerOperation" expression="execution(* omis.courtdocument.web.controller.CourtCaseDocumentAssociationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="courtCaseDocumentControllerOperation"/>
+  </aop:config>
+  
+  <bean id="courtCaseAssociationItem" 
+        	class="omis.document.web.controller.OffenderDocumentAssociationItem">
+        	<constructor-arg name="documentAssociationNameKey" value="courtCase"/>
+        	<constructor-arg name="listView" value="/courtCase/document/list.html"/>
+        	<constructor-arg name="listLinkLabelKey" value="courtCaseDocumentListLabel"/>
+        	<constructor-arg name="createView" value="/courtCase/document/create.html"/>
+        	<constructor-arg name="createLinkLabelKey" value="courtCaseDocumentCreateLabel"/>
+        	<constructor-arg name="offenderDocumentAssociationItemRegistry" ref="offenderDocumentAssociationItemRegistry"/>
+  </bean>
+
+	<!-- Profile Item -->
+
+	<bean id="courtCaseDocumentAssociationProfileItem"
+  			class="omis.courtdocument.web.profile.CourtCaseDocumentAssociationProfileItem">
+  			<constructor-arg name="requiredAuthorizations">
+  				<set>
+  					<value>COURT_CASE_DOCUMENT_LIST</value>
+  					<value>ADMIN</value>
+  				</set>
+  			</constructor-arg>
+  			<constructor-arg name="includePage" value="/WEB-INF/views/courtDocument/profile/includes/profileItem.jsp"/>
+  			<constructor-arg name="name" value="courtDocuments"/>
+  			<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  			<constructor-arg name="courtCaseDocumentAssociationProfileItemReportService" ref="courtCaseDocumentAssociationProfileItemReportService"/>
+			<constructor-arg name="enabled" value="${courtCaseDocumentAssociationProfileItemEnabled}"/>
+	</bean>
+</beans>

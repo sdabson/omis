@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.domain">
+	<class entity-name="omis.financial.domain.FinancialAssetCategory"
+			proxy="omis.financial.domain.FinancialAssetCategory"
+			name="omis.financial.domain.impl.FinancialAssetCategoryImpl"
+			table="`FINANCIAL_ASSET_CAT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FINANCIAL_ASSET_CAT_SEQ`</param>
+				</generator>
+			</id>
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findFinancialAssetCategory"><![CDATA[
+		select financialAssetCat
+		from
+			omis.financial.domain.FinancialAssetCategory financialAssetCat
+		where
+			financialAssetCat.name = :name
+	]]></query>	
+	<query name="findFinancialAssetCategoryExcluding"><![CDATA[
+		select financialAssetCat
+		from
+			omis.financial.domain.FinancialAssetCategory financialAssetCat
+		where
+			financialAssetCat.name = :name
+		and
+			financialAssetCat != :excludedFinancialAssetCategory
+	]]></query>	
+	<query name="findAllFinancialAssetCategories"><![CDATA[
+		select financialAssetCat
+		from
+			omis.financial.domain.FinancialAssetCategory financialAssetCat
+		order by financialAssetCat.sortOrder, financialAssetCat.name
+	]]></query>	
+</hibernate-mapping>

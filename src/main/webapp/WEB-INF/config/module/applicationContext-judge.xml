@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Configuration for offense term.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Helpers -->
+
+  <bean id="judgeTermDelegate" class="omis.judge.service.delegate.JudgeTermDelegate">
+    <constructor-arg name="judgeTermDao" ref="judgeTermDao"/>
+    <constructor-arg name="judgeTermInstanceFactory" ref="judgeTermInstanceFactory"/>
+  </bean>
+  
+   <!-- Instance Factories -->
+  
+  <bean id="judgeTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.judge.domain.JudgeTerm"/>
+  </bean>
+  
+  <!-- Data access objects -->
+  
+  <bean id="judgeTermDao" class="omis.judge.dao.impl.hibernate.JudgeTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.judge.domain.JudgeTerm"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="judgeTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.judge.domain.JudgeTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="judgeTermDao"/>
+  </bean>
+</beans>

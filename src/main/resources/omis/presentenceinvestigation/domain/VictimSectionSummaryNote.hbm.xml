@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.VictimSectionSummaryNote"
+			proxy="omis.presentenceinvestigation.domain.VictimSectionSummaryNote"
+			name="omis.presentenceinvestigation.domain.impl.VictimSectionSummaryNoteImpl"
+			table="`VICTIM_SECTION_SUMMARY_NTE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`VICTIM_SECTION_SUMMARY_NTE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="victimSectionSummary" column="`VICTIM_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.VictimSectionSummary" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findVictimSectionSummaryNote"><![CDATA[
+		select victimSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryNote victimSectionSummaryNote
+		where
+			victimSectionSummaryNote.victimSectionSummary = :victimSectionSummary
+		and
+			victimSectionSummaryNote.description = :description
+		and
+			victimSectionSummaryNote.date = :date
+	]]></query>
+	<query name="findVictimSectionSummaryNoteExcluding"><![CDATA[
+		select victimSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryNote victimSectionSummaryNote
+		where
+			victimSectionSummaryNote.victimSectionSummary = :victimSectionSummary
+		and
+			victimSectionSummaryNote.description = :description
+		and
+			victimSectionSummaryNote.date = :date
+		and
+			victimSectionSummaryNote != :victimSectionSummaryNote
+	]]></query>
+	<query name="findVictimSectionSummaryNotesByVictimSectionSummary"><![CDATA[
+		select victimSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryNote victimSectionSummaryNote
+		where
+			victimSectionSummaryNote.victimSectionSummary = :victimSectionSummary
+	]]></query>
+</hibernate-mapping>

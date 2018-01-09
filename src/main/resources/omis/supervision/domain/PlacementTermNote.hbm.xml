@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Mappings and queries for placement term note.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+
+	<!-- Maps of note for placement term. -->
+	<class entity-name="omis.supervision.domain.PlacementTermNote"
+	       proxy="omis.supervision.domain.PlacementTermNote"
+	       name="omis.supervision.domain.impl.PlacementTermNoteImpl"
+	       table="`PLACEMENT_TERM_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PLACEMENT_TERM_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniquePlacementTermNote">
+			<many-to-one name="placementTerm" entity-name="omis.supervision.domain.PlacementTerm" not-null="true" column="`PLACEMENT_TERM_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
+		</properties>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+	</class>
+	
+	<!-- Returns note for placement term. -->
+	<query name="findPlacementTermNote"><![CDATA[
+		select placementTermNote
+		from omis.supervision.domain.PlacementTermNote placementTermNote
+		where placementTermNote.placementTerm = :placementTerm
+		  and placementTermNote.date = :date
+		  and placementTermNote.value = :value
+	]]></query>
+	
+	<!-- Returns note for placement term excluding. -->
+	<query name="findPlacementTermNoteExcluding"><![CDATA[
+		select placementTermNote
+		from omis.supervision.domain.PlacementTermNote placementTermNote
+		where placementTermNote.placementTerm = :placementTerm
+		  and placementTermNote.date = :date
+		  and placementTermNote.value = :value
+		  and placementTermNote not in (:excludedNotes)
+	]]></query>
+	
+	<!-- Returns notes by placement term. -->
+	<query name="findPlacementTermNotesByPlacementTerm"><![CDATA[
+		select placementTermNote
+		from omis.supervision.domain.PlacementTermNote placementTermNote
+		where placementTermNote.placementTerm = :placementTerm
+		order by placementTermNote.date, placementTermNote.value
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.AllowedAnswer"
+			proxy="omis.questionnaire.domain.AllowedAnswer"
+			name="omis.questionnaire.domain.impl.AllowedAnswerImpl"
+			table="`ALLOWED_ANSWER`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`ALLOWED_ANSWER_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="allowedQuestion" column="`ALLOWED_QUESTION_ID`" entity-name="omis.questionnaire.domain.AllowedQuestion" not-null="true"/>
+			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short" not-null="true"/>
+			<many-to-one name="answerValue" column="`ANSWER_VALUE_ID`" entity-name="omis.questionnaire.domain.AnswerValue" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findAllowedAnswer"><![CDATA[
+		select allowedAnswer
+		from
+			omis.questionnaire.domain.AllowedAnswer allowedAnswer
+		where
+			allowedAnswer.allowedQuestion = :allowedQuestion
+		and
+			allowedAnswer.answerValue = :answerValue
+	]]></query>
+	<query name="findAllowedAnswerExcluding"><![CDATA[
+		select allowedAnswer
+		from
+			omis.questionnaire.domain.AllowedAnswer allowedAnswer
+		where
+			allowedAnswer.allowedQuestion = :allowedQuestion
+		and
+			allowedAnswer.answerValue = :answerValue
+		and
+			allowedAnswer != :allowedAnswer
+	]]></query>
+	<query name="findAllowedAnswerByAllowedQuestion"><![CDATA[
+		select allowedAnswer
+		from
+			omis.questionnaire.domain.AllowedAnswer allowedAnswer
+		where
+			allowedAnswer.allowedQuestion = :allowedQuestion
+		order by
+			allowedAnswer.sortOrder
+	]]></query>
+</hibernate-mapping>

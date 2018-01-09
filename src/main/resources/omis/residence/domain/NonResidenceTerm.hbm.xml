@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.residence.domain">
+	<typedef name="residenceStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.residence.domain.ResidenceStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.residence.domain.NonResidenceTerm"
+		proxy="omis.residence.domain.NonResidenceTerm"
+		name="omis.residence.domain.impl.NonResidenceTermImpl"
+		table="`NON_RESIDENCE_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`NON_RESIDENCE_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" column="`PERSON_ID`" not-null="true" entity-name="omis.person.domain.Person" unique="false"/>
+		<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" not-null="false" type="java.util.Date"/>
+				<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<many-to-one name="location" column="`LOCATION_ID`" not-null="false" entity-name="omis.location.domain.Location"/>
+		<many-to-one name="state" column="`STATE_ID`" not-null="false" entity-name="omis.region.domain.State"/>
+		<many-to-one name="city" column="`CITY_ID`" not-null="false" entity-name="omis.region.domain.City"/>
+		<property name="notes" column="`NOTES`" not-null="false" type="text"/>
+		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="boolean"/>
+		<property name="status" column="`STATUS`" not-null="true" type="residenceStatus"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<component name="verificationSignature" class="omis.audit.domain.VerificationSignature">
+			<property name="result" type="yes_no" not-null="false" column="`VERIFICATION_RESULT`"/>
+			<many-to-one name="method" entity-name="omis.audit.domain.VerificationMethod" not-null="false" column="`VERIFICATION_METHOD_ID`"/>
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
+		</component>
+	</class>
+<!-- 	find nonResidenceTerm by offender(person) and dateRange excluding the non residence term in view -->
+	<query name="findNonResidenceTermExcluding"><![CDATA[
+	select nonResidenceTerm
+	from
+		omis.residence.domain.NonResidenceTerm nonResidenceTerm
+	where
+		nonResidenceTerm.person = :person
+	and 
+		(nonResidenceTerm.location = :location
+		 or nonResidenceTerm.location is null and :location is null)
+	and 
+		nonResidenceTerm.status = :status
+	and nonResidenceTerm != :nonResidenceTerm
+	]]></query>	
+<!-- 	find nonResidenceTerm by offender(person) -->
+	<query name="findNonResidenceTerm"><![CDATA[
+	select nonResidenceTerm
+	from
+		omis.residence.domain.NonResidenceTerm nonResidenceTerm
+	where
+		nonResidenceTerm.person = :person	
+	and 
+		(nonResidenceTerm.location = :location
+		 or nonResidenceTerm.location is null and :location is null)
+	and 
+		nonResidenceTerm.status = :status
+	]]></query>	
+<!-- 	find locations within dateRange of this nonResidenceterm excluding the nonResidenceTerm in view -->
+	<query name="findLocationsWithinDateRangeExcluding"><![CDATA[
+	select location 
+		from 
+			omis.residence.domain.NonResidenceTerm nonResidenceTerm
+		where
+			nonResidenceTerm.location = :location
+		and 
+			((nonResidenceTerm.dateRange.startDate >= :startDate
+			and
+			 	(nonResidenceTerm.dateRange.startDate <= :endDate
+			 	or
+			 	:endDate is null))
+		or
+			((nonResidenceTerm.dateRange.startDate <= :startDate)
+			and
+				(:startDate <= nonResidenceTerm.dateRange.endDate
+				or
+				nonResidenceTerm.dateRange.endDate is null)))
+		and 
+			nonResidenceTerm != :nonResidenceTerm
+	]]></query>	
+<!-- 	find locations within dateRange of this nonResidenceterm -->
+	<query name="findLocationsWithinDateRange"><![CDATA[
+	select location 
+		from 
+			omis.residence.domain.NonResidenceTerm nonResidenceTerm
+		where
+			nonResidenceTerm.location = :location
+		and 
+			((nonResidenceTerm.dateRange.startDate >= :startDate
+			and
+			 	(nonResidenceTerm.dateRange.startDate <= :endDate
+			 	or
+			 	:endDate is null))
+		or
+			((nonResidenceTerm.dateRange.startDate <= :startDate)
+			and
+				(:startDate <= nonResidenceTerm.dateRange.endDate
+				or
+				nonResidenceTerm.dateRange.endDate is null)))
+	]]></query>	
+	<query name="findNonResidenceTermsByDateRange"><![CDATA[
+	from 
+		omis.residence.domain.NonResidenceTerm nonResidenceTerm
+	where
+		nonResidenceTerm.person = :person
+	and 
+		(((nonResidenceTerm.dateRange.startDate >= :startDate
+		and
+		(nonResidenceTerm.dateRange.startDate <= :endDate
+		or :endDate is null))
+	or 
+		((nonResidenceTerm.dateRange.startDate <= :startDate)	
+		and 
+		(nonResidenceTerm.dateRange.endDate is null 
+		or :startDate <= nonResidenceTerm.dateRange.endDate)))
+	or
+		(:startDate is null and :endDate is null))
+	]]></query>
+	<query name="findNonResidenceTermsByDateRangeExcluding"><![CDATA[
+	from 
+		omis.residence.domain.NonResidenceTerm nonResidenceTerm
+	where
+		nonResidenceTerm.person = :person	
+	and 
+		(((nonResidenceTerm.dateRange.startDate >= :startDate
+		and
+		(nonResidenceTerm.dateRange.startDate <= :endDate
+		or :endDate is null))
+	or 
+		((nonResidenceTerm.dateRange.startDate <= :startDate)	
+		and 
+		(nonResidenceTerm.dateRange.endDate is null 
+		or :startDate <= nonResidenceTerm.dateRange.endDate)))
+	or
+		(:startDate is null and :endDate is null))
+	and 
+		nonResidenceTerm != :nonResidenceTerm	
+	]]></query>
+	<query name="findNonResidenceTermsAssociatedWithPerson"><![CDATA[
+		from 
+			omis.residence.domain.NonResidenceTerm nonResidenceTerm
+		where
+			nonResidenceTerm.person = :person
+		and
+				(nonResidenceTerm.dateRange.startDate <= :endDate
+				or
+				nonResidenceTerm.dateRange.startDate is null or :endDate is null)
+		and
+				(nonResidenceTerm.dateRange.endDate > :startDate
+				or
+				nonResidenceTerm.dateRange.endDate is null or :startDate is null)
+	]]></query>	
+	<query name="findNonResidenceTermsByPersonOnDate"><![CDATA[
+		from
+			omis.residence.domain.NonResidenceTerm term
+		where
+			term.person = :person
+		and 
+				(term.dateRange.startDate < :date
+			and
+				(term.dateRange.endDate is null or term.dateRange.endDate > :date))
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,131 @@
+.detailsLabel, .summarizeMessage{
+	font-weight: bold;
+}
+
+.summarizeMessage{
+	float: left;
+	margin-bottom: 10px;
+}
+
+span.oneline{
+	text-align:right;
+	width: 100%;
+	float: left;
+	clear: both;
+}
+
+span.onelineHalf{
+	width: 45%;
+	
+}
+span.oneline label {
+	width: 20%;
+	white-space: nowrap;
+	margin-right: 2%;
+	float:left;
+}
+
+span.oneline span.detail{
+	float: left;
+	max-width: 60%;
+	margin-bottom: 2px;
+}
+
+.addLink{
+	clear:both;
+	float:left;
+}
+
+.removeTag{
+	float:left;
+	margin-left: 10%;
+}
+
+.removeContent{
+	background-color: hsla(355, 100%, 50%, 0.3);
+}
+
+.documentTag{
+	clear:both;
+	float:left;
+	margin-left: 10%;
+	padding-top: 5px;
+	padding-bottom: 1px;
+}
+
+.personOption{
+	padding-top: 2em;
+}
+
+.tagError{
+	display: inherit;
+	margin-left: 25%;
+	font-size: 76%;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #D8000C;
+}
+
+.summaryDocumentItem {
+	clear:both;
+	float:left;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 2%;
+	padding-right: 2%;
+	width: 65%;
+	border-style: solid;
+	border-width: 1px;
+	margin-bottom: 10px;
+}
+
+#psiLinks li.psiLink {
+	display: inline-block;
+	margin-bottom: 10px;
+	vertical-align: top;
+}
+
+li.psiLink a.button {
+    display: inline-block;
+    
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin: 1px;   
+    text-align: center;
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 3px;
+    min-height:10px;
+}
+
+li.psiLink input {
+	vertical-align: center;
+}
+
+@media screen and (min-width: 1001px) {
+	a.button {
+		max-width: 100px;
+		min-width: 200px;
+	}
+	#psiLinks li.psiLink {
+		width: 33%;
+		
+	}
+}
+
+@media screen and (max-width: 1000px) {
+	a.button {
+		width: 80px;
+		max-height: 85px;
+	}
+	#psiLinks li.psiLink {
+		width: 23%;
+		margin-right: 5px;
+	}
+}
+.moduleCheckBox {
+	/* Might not need this class. */
+}
+

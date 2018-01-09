@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.country.domain">
+	<class entity-name="omis.country.domain.Country"
+	       proxy="omis.country.domain.Country"
+	       name="omis.country.domain.impl.CountryImpl"
+	       table="`COUNTRY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COUNTRY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true"/>
+		<property name="abbreviation" column="`ABBREVIATION`" not-null="true" unique="true"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findAllContries"><![CDATA[
+		select country
+		from omis.country.domain.Country as country
+		order by country.name
+	]]></query>
+	<query name="findCountry"><![CDATA[
+		select country
+		from omis.country.domain.Country as country
+		where country.name = :name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Yidong Li
+ - Date:   July 5, 2014
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.incident.report">
+	<query name="findIncidentSummaryByAny"><![CDATA[
+ 	select new omis.incident.report.IncidentStatementSummary(
+ 		incidentStatement.id,
+		incidentStatement.number,
+		incidentStatement.incidentDate,
+		incidentStatement.title,
+		incidentStatement.reporter.name.lastName,
+		incidentStatement.reporter.name.firstName,
+		incidentStatement.scene.location,
+		incidentStatement.scene.facility.name,
+		incidentStatement.scene.complex.name,
+		incidentStatement.scene.unit.name,
+		incidentStatement.scene.level.name,
+		incidentStatement.scene.section.name,
+		incidentStatement.scene.room.name,
+		incidentStatement.submissionCategory
+    ) 
+	from omis.incident.domain.InvolvedParty involvedParty
+	inner join involvedParty.statement incidentStatement
+	where 
+		(((:startDate is not null and incidentStatement.incidentDate is not null and :endDate is null) and (incidentStatement.incidentDate > :startDate)) 
+		or ((:endDate is not null and incidentStatement.incidentDate is not null and :startDate is null) and (incidentStatement.incidentDate < :endDate)) 
+		or ((:endDate is null) and (:startDate is null)) 
+		or (:startDate is not null and incidentStatement.incidentDate is not null and :endDate is not null and incidentStatement.incidentDate > :startDate and incidentStatement.incidentDate < :endDate))
+	and
+		(((:offender is not null and involvedParty.person is not null) and (involvedParty.person = :offender)) or ((:otherPerson is not null and involvedParty.person is not null) and (involvedParty.person = :otherPerson)) or ((:staff is not null and involvedParty.person is not null) and (involvedParty.person = :staff)))
+	and
+		(((:location is not null and incidentStatement.scene.facility.location is not null) and (incidentStatement.scene.facility.location = :location)) or (:location is null))
+	group by
+		incidentStatement.id,
+		incidentStatement.number,
+		incidentStatement.incidentDate,
+		incidentStatement.title,
+		incidentStatement.reporter.name.lastName,
+		incidentStatement.reporter.name.firstName,
+		incidentStatement.scene.location,
+		incidentStatement.scene.facility.name,
+		incidentStatement.scene.complex.name,
+		incidentStatement.scene.unit.name,
+		incidentStatement.scene.level.name,
+		incidentStatement.scene.section.name,
+		incidentStatement.scene.room.name,
+		incidentStatement.submissionCategory
+	 ]]></query>
+	 
+	 <query name="findInvolvedPartiesByCriteria"><![CDATA[
+	 select new omis.incident.report.InvolvedPartySummary( 
+	 	involvedParty.id,
+	 	case when person.class in (omis.offender.domain.Offender) then true else false end,
+	 	person.name.firstName,
+	 	person.name.lastName,
+	 	case when person.class in (omis.offender.domain.Offender) then person.offenderNumber else null end  
+	    ) 
+	 from omis.incident.domain.InvolvedParty involvedParty 
+	 	inner join involvedParty.person person
+	 	where involvedParty.statement.id = :statementId
+	 ]]></query>
+	 
+	 <query name="findIncidentSummaryByAll"><![CDATA[
+		 select new omis.incident.report.IncidentStatementSummary(
+ 	 	incidentStatementOut.id,
+ 	 	incidentStatementOut.number,
+		incidentStatementOut.incidentDate,
+		incidentStatementOut.title,
+		incidentStatementOut.reporter.name.lastName,
+		incidentStatementOut.reporter.name.firstName,
+		incidentStatementOut.scene.location,
+		incidentStatementOut.scene.facility.name,
+		incidentStatementOut.scene.complex.name,
+		incidentStatementOut.scene.unit.name,
+		incidentStatementOut.scene.level.name,
+		incidentStatementOut.scene.section.name,
+		incidentStatementOut.scene.room.name,
+		incidentStatementOut.submissionCategory
+	)
+ 	from omis.incident.domain.InvolvedParty involvedPartyOut
+	inner join involvedPartyOut.statement incidentStatementOut
+	where 
+		incidentStatementOut in (		
+		 	select incidentStatementInner1
+		 	from omis.incident.domain.InvolvedParty involvedPartyInner1
+			inner join involvedPartyInner1.statement incidentStatementInner1
+			where 
+				(((:startDate is not null and incidentStatementInner1.incidentDate is not null and :endDate is null) and (incidentStatementInner1.incidentDate > :startDate)) 
+				or ((:endDate is not null and incidentStatementInner1.incidentDate is not null and :startDate is null) and (incidentStatementInner1.incidentDate < :endDate)) 
+				or ((:endDate is null) and (:startDate is null)) 
+				or (:startDate is not null and incidentStatementInner1.incidentDate is not null and :endDate is not null and incidentStatementInner1.incidentDate > :startDate and incidentStatementInner1.incidentDate < :endDate))
+			and
+				((:offender is not null and involvedPartyInner1.person is not null) and (involvedPartyInner1.person = :offender))
+			and
+				(((:location is not null and incidentStatementInner1.scene.facility.location is not null) and (incidentStatementInner1.scene.facility.location = :location)) or (:location is null))
+		)
+	and
+	incidentStatementOut in (		
+	 	select incidentStatementInner2
+	 	from omis.incident.domain.InvolvedParty involvedPartyInner2
+		inner join involvedPartyInner2.statement incidentStatementInner2
+		where 
+			(((:startDate is not null and incidentStatementInner2.incidentDate is not null and :endDate is null) and (incidentStatementInner2.incidentDate > :startDate)) 
+			or ((:endDate is not null and incidentStatementInner2.incidentDate is not null and :startDate is null) and (incidentStatementInner2.incidentDate < :endDate)) 
+			or ((:endDate is null) and (:startDate is null)) 
+			or (:startDate is not null and incidentStatementInner2.incidentDate is not null and :endDate is not null and incidentStatementInner2.incidentDate > :startDate and incidentStatementInner2.incidentDate < :endDate))
+		and
+			((:otherPerson is not null and involvedPartyInner2.person is not null) and (involvedPartyInner2.person = :otherPerson))
+		and
+			(((:location is not null and incidentStatementInner2.scene.facility.location is not null) and (incidentStatementInner2.scene.facility.location = :location)) or (:location is null))
+	)
+	and
+	incidentStatementOut in (		
+	 	select incidentStatementInner3
+	 	from omis.incident.domain.InvolvedParty involvedPartyInner3
+		inner join involvedPartyInner3.statement incidentStatementInner3
+		where 
+			(((:startDate is not null and incidentStatementInner3.incidentDate is not null and :endDate is null) and (incidentStatementInner3.incidentDate > :startDate)) 
+			or ((:endDate is not null and incidentStatementInner3.incidentDate is not null and :startDate is null) and (incidentStatementInner3.incidentDate < :endDate)) 
+			or ((:endDate is null) and (:startDate is null)) 
+			or (:startDate is not null and incidentStatementInner3.incidentDate is not null and :endDate is not null and incidentStatementInner3.incidentDate > :startDate and incidentStatementInner3.incidentDate < :endDate))
+		and
+			((:staff is not null and involvedPartyInner3.person is not null) and (involvedPartyInner3.person = :staff))
+		and
+			(((:location is not null and incidentStatementInner3.scene.facility.location is not null) and (incidentStatementInner3.scene.facility.location = :location)) or (:location is null))
+	)
+	group by
+		incidentStatementOut.id,
+		incidentStatementOut.number,
+		incidentStatementOut.incidentDate,
+		incidentStatementOut.title,
+		incidentStatementOut.reporter.name.lastName,
+		incidentStatementOut.reporter.name.firstName,
+		incidentStatementOut.scene.location,
+		incidentStatementOut.scene.facility.name,
+		incidentStatementOut.scene.complex.name,
+		incidentStatementOut.scene.unit.name,
+		incidentStatementOut.scene.level.name,
+		incidentStatementOut.scene.section.name,
+		incidentStatementOut.scene.room.name,
+		incidentStatementOut.submissionCategory
+	 ]]></query>
+	 <query name="findIncidentStatementsByInvolvedPeople"><![CDATA[
+	 select new omis.incident.report.IncidentStatementSummary(
+ 	 	statement.id,
+ 	 	statement.number,
+		statement.incidentDate,
+		statement.title,
+		name.lastName,
+		name.firstName,
+		statement.scene.location,
+		facility.name,
+		complex.name,
+		unit.name,
+		level.name,
+		section.name,
+		room.name,
+		statement.submissionCategory
+	)
+	from
+		omis.incident.domain.InvolvedParty party
+		right outer join party.statement statement
+		inner join statement.reporter reporter
+		inner join reporter.name name
+		left outer join statement.scene.facility facility
+		left outer join statement.scene.complex complex
+		left outer join statement.scene.unit unit
+		left outer join statement.scene.level level
+		left outer join statement.scene.section section
+		left outer join statement.scene.room room
+		left outer join party.person person
+		left outer join statement.jurisdiction jurisdiction
+	where
+		((:startDate is null or statement.incidentDate >= :startDate)
+	and
+		(:endDate is null or statement.incidentDate <= :endDate))
+	and
+			(party is not null
+		and 
+			person in (:persons))
+	and
+			(((:location is not null and facility.location is not null)
+		and
+			facility.location = :location)
+		or
+			:location is null)
+	and
+				(((:jurisdiction is not null and jurisdiction is not null)
+			and
+				:jurisdiction = jurisdiction)
+			or
+				:jurisdiction is null)
+	group by
+		statement.id,
+		statement.number,
+		statement.incidentDate,
+		statement.title,
+		name.lastName,
+		name.firstName,
+		statement.scene.location,
+		facility.name,
+		complex.name,
+		unit.name,
+		level.name,
+		section.name,
+		room.name,
+		statement.submissionCategory
+	]]></query>
+	<query name="findIncidentStatementsByLocation"><![CDATA[
+		select new omis.incident.report.IncidentStatementSummary(
+	 	 	statement.id,
+	 	 	statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		)
+		from
+			omis.incident.domain.InvolvedParty party
+			right outer join party.statement statement
+			inner join statement.reporter reporter
+			inner join reporter.name name
+			left outer join statement.scene.facility facility
+			left outer join statement.scene.complex complex
+			left outer join statement.scene.unit unit
+			left outer join statement.scene.level level
+			left outer join statement.scene.section section
+			left outer join statement.scene.room room
+			left outer join statement.jurisdiction jurisdiction
+		where
+			((:startDate is null or statement.incidentDate >= :startDate)
+		and
+			(:endDate is null or statement.incidentDate <= :endDate))
+		and
+				(((:location is not null and facility.location is not null)
+			and
+				facility.location = :location)
+			or
+				:location is null)
+		and
+				(((:jurisdiction is not null and jurisdiction is not null)
+			and
+				:jurisdiction = jurisdiction)
+			or
+				:jurisdiction is null)
+		group by
+			statement.id,
+			statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+	]]></query>
+	<query name="findIncidentByUser"><![CDATA[
+		select new omis.incident.report.IncidentStatementSummary(
+	 	 	statement.id,
+	 	 	statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		)
+		from
+			omis.incident.domain.InvolvedParty party
+			right outer join party.statement statement
+			inner join statement.reporter reporter
+			inner join reporter.name name
+			left outer join statement.scene.facility facility
+			left outer join statement.scene.complex complex
+			left outer join statement.scene.unit unit
+			left outer join statement.scene.level level
+			left outer join statement.scene.section section
+			left outer join statement.scene.room room
+			left outer join statement.jurisdiction jurisdiction
+		where
+			((:startDate is null or statement.incidentDate >= :startDate)
+		and
+			(:endDate is null or statement.incidentDate <= :endDate))
+		and
+			:userAccount = statement.documenter
+		group by
+			statement.id,
+			statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+	]]></query>
+	<query name="findIncidentStatementsByDocumenter"><![CDATA[
+		select new omis.incident.report.IncidentStatementSummary(
+	 	 	statement.id,
+	 	 	statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		)
+		from
+			omis.incident.domain.InvolvedParty party
+			right outer join party.statement statement
+			inner join statement.reporter reporter
+			inner join reporter.name name
+			left outer join statement.scene.facility facility
+			left outer join statement.scene.complex complex
+			left outer join statement.scene.unit unit
+			left outer join statement.scene.level level
+			left outer join statement.scene.section section
+			left outer join statement.scene.room room
+			left outer join statement.jurisdiction jurisdiction
+		where
+			:documenter = statement.documenter
+		group by
+			statement.id,
+			statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		order by
+			statement.incidentDate desc, statement.number
+	]]></query>
+</hibernate-mapping>

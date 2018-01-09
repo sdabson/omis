@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substancetest.domain">
+	<class entity-name="omis.substancetest.domain.SampleRequest"
+		proxy="omis.substancetest.domain.SampleRequest"
+		name="omis.substancetest.domain.impl.SampleRequestImpl"
+		table="`SAMPLE_REQUEST`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SAMPLE_REQUEST_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<property name="date" column="`DATE`" not-null="false" type="java.util.Date"/>
+		<component name="resolution">
+			<many-to-one name="sample" column="`SAMPLE_ID`" cascade="none" not-null="false"
+				entity-name="omis.substancetest.domain.SubstanceTestSample" unique="false"/>
+			<many-to-one name="statusReason" column="`STATUS_REASON_ID`" cascade="none" not-null="false"
+				entity-name="omis.substancetest.domain.SampleRequestStatusReason" unique="false"/>
+		</component>
+	</class>
+	<query name="findUnresolvedByOffender"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+			request.resolution.sample is null
+		and
+			request.resolution.statusReason is null
+	]]></query>
+	<query name="findSubstanceTestSampleRequestByOffender"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+			request.resolution.sample is null
+	]]></query>
+	<query name="findSubstanceTestSampleRequestBySample"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.resolution.sample = :sample
+	]]></query>
+	<query name="findSampleRequestBySample"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.resolution.sample = :sample
+	]]></query>
+	<query name="findRequestExcluding"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+			request.date = :date
+		and
+			request <> :request
+	]]></query>
+	<query name="findRequest"><![CDATA[
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+			request.date = :date
+	]]></query>
+</hibernate-mapping>

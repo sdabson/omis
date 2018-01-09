@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Helpers. -->
+  
+  <bean id="cityDelegate" class="omis.region.service.delegate.CityDelegate">
+    <constructor-arg name="cityDao" ref="cityDao"/>
+    <constructor-arg name="cityInstanceFactory" ref="cityInstanceFactory"/>
+  </bean>
+  
+  <bean id="stateDelegate" class="omis.region.service.delegate.StateDelegate">
+  	<constructor-arg name="stateInstanceFactory" ref="stateInstanceFactory"/>
+    <constructor-arg name="stateDao" ref="stateDao"/>
+  </bean>
+  
+	<bean id="countyDelegate" class="omis.region.service.delegate.CountyDelegate">
+		<constructor-arg name="countyDao" ref="countyDao" />
+		<constructor-arg name="countyInstanceFactory" ref="countyInstanceFactory" />
+	</bean>
+
+  <!-- Services. -->
+  
+  <bean id="stateService"
+     class="omis.region.service.impl.StateServiceImpl">
+     <property name="stateDao" ref="stateDao"/>
+  </bean>
+  
+  <bean id="countyService"
+     class="omis.region.service.impl.CountyServiceImpl">
+     <property name="countyDao" ref="countyDao"/>
+  </bean>
+  
+  <bean id="cityService"
+     class="omis.region.service.impl.CityServiceImpl">
+     <property name="cityDao" ref="cityDao"/>
+  </bean>
+  
+  <!-- Data access objects. -->
+  
+  <bean id="cityDao" class="omis.region.dao.impl.hibernate.CityDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.region.domain.City"/>
+  </bean>
+
+  <bean id="countyDao" class="omis.region.dao.impl.hibernate.CountyDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.region.domain.County"/>
+  </bean>
+  
+  <bean id="stateDao" class="omis.region.dao.impl.hibernate.StateDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.region.domain.State"/>
+  </bean>
+  
+  <bean id="cityCountyAssociationDao" class="omis.region.dao.impl.hibernate.CityCountyAssociationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.region.domain.CityCountyAssociation"/>
+  </bean>
+  
+  <!-- Property editor factories. -->
+  
+  <bean id="statePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="stateDao"/>
+  	<constructor-arg name="entityName" value="omis.region.domain.State"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="countyPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="countyDao"/>
+  	<constructor-arg name="entityName" value="omis.region.domain.County"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="cityPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="cityDao"/>
+    <constructor-arg name="entityName" value="omis.region.domain.City"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <!-- Instance factories. -->
+  
+  <bean id="cityInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.region.domain.City"/>
+  </bean>
+
+  <bean id="stateInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.region.domain.State"/>
+  </bean>
+  
+  <bean id="countyInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.region.domain.County" />
+	</bean>
+  
+</beans>

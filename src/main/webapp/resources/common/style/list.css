@@ -1,0 +1,79 @@
+/*
+ * Style sheet for tables used to list records of information.
+ *
+ * Author: Stephen Abson
+ * Author: Joel Norris
+ * Version: 0.1.1 (January 25, 2015)
+ */
+
+/* Multiple table list screen */
+
+div.multiListTableContainer {
+	display: block;
+	max-height: 300px;
+	width: 100%;
+	overflow-y: auto;
+	margin: 0 0 10px 0; 
+}
+
+/** Listing table. */
+
+table.listTable {
+	width: 100%;
+	margin-top: 2px;
+	border-collapse: collapse;
+}
+
+/** Table caption. */
+
+table.listTable caption {
+
+}
+
+/* Table borders. */
+
+table.listTable td, table.listTable tr, table.listTable th, table.listTable {
+	border-width: 0px;
+	border-style: solid;
+	padding: 2px;
+	margin: 0px;
+	text-align:left;
+}
+
+/* Basic operations. */
+
+table.listTable colgroup col.operations, table.listTable thead tr th.operations {
+	width: 64px;
+}
+
+table.listTable colgroup col.operations, table.listTable thead tr th.moreOperations {
+	width: 96px;
+}
+
+/* Date columns. */
+
+table.listTable colgroup col.date, table.listTable thead tr th.date {
+	width: 96px;
+}
+
+/* Time columns. */
+
+table.listTable colgroup col.time, table.listTable thead tr th.time {
+	width: 64px;
+}
+
+/* Date/time columns. */
+
+table.listTable colgroup col.datetime, table.listTable thead tr th.datetime {
+	width: 160px;
+}
+
+/* Small photo columns. */
+
+table.listTable colgroup col.smallPhoto, table.listTable thead tr th.smallPhoto {
+	width: 100px;
+}
+
+table.listTable tbody tr td.smallPhoto {
+	text-align: center;
+}

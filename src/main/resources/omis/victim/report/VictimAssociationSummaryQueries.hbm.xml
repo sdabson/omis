@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<query name="findVictimSummaryAssociationsByOffender"><![CDATA[
+		select new omis.victim.report.VictimAssociationSummary(
+			association,
+			  (
+			    select mailingAddress
+			    from omis.contact.domain.Contact contact
+			      inner join contact.mailingAddress mailingAddress
+			    where contact.person = victim
+			  ),
+			  (
+			    select telephoneNumber
+			    from omis.contact.domain.TelephoneNumber telephoneNumber
+			      inner join telephoneNumber.contact contact
+			    where contact.person = victim and telephoneNumber.primary = true
+			  ),
+			  (
+			    select count(note)
+			    from omis.victim.domain.VictimNote note
+			    inner join note.association noteAssociation
+			    where noteAssociation = association
+			  )
+			)
+		from omis.victim.domain.VictimAssociation as association
+		  inner join association.relationship as relationship
+		  inner join relationship.firstPerson as offender
+		  inner join offender.name as offenderName
+		  inner join relationship.secondPerson as victim
+		  inner join victim.name as victimName
+		  left outer join victim.identity as victimIdentity
+		where offender = :offender
+		order by victimName.lastName, victimName.firstName,
+		         victimIdentity.birthDate
+	]]></query>
+	<query name="findVictimSummaryAssociationsByVictim"><![CDATA[
+		select new omis.victim.report.VictimAssociationSummary(
+			association,
+			  (
+			    select mailingAddress
+			    from omis.contact.domain.Contact contact
+			      inner join contact.mailingAddress mailingAddress
+			    where contact.person = victim
+			  ),
+			  (
+			    select telephoneNumber
+			    from omis.contact.domain.TelephoneNumber telephoneNumber
+			      inner join telephoneNumber.contact contact
+			    where contact.person = victim and telephoneNumber.primary = true
+			  ),
+			  (
+			    select count(note)
+			    from omis.victim.domain.VictimNote note
+			    inner join note.association noteAssociation
+			    where noteAssociation = association
+			  )
+			)
+		from omis.victim.domain.VictimAssociation as association
+		  inner join association.relationship as relationship
+		  inner join relationship.firstPerson as offender
+		  inner join offender.name as offenderName
+		  inner join relationship.secondPerson as victim
+		  inner join victim.name as victimName
+		  left outer join victim.identity as victimIdentity
+		where victim = :victim
+		order by offenderName.lastName, offenderName.firstName,
+		         offender.offenderNumber
+	]]></query>
+	<query name="summarizeVictimAssociation"><![CDATA[
+		select new omis.victim.report.VictimAssociationSummary(
+			victimName.lastName, victimName.firstName, victimName.middleName,
+			(
+			    select mailingAddress
+			    from omis.contact.domain.Contact contact
+			      inner join contact.mailingAddress mailingAddress
+			    where contact.person = victim
+			  )
+		)
+		from omis.victim.domain.VictimAssociation as association
+		  inner join association.relationship as relationship
+		  inner join relationship.secondPerson as victim
+		  inner join victim.name as victimName
+		where association = :victimAssociation
+	]]></query>
+	<query name="findDocumentAssociationSummariesByVictim"><![CDATA[
+		select new omis.victim.report.VictimDocumentAssociationSummary(
+			documentAssociation.id, document.title, document.date, 
+			name.lastName, name.firstName)
+		from omis.victim.domain.VictimDocumentAssociation as documentAssociation
+			inner join documentAssociation.victim as victim
+			inner join documentAssociation.document as document
+			inner join document.creationSignature.userAccount as userAccount
+			inner join userAccount.user as user
+			inner join user.name as name
+		where victim = :victim			
+	]]></query>
+</hibernate-mapping>

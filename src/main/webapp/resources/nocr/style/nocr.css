@@ -1,0 +1,60 @@
+/*
+ * Styling for non offender-centric reporting.
+ *
+ * Author: Josh Divine
+ * Version: 0.1.0 (Dec 09, 2016)
+ * Since: OMIS 3.0
+ */
+ 
+div.reportContainer {
+    display: inline-block;
+    vertical-align: top;
+    margin:3px;
+    border:1px solid #000;
+}
+
+@media only screen and (max-width:899px) {
+	div.reportContainer {
+		width: calc(100% - 10px);
+	}
+}
+
+@media only screen and (min-width:900px) and (max-width:1199px) {
+	div.reportContainer {
+		width: calc(50% - 10px);
+	}
+}
+
+
+@media only screen and (min-width:1200px ) {
+	div.reportContainer {
+		width: calc(33% - 9px);
+	}
+}
+
+div#reportItems {
+	display: inline-block;
+}
+
+div.reportItem {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+    padding-left:3px;
+}
+
+div.reportItem a {
+	margin:1px;
+	padding-left:5px;
+	padding-right:5px;
+	padding-top:1px;
+	padding-bottom:1px;
+	text-decoration:none;
+	display:inline-block;
+}
+div.reportItem:not(.inactive) a:hover {
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-right:4px;
+	padding-left:4px;
+}

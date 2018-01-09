@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Program facility offer mapping and queries.
+ -
+ - Author: Stephen Abson 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.program.domain">
+	<class entity-name="omis.program.domain.ProgramLocationOffer"
+	       proxy="omis.program.domain.ProgramLocationOffer"
+	       name="omis.program.domain.impl.ProgramLocationOfferImpl"
+		   table="`PROGRAM_LOCATION_OFFER`">
+		<cache usage="transactional" region="program"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROGRAM_LOCATION_OFFER_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueProgramLocationOffer">
+		  <many-to-one name="program" entity-name="omis.program.domain.Program" not-null="true" column="`PROGRAM_ID`"/>
+		  <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+		</properties>
+	</class>
+	<query name="findProgramLocationOffers" cacheable="true" cache-region="program"><![CDATA[
+		select programLocationOffer
+		from omis.program.domain.ProgramLocationOffer
+			programLocationOffer
+	      inner join programLocationOffer.program program
+		order by program.name
+	]]></query>
+</hibernate-mapping>

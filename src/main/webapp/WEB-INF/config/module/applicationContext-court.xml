@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  <bean id="courtService" class="omis.court.service.impl.CourtServiceImpl">
+    <constructor-arg name="courtDao" ref="courtDao"/>
+  </bean>
+
+  <bean id="judgeService" class="omis.court.service.impl.JudgeServiceImpl">
+    <constructor-arg name="courtJudgeAssignmentDao" ref="courtJudgeAssignmentDao"/>
+  </bean>
+  <!-- Delegates -->
+  <bean id="courtJudgeAssignmentDelegate"
+  	class="omis.court.service.delegate.CourtJudgeAssignmentDelegate">
+  		<constructor-arg name="courtJudgeAssignmentDao" ref="courtJudgeAssignmentDao"/>
+  	</bean>
+  	
+  <bean id="courtDelegate" class="omis.court.service.delegate.CourtDelegate">
+  	<constructor-arg name="courtDao" ref="courtDao"/>
+  	<constructor-arg name="courtInstanceFactory" ref="courtInstanceFactory"/>
+  </bean>
+  
+   <!-- Instance Factories -->
+  
+  <bean id="courtInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.court.domain.Court"/>
+  </bean>	
+  	
+  <!-- Data access objects -->
+  
+  <bean id="courtDao" class="omis.court.dao.impl.hibernate.CourtDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.court.domain.Court"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="courtJudgeAssignmentDao" class="omis.court.dao.impl.hibernate.CourtJudgeAssignmentDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.court.domain.CourtJudgeAssignment"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Property editor factories -->
+  
+  <bean id="courtPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.court.domain.Court"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="courtDao"/>
+  </bean>
+  
+</beans>

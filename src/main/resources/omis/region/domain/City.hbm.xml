@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.region.domain">
+	<class entity-name="omis.region.domain.City"
+	       proxy="omis.region.domain.City"
+	       name="omis.region.domain.impl.CityImpl"
+	       table="`CITY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`CITY_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCity">
+		  <property name="name" column="`NAME`" not-null="true"/>
+		  <many-to-one name="state" column="`STATE_ID`" not-null="false"
+		               entity-name="omis.region.domain.State"/>
+		  <many-to-one name="country" column="`COUNTRY_ID`" not-null="true"
+		              entity-name="omis.country.domain.Country"/>
+		</properties>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findCities"><![CDATA[
+		select city
+		from omis.region.domain.City as city
+			left outer join city.state as state
+		order by city.name, state.name
+	]]></query>
+	<query name="findCitiesByState"><![CDATA[
+		select city
+		from omis.region.domain.City as city
+			inner join city.state as state
+		where state = :state
+		  and city.valid = true
+		order by city.name, state.name
+	]]></query>
+	<query name="findCity"><![CDATA[
+		select city from omis.region.domain.City city
+		where upper(city.name) = upper(:name)
+		  and city.country = :country
+		  and ((city.state is null and :state is null) or city.state = :state)
+	]]></query>
+	<query name="findCityExcluding"><![CDATA[
+		select city from omis.region.domain.City city
+		where upper(city.name) = upper(:name)
+		  and city.country = :country
+		  and ((city.state is null and :state is null) or city.state = :state)
+		  and city not in (:excludedCities)
+	]]></query>
+	<query name="findCitiesByCountry"><![CDATA[
+		select city from omis.region.domain.City city
+		where city.country = :country
+	]]></query>
+	<query name="findCitiesByCountryWithoutState"><![CDATA[
+		select city from omis.region.domain.City city
+		where city.country = :country and city.state is null
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.media.domain">
+	<class entity-name="omis.media.domain.Photo"
+	       proxy="omis.media.domain.Photo"
+	       name="omis.media.domain.impl.PhotoImpl"
+	       table="`PHOTO`">
+	  <id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PHOTO_SEQ`</param>
+			</generator>
+		</id>
+		<property name="filename" unique="true" column="`FILENAME`"
+							not-null="true" type="string"/>
+		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+	  <component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<sql-query name="findNextPhotoFilename"><![CDATA[
+		select "PHOTO_FILENAME_SEQ".nextval from dual
+	]]></sql-query>
+</hibernate-mapping>

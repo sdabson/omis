@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Ryan Johns
+ - Version: 0.1.0 (Apr 8, 2014)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping>
+    <!--
+      - Note: this query returns all facilities if the person has an assignment
+      - on the date (viz., the results are not limited to the organization
+      - of the staff assignment) - SA
+      -->
+	<query name="findFacilitiesByStaffAndDate"><![CDATA[
+		select f
+		  from omis.facility.domain.Facility f,
+		       omis.staff.domain.StaffAssignment sa
+		 where sa.staffMember = :staff
+		   and (sa.dateRange.startDate < :date
+		       or sa.dateRange.startDate is null)
+		   and (sa.dateRange.endDate is null
+		       or sa.dateRange.endDate > :date)
+		 order by f.name
+	]]></query>
+	<query name="FindAllFacilities"><![CDATA[
+		  from omis.facility.domain.Facility order by name
+	]]></query>
+	
+</hibernate-mapping>

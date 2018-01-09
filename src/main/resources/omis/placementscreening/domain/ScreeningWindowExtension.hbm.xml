@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placementscreening.domain">
+<class entity-name="omis.placementscreening.domain.ScreeningWindowExtension"
+			proxy="omis.placementscreening.domain.ScreeningWindowExtension"
+			name="omis.placementscreening.domain.impl.ScreeningWindowExtensionImpl"
+			table="`SCREENING_WINDOW_EXTENSION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SCREENING_WINDOW_EXTENSION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="approved" column="`APPROVED`" type="java.lang.Boolean"/>
+		<many-to-one name="referralScreening" column="`REFFERRAL_SCREENING_ID`" class="omis.placementscreening.domain.ReferralScreening"/>
+		<property name="decisionDate" column="`DESCISION_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="requestDate" column="`REQUEST_DATE`" type="java.util.Date" not-null="true"/>
+	</class>
+</hibernate-mapping>

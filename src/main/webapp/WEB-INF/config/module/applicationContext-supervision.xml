@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Configuration for supervision.
+  -
+  - Author: Stephen Abson
+  - Author: Ryan Johns
+  - Author: Josh Divine
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+    
+  <bean id="placementTermService"
+      	class="omis.supervision.service.impl.PlacementTermServiceImpl">
+    <constructor-arg name="placementTermInstanceFactory" ref="placementTermInstanceFactory" />
+   	<constructor-arg name="placementTermDao" ref="placementTermDao" />
+   	<constructor-arg name="correctionalStatusDao" ref="correctionalStatusDao" />
+   	<constructor-arg name="correctionalStatusTermInstanceFactory" ref="correctionalStatusTermInstanceFactory"/>
+   	<constructor-arg name="correctionalStatusTermDao" ref="correctionalStatusTermDao" />
+   	<constructor-arg name="supervisoryOrganizationDao" ref="supervisoryOrganizationDao" />
+   	<constructor-arg name="supervisoryOrganizationTermInstanceFactory" ref="supervisoryOrganizationTermInstanceFactory"/>
+   	<constructor-arg name="supervisoryOrganizationTermDao" ref="supervisoryOrganizationTermDao" />
+   	<constructor-arg name="placementTermChangeReasonDao" ref="placementTermChangeReasonDao" />
+   	<constructor-arg name="stateDao" ref="stateDao"/>
+   	<constructor-arg name="locationDao" ref="locationDao"/>
+   	<constructor-arg name="locationTermDao" ref="locationTermDao"/>
+   	<constructor-arg name="placementTermNoteDelegate" ref="placementTermNoteDelegate"/>
+   	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>     
+  
+  <bean id="changeSupervisoryOrganizationService"
+        class="omis.supervision.service.impl.ChangeSupervisoryOrganizationServiceImpl">
+    <constructor-arg name="placementTermInstanceFactory" ref="placementTermInstanceFactory"/>
+    <constructor-arg name="placementTermDao" ref="placementTermDao"/>
+    <constructor-arg name="supervisoryOrganizationTermInstanceFactory" ref="supervisoryOrganizationTermInstanceFactory"/>
+    <constructor-arg name="supervisoryOrganizationTermDao" ref="supervisoryOrganizationTermDao"/>
+    <constructor-arg name="placementTermChangeReasonDao" ref="placementTermChangeReasonDao"/>
+    <constructor-arg name="allowedSupervisoryOrganizationChangeDao" ref="allowedSupervisoryOrganizationChangeDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationTermService"
+        class="omis.supervision.service.impl.SupervisoryOrganizationTermServiceImpl">
+    <constructor-arg name="supervisoryOrganizationTermInstanceFactory" ref="supervisoryOrganizationTermInstanceFactory"/>
+    <constructor-arg name="supervisoryOrganizationTermDao" ref="supervisoryOrganizationTermDao"/>
+    <constructor-arg name="supervisoryOrganizationDao" ref="supervisoryOrganizationDao"/>
+    <constructor-arg name="placementTermDao" ref="placementTermDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="correctionalStatusTermService"
+        class="omis.supervision.service.impl.CorrectionalStatusTermServiceImpl">
+    <constructor-arg name="correctionalStatusTermInstanceFactory" ref="correctionalStatusTermInstanceFactory"/>
+    <constructor-arg name="correctionalStatusTermDao" ref="correctionalStatusTermDao"/>
+    <constructor-arg name="correctionalStatusDao" ref="correctionalStatusDao"/>
+    <constructor-arg name="placementTermDao" ref="placementTermDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="endPlacementTermService"
+        class="omis.supervision.service.impl.EndPlacementTermServiceImpl">
+    <constructor-arg name="placementTermDelegate" ref="placementTermDelegate"/>
+    <constructor-arg name="placementTermChangeReasonDelegate" ref="placementTermChangeReasonDelegate"/>
+    <constructor-arg name="correctionalStatusTermDelegate" ref="correctionalStatusTermDelegate"/>
+    <constructor-arg name="supervisoryOrganizationTermDelegate" ref="supervisoryOrganizationTermDelegate"/>
+    <constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
+    <constructor-arg name="locationReasonTermDelegate" ref="locationReasonTermDelegate"/>
+  </bean>
+  
+  <!-- Report services -->
+  
+  <bean id="supervisionSummaryReportService"
+  	class="omis.supervision.report.impl.hibernate.SupervisionSummaryReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="placementTermProfileItemReportService"
+  	class="omis.supervision.report.impl.hibernate.PlacementTermProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="placementTermReportService" class="omis.supervision.report.impl.hibernate.PlacementTermReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Delegates -->
+  
+  <bean id="allowedCorrectionalStatusChangeReasonRuleDelegate" class="omis.supervision.service.delegate.AllowedCorrectionalStatusChangeReasonRuleDelegate">
+  	<constructor-arg name="allowedCorrectionalStatusChangeReasonRuleInstanceFactory" ref="allowedCorrectionalStatusChangeReasonRuleInstanceFactory"/>
+    <constructor-arg name="allowedCorrectionalStatusChangeReasonRuleDao" ref="allowedCorrectionalStatusChangeReasonRuleDao"/>
+  </bean>
+  
+  <bean id="allowedCorrectionalStatusChangeDelegate" class="omis.supervision.service.delegate.AllowedCorrectionalStatusChangeDelegate">
+  	<constructor-arg name="allowedCorrectionalStatusChangeInstanceFactory" ref="allowedCorrectionalStatusChangeInstanceFactory"/>
+    <constructor-arg name="allowedCorrectionalStatusChangeDao" ref="allowedCorrectionalStatusChangeDao"/>
+  </bean>
+  
+  <bean id="placementTermChangeReasonDelegate" class="omis.supervision.service.delegate.PlacementTermChangeReasonDelegate">
+    <constructor-arg name="placementTermChangeReasonInstanceFactory" ref="placementTermChangeReasonInstanceFactory"/>
+    <constructor-arg name="placementTermChangeReasonDao" ref="placementTermChangeReasonDao"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationDelegate" class="omis.supervision.service.delegate.SupervisoryOrganizationDelegate">
+    <constructor-arg name="supervisoryOrganizationInstanceFactory" ref="supervisoryOrganizationInstanceFactory"/>
+    <constructor-arg name="supervisoryOrganizationDao" ref="supervisoryOrganizationDao"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationTermDelegate"
+        class="omis.supervision.service.delegate.SupervisoryOrganizationTermDelegate">
+    <constructor-arg name="supervisoryOrganizationTermInstanceFactory" ref="supervisoryOrganizationTermInstanceFactory"/>
+    <constructor-arg name="supervisoryOrganizationTermDao" ref="supervisoryOrganizationTermDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="placementTermDelegate"
+        class="omis.supervision.service.delegate.PlacementTermDelegate">
+    <constructor-arg name="placementTermInstanceFactory" ref="placementTermInstanceFactory"/>
+    <constructor-arg name="placementTermDao" ref="placementTermDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="placementTermChangeActionDelegate"
+        class="omis.supervision.service.delegate.PlacementTermChangeActionDelegate">
+    <constructor-arg name="placementTermChangeActionInstanceFactory" ref="placementTermChangeActionInstanceFactory"/>
+    <constructor-arg name="placementTermChangeActionDao" ref="placementTermChangeActionDao"/>
+  </bean>
+  
+  <bean id="correctionalStatusTermDelegate"
+        class="omis.supervision.service.delegate.CorrectionalStatusTermDelegate">
+    <constructor-arg name="correctionalStatusTermInstanceFactory" ref="correctionalStatusTermInstanceFactory"/>
+    <constructor-arg name="correctionalStatusTermDao" ref="correctionalStatusTermDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+
+  <bean id="correctionalStatusDelegate"
+        class="omis.supervision.service.delegate.CorrectionalStatusDelegate">
+    <constructor-arg name="correctionalStatusInstanceFactory" ref="correctionalStatusInstanceFactory"/>
+    <constructor-arg name="correctionalStatusDao" ref="correctionalStatusDao"/>
+  </bean>
+
+  <bean id="placementTermNoteDelegate"
+        class="omis.supervision.service.delegate.PlacementTermNoteDelegate">
+    <constructor-arg name="placementTermNoteInstanceFactory" ref="placementTermNoteInstanceFactory"/>
+    <constructor-arg name="placementTermNoteDao" ref="placementTermNoteDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+
+  <!-- Data access objects -->
+    
+  <bean id="placementTermDao"
+      	class="omis.supervision.dao.impl.hibernate.PlacementTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.PlacementTerm"/>
+  </bean>
+  
+    <bean id="placementTermChangeReasonDao"
+      	class="omis.supervision.dao.impl.hibernate.PlacementTermChangeReasonDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeReason"/>
+  </bean>
+ 
+  <bean id="correctionalStatusDao"
+        class="omis.supervision.dao.impl.hibernate.CorrectionalStatusDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatus"/>
+  </bean>
+  
+   <bean id="correctionalStatusTermDao"
+        class="omis.supervision.dao.impl.hibernate.CorrectionalStatusTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatusTerm"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationDao"
+        class="omis.supervision.dao.impl.hibernate.SupervisoryOrganizationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganization"/>
+  </bean>
+  
+   <bean id="supervisoryOrganizationTermDao"
+        class="omis.supervision.dao.impl.hibernate.SupervisoryOrganizationTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganizationTerm"/>
+  </bean>
+  
+  <bean id="allowedSupervisoryOrganizationRuleDao"
+  		class="omis.supervision.dao.impl.hibernate.AllowedSupervisoryOrganizationRuleDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.AllowedSupervisoryOrganizationRule"/>
+  </bean>
+ 
+  <bean id="placementTermChangeActionDao"
+  		class="omis.supervision.dao.impl.hibernate.PlacementTermChangeActionDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeAction"/>
+  </bean>
+
+  <bean id="allowedFacilityChangeDao"
+  		class="omis.supervision.dao.impl.hibernate.AllowedFacilityChangeDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.AllowedFacilityChange"/>
+  </bean>
+
+  <bean id="allowedSupervisoryOrganizationChangeDao"
+  		class="omis.supervision.dao.impl.hibernate.AllowedSupervisoryOrganizationChangeDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.AllowedSupervisoryOrganizationChange"/>
+  </bean>
+
+  <bean id="allowedCorrectionalStatusChangeDao"
+  		class="omis.supervision.dao.impl.hibernate.AllowedCorrectionalStatusChangeDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.AllowedCorrectionalStatusChange"/>
+  </bean>
+  
+  <bean id="allowedCorrectionalStatusChangeReasonRuleDao"
+		class="omis.supervision.dao.impl.hibernate.AllowedCorrectionalStatusChangeReasonRuleDaoHibernateImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.supervision.domain.AllowedCorrectionalStatusChangeReasonRule"/>
+  </bean>
+  
+  <bean id="placementTermNoteDao"
+        class="omis.supervision.dao.impl.hibernate.PlacementTermNoteDaoHibernateImpl">
+      <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+      <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermNote"/>
+  </bean>
+  
+  <!-- Instance factories. -->
+  
+  <bean id="placementTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTerm"/>
+  </bean>
+
+  <bean id="placementTermChangeReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeReason"/>
+  </bean>
+  
+  <bean id="placementTermChangeActionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeAction"/>
+  </bean>
+
+  <bean id="supervisoryOrganizationTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganizationTerm"/>
+  </bean>
+
+  <bean id="supervisoryOrganizationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganization"/>
+  </bean>
+  
+  <bean id="correctionalStatusTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatusTerm"/>
+  </bean>
+  
+  <bean id="correctionalStatusInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatus"/>      
+  </bean>
+  
+  <bean id="allowedCorrectionalStatusChangeInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.AllowedCorrectionalStatusChange"/>      
+  </bean>
+
+  <bean id="allowedCorrectionalStatusChangeReasonRuleInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.AllowedCorrectionalStatusChangeReasonRule"/>      
+  </bean>
+
+  <bean id="placementTermNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermNote"/>
+  </bean>
+
+  <!-- Property editor factories. -->
+
+  <bean id="placementTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="placementTermDao"/>
+  </bean>
+
+  <bean id="placementTermChangeActionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeAction"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="placementTermChangeActionDao"/>
+  </bean>
+  
+
+  <bean id="placementTermChangeReasonPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermChangeReason"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="placementTermChangeReasonDao"/>
+  </bean>
+
+  <bean id="correctionalStatusPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatus"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="correctionalStatusDao"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganization"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="supervisoryOrganizationDao"/>
+  </bean>
+
+  <bean id="correctionalStatusTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.CorrectionalStatusTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="correctionalStatusTermDao"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.supervision.domain.SupervisoryOrganizationTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="supervisoryOrganizationTermDao"/>
+  </bean>
+  
+  <bean id="placementTermNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      <constructor-arg name="entityName" value="omis.supervision.domain.PlacementTermNote"/>
+      <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      <constructor-arg name="dao" ref="placementTermNoteDao"/>
+  </bean>
+
+</beans>

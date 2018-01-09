@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  
+  <!-- Services -->
+  
+  <bean id="victimAssociationService"
+        class="omis.victim.service.impl.VictimAssociationServiceImpl">
+    <constructor-arg name="victimAssociationDelegate" ref="victimAssociationDelegate"/>
+    <constructor-arg name="victimNoteDelegate" ref="victimNoteDelegate"/>
+    <constructor-arg name="victimNoteCategoryDelegate" ref="victimNoteCategoryDelegate"/>
+    <constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+    <constructor-arg name="personDelegate" ref="personDelegate"/>
+    <constructor-arg name="addressDelegate" ref="addressDelegate"/>
+    <constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+    <constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+    <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    <constructor-arg name="countryDelegate" ref="countryDelegate"/>
+    <constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+    <constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+    <constructor-arg name="contactDelegate" ref="contactDelegate"/>
+    <constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+    <constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+    <constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+  </bean>
+  
+  <bean id="victimNoteService"
+        class="omis.victim.service.impl.VictimNoteServiceImpl">
+    <constructor-arg name="victimNoteDelegate" ref="victimNoteDelegate"/>
+    <constructor-arg name="victimAssociationDelegate" ref="victimAssociationDelegate"/>
+    <constructor-arg name="victimNoteCategoryDelegate" ref="victimNoteCategoryDelegate"/>
+  </bean>
+  
+  <bean id="victimContactService"
+     class="omis.victim.service.impl.VictimContactServiceImpl">
+    <constructor-arg name="addressDelegate" ref="addressDelegate"/>
+    <constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+    <constructor-arg name="contactDelegate" ref="contactDelegate"/>
+    <constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+    <constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+    <constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+    <constructor-arg name="countryDelegate" ref="countryDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+    <constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+    <constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+    <constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+  </bean>
+  
+	<bean id="victimDocumentAssociationService"
+		class="omis.victim.service.impl.VictimDocumentAssociationServiceImpl">
+			<constructor-arg name="victimDocumentAssociationDelegate" ref="victimDocumentAssociationDelegate"/>
+			<constructor-arg name="documentDelegate" ref="documentDelegate"/>
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate"/>
+			<constructor-arg name="victimAssociationDelegate" ref="victimAssociationDelegate"/>
+			<constructor-arg name="docketDelegate" ref="docketDelegate"/>
+	</bean>
+  <!-- Report Services -->
+  
+  <bean id="victimAssociationReportService" class="omis.victim.report.impl.hibernate.VictimAssociationReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="victimNoteDelegate" ref="victimNoteDelegate"/>
+    <constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+  </bean>
+  
+  <bean id="victimReportService" class="omis.victim.report.impl.hibernate.VictimReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="victimNoteReportService" class="omis.victim.report.impl.hibernate.VictimNoteReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="victimOffenderSearchReportService" class="omis.victim.report.impl.hibernate.VictimOffenderSearchReportServiceHibernateImpl">
+    <constructor-arg name="offenderReportDelegate" ref="offenderReportDelegate"/>
+  </bean>
+  
+  <bean id="victimProfileItemReportService" class="omis.victim.report.impl.hibernate.VictimProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  <!-- Service Delegates -->
+  
+  <bean id="victimAssociationDelegate"
+        class="omis.victim.service.delegate.VictimAssociationDelegate">
+    <constructor-arg name="victimAssociationDao" ref="victimAssociationDao"/>
+    <constructor-arg name="victimAssociationInstanceFactory" ref="victimAssociationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="victimNoteDelegate"
+        class="omis.victim.service.delegate.VictimNoteDelegate">
+    <constructor-arg name="victimNoteDao" ref="victimNoteDao"/>
+    <constructor-arg name="victimNoteInstanceFactory" ref="victimNoteInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="victimNoteCategoryDelegate"
+        class="omis.victim.service.delegate.VictimNoteCategoryDelegate">
+    <constructor-arg name="victimNoteCategoryDao" ref="victimNoteCategoryDao"/>
+  </bean>
+  
+  <bean id="victimDocketAssociationDelegate"
+  		class="omis.victim.service.delegate.VictimDocketAssociationDelegate">
+  	<constructor-arg name="victimDocketAssociationDao" ref="victimDocketAssociationDao"/>
+    <constructor-arg name="victimDocketAssociationInstanceFactory" ref="victimDocketAssociationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="victimDocketDocumentAssociationDelegate"
+  		class="omis.victim.service.delegate.VictimDocketDocumentAssociationDelegate">
+  	<constructor-arg name="victimDocketDocumentAssociationDao" ref="victimDocketDocumentAssociationDao"/>
+    <constructor-arg name="victimDocketDocumentAssociationInstanceFactory" ref="victimDocketDocumentAssociationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="victimDocumentAssociationDelegate"
+  		class="omis.victim.service.delegate.VictimDocumentAssociationDelegate">
+  	<constructor-arg name="victimDocumentAssociationDao" ref="victimDocumentAssociationDao"/>
+    <constructor-arg name="victimDocumentAssociationInstanceFactory" ref="victimDocumentAssociationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- DAOs -->
+  
+  <bean id="victimAssociationDao"
+        class="omis.victim.dao.impl.hibernate.VictimAssociationDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.victim.domain.VictimAssociation"/>
+  </bean>
+  
+  <bean id="victimNoteDao" class="omis.victim.dao.impl.hibernate.VictimNoteDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimNote"/>
+  </bean>
+  
+  <bean id="victimNoteCategoryDao" class="omis.victim.dao.impl.hibernate.VictimNoteCategoryDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimNoteCategory"/>
+  </bean>
+  
+  <bean id="victimDocketAssociationDao"
+		class="omis.victim.dao.impl.hibernate.VictimDocketAssociationDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.victim.domain.VictimDocketAssociation"/>	
+	</bean>
+	
+	<bean id="victimDocketDocumentAssociationDao"
+  		class="omis.victim.dao.impl.hibernate.VictimDocketDocumentAssociationDaoHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		<constructor-arg name="entityName" value="omis.victim.domain.VictimDocketDocumentAssociation"/>	
+  	</bean>
+  	
+  <bean id="victimDocumentAssociationDao"
+  		class="omis.victim.dao.impl.hibernate.VictimDocumentAssociationDaoHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		<constructor-arg name="entityName" value="omis.victim.domain.VictimDocumentAssociation"/>	
+ 	</bean>
+  	
+  <!-- Instance Factories -->
+  
+  <bean id="victimAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimAssociation"/>
+  </bean>
+  
+  <bean id="victimNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimNote"/>
+  </bean>
+  
+  <bean id="victimDocketAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimDocketAssociation"/>
+  </bean>
+  
+  <bean id="victimDocketDocumentAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimDocketDocumentAssociation"/>
+  </bean>
+  
+  <bean id="victimDocumentAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimDocumentAssociation"/>
+  </bean>
+  
+  <!-- Property Editor Factories -->
+  
+  <bean id="victimAssociationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="victimAssociationDao"/>
+  	<constructor-arg name="entityName" value="omis.victim.domain.VictimAssociation"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="victimNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="victimNoteDao"/>
+  	<constructor-arg name="entityName" value="omis.victim.domain.VictimNote"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="victimNoteCategoryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="victimNoteCategoryDao"/>
+  	<constructor-arg name="entityName" value="omis.victim.domain.VictimNoteCategory"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="victimDocketAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimDocketAssociationDao"/>
+			<constructor-arg name="entityName" value="omis.victim.domain.VictimDocketAssociation"/>
+			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<bean id="victimDocketDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimDocketDocumentAssociationDao"/>
+			<constructor-arg name="entityName" value="omis.victim.domain.VictimDocketDocumentAssociation"/>
+			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<bean id="victimDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="victimDocumentAssociationDao"/>
+			<constructor-arg name="entityName" value="omis.victim.domain.VictimDocumentAssociation"/>
+			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<!-- Document interactions -->
+	
+		<bean id="victimDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="victimDocumentLocator"/>
+		</bean>
+
+		<bean id="victimDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="victimDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="victimDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\VictimDocuments"/>
+		</bean>
+		
+		<bean id="victimDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="victimDocumentLocator"/>
+		</bean>
+	
+</beans>

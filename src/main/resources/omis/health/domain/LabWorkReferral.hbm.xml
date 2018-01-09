@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWorkReferral"
+		proxy="omis.health.domain.LabWorkReferral"
+		name="omis.health.domain.impl.LabWorkReferralImpl"
+		table="`LAB_WORK_REFERRAL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_REFERRAL_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offenderAppointmentAssociation" column="`OFFENDER_APPT_ASSOC_ID`" not-null="true"
+			entity-name="omis.health.domain.OffenderAppointmentAssociation" unique="true"/>
+		<many-to-one name="actionRequest" column="`ACTION_REQUEST_ID`" not-null="false"
+			entity-name="omis.health.domain.HealthRequest"/>
+		<many-to-one name="statusReason" column="`STATUS_REASON_ID`" not-null="false" 
+			entity-name="omis.health.domain.LabWorkReferralStatusReason"/>
+		<property name="assessmentNotes" column="`ASSESSMENT_NOTES`" not-null="false" type="string"/>
+		<property name="schedulingNotes" column="`SCHEDULING_NOTES`" not-null="false" type="string"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findLabWorkReferral"><![CDATA[
+		from
+			omis.health.domain.LabWorkReferral referral
+		where
+			referral.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findLabWorkReferralExcluding"><![CDATA[
+		from
+			omis.health.domain.LabWorkReferral referral
+		where
+			referral.offenderAppointmentAssociation = :offenderAppointmentAssociation
+		and
+			referral <> :labWorkReferral
+	]]></query>
+</hibernate-mapping>

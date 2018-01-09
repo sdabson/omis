@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup"
+			proxy="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup"
+			name="omis.presentenceinvestigation.domain.impl.PresentenceInvestigationTaskGroupImpl"
+			table="`PRESNTNCE_INVSTGTN_TSK_GRP`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PRESNTNCE_INVSTGTN_TSK_GRP_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="group" column="`TASK_TEMPLATE_GROUP_ID`" entity-name="omis.task.domain.TaskTemplateGroup" not-null="true" />
+			<many-to-one name="presentenceInvestigationCategory" column="`PRSNTNCE_INVSTGTN_CTGRY_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationCategory" not-null="true" />
+	</class>
+	<query name="findPresentenceInvestigationTaskGroups"><![CDATA[
+		select taskTemplateGroup
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup presentenceInvestigationTaskGroup
+		inner join
+			presentenceInvestigationTaskGroup.group taskTemplateGroup
+	]]></query>
+	<query name="findPresentenceInvestigationTaskGroupByPresentenceInvestigationCategory"><![CDATA[
+		select presentenceInvestigationTaskGroup
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup presentenceInvestigationTaskGroup
+		where
+			presentenceInvestigationTaskGroup.presentenceInvestigationCategory = :presentenceInvestigationCategory
+	]]></query>
+</hibernate-mapping>

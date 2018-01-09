@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.AdministeredQuestionnaire"
+			proxy="omis.questionnaire.domain.AdministeredQuestionnaire"
+			name="omis.questionnaire.domain.impl.AdministeredQuestionnaireImpl"
+			table="`ADMINISTERED_QUESTIONNAIRE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`ADMINISTERED_QUESTIONNAIRE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="answerer" column="`ANSWERER_PERSON_ID`" entity-name="omis.person.domain.Person" not-null="true"/>
+			<property name="draft" column="`DRAFT`" type="yes_no" not-null="true"/>
+			<property name="comments" column="`COMMENTS`" type="java.lang.String"/>
+			<many-to-one name="assessor" column="`ASSESSOR_PERSON_ID`" entity-name="omis.person.domain.Person" not-null="true"/>
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true"/>
+			<many-to-one name="questionnaireType" column="`QUESTIONNAIRE_TYPE_ID`" entity-name="omis.questionnaire.domain.QuestionnaireType" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findAdministeredQuestionnaire"><![CDATA[
+		select administeredQuestionnaire
+		from
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+		where
+			administeredQuestionnaire.answerer = :answerer
+		and
+			administeredQuestionnaire.date = :date
+		and
+			administeredQuestionnaire.questionnaireType = :questionnaireType
+	]]></query>
+	<query name="findAdministeredQuestionnaireExcluding"><![CDATA[
+		select administeredQuestionnaire
+		from
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+		where
+			administeredQuestionnaire.answerer = :answerer
+		and
+			administeredQuestionnaire.date = :date
+		and
+			administeredQuestionnaire.questionnaireType = :questionnaireType
+		and
+			administeredQuestionnaire != :administeredQuestionnaire
+	]]></query>
+</hibernate-mapping>

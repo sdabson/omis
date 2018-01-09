@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<query name="summarizeVictimNotesByVictim"><![CDATA[
+		select new omis.victim.report.VictimNoteSummary(
+		  victimNote, category, victim, victimName,
+		  (select victimOffender from omis.offender.domain.Offender victimOffender where victimOffender = victim),
+		  association,
+		  (select offenderAsOffender from omis.offender.domain.Offender as offenderAsOffender where offenderAsOffender = offender),
+		  offenderName
+		)
+		from omis.victim.domain.VictimNote as victimNote
+		  inner join victimNote.category as category
+		  inner join victimNote.victim as victim
+		  inner join victim.name as victimName
+		  left outer join victimNote.association as association
+		  left outer join association.relationship as associationRelationship
+		  left outer join associationRelationship.firstPerson as offender
+		  left outer join offender.name as offenderName
+		where
+		  victimNote.victim = :victim
+	]]></query>
+</hibernate-mapping>

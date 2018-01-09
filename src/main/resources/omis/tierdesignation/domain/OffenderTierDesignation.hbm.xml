@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.tierdesignation.domain">
+	<class entity-name="omis.tierdesignation.domain.OffenderTierDesignation"
+	       proxy="omis.tierdesignation.domain.OffenderTierDesignation"
+	       name="omis.tierdesignation.domain.impl.OffenderTierDesignationImpl"
+	       table="`TIER_DESIGNATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`TIER_DESIGNATION_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueOffenderTierDesignation">
+			<many-to-one name="offender" entity-name="omis.offender.domain.Offender"
+		             column="`OFFENDER_ID`" not-null="true"/>
+			<many-to-one name="level" entity-name="omis.tierdesignation.domain.TierLevel"
+		             column="`LEVEL_ID`" not-null="true"/>
+			<many-to-one name="source" entity-name="omis.tierdesignation.domain.TierSource"
+					 column="`SOURCE_ID`" not-null="true"/>
+			<many-to-one name="changeReason" entity-name="omis.tierdesignation.domain.TierChangeReason"
+		             column="`CHANGE_REASON_ID`" not-null="true"/>
+            <component name="dateRange" class="omis.datatype.DateRange">
+              <property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+              <property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+            </component>
+		</properties>					 
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<property name="comment" column='"COMMENT"' type="java.lang.String" not-null="false"/>
+	</class>
+	<query name="findOffenderTierDesignationsByOffender"><![CDATA[
+		select tierDesignation
+		from OffenderTierDesignation tierDesignation
+		where tierDesignation.offender = :offender
+		order by
+		   tierDesignation.dateRange.startDate, tierDesignation.dateRange.endDate,
+		   tierDesignation.changeReason.name, tierDesignation.level.name,
+		   tierDesignation.source.name
+	]]></query>
+	<query name="findOffenderTierDesignation"><![CDATA[
+	  select offenderTierDesignation
+	  from omis.tierdesignation.domain.OffenderTierDesignation offenderTierDesignation
+	  where offenderTierDesignation.offender = :offender
+	    and offenderTierDesignation.level = :level
+	    and offenderTierDesignation.source = :source
+	    and offenderTierDesignation.changeReason = :changeReason
+	    and (offenderTierDesignation.dateRange.startDate = :startDate
+	    	or (offenderTierDesignation.dateRange.startDate is null and :startDate is null))
+	    and (offenderTierDesignation.dateRange.endDate = :endDate
+	        or (offenderTierDesignation.dateRange.endDate is null and :endDate is null))
+	]]></query>
+	<query name="findOffenderTierDesignationExcluding"><![CDATA[
+	  select offenderTierDesignation
+	  from omis.tierdesignation.domain.OffenderTierDesignation offenderTierDesignation
+	  where offenderTierDesignation.offender = :offender
+	    and offenderTierDesignation.level = :level
+	    and offenderTierDesignation.source = :source
+	    and offenderTierDesignation.changeReason = :changeReason
+	    and (offenderTierDesignation.dateRange.startDate = :startDate
+	    	or (offenderTierDesignation.dateRange.startDate is null and :startDate is null))
+	    and (offenderTierDesignation.dateRange.endDate = :endDate
+	        or (offenderTierDesignation.dateRange.endDate is null and :endDate is null))
+	    and offenderTierDesignation <> :excludedOffenderTierDesignation
+	]]></query>
+	<query name="findTierDesignationCountByOffenderAndDate"><![CDATA[
+	 select count(offenderTierDesignation)
+	   from omis.tierdesignation.domain.OffenderTierDesignation offenderTierDesignation
+	  where offenderTierDesignation.offender = :offender
+	    and ((offenderTierDesignation.dateRange.startDate <= :effectiveDate
+	     or offenderTierDesignation.dateRange.startDate is null)
+	    and (offenderTierDesignation.dateRange.endDate > :effectiveDate
+	     or offenderTierDesignation.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

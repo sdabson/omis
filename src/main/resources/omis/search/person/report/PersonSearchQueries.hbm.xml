@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!--    Person/Name searches -->
+	
+
+	<query name="findAllNameByFirstLastNameSearch"><![CDATA[
+	  SELECT new omis.search.report.PersonSearchResult(an.id, 
+	         an.person.id, an.firstName, an.middleName, an.lastName, an.suffix)
+		FROM omis.person.domain.PersonName an
+	   WHERE (utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName), upper(:name2)) >= 90)
+		 AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName), upper(:name1)) >= 85))
+	ORDER BY an.lastName, an.firstName
+	]]></query>
+	
+	<query name="findAllNameByFirstMiddleLastSearch"><![CDATA[
+	  SELECT new omis.search.report.PersonSearchResult(an.id, 
+	         an.person.id,  an.firstName, an.middleName, an.lastName, an.suffix )
+		FROM omis.person.domain.PersonName an
+	   WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName), upper(:last)) >= 90 
+	     AND (utl_match.JARO_WINKLER_SIMILARITY(upper(an.middleName), upper(:middle)) >= 90
+	         OR upper(an.middleName) like upper(:middle) || '%' 
+	         OR an.middleName is null 
+	         OR an.middleName like '') 
+	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:first)) > 85
+	ORDER BY an.lastName, an.firstName
+	]]></query>
+	
+	
+	<query name="findActualNameByFirstLastNameSearch"><![CDATA[
+	  SELECT new omis.search.report.PersonSearchResult(a.name.id, 
+	         a.id, a.name.firstName, a.name.middleName, a.name.lastName, a.name.suffix )
+		FROM omis.person.domain.Person a 
+	   WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(a.name.firstName),upper(:name1)) >= 85 
+	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(a.name.lastName),upper(:name2)) >= 90
+    ORDER BY a.name.lastName, a.name.firstName
+	]]></query>
+	
+	<query name="findNameByLastNameSearch"><![CDATA[
+	  SELECT new omis.search.report.PersonSearchResult(p.name.id,
+	         p.id, p.name.firstName, p.name.middleName, p.name.lastName, p.name.suffix )
+	    FROM omis.person.domain.Person p
+	   WHERE upper(p.name.lastName) like upper(:name || '%' )
+	ORDER BY p.name.lastName, p.name.firstName
+	]]></query>
+
+	<query name="findPersonSearchById"><![CDATA[
+	 SELECT new omis.search.report.PersonSearchResult(p.name.id, 
+	 		p.id, p.name.firstName, p.name.middleName, p.name.lastName,  p.name.suffix)
+	   FROM omis.person.domain.Person p
+	  WHERE p.id = :id
+   ORDER BY p.name.lastName, p.name.firstName
+		]]></query>
+
+
+<!--   Offender/Name searches -->
+	<query name="findAllOffenderNameByFirstLastNameSearch"><![CDATA[
+	  SELECT new omis.search.report.OffenderSearchResult(an.id, 
+	         an.person.id, o.offenderNumber, an.firstName, an.middleName, an.lastName, an.suffix)
+	 	FROM omis.person.domain.PersonName an,
+		     omis.offender.domain.Offender o
+	   WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name2)) >= 85
+	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name1)) >= 90
+		 AND an.person = o 
+    ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name2)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name1)) DESC
+	]]></query>
+	
+	<query name="findAllOffenderNameByFirstMiddleLastSearch"><![CDATA[
+	  SELECT new omis.search.report.OffenderSearchResult(an.id, 
+	         an.person.id, o.offenderNumber, an.firstName, an.middleName, an.lastName, an.suffix )
+		FROM omis.offender.domain.Offender o,
+		     omis.person.domain.PersonName an
+	    WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName), upper(:last)) >= 90 
+	     AND (utl_match.JARO_WINKLER_SIMILARITY(upper(an.middleName), upper(:middle)) >= 90
+	         OR upper(an.middleName) like upper(:middle) || '%' 
+	         OR an.middleName is null 
+	         OR an.middleName like '')
+	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:first)) >= 85
+	     AND an.person = o
+	ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.middleName), upper(:middle)) DESC
+	]]></query>
+	
+	<query name="findOffenderNameByOffenderNumberSearch"><![CDATA[
+	  SELECT new omis.search.report.OffenderSearchResult(n.id, 
+	         o.id, o.offenderNumber, n.firstName, n.middleName, n.lastName, n.suffix )
+	    FROM omis.offender.domain.Offender o
+LEFT OUTER JOIN o.name n
+	   WHERE :offenderNumber = o.offenderNumber
+	ORDER BY o.name.lastName, o.name.firstName
+	]]></query>
+	
+	<query name="findOffenderNamesByLastNameSearch"><![CDATA[
+	  SELECT new omis.search.report.OffenderSearchResult(o.name.id,
+	         o.id, o.offenderNumber, o.name.firstName, o.name.middleName, o.name.lastName, o.name.suffix )
+	    FROM omis.offender.domain.Offender o
+	   WHERE upper(o.name.lastName) like upper(:name || '%')
+	ORDER BY o.name.lastName, o.name.firstName
+	]]></query>
+	
+	<query name="findOffenderSearchById"><![CDATA[
+	 SELECT new omis.search.report.OffenderSearchResult(o.name.id, 
+	 		o.id, o.offenderNumber, o.name.firstName, o.name.middleName, o.name.lastName, o.name.suffix)
+	   FROM omis.offender.domain.Offender o
+	  WHERE o.id = :id
+   ORDER BY o.name.lastName, o.name.firstName
+		]]></query>
+	
+	
+<!--   User/Name searches -->
+	<query name="findUsersNamesByFirstLastNameSearch"><![CDATA[
+	   SELECT new omis.search.report.UserSearchResult(ua.id, an.person.id,
+		      an.id, an.firstName, an.middleName, an.lastName, an.suffix, ua.username)
+		FROM omis.person.domain.PersonName an,
+		     omis.user.domain.UserAccount as ua
+       WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) >= 85 
+	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) >= 90
+         AND ua.user = an.person
+    ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) DESC 
+	]]></query>
+	
+	<query name="findUsersNameByFirstMiddleLastNameSearch"><![CDATA[
+	   SELECT new omis.search.report.UserSearchResult(ua.id, an.person.id,
+			  an.id, an.firstName, an.middleName, an.lastName, an.suffix, ua.username)
+		 FROM omis.person.domain.PersonName an,
+		  	  omis.user.domain.UserAccount as ua
+	    WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) >= 85 
+	      AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) >= 90
+	      AND an.person = ua.user
+     ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) DESC
+	]]></query>
+	
+	
+	<query name="findUserNamesByUsernameSearchCriteria"><![CDATA[
+		select new omis.search.report.UserSearchResult(ua.id, an.person.id,
+		       an.id, an.firstName, an.middleName, an.lastName, an.suffix, ua.username )
+		  from omis.person.domain.PersonName an, 
+		       omis.user.domain.UserAccount as ua
+		 where upper(ua.username) like upper(:username)
+		   and an.person = ua.user
+	  ORDER BY an.lastName, an.firstName
+	]]></query>
+	
+	<query name="findUserNamesByLastNameSearchCriteria"><![CDATA[
+	  SELECT new omis.search.report.UserSearchResult(ua.id, ua.user.id,
+	         ua.user.name.id, ua.user.name.firstName, ua.user.name.middleName, 
+	         ua.user.name.lastName, ua.user.name.suffix, ua.username )
+	    FROM omis.person.domain.PersonName an,
+	         omis.user.domain.UserAccount as ua
+	   WHERE upper(an.lastName) like upper(:name || '%') 
+	     AND an.person = ua.user
+    ORDER BY an.lastName, an.firstName
+	]]></query>
+	
+<!-- Case Load person name search -->
+	<!-- <query name="findCaseLoadOffenderByPerson"><![CDATA[
+		select distinct new omis.search.report.OffenderSearchResult(o.name.id,
+			   o.id,
+			   o.offenderNumber,
+			   o.name.firstName,
+			   o.name.middleName,
+			   o.name.lastName)
+		  from omis.caseload.domain.CaseLoadOffenderAssignment as coa,
+			   omis.caseload.domain.CaseLoadWorkerAssignment as cwa,
+		       omis.offender.domain.Offender as o
+		 where coa.caseLoad = cwa.caseLoad
+		   and cwa.person = :person
+		   and cwa.dateRange.startDate <= :date
+		   and (cwa.dateRange.endDate >= :date
+		    or cwa.dateRange.endDate is null)
+		   and coa.dateRange.startDate <= :date
+		   and (coa.dateRange.endDate >= :date
+		    or coa.dateRange.endDate is null)
+		   and o = coa.offender
+	 ORDER BY o.name.lastName, o.name.firstName
+	]]></query>	 -->
+	
+	<query name="findUserSearchById"><![CDATA[
+	 	 SELECT new omis.search.report.UserSearchResult(ua.id, an.person.id,
+	 	        an.id, an.firstName, an.middleName, an.lastName, an.suffix, ua.username)
+		FROM omis.person.domain.PersonName an,
+		     omis.user.domain.UserAccount ua
+		WHERE ua.id = :id
+		  AND an.person = ua.user 
+	 ORDER BY an.lastName, an.firstName
+		]]></query>
+
+</hibernate-mapping>

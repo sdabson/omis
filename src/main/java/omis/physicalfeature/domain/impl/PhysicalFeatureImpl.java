@@ -1,0 +1,125 @@
+package omis.physicalfeature.domain.impl;
+
+import omis.physicalfeature.domain.FeatureClassification;
+import omis.physicalfeature.domain.PhysicalFeature;
+
+/**
+ * Physical feature implementation.
+ * @author Joel Norris
+ * @version 0.1.0 (Nov 15, 2013)
+ * @since OMIS 3.0
+ */
+public class PhysicalFeatureImpl implements PhysicalFeature {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long id;
+	
+	private String name;
+	
+	private FeatureClassification featureClassification;
+	
+	private Boolean valid;
+	
+	/**
+	 * Instantiates a default instance of physical feature implementation.
+	 */
+	public PhysicalFeatureImpl() {
+		//Default constructor
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Long getId() {
+		return this.id;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setId(final Long id) {
+		this.id = id;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public FeatureClassification getFeatureClassification() {
+		return this.featureClassification;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setFeatureClassification(final FeatureClassification 
+			featureClassification) {
+		this.featureClassification = featureClassification;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Boolean getValid() {
+		return this.valid;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setValid(final Boolean valid) {
+		this.valid = valid;
+	}	
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}	
+		if (!(o instanceof PhysicalFeature)) {
+			return false;
+		}
+		
+		PhysicalFeature that = (PhysicalFeature) o;
+		
+		if (this.getName() == null) {
+			throw new IllegalStateException("Name required.");
+		}
+		if (!this.getName().equals(that.getName())) {
+			return false;
+		}
+		if (this.getFeatureClassification() == null) {
+			throw new IllegalStateException("FeatureClassification required.");
+		}
+		if (!this.getFeatureClassification().equals(
+				that.getFeatureClassification())) {
+			return false;
+		}
+		return true;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public int hashCode() {
+		if (this.getName() == null) {
+			throw new IllegalStateException("Name required.");
+		}
+		if (this.getFeatureClassification() == null) {
+			throw new IllegalStateException("FeatureClassification required.");
+		}
+		
+		int hashCode = 14;
+		
+		hashCode = 29 * hashCode + this.getName().hashCode();
+		hashCode = 29 * hashCode + this.getFeatureClassification().hashCode();
+		
+		return hashCode;
+	}
+}

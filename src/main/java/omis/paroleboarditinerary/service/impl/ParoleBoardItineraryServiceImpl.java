@@ -1,0 +1,271 @@
+package omis.paroleboarditinerary.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import omis.exception.DuplicateEntityFoundException;
+import omis.location.domain.Location;
+import omis.location.service.delegate.LocationDelegate;
+import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
+import omis.paroleboarditinerary.domain.BoardAttendee;
+import omis.paroleboarditinerary.domain.BoardMeetingSite;
+import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardItineraryNote;
+import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
+import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
+import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryNoteDelegate;
+import omis.paroleboardmember.domain.ParoleBoardMember;
+import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
+
+/**
+ * Implementation of service for parole board itinerary.
+ * 
+ * @author Josh Divine
+ * @version 0.1.0 (Nov 20, 2017)
+ * @since OMIS 3.0
+ */
+public class ParoleBoardItineraryServiceImpl 
+		implements ParoleBoardItineraryService {
+	
+	/* Delegates. */
+	
+	private final ParoleBoardItineraryDelegate paroleBoardItineraryDelegate;
+	
+	private final ParoleBoardItineraryNoteDelegate 
+			paroleBoardItineraryNoteDelegate;
+	
+	private final BoardAttendeeDelegate boardAttendeeDelegate;
+	
+	private final BoardMeetingSiteDelegate boardMeetingSiteDelegate;
+
+	private final LocationDelegate locationDelegate;
+	
+	private final ParoleBoardMemberDelegate paroleBoardMemberDelegate;
+	
+	/**
+	 * Instantiates a parole board itinerary service implementation with the 
+	 * specified delegates.
+	 * 
+	 * @param paroleBoardItineraryDelegate parole board itinerary delegate
+	 * @param paroleBoardItineraryNoteDelegate parole board itinerary note 
+	 * delegate
+	 * @param boardAttendeeDelegate board attendee delegate
+	 * @param boardMeetingSiteDelegate board meeting site delegate
+	 * @param locationDelegate location delegate
+	 * @param paroleBoardMemberDelegate parole board member delegate
+	 */
+	public ParoleBoardItineraryServiceImpl(
+			final ParoleBoardItineraryDelegate paroleBoardItineraryDelegate,
+			final ParoleBoardItineraryNoteDelegate 
+					paroleBoardItineraryNoteDelegate,
+			final BoardAttendeeDelegate boardAttendeeDelegate,
+			final BoardMeetingSiteDelegate boardMeetingSiteDelegate,
+			final LocationDelegate locationDelegate,
+			final ParoleBoardMemberDelegate paroleBoardMemberDelegate) {
+		this.paroleBoardItineraryDelegate = paroleBoardItineraryDelegate;
+		this.paroleBoardItineraryNoteDelegate = 
+				paroleBoardItineraryNoteDelegate;
+		this.boardAttendeeDelegate = boardAttendeeDelegate;
+		this.boardMeetingSiteDelegate = boardMeetingSiteDelegate;
+		this.locationDelegate = locationDelegate;
+		this.paroleBoardMemberDelegate = paroleBoardMemberDelegate;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ParoleBoardItinerary create(final Location location, 
+			final Date startDate, final Date endDate) 
+					throws DuplicateEntityFoundException {
+		return this.paroleBoardItineraryDelegate.create(location, startDate, 
+				endDate);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ParoleBoardItinerary update(
+			final ParoleBoardItinerary paroleBoardItinerary, 
+			final Location location, final Date startDate, final Date endDate) 
+					throws DuplicateEntityFoundException {
+		return this.paroleBoardItineraryDelegate.update(paroleBoardItinerary, 
+				location, startDate, endDate);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void remove(final ParoleBoardItinerary paroleBoardItinerary) {
+		for (BoardAttendee boardAttendee : 
+			this.findBoardAttendeesByBoardItinerary(paroleBoardItinerary)) {
+			this.removeAttendee(boardAttendee);
+		}
+		if (this.findBoardAlternateAttendeeByBoardItinerary(
+				paroleBoardItinerary) != null) {
+			this.removeAttendee(this.findBoardAlternateAttendeeByBoardItinerary(
+					paroleBoardItinerary));
+		}
+		for (BoardMeetingSite boardMeetingSite : 
+			this.findBoardMeetingSitesByBoardItinerary(paroleBoardItinerary)) {
+			this.removeBoardMeetingSite(boardMeetingSite);
+		}
+		this.paroleBoardItineraryDelegate.remove(paroleBoardItinerary);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findJailLocations() {
+		return this.locationDelegate.findJailLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findPrereleaseLocations() {
+		return this.locationDelegate.findPrereleaseLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findFacilityLocations() {
+		return this.locationDelegate.findFacilityLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findCommunitySupervisionOfficeLocations() {
+		return this.locationDelegate.findCommunitySupervisionOfficeLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findTreatmentAndSactionCenterLocations() {
+		return this.locationDelegate.findTreatmentAndSactionCenterLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Location> findAllBoardItineraryLocations() {
+		return this.locationDelegate.findAllBoardItineraryLocations();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public BoardAttendee createAttendee(
+			final ParoleBoardItinerary boardItinerary, 
+			final ParoleBoardMember boardMember, final Long number,
+			final AttendeeRoleCategory role) 
+					throws DuplicateEntityFoundException {
+		return this.boardAttendeeDelegate.create(boardItinerary, boardMember,
+				number, role);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public BoardAttendee updateAttendee(final BoardAttendee boardAttendee, 
+			final ParoleBoardMember boardMember, 
+			final AttendeeRoleCategory role) 
+					throws DuplicateEntityFoundException {
+		return this.boardAttendeeDelegate.update(boardAttendee, 
+				boardAttendee.getBoardItinerary(), boardMember, 
+				boardAttendee.getNumber(), role);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void removeAttendee(final BoardAttendee boardAttendee) {
+		this.boardAttendeeDelegate.remove(boardAttendee);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public BoardMeetingSite createBoardMeetingSite(
+			final ParoleBoardItinerary boardItinerary, final Location location, 
+			final Date date, final Integer order) 
+					throws DuplicateEntityFoundException {
+		return this.boardMeetingSiteDelegate.create(boardItinerary, location,
+				date, order);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public BoardMeetingSite updateBoardMeetingSite(
+			final BoardMeetingSite boardMeetingSite, final Location location, 
+			final Date date, final Integer order) 
+					throws DuplicateEntityFoundException {
+		return this.boardMeetingSiteDelegate.update(boardMeetingSite, 
+				boardMeetingSite.getBoardItinerary(), location, date, order);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void removeBoardMeetingSite(
+			final BoardMeetingSite boardMeetingSite) {
+		this.boardMeetingSiteDelegate.remove(boardMeetingSite);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ParoleBoardItineraryNote createBoardIteneraryNote(
+			final ParoleBoardItinerary boardItinerary, final String description,
+			final Date date) throws DuplicateEntityFoundException {
+		return this.paroleBoardItineraryNoteDelegate.create(boardItinerary, 
+				description, date);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ParoleBoardItineraryNote updateBoardItineraryNote(
+			final ParoleBoardItineraryNote itineraryNote, 
+			final String description, final Date date) 
+					throws DuplicateEntityFoundException {
+		return this.paroleBoardItineraryNoteDelegate.update(itineraryNote, 
+				itineraryNote.getBoardItinerary(), description, date);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void removeBoardItineraryNote(
+			final ParoleBoardItineraryNote itineraryNote) {
+		this.paroleBoardItineraryNoteDelegate.remove(itineraryNote);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<BoardAttendee> findBoardAttendeesByBoardItinerary(
+			final ParoleBoardItinerary boardItinerary) {
+		return this.boardAttendeeDelegate.findBoardAttendeesByBoardItinerary(
+				boardItinerary);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public BoardAttendee findBoardAlternateAttendeeByBoardItinerary(
+			final ParoleBoardItinerary boardItinerary) {
+		return this.boardAttendeeDelegate
+				.findBoardAlternateAttendeeByBoardItinerary(boardItinerary);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<BoardMeetingSite> findBoardMeetingSitesByBoardItinerary(
+			final ParoleBoardItinerary boardItinerary) {
+		return this.boardMeetingSiteDelegate
+				.findBoardMeetingSitesByBoardItinerary(boardItinerary);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<ParoleBoardItineraryNote> findItineraryNotesByBoardItinerary(
+			final ParoleBoardItinerary boardItinerary) {
+		return this.paroleBoardItineraryNoteDelegate
+				.findItineraryNotesByBoardItinerary(boardItinerary);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<ParoleBoardMember> findBoardMembersByDate(
+			final Date effectiveDate) {
+		return this.paroleBoardMemberDelegate
+				.findBoardMembersByDate(effectiveDate);
+	}
+
+}

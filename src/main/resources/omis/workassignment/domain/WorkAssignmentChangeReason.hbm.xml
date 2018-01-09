@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workassignment.domain">
+	<class entity-name="omis.workassignment.domain.WorkAssignmentChangeReason"
+	       proxy="omis.workassignment.domain.WorkAssignmentChangeReason"
+	       name="omis.workassignment.domain.impl.WorkAssignmentChangeReasonImpl"
+		   table="`WORK_ASSIGNMENT_CNG_RSN`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`WORK_ASSIGNMENT_CNG_RSN_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" column="`NAME`" not-null="true" unique="true" />
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`" unique="false"/>
+	</class>
+	<!-- 	find all work assignment change reasons -->
+	<query name="findWorkAssignmentChangeReasons"><![CDATA[
+		select workAssignmentChangeReason
+		from 
+			omis.workassignment.domain.WorkAssignmentChangeReason workAssignmentChangeReason	
+		order by
+			workAssignmentChangeReason.name
+	]]></query>
+	<query name="findWorkAssignmentChangeReason"><![CDATA[
+		select workAssignmentChangeReason
+		from 
+			omis.workassignment.domain.WorkAssignmentChangeReason workAssignmentChangeReason	
+		where
+			workAssignmentChangeReason.name = :name
+	]]></query>
+	<query name="findWorkAssignmentChangeReasonExcluding"><![CDATA[
+		select workAssignmentChangeReason
+		from 
+			omis.workassignment.domain.WorkAssignmentChangeReason workAssignmentChangeReason	
+		where
+			workAssignmentChangeReason.name = :name
+		and
+			workAssignmentChangeReason <> :excludedWorkAssignmentChangeReason
+	]]></query>
+</hibernate-mapping>

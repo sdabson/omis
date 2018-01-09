@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+        
+ <!-- Property editor factories -->
+    <bean id="telephoneNumberPropertyEditorFactory"
+    	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    	<constructor-arg name="dao" ref="telephoneNumberDao"/>
+    	<constructor-arg name="entityName" value="omis.contact.domain.TelephoneNumber"/>
+    	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    </bean>
+ 
+	<bean id="contactPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="contactDao"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.Contact"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+     <bean id="onlineAccountPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="onlineAccountDao"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccount"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+     <bean id="onlineAccountHostPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="onlineAccountHostDao"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccountHost"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+     <bean id="poBoxPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="poBoxDao"/>
+     	<constructor-arg name="entityName" value="omis.mail.domain.PoBox"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+     
+ <!-- DAOs -->
+  <bean name="contactDao" class="omis.contact.dao.impl.hibernate.ContactDaoHibernateImpl">
+ 	<constructor-arg name="entityName" value="omis.contact.domain.Contact"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="telephoneNumberDao" class="omis.contact.dao.impl.hibernate.TelephoneNumberDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.contact.domain.TelephoneNumber"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="onlineAccountDao" class="omis.contact.dao.impl.hibernate.OnlineAccountDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccount"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="onlineAccountHostDao" class="omis.contact.dao.impl.hibernate.OnlineAccountHostDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccountHost"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="PoBoxDao" class="omis.mail.dao.impl.hibernate.PoBoxDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.mail.domain.PoBox"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Instance factories -->
+  <bean name="telephoneNumberInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.TelephoneNumber"/>
+  </bean>
+  
+  <bean name="contactInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.Contact"/>
+  </bean>
+  
+  <bean name="onlineAccountInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccount"/>
+  </bean>
+  
+  <bean name="onlineAccountHostInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.contact.domain.OnlineAccountHost"/>
+  </bean>
+  
+  <bean name="poBoxInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.mail.domain.PoBox"/>
+  </bean>
+
+  <!-- Contact related services -->
+  
+  <bean id="contactService"
+ 		class="omis.contact.service.impl.ContactServiceImpl">
+ 		<constructor-arg name="contactDelegate" ref="contactDelegate"/>
+ 		<constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+ 		<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+ 		<constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+  </bean>
+
+  <!-- Report services --> 
+ 
+  <bean id="contactReportService" class="omis.contact.report.impl.hibernate.ContactReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="contactSummaryItemReportService" class="omis.contact.report.impl.hibernate.ContactSummaryItemReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+ 
+   <!-- Helpers -->
+  <bean id="contactDelegate" class="omis.contact.service.delegate.ContactDelegate">
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	<constructor-arg name="contactDao" ref="contactDao"/>
+	<constructor-arg name="contactInstanceFactory" ref="contactInstanceFactory"/>
+  </bean>
+  <bean id="telephoneNumberDelegate" class="omis.contact.service.delegate.TelephoneNumberDelegate">
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	<constructor-arg name="telephoneNumberDao" ref="telephoneNumberDao"/>
+	<constructor-arg name="telephoneNumberInstanceFactory" ref="telephoneNumberInstanceFactory"/>
+  </bean>
+  <bean id="addressDelegate" class="omis.address.service.delegate.AddressDelegate">
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	<constructor-arg name="addressDao" ref="addressDao"/>
+	<constructor-arg name="addressInstanceFactory" ref="addressInstanceFactory"/>
+  </bean>
+   <bean id="poBoxDelegate" class="omis.mail.service.delegate.PoBoxDelegate">
+	<constructor-arg name="poBoxDao" ref="poBoxDao"/>
+	<constructor-arg name="poBoxInstanceFactory" ref="poBoxInstanceFactory"/>
+   </bean>
+   <bean id="onlineAccountDelegate" class="omis.contact.service.delegate.OnlineAccountDelegate">
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	<constructor-arg name="onlineAccountDao" ref="onlineAccountDao"/>
+	<constructor-arg name="onlineAccountInstanceFactory" ref="onlineAccountInstanceFactory"/>
+  	</bean>
+  	
+  	<bean id="onlineAccountHostDelegate" class="omis.contact.service.delegate.OnlineAccountHostDelegate">
+  		<constructor-arg name="onlineAccountHostDao" ref="onlineAccountHostDao"/>
+  	</bean>
+ <!--  
+  <context:component-scan base-package="omis.contact.web.controller"/>
+-->
+</beans>

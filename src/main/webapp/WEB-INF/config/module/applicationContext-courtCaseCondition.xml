@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  <bean id="courtCaseAgreementService"
+        class="omis.courtcasecondition.service.impl.CourtCaseAgreementServiceImpl">
+        <constructor-arg name="agreementNoteDelegate" ref="agreementNoteDelegate" />
+        <constructor-arg name="agreementDelegate" ref="agreementDelegate" />
+        <constructor-arg name="agreementAssociableDocumentDelegate" ref="agreementAssociableDocumentDelegate" />
+        <constructor-arg name="courtCaseAgreementDelegate" ref="courtCaseAgreementDelegate" />
+        <constructor-arg name="courtCaseAgreementCategoryDelegate" ref="courtCaseAgreementCategoryDelegate" />
+        <constructor-arg name="conditionDelegate" ref="conditionDelegate" />
+        <constructor-arg name="docketDelegate" ref="docketDelegate" />
+        <constructor-arg name="documentDelegate" ref="documentDelegate" />
+        <constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+  </bean>
+  
+  <bean id="courtCaseAgreementConditionService"
+		class="omis.courtcasecondition.service.impl.CourtCaseAgreementConditionServiceImpl">
+		<constructor-arg name="conditionDelegate" ref="conditionDelegate" />
+        <constructor-arg name="conditionClauseDelegate" ref="conditionClauseDelegate" />
+        <constructor-arg name="conditionGroupDelegate" ref="conditionGroupDelegate" />
+	</bean>
+ 
+  
+  
+  <!-- Service delegates -->
+  
+  <bean id="courtCaseAgreementDelegate" class="omis.courtcasecondition.service.delegate.CourtCaseAgreementDelegate">
+    <constructor-arg name="courtCaseAgreementDao" ref="courtCaseAgreementDao"/>
+    <constructor-arg name="courtCaseAgreementInstanceFactory" ref="courtCaseAgreementInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+  </bean>
+  
+  <bean id="courtCaseAgreementCategoryDelegate" class="omis.courtcasecondition.service.delegate.CourtCaseAgreementCategoryDelegate">
+		<constructor-arg name="courtCaseAgreementCategoryDao" ref="courtCaseAgreementCategoryDao" />
+		<constructor-arg name="courtCaseAgreementCategoryInstanceFactory" ref="courtCaseAgreementCategoryInstanceFactory" />
+	</bean>
+   
+  <!-- Report services -->
+  
+  <bean id="conditionReportService" class="omis.courtcasecondition.report.impl.hibernate.CourtCaseConditionReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="offenderReportDelegate" ref="offenderReportDelegate"/>
+  </bean>
+  
+  <bean id="courtCaseConditionProfileItemReportService" class="omis.courtcasecondition.report.impl.hibernate.CourtCaseConditionProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  
+  <!-- Data access objects -->
+   
+  <bean id="courtCaseAgreementCategoryDao"
+        class="omis.courtcasecondition.dao.impl.hibernate.CourtCaseAgreementCategoryDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreementCategory"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+   
+  <bean id="courtCaseAgreementDao"
+        class="omis.courtcasecondition.dao.impl.hibernate.CourtCaseAgreementDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreement"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="courtCaseConditionDao"
+        class="omis.courtcasecondition.dao.impl.hibernate.CourtCaseConditionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.courtCaseCondition"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="courtCaseAgreementInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreement"/>
+  </bean>
+  
+  <bean id="courtCaseAgreementCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreementCategory"/>
+  </bean>
+  
+  <bean id="courtCaseConditionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseCondition"/>
+  </bean>
+  
+  
+<!--   Editor Factories -->
+  
+  
+  <bean id="courtCaseAgreementPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="courtCaseAgreementDao"/>
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreement"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  
+  <bean id="courtCaseAgreementCategoryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="courtCaseAgreementCategoryDao"/>
+    <constructor-arg name="entityName" value="omis.courtcasecondition.domain.CourtCaseAgreementCategory"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <!-- Document Beans -->
+  
+  <bean id="courtCaseConditionDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+		<constructor-arg name="fileLocator" ref="courtCaseConditionDocumentLocator"/>
+	</bean>
+
+	<bean id="courtCaseConditionDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+		<constructor-arg name="fileLocator" ref="courtCaseConditionDocumentLocator"/>
+		<constructor-arg name="defaultFilename" value="notFound"/>
+	</bean>
+
+	<bean id="courtCaseConditionDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+		<constructor-arg name="path" value="${application.resource.path}\Documents\CourtCaseConditionDocuments"/>
+	</bean>
+	
+	<bean id="courtCaseConditionDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+		<constructor-arg name="fileLocator" ref="courtCaseConditionDocumentLocator"/>
+	</bean>
+  
+</beans>

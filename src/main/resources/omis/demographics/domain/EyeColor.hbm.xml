@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.demographics.domain">
+	<class entity-name="omis.demographics.domain.EyeColor"
+	       proxy="omis.demographics.domain.EyeColor"
+	       name="omis.demographics.domain.impl.EyeColorImpl"
+	       table="`EYE_COLOR`">
+	    <cache usage="transactional" region="demographics"/>
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`EYE_COLOR_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findEyeColorByName" cacheable="true" cache-region="demographics"><![CDATA[
+		select eyeColor from omis.demographics.domain.EyeColor eyeColor
+		where eyeColor.name = :name
+	]]></query>
+	<query name="findEyeColors" cacheable="true" cache-region="demographics"><![CDATA[
+		select eyeColor from omis.demographics.domain.EyeColor eyeColor order by eyeColor.name
+	]]></query>
+</hibernate-mapping>

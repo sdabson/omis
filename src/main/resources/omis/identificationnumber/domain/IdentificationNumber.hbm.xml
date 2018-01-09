@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Mappings and query for identification numbers.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.identificationnumber.domain">
+	<class entity-name="omis.identificationnumber.domain.IdentificationNumber"
+		   proxy="omis.identificationnumber.domain.IdentificationNumber"
+		   name="omis.identificationnumber.domain.impl.IdentificationNumberImpl"
+		   table="`IDENTIFICATION_NUM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`IDENTIFICATION_NUM_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueIdentificationNumber">
+			<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+			<many-to-one name="issuer" entity-name="omis.identificationnumber.domain.IdentificationNumberIssuer" not-null="true" column="`ISSUER_ID`"/>
+			<many-to-one name="category" entity-name="omis.identificationnumber.domain.IdentificationNumberCategory" not-null="true" column="`CATEGORY_ID`"/>
+			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
+			<property name="issueDate" type="java.util.Date" not-null="false" column="`ISSUE_DATE`"/>
+			<property name="expireDate" type="java.util.Date" not-null="false" column="`EXPIRE_DATE`"/> 
+		</properties>
+		<component name="updateSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findIdentificationNumber"><![CDATA[
+		select identificationNumber
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		  and identificationNumber.issuer = :issuer
+		  and identificationNumber.category = :category
+		  and identificationNumber.value = :value
+		  and identificationNumber.issueDate = :issueDate
+		  and identificationNumber.expireDate = :expireDate
+	]]></query>
+	<query name="findIdentificationNumberExcluding"><![CDATA[
+		select identificationNumber
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		  and identificationNumber.issuer = :issuer
+		  and identificationNumber.category = :category
+		  and identificationNumber.value = :value
+		  and identificationNumber.issueDate = :issueDate
+		  and identificationNumber.expireDate = :expireDate
+		  and identificationNumber not in (:excludedIdentificationNumbers)
+	]]></query>
+	<query name="countIdentificationNumbersForOffenderOnDate"><![CDATA[
+		select count(identificationNumber)
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		  and (identificationNumber.expireDate is null
+	        or identificationNumber.expireDate > :date)
+	      and (identificationNumber.issueDate is null
+	        or identificationNumber.issueDate <= :date)
+	]]></query>
+	<query name="findIdentificationNumbersByOffender"><![CDATA[
+		select identificationNumber
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		order by identificationNumber.offender.name.lastName,
+		         identificationNumber.offender.name.firstName,
+		         identificationNumber.offender.offenderNumber,
+		         identificationNumber.issueDate,
+		         identificationNumber.expireDate,
+		         identificationNumber.category.name,
+		         identificationNumber.issuer.name,
+		         identificationNumber.value
+	]]></query>
+	
+	<query name="findIdentificationNumberWithinDates"><![CDATA[
+		select identificationNumber
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		  and identificationNumber.issuer = :issuer
+		  and identificationNumber.category = :category
+		  and (identificationNumber.issueDate is null
+	        or identificationNumber.expireDate > :issueDate
+	        or :issueDate is null)
+	      and (identificationNumber.expireDate is null
+	        or identificationNumber.issueDate <= :expireDate
+	        or :expireDate is null)
+	]]></query>
+	<query name="findIdentificationNumberWithinDatesExcluding"><![CDATA[
+		select identificationNumber
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+		where identificationNumber.offender = :offender
+		  and identificationNumber.issuer = :issuer
+		  and identificationNumber.category = :category
+		  and (identificationNumber.issueDate is null
+	        or identificationNumber.expireDate > :issueDate
+	        or :issueDate is null)
+	      and (identificationNumber.expireDate is null
+	        or identificationNumber.issueDate <= :expireDate
+	        or :expireDate is null)
+		  and identificationNumber not in (:excludedIdentificationNumbers)
+	]]></query>
+</hibernate-mapping>

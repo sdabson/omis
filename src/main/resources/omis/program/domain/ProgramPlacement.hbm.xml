@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Program placement mapping and queries.
+ -
+ - Author: Stephen Abson 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.program.domain">
+	<class entity-name="omis.program.domain.ProgramPlacement"
+	       proxy="omis.program.domain.ProgramPlacement"
+	       name="omis.program.domain.impl.ProgramPlacementImpl"
+		   table="`PROGRAM_PLACEMENT`">
+		<cache usage="transactional" region="program"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROGRAM_PLACEMENT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueProgramPlacement">
+		  <many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+		  <many-to-one name="program" entity-name="omis.program.domain.Program" not-null="true" column="`PROGRAM_ID`"/>
+		  <component name="dateRange" class="omis.datatype.DateRange">
+		  	<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+		  	<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+		  </component>  
+		</properties>
+		<many-to-one name="placementTerm" entity-name="omis.supervision.domain.PlacementTerm" not-null="true" column="`PLACEMENT_TERM_ID`"/>
+		<many-to-one name="locationTerm" entity-name="omis.locationterm.domain.LocationTerm" not-null="false" column="`LOCATION_TERM_ID`"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+		  <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+		  <property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+		  <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+		  <property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+	</class>
+	<query name="findProgramPlacement"><![CDATA[
+	  select programPlacement
+	  from omis.program.domain.ProgramPlacement programPlacement
+	  where programPlacement.offender = :offender
+	    and (programPlacement.dateRange.startDate = :startDate
+	      or (programPlacement.dateRange.startDate is null and :startDate is null))
+	    and (programPlacement.dateRange.endDate = :endDate
+	      or (programPlacement.dateRange.endDate is null and :endDate is null))
+	    and programPlacement.program = :program 
+	]]></query>
+	<query name="findProgramPlacementsByOffenderOnDate"><![CDATA[
+	  select programPlacement
+	  from omis.program.domain.ProgramPlacement programPlacement
+	  where programPlacement.offender = :offender
+		and (programPlacement.dateRange.endDate is null or programPlacement.dateRange.endDate > :date)
+		  and (programPlacement.dateRange.startDate is null or programPlacement.dateRange.startDate <= :date)
+	]]></query>
+	<query name="findProgramPlacementExcluding"><![CDATA[
+	  select programPlacement
+	  from omis.program.domain.ProgramPlacement programPlacement
+	  where programPlacement.offender = :offender
+	    and (programPlacement.dateRange.startDate = :startDate
+	      or (programPlacement.dateRange.startDate is null and :startDate is null))
+	    and (programPlacement.dateRange.endDate = :endDate
+	      or (programPlacement.dateRange.endDate is null and :endDate is null))
+	    and programPlacement.program = :program
+	    and programPlacement not in (:excludedProgramPlacements) 
+	]]></query>
+	<query name="countProgramPlacementsForOffenderBetweenDatesExcluding"><![CDATA[
+	  select count(programPlacement)
+	  from omis.program.domain.ProgramPlacement programPlacement
+	  where programPlacement.offender = :offender
+	    and (programPlacement.dateRange.startDate <= :endDate
+	       or (programPlacement.dateRange.startDate is null and :endDate is null))
+	    and (programPlacement.dateRange.endDate > :startDate
+	       or (programPlacement.dateRange.endDate is null and :startDate is null))
+	    and programPlacement not in (:excludedProgramPlacements)
+	]]></query>
+	<query name="countProgramPlacementsForOffenderAfterDateExcluding"><![CDATA[
+		select count(programPlacement)
+		from omis.program.domain.ProgramPlacement programPlacement
+		where programPlacement.offender = :offender
+		  and programPlacement.dateRange.startDate >= :startDate
+		  and (programPlacement <> :excludedProgramPlacement
+		  		or :excludedProgramPlacement = null)
+	]]></query>
+</hibernate-mapping>

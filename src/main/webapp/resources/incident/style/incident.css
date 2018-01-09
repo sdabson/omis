@@ -1,0 +1,131 @@
+/*
+* Incident module styling.
+*
+* Author: Joel Norris
+* Versino 0.1.0 (Oct 13, 2015)
+* Since: OMIS 3.0
+*/
+a.addPersonLink.actionMenuItem:before {
+	content: url('../images/addPerson.png');
+	cursor: pointer;
+	vertical-align: -50%;
+}
+
+a.addPersonLink.actionMenuItem {
+	vertical-align: middle;
+	float: none;
+}
+
+div.centeredFieldGroup span.fieldGroup {
+	width: 24%;
+   	min-width: 300px;
+}
+
+div.centeredFieldGroup span.fieldGroup label.fieldLabel {
+  width: 10%;
+  margin-right: 2%;
+  min-width: 65px;
+  display: inline-block;
+}
+
+div.centeredFieldGroup {
+	display: block;
+	text-align: center;
+	width: 99%;
+	margin: 5px auto 5px auto;
+}
+
+div.centeredFieldGroup span.searchFieldGroup {
+  	display: inline-block;
+   	font-size: 16px;
+   	vertical-align: middle;
+   	width: 24%;
+   	min-width: 300px;
+   	text-align: center;
+   	margin: 3px 0px 3px 0px;
+}
+
+div.centeredFieldGroup span.searchFieldGroup span.infoRow a.removeLink {
+	float: left;
+	padding: 0 0 0 4px;
+}
+
+div.centeredFieldGroup span.searchFieldGroup span.infoRow {
+	display: block;
+	min-height: 22px;
+	max-height: 44px;
+}
+
+div.centeredFieldGroup span.allButton.searchFieldGroup {
+	display: block;
+	width: 100%;
+}
+
+div.jurisdictionSummaryContainer {
+	display: inline-block;
+	width: 300px;
+	background-color: #CCCCCC;
+	margin: 5px;
+	color: #000000;
+	text-align: center;
+}
+
+div.jurisdictionSummaryContainer:hover {
+	-moz-box-shadow: 0 0 7px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 0 7px rgba(0,0,0,0.5);
+	box-shadow: 0 0 7px rgba(0,0,0,0.5);
+	opacity: 0.9;
+}
+
+div.jurisdictionSummaryContainer h2 {
+	display: inline-block;
+	text-align: center;
+	height: 90px;
+	overflow: hidden;
+	width: 100%;
+	margin: 0px;
+	background-color: #939393;
+}
+
+div.jurisdictionSummaryContainer span.infoGroup {
+	display: inline-block;
+	width: 95%;
+	margin: 0px;
+}
+
+div.jurisdictionSummaryContainer span.jurisdictionInfoDisplay {
+	height: 300px;
+	width: 100%;
+	display: inline-block;
+}
+
+div.jurisdictionSummaryContainer span.jurisdictionInfoDisplay img {
+	height: 100%;
+	width: 100%;
+	display: inline-block;
+	border: none;
+}
+
+div.jurisdictionSummaryContainer a {
+	text-decoration: none;
+	color: inherit;
+}
+
+span.jurisdicitonInfo {
+	display: inline-block;
+	background-color: #939393;
+	text-align: center;
+	width: 100%;
+}
+
+label.infoNameLabel {
+	float: left;
+	width: 47.5%;
+	text-align: left;
+}
+
+label.infoLabel {
+	float: right;
+	width: 47.5%;
+	text-align: right;
+}

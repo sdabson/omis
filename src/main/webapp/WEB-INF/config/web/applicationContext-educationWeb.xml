@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+	
+	<!-- Web configuration -->
+	<context:component-scan base-package="omis.education.web.controller"/>
+	
+	<!-- Report services -->
+	<bean id="educationSummaryReportService"
+		class="omis.education.report.impl.hibernate.EducationSummaryReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="educationProfileItemReportService"
+		class="omis.education.report.impl.hibernate.EducationProfileItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- Profile Items -->
+	<bean id="educationProfileItem"
+		class="omis.education.web.profile.EducationProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>EDUCATION_LIST</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/education/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="education"/>
+		<constructor-arg name="profileItemRegistry" ref="caseManagementProfileItemRegistry"/>
+		<constructor-arg name="educationProfileItemReportService" ref="educationProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${educationProfileItemEnabled}"/>
+	</bean>
+	
+	<!-- Validators -->
+	 <bean id="educationFormValidator"
+		class="omis.education.web.validator.EducationFormValidator">
+	</bean>
+	
+	<bean id="educationDocumentFormValidator"
+		class="omis.education.web.validator.EducationDocumentFormValidator">
+	</bean>
+	
+	<!-- Use controller transaction -->
+	
+	<aop:config>
+		<aop:pointcut id="educationControllerOperation"
+			expression="execution(* omis.education.web.controller.EducationController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="educationControllerOperation"/>	
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="educationDocumentControllerOperation"
+			expression="execution(* omis.education.web.controller.EducationDocumentController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="educationDocumentControllerOperation"/>	
+	</aop:config>
+	
+</beans>

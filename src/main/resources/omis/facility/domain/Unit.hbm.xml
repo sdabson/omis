@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.facility.domain">
+	<class entity-name="omis.facility.domain.Unit"
+		proxy="omis.facility.domain.Unit"
+		name="omis.facility.domain.impl.UnitImpl"
+		table="`FACILITY_UNIT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FACILITY_UNIT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<many-to-one name="facility" column="`FACILITY_ID`" 
+			entity-name="omis.facility.domain.Facility" not-null="true" />
+		<many-to-one name="complex" column="`COMPLEX_ID`" cascade="none" not-null="false"
+			entity-name="omis.facility.domain.Complex" unique="false"/>
+	</class>
+	<query name="findUnitsByFacility">
+		from 
+			omis.facility.domain.Unit unit
+		where 
+			unit.facility = :facility
+		order by
+			unit.name
+	</query>
+	<query name="countUnitsByFacility">
+		select 
+			count(*)
+		from 
+			omis.facility.domain.Unit unit
+		where 
+			unit.facility = :facility
+	</query>
+	<query name="findUnitsByComplex"><![CDATA[
+		select unit
+		from
+			omis.facility.domain.Unit unit
+			inner join fetch unit.complex complex
+		where
+			complex = :complex
+		order by
+			unit.name
+	]]></query>
+	<query name="findUnits"><![CDATA[
+		from
+			omis.facility.domain.Unit unit
+		where
+			unit.facility = :facility
+		and
+			(:complex is null or unit.complex = :complex)
+	]]></query>
+	<query name="findUnit"><![CDATA[
+		select unit
+		from
+			omis.facility.domain.Unit unit
+		where
+			unit.name = :name
+		and
+			unit.facility = :facility
+	]]></query>
+	<query name="findUnitExcluding"><![CDATA[
+		select unit
+		from
+			omis.facility.domain.Unit unit
+		where
+			unit.name = :name
+		and
+			unit.facility = :facility
+		and
+			unit <> :unit
+	]]></query>
+</hibernate-mapping>

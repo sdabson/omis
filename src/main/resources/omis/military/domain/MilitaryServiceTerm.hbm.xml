@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.military.domain">
+	<class entity-name="omis.military.domain.MilitaryServiceTerm"
+		proxy="omis.military.domain.MilitaryServiceTerm"
+		name="omis.military.domain.impl.MilitaryServiceTermImpl"
+		table="`MILITARY_SERVICE_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`MILITARY_SERVICE_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="true"/>
+			<property name="endDate" column="`END_DATE`" type="java.util.Date" not-null="false"/>
+		</component>
+		<many-to-one name="branch" column="`MILITARY_BRANCH_ID`" cascade="none" not-null="true"
+			entity-name="omis.military.domain.MilitaryBranch" unique="false"/>
+		<many-to-one name="dischargeStatus" column="`MILITARY_DISCHARGE_STATUS_ID`" cascade="none" not-null="false"
+			entity-name="omis.military.domain.MilitaryDischargeStatus" unique="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>	
+	</class>
+	<query name="findMilitaryServiceTerm"><![CDATA[
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+		where
+			serviceTerm.offender = :offender
+		and
+			serviceTerm.dateRange.startDate = :startDate
+		and
+			serviceTerm.branch = :branch
+	]]></query>
+	<query name="findMilitaryServiceTermExcluding"><![CDATA[
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+		where
+			serviceTerm.offender = :offender
+		and
+			serviceTerm.dateRange.startDate = :startDate
+		and
+			serviceTerm.branch = :branch
+		and
+			serviceTerm <> :serviceTerm
+	]]></query>
+	<query name="findMilitaryServiceTermsInDateRange"><![CDATA[
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+		where
+			serviceTerm.offender = :offender
+		and
+			(serviceTerm.dateRange.startDate < :endDate
+		     or 
+		    :endDate is null)
+		and 
+			(serviceTerm.dateRange.endDate > :startDate
+		     or 
+		    serviceTerm.dateRange.endDate is null)		
+	]]></query>
+	<query name="findMilitaryServiceTermsInDateRangeExcluding"><![CDATA[
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+		where
+			serviceTerm.offender = :offender
+		and
+			(serviceTerm.dateRange.startDate < :endDate
+		     or 
+		    :endDate is null)
+		and 
+			(serviceTerm.dateRange.endDate > :startDate
+		     or 
+		    serviceTerm.dateRange.endDate is null)
+		and
+			serviceTerm <> :serviceTerm
+	]]></query>
+	<query name="findMilitaryServiceTermsByOffender"><![CDATA[
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+		where
+			serviceTerm.offender = :offender
+		order by
+			serviceTerm.dateRange.startDate
+	]]></query>
+</hibernate-mapping>

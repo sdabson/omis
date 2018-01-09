@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearing.report">
+	<query name="findHearingSummariesByOffender"><![CDATA[
+		select new omis.hearing.report.HearingSummary(
+			hearing.id,
+			hearing.date,
+			organization.name,
+			hearing.category,
+			status.category,
+			status.date)
+		from
+			omis.hearing.domain.HearingStatus status
+		right outer join
+			status.hearing hearing
+		inner join
+			hearing.location location
+		inner join
+			location.organization organization
+		where
+			hearing.subject.offender = :offender
+		and
+			status.date
+			in
+				(select MAX(status.date) from status 
+				where 
+					status.hearing = hearing)
+		order by hearing.date asc
+	]]></query>
+	<query name="summarizeHearing"><![CDATA[
+		select new omis.hearing.report.HearingSummary(
+			hearing.id,
+			hearing.date,
+			organization.name,
+			hearing.category,
+			status.category,
+			status.date)
+		from
+			omis.hearing.domain.HearingStatus status
+		right outer join
+			status.hearing hearing
+		inner join
+			hearing.location location
+		inner join
+			location.organization organization
+		where
+			hearing = :hearing
+		and
+			status.date
+			in
+				(select MAX(status.date) from status 
+				where 
+					status.hearing = hearing)
+	]]></query>
+</hibernate-mapping>

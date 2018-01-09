@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="specialNeedService"
+        	class="omis.specialneed.service.impl.SpecialNeedServiceImpl">
+        	<constructor-arg name="specialNeedDelegate" ref="specialNeedDelegate"/>
+        	<constructor-arg name="specialNeedCategoryDelegate" ref="specialNeedCategoryDelegate"/>
+        	<constructor-arg name="specialNeedClassificationDelegate" ref="specialNeedClassificationDelegate"/>
+        	<constructor-arg name="specialNeedNoteDelegate" ref="specialNeedNoteDelegate"/>
+        	<constructor-arg name="specialNeedSourceDelegate" ref="specialNeedSourceDelegate"/>
+        	<constructor-arg name="documentDelegate" ref="documentDelegate"/>
+        	<constructor-arg name="documentTagDelegate" ref="documentTagDelegate"/>
+        	<constructor-arg name="specialNeedAssociableDocumentDelegate" ref="specialNeedAssociableDocumentDelegate"/>
+        	<constructor-arg name="specialNeedAssociableDocumentCategoryDelegate" ref="specialNeedAssociableDocumentCategoryDelegate"/>
+        </bean>        
+        
+        <!-- Report services -->
+        
+        <bean id="specialNeedProfileItemReportService"
+        	class="omis.specialneed.report.impl.hibernate.SpecialNeedProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="specialNeedReportService"
+        	class="omis.specialneed.report.impl.hibernate.SpecialNeedReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <!-- Delegates -->
+        
+        <bean id="specialNeedDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedDelegate">
+        	<constructor-arg name="specialNeedDao" ref="specialNeedDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="specialNeedInstanceFactory" ref="specialNeedInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedCategoryDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedCategoryDelegate">
+        	<constructor-arg name="specialNeedCategoryDao" ref="specialNeedCategoryDao"/>
+        	<constructor-arg name="specialNeedCategoryInstanceFactory" ref="specialNeedCategoryInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedClassificationDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedClassificationDelegate">
+        	<constructor-arg name="specialNeedClassificationDao" ref="specialNeedClassificationDao"/>
+        	<constructor-arg name="specialNeedClassificationInstanceFactory" ref="specialNeedClassificationInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedNoteDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedNoteDelegate">
+        	<constructor-arg name="specialNeedNoteDao"  ref="specialNeedNoteDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="specialNeedNoteInstanceFactory" ref="specialNeedNoteInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedSourceDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedSourceDelegate">
+        	<constructor-arg name="specialNeedSourceDao" ref="specialNeedSourceDao"/>
+        	<constructor-arg name="specialNeedSourceInstanceFactory" ref="specialNeedSourceInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedAssociableDocumentDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedAssociableDocumentDelegate">
+        	<constructor-arg name="specialNeedAssociableDocumentDao"  ref="specialNeedAssociableDocumentDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="specialNeedAssociableDocumentInstanceFactory" ref="specialNeedAssociableDocumentInstanceFactory"/>
+        </bean>
+        
+         <bean id="specialNeedAssociableDocumentCategoryDelegate"
+        	class="omis.specialneed.service.delegate.SpecialNeedAssociableDocumentCategoryDelegate">
+        	<constructor-arg name="specialNeedAssociableDocumentCategoryDao"  ref="specialNeedAssociableDocumentCategoryDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="specialNeedAssociableDocumentCategoryInstanceFactory" ref="specialNeedAssociableDocumentCategoryInstanceFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+         <bean id="specialNeedDao"
+        	class="omis.specialneed.dao.impl.hibernate.SpecialNeedDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeed"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="specialNeedSourceDao"
+        	class="omis.specialneed.dao.impl.hibernate.SpecialNeedSourceDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedSource"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="specialNeedCategoryDao"
+        	class="omis.specialneed.dao.impl.hibernate.SpecialNeedCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="specialNeedClassificationDao"
+        	class="omis.specialneed.dao.impl.hibernate.SpecialNeedClassificationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedClassification"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="specialNeedNoteDao"
+  			class="omis.specialneed.dao.impl.hibernate.SpecialNeedNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>		
+  		</bean>
+  		
+  		<bean id="specialNeedAssociableDocumentDao"
+  			class="omis.specialneed.dao.impl.hibernate.SpecialNeedAssociableDocumentDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocument"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>		
+  		</bean>
+  		
+  		<bean id="specialNeedAssociableDocumentCategoryDao"
+  			class="omis.specialneed.dao.impl.hibernate.SpecialNeedAssociableDocumentCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocumentCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>		
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="specialNeedInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeed"/>
+		</bean>
+		
+		<bean id="specialNeedNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedNote"/>
+		</bean>
+ 		 
+ 		 <bean id="specialNeedCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedCategory"/>
+		</bean>
+		
+		<bean id="specialNeedClassificationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedClassification"/>
+		</bean>
+		
+		<bean id="specialNeedSourceInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedSource"/>
+		</bean>
+		
+		<bean id="specialNeedAssociableDocumentInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocument"/>
+		</bean>
+		
+		<bean id="specialNeedAssociableDocumentCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocumentCategory"/>
+		</bean>
+		
+  		 <!--Property editor factories -->
+ 		 
+ 		 <bean id="specialNeedPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeed"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedDao"/>
+		</bean>
+		
+		 <bean id="sourcePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedSource"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedSourceDao"/>
+		</bean>
+		
+		 <bean id="categoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedCategoryDao"/>
+		</bean>
+		
+		<bean id="classificationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedClassification"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedClassificationDao"/>
+		</bean>
+		
+		 <bean id="specialNeedNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedNoteDao"/>
+		</bean>
+		
+		<bean id="specialNeedAssociableDocumentPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocument"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedAssociableDocumentDao"/>
+		</bean>
+		
+		<bean id="specialNeedAssociableDocumentCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.specialneed.domain.SpecialNeedAssociableDocumentCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="specialNeedAssociableDocumentCategoryDao"/>
+		</bean>
+		
+		<!-- Document Beans -->
+		
+		<bean id="specialNeedDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="specialNeedDocumentLocator"/>
+		</bean>
+
+		<bean id="specialNeedDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="specialNeedDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="specialNeedDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\SpecialNeedDocuments"/>
+		</bean>
+		
+		<bean id="specialNeedDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="specialNeedDocumentLocator"/>
+		</bean>
+</beans>

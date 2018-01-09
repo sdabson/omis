@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping and queries for task assignment.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.task.domain">
+	<class entity-name="omis.task.domain.TaskAssignment"
+	       proxy="omis.task.domain.TaskAssignment"
+	       name="omis.task.domain.impl.TaskAssignmentImpl"
+	       table="`TASK_ASSIGNMENT`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TASK_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueTaskAssignment">
+			<many-to-one name="task" entity-name="omis.task.domain.Task" column="`TASK_ID`" not-null="true"/>
+			<many-to-one name="assigneeAccount" entity-name="omis.user.domain.UserAccount" column="`ASSIGNEE_ACCOUNT_ID`" not-null="true"/>
+			<property name="assignedDate" type="java.util.Date" column="`ASSIGNED_DATE`" not-null="true"/>
+		</properties>
+	</class>
+	<query name="findTaskAssignment"><![CDATA[
+		select taskAssignment
+		from omis.task.domain.TaskAssignment taskAssignment
+		where taskAssignment.task = :task
+		  and taskAssignment.assigneeAccount = :assigneeAccount
+		  and taskAssignment.assignedDate = :assignedDate
+	]]></query>
+	<query name="findTaskAssignmentExcluding"><![CDATA[
+		select taskAssignment
+		from omis.task.domain.TaskAssignment taskAssignment
+		where taskAssignment.task = :task
+		  and taskAssignment.assigneeAccount = :assigneeAccount
+		  and taskAssignment.assignedDate = :assignedDate
+		  and taskAssignment not in (:excludedTaskAssignments)
+	]]></query>
+	<query name="findTaskAssignmentsByTask"><![CDATA[
+		select taskAssignment
+		from omis.task.domain.TaskAssignment taskAssignment
+		where taskAssignment.task = :task
+		order by taskAssignment.assignedDate, taskAssignment.assigneeAccount.username
+	]]></query>
+</hibernate-mapping>

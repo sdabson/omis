@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.ConditionClause"
+	       proxy="omis.condition.domain.ConditionClause"
+	       name="omis.condition.domain.impl.ConditionClauseImpl"
+	       table="`CONDITION_CLAUSE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CONDITION_CLAUSE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="conditionTitle"  class="omis.condition.domain.ConditionTitle" column="`CONDITION_TITLE_ID`" not-null="true"/>
+		<property name="description" type="java.lang.String" column="`DESCRIPTION`" not-null="true"></property>
+		<property name="valid" type="yes_no" column="`VALID`" not-null="true"></property>
+	</class>
+	<query name="findConditionClausesByCourtCaseAgreementCategory"><![CDATA[
+		select conditionClause
+		from
+			omis.courtcasecondition.domain.CourtCaseCondition courtCaseCondition
+		inner join
+			courtCaseCondition.conditionClause conditionClause
+		inner join
+			courtCaseCondition.courtCaseAgreementCategory courtCaseAgreementCategory
+		where
+			courtCaseAgreementCategory = :courtCaseAgreementCategory
+	]]></query>
+	<query name="findConditionClausesByParoleBoardAgreementCategory"><![CDATA[
+		select conditionClause
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreementCondition paroleBoardAgreementCondition
+		inner join
+			paroleBoardAgreementCondition.conditionClause conditionClause
+		inner join
+			paroleBoardAgreementCondition.category paroleBoardAgreementCategory
+		where
+			paroleBoardAgreementCategory = :paroleBoardAgreementCategory
+	]]></query>
+	<query name="findConditionClausesByConditionGroup"><![CDATA[
+		select conditionClause 
+			from omis.condition.domain.ConditionGroupClause conditionGroupClause
+		inner join
+			conditionGroupClause.conditionClause conditionClause
+		where
+			conditionGroupClause.conditionGroup = :conditionGroup
+	]]></query>
+	<query name="findConditionClausesByConditionTitle"><![CDATA[
+		select conditionClause 
+			from omis.condition.domain.ConditionClause conditionClause
+		where
+			conditionClause.conditionTitle = :conditionTitle
+	]]></query>
+</hibernate-mapping>

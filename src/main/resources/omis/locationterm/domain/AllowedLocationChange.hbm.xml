@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Allowed location change mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.locationterm.domain">
+	<class entity-name="omis.locationterm.domain.AllowedLocationChange"
+	       proxy="omis.locationterm.domain.AllowedLocationChange"
+	       name="omis.locationterm.domain.impl.AllowedLocationChangeImpl"
+		   table="`ALLOWED_LOCATION_CHANGE`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`ALLOWED_LOCATION_CHANGE_SEQ`</param>
+        </generator>
+	  </id>
+      <properties name="uniqueAllowedLocationChange">
+        <many-to-one name="action" entity-name="omis.locationterm.domain.LocationTermChangeAction" not-null="true" column="`ACTION_ID`"/>
+        <many-to-one name="correctionalStatus" entity-name="omis.supervision.domain.CorrectionalStatus" not-null="false" column="`COR_STAT_ID`"/>
+        <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+      </properties>
+	</class>
+	<query name="findLocationsForTermChangeActionForCorrectionalStatus"><![CDATA[
+	  select location
+	  from omis.location.domain.Location location
+	    inner join location.organization organization
+	  where exists (
+	      select action
+	      from omis.locationterm.domain.AllowedLocationChange change
+	        inner join change.action action
+	        inner join change.correctionalStatus correctionalStatus
+	        inner join change.location innerLocation
+	      where action = :action
+	        and correctionalStatus = :correctionalStatus
+	        and location = innerLocation)
+	  order by organization.name, location.dateRange.startDate
+	]]></query>
+	<query name="findLocationsForTermChangeActionForCorrectionalStatusInState"><![CDATA[
+	  select location
+	  from omis.location.domain.Location location
+	    inner join location.organization organization
+	  where exists (
+	      select action
+	      from omis.locationterm.domain.AllowedLocationChange change
+	        inner join change.action action
+	        inner join change.correctionalStatus correctionalStatus
+	        inner join change.location innerLocation
+	        inner join innerLocation.address address
+	        inner join address.zipCode zipCode
+	        inner join zipCode.city city
+	        inner join city.state state
+	      where action = :action
+	        and correctionalStatus = :correctionalStatus
+	        and state = :state
+	        and location = innerLocation)
+	  order by organization.name, location.dateRange.startDate
+	]]></query>
+	<query name="findLocationsAllowedForAnyChange"><![CDATA[
+	  select location
+	  from omis.location.domain.Location location
+	    inner join location.organization organization
+	  where location in (
+	    select innerLocation
+	    from omis.locationterm.domain.AllowedLocationChange change
+	    inner join change.location innerLocation
+	    where innerLocation = location)
+	  order by organization.name, location.dateRange.startDate
+	]]></query>
+	<query name="findLocationsAllowedForAnyChangeInState"><![CDATA[
+	  select location
+	  from omis.location.domain.Location location
+	    inner join location.organization organization
+	  where location in (
+	    select innerLocation
+	    from omis.locationterm.domain.AllowedLocationChange change
+	      inner join change.location innerLocation
+	      inner join innerLocation.address address
+	      inner join address.zipCode zipCode
+	      inner join zipCode.city city
+	      inner join city.state state
+	    where innerLocation = location
+	      and state = :state)
+	  order by organization.name, location.dateRange.startDate
+	]]></query>
+</hibernate-mapping>

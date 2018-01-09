@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<typedef name="externalReferralAuthorizationStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.ExternalReferralAuthorizationStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<typedef name="externalReferralMedicalPanelReviewDecisionStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.ExternalReferralMedicalPanelReviewDecisionStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.health.domain.ExternalReferralAuthorization"
+		proxy="omis.health.domain.ExternalReferralAuthorization"
+		name="omis.health.domain.impl.ExternalReferralAuthorizationImpl"
+		table="`EXTERNAL_REFERRAL_AUTHRZTN`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EXTERNAL_REFERRAL_AUTHRZTN_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="request" entity-name="omis.health.domain.ExternalReferralAuthorizationRequest" not-null="true" column="`REQUEST_ID`" unique="true"/>
+		<property name="decisionDate" type="java.util.Date" not-null="false" column="`DECISION_DATE`"/>
+		<many-to-one name="authorizedBy" entity-name="omis.person.domain.Person" not-null="false" column="`AUTHORIZED_BY_PERSON_ID`"/>
+		<property name="notes" type="string" not-null="false" column="`NOTES`"/>
+		<property name="status" column="`STATUS`" not-null="false" type="externalReferralAuthorizationStatus"/>
+		<component name="panelReviewDecision">
+			<property name="reviewDate" column="`REVIEW_DATE`" not-null="false" type="java.util.Date"/>
+			<property name="status" column="`PANEL_REVIEW_DECISION_STATUS`" not-null="false" type="externalReferralMedicalPanelReviewDecisionStatus"/>
+		</component>
+	</class>
+	<query name="findExternalReferralAuthorizationByRequest"><![CDATA[
+	  select authorization
+	  from omis.health.domain.ExternalReferralAuthorization authorization
+	  where authorization.request = :request
+	]]></query>
+</hibernate-mapping>

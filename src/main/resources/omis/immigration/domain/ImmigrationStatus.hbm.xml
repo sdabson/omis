@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.immigration.domain">
+	<class entity-name="omis.immigration.domain.ImmigrationStatus"
+	       proxy="omis.immigration.domain.ImmigrationStatus"
+	       name="omis.immigration.domain.impl.ImmigrationStatusImpl"
+	       table="`IMMIGRATION_STATUS`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`IMMIGRATION_STATUS_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+		<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+</hibernate-mapping>

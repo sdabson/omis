@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.ConditionGroupClause"
+	       proxy="omis.condition.domain.ConditionGroupClause"
+	       name="omis.condition.domain.impl.ConditionGroupClauseImpl"
+	       table="`CONDITION_GROUP_CLAUSE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CONDITION_GROUP_CLAUSE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<many-to-one name="conditionClause"  class="omis.condition.domain.ConditionClause" column="`CONDITION_CLAUSE_ID`" not-null="true"/>
+			<many-to-one name="conditionGroup"  class="omis.condition.domain.ConditionGroup" column="`CONDITION_GROUP_ID`" not-null="true"/>
+		</properties>
+	</class>
+</hibernate-mapping>

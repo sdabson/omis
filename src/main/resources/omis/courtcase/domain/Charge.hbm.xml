@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.court.domain">
+	<class	entity-name="omis.courtcase.domain.Charge"
+			proxy="omis.courtcase.domain.Charge"
+			name="omis.courtcase.domain.impl.ChargeImpl"
+			table="`CHARGE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`CHARGE_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<properties name="uniqueCharge">
+			<many-to-one name="courtCase" column="`COURT_CASE_ID`" not-null="true"
+		             entity-name="omis.courtcase.domain.CourtCase"/>
+			<many-to-one name="offense" column="`OFFENSE_ID`" not-null="true"
+		             entity-name="omis.offense.domain.Offense"/>
+			<property name="counts" column="`COUNTS`" not-null="true"/>
+		</properties>
+		<property name="date" column="`DATE`" not-null="true"/>
+		<property name="fileDate" column="`FILE_DATE`" not-null="false"/>
+	</class>
+	<query name="findChargesByCourtCase"><![CDATA[
+		select charge from omis.courtcase.domain.Charge charge
+		where charge.courtCase = :courtCase
+	]]></query>
+	<query name="findCharge"><![CDATA[
+		select charge from omis.courtcase.domain.Charge charge
+		where charge.courtCase = :courtCase
+			and charge.offense = :offense
+			and charge.counts = :counts
+	]]></query>
+	<query name="findChargeExcluding"><![CDATA[
+		select charge from omis.courtcase.domain.Charge charge
+		where charge.courtCase = :courtCase
+			and charge.offense = :offense
+			and charge.counts = :counts
+			and charge not in (:charges)
+	]]></query>
+	<query name="removeChargesByCourtCaseExcluding"><![CDATA[
+		delete Charge charge where charge.courtCase = :courtCase
+			 and charge not in (:charges)
+	]]></query>
+	<query name="countChargesByCourtCase"><![CDATA[
+		select count(charge)
+		from omis.courtcase.domain.Charge as charge
+		where charge.courtCase = :courtCase
+	]]></query>
+</hibernate-mapping>

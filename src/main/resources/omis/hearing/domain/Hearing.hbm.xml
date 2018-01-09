@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearing.domain">
+	<class entity-name="omis.hearing.domain.Hearing"
+			proxy="omis.hearing.domain.Hearing"
+			name="omis.hearing.domain.impl.HearingImpl"
+			table="`HEARING`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEARING_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="location" column="`LOCATION_ID`" entity-name="omis.location.domain.Location" not-null="true"/>
+			<component name="subject">
+				<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true"/>
+				<property name="inAttendance" column="`OFFENDER_ATTENDED`" type="yes_no" />
+			</component>
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true"/>
+			<property name="category" column="`CATEGORY`">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.hearing.domain.HearingCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<many-to-one name="officer" column="`STAFF_ASSIGNMENT_ID`" entity-name="omis.staff.domain.StaffAssignment" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findHearing"><![CDATA[
+		select hearing
+		from
+			omis.hearing.domain.Hearing hearing
+		where
+			hearing.location = :location
+		and
+			hearing.subject.offender = :offender
+		and
+			hearing.date = :date
+		and
+			hearing.officer = :officer
+		and
+			hearing.category = :category
+	]]></query>
+	<query name="findHearingExcluding"><![CDATA[
+		select hearing
+		from
+			omis.hearing.domain.Hearing hearing
+		where
+			hearing.location = :location
+		and
+			hearing.subject.offender = :offender
+		and
+			hearing.date = :date
+		and
+			hearing.officer = :officer
+		and
+			hearing.category = :category
+		and
+			hearing != :hearing
+	]]></query>
+	<query name="findHearingsByOffender"><![CDATA[
+		select hearing
+		from
+			omis.hearing.domain.Hearing hearing
+		where
+			hearing.subject.offender = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+   <bean id="offenderContactService"
+        class="omis.offendercontact.service.impl.OffenderContactServiceImpl">
+     <constructor-arg name="contactDelegate" ref="contactDelegate"/>
+     <constructor-arg name="addressDelegate" ref="addressDelegate"/>
+     <constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+     <constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+     <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+     <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+     <constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+     <constructor-arg name="countryDelegate" ref="countryDelegate"/>
+     <constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+     <constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+     <constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+  </bean>
+  
+  </beans>

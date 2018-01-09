@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderInternalReferralAssociation"
+		proxy="omis.health.domain.ProviderInternalReferralAssociation"
+		name="omis.health.domain.impl.ProviderInternalReferralAssociationImpl"
+		table="`PROV_INTERNAL_REF_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROV_INTERNAL_REF_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ProviderAssignment" unique="false"/>
+		<property name="cancelled" column="`CANCELLED`" not-null="false" type="yes_no"/>
+		<property name="primary" column="`PRIMARY`" not-null="true" type="yes_no"/>
+		<many-to-one name="internalReferral" column="`INTERNAL_REFERRAL_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.InternalReferral" unique="false"/>
+	</class>
+	<query name="findPrimaryProviderInternalReferralAssociationByReferral"><![CDATA[
+	  select
+	    providerInternalReferralAssociation
+	  from omis.health.domain.ProviderInternalReferralAssociation
+	    providerInternalReferralAssociation
+	  where
+	    providerInternalReferralAssociation.internalReferral = :internalReferral
+	    and providerInternalReferralAssociation.primary = true
+	]]></query>
+	<query name="findProviderInternalReferralAssociationByReferralAndProvider"><![CDATA[
+		from omis.health.domain.ProviderInternalReferralAssociation pira
+	   where pira.internalReferral = :internalReferral
+	     and pira.providerAssignment = :providerAssignment
+	]]></query>
+	<query name="findProviderInternalReferralAssociationByReferralAndProviderExcluding"><![CDATA[
+		from omis.health.domain.ProviderInternalReferralAssociation pira
+	   where pira.internalReferral = :internalReferral
+	     and pira.providerAssignment = :providerAssignment
+	     and pira not in (:excluding)
+   ]]></query>
+</hibernate-mapping>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- Services -->
+        <bean id="familyAssociationService"
+        	class="omis.family.service.impl.FamilyAssociationServiceImpl">
+        	<constructor-arg name="familyAssociationCategoryDelegate" ref="familyAssociationCategoryDelegate"/>
+        	<constructor-arg name="relationshipDao" ref="relationshipDao"/>
+        	<constructor-arg name="familyAssociationNoteDelegate" ref="familyAssociationNoteDelegate"/>
+        	<constructor-arg name="residenceTermDao" ref="residenceTermDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="relationshipInstanceFactory" ref="relationshipInstanceFactory"/>
+        	<constructor-arg name="familyAssociationNoteInstanceFactory" ref="familyAssociationNoteInstanceFactory"/>
+        	<constructor-arg name="familyAssociationDelegate" ref="familyAssociationDelegate"/>
+        	<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+        	<constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+        	<constructor-arg name="contactDelegate" ref="contactDelegate"/>
+        	<constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+        	<constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+        	<constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+        	<constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+        	<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+        	<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+        	<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+        	<constructor-arg name="personDelegate" ref="personDelegate"/>
+        	<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+        	<constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+        	<constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+        	<constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
+        	<constructor-arg name="familyAssociationNoteDelegate" ref="familyAssociationNoteDelegate"/>
+        	<constructor-arg name="personDao" ref="personDao"/>
+        	<constructor-arg name="suffixDao" ref="suffixDao"/>
+        	<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+        </bean>
+        
+        <bean id="familyAssociationReportService" class="omis.family.report.impl.hibernate.FamilyAssociationReportServiceHibernateImpl">
+ 			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		</bean>
+ 		
+ 		<bean id="familyProfileItemReportService" class="omis.family.report.impl.hibernate.FamilyProfileItemReportServiceHibernateImpl">
+ 			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		</bean>
+        
+    <!--  Delegates -->
+    	<bean id="familyAssociationDelegate"
+    		class="omis.family.service.delegate.FamilyAssociationDelegate">
+    		<constructor-arg name="familyAssociationDao" ref="familyAssociationDao"/>
+    		<constructor-arg name="familyAssociationInstanceFactory" ref="familyAssociationInstanceFactory"/>
+    		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    	</bean>
+    	
+    	<bean id="familyAssociationNoteDelegate"
+    		class="omis.family.service.delegate.FamilyAssociationNoteDelegate">
+    		<constructor-arg name="familyAssociationNoteDao" ref="familyAssociationNoteDao"/>
+    		<constructor-arg name="familyAssociationNoteInstanceFactory" ref="familyAssociationNoteInstanceFactory"/>
+    		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    	</bean>
+    	
+    	<bean id="familyAssociationCategoryDelegate"
+    		class="omis.family.service.delegate.FamilyAssociationCategoryDelegate">
+    		<constructor-arg name="familyAssociationCategoryDao" ref="familyAssociationCategoryDao"/>
+    		<constructor-arg name="familyAssociationCategoryInstanceFactory" ref="familyAssociationCategoryInstanceFactory"/>
+    	</bean>
+    		
+    <!-- Data access objects -->
+        <bean id="familyAssociationDao"
+        	class="omis.family.dao.impl.hibernate.FamilyAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="familyAssociationCategoryDao"
+        	class="omis.family.dao.impl.hibernate.FamilyAssociationCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="familyAssociationNoteDao"
+        	class="omis.family.dao.impl.hibernate.FamilyAssociationNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  	<!-- Instance factories -->
+		<bean id="familyAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociation"/>
+		</bean>
+		
+		<bean id="familyAssociationNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationNote"/>
+		</bean>
+		
+		<bean id="familyAssociationCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationCategory"/>
+		</bean>
+		
+	<!--Property editor factories -->
+        <bean id="familyAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="familyAssociationDao"/>
+		</bean>
+		
+		<bean id="familyAssociationNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="familyAssociationNoteDao"/>
+		</bean>
+		
+		<bean id="familyAssociationCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.family.domain.FamilyAssociationCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="familyAssociationCategoryDao"/>
+		</bean>
+		
+</beans>

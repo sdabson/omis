@@ -1,0 +1,118 @@
+/*
+ * Multi screen css.
+ *
+ * Author: Stephen Abson
+ * Author: Ryan Johns
+ */
+ 
+/* Set minimum width for body. Should fit roughly on a 1024x768 screen. */
+body {
+	min-width: 986px;
+	margin: 0px;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+}
+
+ #contentFrameContainer {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	right:0px;
+	padding:0px;
+	margin:0px;
+}
+
+#toolBox {
+	position: absolute;
+	right: 0px;
+	bottom:0px;
+	background-color: #F89;
+}
+#offenderSearchResults {
+	position:absolute;
+	top:29px;
+	left:152px;
+	z-index:5000;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+
+#multiMenu:before {
+	content: url("../images/omis3_17.png");
+}
+
+#offenderSearch, img.offenderSearchIcon {
+	padding-top: 5px;
+	padding-bottom: 1px;
+}
+
+#multiMenu, .homeLink, #reportHomeLink, #applicationHelpLink, #offenderSearch, img.offenderSearchIcon  {
+	float:left;
+	padding-left: 3px;
+	padding-right: 3px;
+	
+	margin-right:1px;
+	margin-left:1px;
+	margin-top:7px;
+	margin-bottom:1px;
+	top: 0px;
+}
+
+#offenderSearch {
+	margin-right:15px;
+}
+
+#multiMenu, .homeLink, #applicationHelpLink, #reportHomeLink {
+	padding-bottom: 1px;
+	padding-top: 2px;
+}
+
+ul.toolbar li a.actionMenuItem, a.actionMenuItem {
+ 	float:left;
+ 	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 1px;
+	padding-bottom: 2px;
+ }
+ 
+ ul li a.actionMenuItem, h1 a.actionMenuItem {
+ 	top: -2px;
+ 	position:relative;
+ }
+ 
+ 
+#multiMenu.open:hover, .homeLink.open:hover, #multiMenu.open, .homeLink.open {
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	margin-right:1px;
+	margin-left:1px;
+	margin-bottom: 1px;
+	margin-top: 2px;
+}
+
+#multiMenu:hover, .homeLink:hover, #reportHomeLink:hover, #applicationHelpLink:hover {
+	float:left;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 1px;
+	padding-bottom: 0px;
+	margin-right:1px;
+	margin-left:1px;
+	margin-bottom: 1px;
+	margin-top: 7px;
+}
+
+#multiMenu, #multiMenu:hover {
+	margin-left:10px;
+}
+
+#multiMenu.open, #multiMenu.open:hover {
+	margin-top:7px;
+	margin-left:10px;
+}

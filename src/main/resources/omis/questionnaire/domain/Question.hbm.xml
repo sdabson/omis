@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.Question"
+			proxy="omis.questionnaire.domain.Question"
+			name="omis.questionnaire.domain.impl.QuestionImpl"
+			table="`QUESTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`QUESTION_SEQ`</param>
+				</generator>
+			</id>
+			<property name="questionCategory" column="`QUESTION_CATEGORY`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.questionnaire.domain.QuestionCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="text" column="`TEXT`" type="java.lang.String" not-null="true"/>
+			<property name="static" column="`STATIC`" type="yes_no" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findQuestion"><![CDATA[
+		select question
+		from
+			omis.questionnaire.domain.Question question
+		where
+			question.questionCategory = :questionCategory
+		and
+			question.text = :text
+	]]></query>
+	<query name="findQuestionExcluding"><![CDATA[
+		select question
+		from
+			omis.questionnaire.domain.Question question
+		where
+			question.questionCategory = :questionCategory
+		and
+			question.text = :text
+		and
+			question != :question
+	]]></query>
+	<query name="findQuestionsByText"><![CDATA[
+		select question
+		from
+			omis.questionnaire.domain.Question question
+		where
+			upper(question.text) like upper('%' || :text || '%')
+	]]></query>
+</hibernate-mapping>

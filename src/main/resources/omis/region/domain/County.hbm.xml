@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.region.domain">
+	<class entity-name="omis.region.domain.County"
+	       proxy="omis.region.domain.County"
+	       name="omis.region.domain.impl.CountyImpl"
+	       table="`COUNTY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COUNTY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<many-to-one name="state" column="`STATE_ID`" not-null="true"
+		             entity-name="omis.region.domain.State"/>
+	</class>
+	<query name="findAllCountiesInState"><![CDATA[
+		select county
+		from omis.region.domain.County as county
+		where county.state = :state
+		order by county.name, state.name
+	]]></query>
+	<query name="findCounties"><![CDATA[
+		select county
+		from omis.region.domain.County as county
+		order by county.name
+	]]></query>
+</hibernate-mapping>

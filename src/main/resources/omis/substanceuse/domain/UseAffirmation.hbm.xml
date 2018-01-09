@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substanceuse.domain.UseAffirmation">
+	<typedef name="useAffirmationSource" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.substanceuse.domain.UseAffirmationSource</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.substanceuse.domain.UseAffirmation"
+		proxy="omis.substanceuse.domain.UseAffirmation"
+		name="omis.substanceuse.domain.impl.UseAffirmationImpl"
+		table="`USE_AFFIRMATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`USE_AFFIRMATION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+		<many-to-one name="use" column="`SUBSTANCE_USE_ID`" cascade="none" not-null="true"
+			entity-name="omis.substanceuse.domain.SubstanceUse" unique="false"/>
+		<component name="allotment">
+			<property name="quantity" column="`ALLOTMENT_QUANTITY`" type="java.lang.Long" not-null="true"/>
+			<many-to-one name="measurement" column="`ALLOTMENT_MEASUREMENT`" cascade="none" not-null="true"
+				entity-name="omis.substanceuse.domain.UseMeasurement" unique="false"/>
+		</component>
+		<property name="source" column="`SOURCE`" not-null="true" type="useAffirmationSource"/>
+	</class>
+	<query name="findAffirmationsBySubstanceUse"><![CDATA[
+	select affirmation
+		from omis.substanceuse.domain.UseAffirmation affirmation
+		where affirmation.use = :substanceUse
+	]]></query>
+	<query name="findUseAffirmation"><![CDATA[
+		select affirmation
+		from omis.substanceuse.domain.UseAffirmation affirmation
+		where affirmation.date = :date
+		and affirmation.use = :substanceUse
+		and affirmation.source = :source
+	]]></query>
+	<query name="findUseAffirmationExcluding"><![CDATA[
+		select affirmation
+		from omis.substanceuse.domain.UseAffirmation affirmation
+		where affirmation.date = :date
+		and affirmation.use = :substanceUse
+		and affirmation.source = :source
+		and affirmation <> :affirmation
+	]]></query>
+</hibernate-mapping>

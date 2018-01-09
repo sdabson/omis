@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping for schedules.
+  - Author: Stephen Abson
+  - Version: 0.1.1 (Jan 14, 2013)
+  - Since: OMIS 3.0
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.schedule.domain">
+	<class entity-name="omis.schedule.domain.Schedule"
+	       proxy="omis.schedule.domain.Schedule"
+	       name="omis.schedule.domain.impl.ScheduleImpl"
+	       table="`SCHEDULE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`SCHEDULE_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount"
+			             column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`"
+						 not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount"
+			             column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`"
+						 not-null="true"/>
+		</component>
+		<set name="events" inverse="true" cascade="save-update">
+			<key column="`ID`"/>
+			<one-to-many entity-name="omis.schedule.domain.SchedulableEvent"/>
+		</set>
+	</class>
+</hibernate-mapping>

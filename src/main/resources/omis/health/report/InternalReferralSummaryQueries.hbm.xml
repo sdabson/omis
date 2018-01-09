@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Ryan Johns
+ - Version: 0.1.0 (Apr 21, 2014)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping package="omis.health.report">
+<!--
+-->
+	<query name="findScheduledInternalReferralSummaryByFacility"><![CDATA[
+		select new omis.health.report.ScheduledInternalReferralSummary(ha.id, ir.id,
+				ofn.lastName, ofn.middleName, ofn.firstName, o.offenderNumber, ha.date,
+				prvdrn.lastName, prvdrn.middleName, 
+				prvdrn.firstName, pt.abbreviation, '' , ir.schedulingNotes, ir.locationDesignator, rs.name) 
+          from omis.health.domain.ProviderInternalReferralAssociation as pira
+          join pira.internalReferral as ir
+          join ir.offenderAppointmentAssociation as oaa
+          join oaa.appointment as ha
+          join oaa.offender as o
+          join o.name as ofn
+          join pira.providerAssignment as pa
+          join pa.provider as p
+          join p.name prvdrn
+          join pa.title as pt
+          join ir.reason as rs
+          left join ir.statusReason sr
+		 where ha.facility = :facility
+		   and (ir.statusReason is null
+		    or sr.appointmentStatus = omis.health.domain.HealthAppointmentStatus.KEPT)
+		   and (pira.cancelled is null
+		    or pira.cancelled = false)
+           and ha.status is null
+		order by ha.date 
+	]]></query>
+	
+	<query name="findResolvedInternalReferralSummaryByFacility"><![CDATA[
+		select new omis.health.report.ResolvedInternalReferralSummary(ha.id, ir.id,
+				ofn.lastName, ofn.middleName, ofn.firstName, o.offenderNumber, ha.date,
+				prvdrn.lastName, prvdrn.middleName, 
+				prvdrn.firstName, pt.abbreviation,ir.assessmentNotes,sr.name) 
+          from omis.health.domain.ProviderInternalReferralAssociation as pira
+          join pira.internalReferral as ir
+          join ir.offenderAppointmentAssociation as oaa
+          join oaa.appointment as ha
+          join oaa.offender as o
+          join o.name as ofn
+          join pira.providerAssignment as pa
+          join pa.provider as p
+          join p.name prvdrn
+          join pa.title as pt
+          left join ir.statusReason as sr
+		 where ha.facility = :facility
+		   and (ir.statusReason is not null
+		    or pira.cancelled is not null
+		    or ir.rescheduleRequired = true
+		    or ha.status is not null)
+		    
+		order by ha.date desc
+	]]></query>
+</hibernate-mapping>

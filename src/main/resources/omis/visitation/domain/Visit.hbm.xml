@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.visitation.domain">
+		<typedef name="visitMethod" class="org.hibernate.type.EnumType">
+	       <param name="enumClass">omis.visitation.domain.VisitMethod</param>
+	       <param name="useNamed">true</param>
+	       <param name="type">12</param>
+		</typedef>
+		<class entity-name="omis.visitation.domain.Visit"
+			proxy="omis.visitation.domain.Visit"
+			name="omis.visitation.domain.impl.VisitImpl"
+			table="`VISIT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`VISIT_SEQ`</param>
+					</generator>
+			</id>
+			<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" not-null="true"/>
+				<property name="endDate" column="`END_DATE`" not-null="false"/>
+			</component>
+			<property name="badgeNumber" type="string" column="`BADGE_NUMBER`" not-null="true"/>
+			<component name="flags">
+				<property name="deniedByStaff" column="`DENIED_BY_STAFF`" not-null="false" type="yes_no" />
+				<property name="refusedByOffender" column="`REFUSED_BY_OFFENDER`" not-null="false" type="yes_no" />
+				<property name="method" type="visitMethod" column="`VISIT_METHOD`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.visitation.domain.VisitMethod</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+				</property>
+			</component>
+			<many-to-one name="visitationAssociation" column="`VIS_ASSOC_ID`"
+				entity-name="omis.visitation.domain.VisitationAssociation" not-null="true"/>
+			<property name="notes" column="`NOTES`" not-null="false" type="string"/>
+			<many-to-one name="location" column="`LOCATION_ID`" cascade="none" not-null="true"
+				entity-name="omis.location.domain.Location" unique="false"/>
+			<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+					<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+		</class>
+		<query name="findVisitsByOffender">
+		from 
+			omis.visitation.domain.Visit visit
+		where 
+			visit.visitationAssociation.relationship.firstPerson = :offender
+		</query>
+		<query name="findVisit"><![CDATA[
+		from
+			omis.visitation.domain.Visit visit
+		where
+			visit.visitationAssociation = :visitationAssociation
+		and
+			visit.dateRange.startDate = :startDate
+		]]></query>
+		<query name="findVisitExcluding"><![CDATA[
+		from
+			omis.visitation.domain.Visit visit
+		where
+			visit.visitationAssociation = :visitationAssociation
+		and
+			visit.dateRange.startDate = :startDate
+		and
+			visit <> :visit
+		]]></query>
+
+		<query name="findVisitsInRange"><![CDATA[
+			from
+				omis.visitation.domain.Visit visit
+			where
+				visit.visitationAssociation = :visitationAssociation
+			and
+				((:endDate is null or visit.dateRange.startDate < :endDate)
+				and (visit.dateRange.endDate is null
+					or 
+					visit.dateRange.endDate > :startDate))
+		]]></query>
+		<query name="findVisitsInRangeExcluding"><![CDATA[
+			from
+				omis.visitation.domain.Visit visit
+			where
+				visit.visitationAssociation = :visitationAssociation
+			and
+				((:endDate is null
+				or 
+				visit.dateRange.startDate < :endDate)
+				and (visit.dateRange.endDate is null
+					or 
+					visit.dateRange.endDate > :startDate))
+			and
+				visit <> :visit
+		]]></query>
+		<query name="findVisitCountByOffender"><![CDATA[
+			select count(visit.id)
+			  from omis.visitation.domain.Visit visit
+			 where visit.visitationAssociation.relationship.firstPerson = :offender
+		]]></query>
+	<query name="findVisitsByOffenderOnDate"><![CDATA[
+		select visit
+		from
+			omis.visitation.domain.Visit visit
+		inner join visit.visitationAssociation va
+		inner join va.relationship r
+		where 
+			r.firstPerson = :offender
+		and
+			trunc(visit.dateRange.startDate) = trunc(:date)
+	]]></query>
+	<query name="findOffendersWithVisitsByFacilityOnDate"><![CDATA[
+		select offender
+		from
+			omis.visitation.domain.Visit visit
+			inner join visit.visitationAssociation association
+			inner join association.relationship relationship
+			inner join relationship.firstPerson offender
+		where
+			visit.location = :location
+		and
+			trunc(visit.dateRange.startDate) = trunc(:date)
+	]]></query>
+	</hibernate-mapping>

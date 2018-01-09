@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleeligibility.domain">
+	<class entity-name="omis.paroleeligibility.domain.ParoleEligibility"
+		proxy="omis.paroleeligibility.domain.ParoleEligibility"
+		name="omis.paroleeligibility.domain.impl.ParoleEligibilityImpl"
+		table="`PAROLE_ELIGIBILITY`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PAROLE_ELIGIBILITY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="hearingEligibilityDate" column="`HEARING_ELIGIBILITY_DATE`" not-null="true" type="java.util.Date"/>
+		<property name="reviewDate" column="`REVIEW_DATE`" not-null="false" type="java.util.Date"/>
+		<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true"/>
+		<many-to-one name="appearanceCategory" column="`APPEARANCE_CATEGORY_ID`" entity-name="omis.paroleeligibility.domain.AppearanceCategory" not-null="false"/>
+		
+		<component name="status" class="omis.paroleeligibility.domain.component.ParoleEligibilityStatus">
+			<property name="category" column="`STATUS_CATEGORY`" not-null="false">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.paroleeligibility.domain.EligibilityStatusCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="date" column="`STATUS_DATE`" not-null="false" type="java.util.Date"/>
+			<property name="comment" column="`STATUS_COMMENT`" not-null="false" type="java.lang.String"/>
+			<many-to-one name="reason" column="`STATUS_REASON_ID`" entity-name="omis.paroleeligibility.domain.EligibilityStatusReason" not-null="false"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component> 
+	</class>
+	<query name="findParoleEligibility"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		where
+			eligibility.offender = :offender
+		and
+			eligibility.hearingEligibilityDate = :hearingEligibilityDate
+		
+	]]></query>
+	<query name="findParoleEligibilityExcluding"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		where
+			eligibility.offender = :offender
+		and
+			eligibility.hearingEligibilityDate = :hearingEligibilityDate
+		and
+			eligibility <> :excludedEligibility
+	]]></query>
+</hibernate-mapping>

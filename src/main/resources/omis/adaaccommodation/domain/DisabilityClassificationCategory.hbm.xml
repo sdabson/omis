@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.domain">
+	<class entity-name="omis.adaaccommodation.domain.DisabilityClassificationCategory"
+		proxy="omis.adaaccommodation.domain.DisabilityClassificationCategory"
+		name="omis.adaaccommodation.domain.impl.DisabilityClassificationCategoryImpl"
+		table="`ADA_DSBLTY_CLSSIFCATN_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADA_DSBLTY_CLSSIFCATN_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true" />
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no" />
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`CREATE_DATE`" not-null="true" />
+		</component>
+	</class>
+	<query name="findAllDisabilityClassificationCategories"><![CDATA[
+	select category
+		from omis.adaaccommodation.domain.DisabilityClassificationCategory category
+		order by
+		category.name
+	]]></query>
+</hibernate-mapping>

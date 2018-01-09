@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<class entity-name="omis.grievance.domain.GrievanceComplaintCategory"
+		proxy="omis.grievance.domain.GrievanceComplaintCategory"
+		name="omis.grievance.domain.impl.GrievanceComplaintCategoryImpl"
+		table="`GRIEVANCE_COMPLAINT_CAT`">
+		<cache usage="transactional" region="grievance"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`GRIV_COMP_CATE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<many-to-one name="subject" entity-name="omis.grievance.domain.GrievanceSubject" not-null="true" column="`SUBJECT_ID`"/>
+	</class>
+	<query name="findGrievanceComplaintCategoriesBySubject" cacheable="true" cache-region="grievance"><![CDATA[
+		select grievanceComplaintCategory
+		from
+			omis.grievance.domain.GrievanceComplaintCategory grievanceComplaintCategory
+		where
+			grievanceComplaintCategory.subject = :subject
+		and 
+			grievanceComplaintCategory.valid = true
+		order by grievanceComplaintCategory.name
+	]]></query>
+	<query name="findGrievanceComplaintCategory" cacheable="true" cache-region="grievance"><![CDATA[
+		select grievanceComplaintCategory
+		from omis.grievance.domain.GrievanceComplaintCategory grievanceComplaintCategory
+		where grievanceComplaintCategory.name = :name
+	]]></query>
+</hibernate-mapping>

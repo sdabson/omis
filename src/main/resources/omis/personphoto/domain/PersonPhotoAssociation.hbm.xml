@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.photo.domain">
+	<class
+	       entity-name="omis.personphoto.domain.PersonPhotoAssociation"
+	       proxy="omis.personphoto.domain.PersonPhotoAssociation"
+	       name="omis.personphoto.domain.impl.AbstractPersonPhotoAssociation"
+	       table="`PERSON_PHOTO_ASSOC`"
+	       abstract="true">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_PHOTO_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" entity-name="omis.person.domain.Person" 
+                     not-null="true" column="`PERSON_ID`" unique="true"/>
+		<many-to-one name="photo" entity-name="omis.media.domain.Photo" cascade="save-update"
+				     not-null="true" column="`PHOTO_ID`" unique="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+	</class>
+	<query name="findPhotoByPerson"><![CDATA[
+		select association.photo
+		from omis.personphoto.domain.PersonPhotoAssociation association
+		where association.person = :person
+	]]></query>
+</hibernate-mapping>

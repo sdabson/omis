@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderUnitAssignment"
+		proxy="omis.health.domain.ProviderUnitAssignment"
+		name="omis.health.domain.impl.ProviderUnitAssignmentImpl"
+		table="`PROVIDER_UNIT_ASSIGNMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROVIDER_UNIT_ASSIGN_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="unit" column="`UNIT_ID`" cascade="none" not-null="true"
+			entity-name="omis.facility.domain.Unit" unique="false"/>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ProviderAssignment" unique="false"/>
+	</class>
+	<query name="findProviderUnitAssignment"><![CDATA[
+		from
+			omis.health.domain.ProviderUnitAssignment unitAssignment
+		where
+			unitAssignment.providerAssignment = :providerAssignment
+		and
+			unitAssignment.unit = :unit
+	]]></query>
+	<query name="findUnitAssignmentsByUnit"><![CDATA[
+		from
+			omis.health.domain.ProviderUnitAssignment unitAssignment
+		where
+			unitAssignment.unit = :unit
+		and
+			unitAssignment.providerAssignment.dateRange.startDate <= :date
+		and
+			(unitAssignment.providerAssignment.dateRange.endDate >= :date or unitAssignment.providerAssignment.dateRange.endDate is null)
+	]]></query>
+</hibernate-mapping>

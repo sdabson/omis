@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Mapping and queries for correctional status.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+	
+	<!-- Mapping for correctional status. -->
+	<class entity-name="omis.supervision.domain.CorrectionalStatus"
+	       proxy="omis.supervision.domain.CorrectionalStatus"
+	       name="omis.supervision.domain.impl.CorrectionalStatusImpl"
+	       table="`CORRECTIONAL_STATUS`">
+	    <cache usage="transactional" region="supervision"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CORRECTIONAL_STATUS_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="string" not-null="true" unique="true" column="`NAME`"/>
+		<property name="abbreviation" type="string" not-null="true" unique="true" column="`ABBREVIATION`"/>
+		<property name="locationRequired" type="yes_no" not-null="true" column="`LOCATION_REQUIRED`"/>
+		<property name="sortOrder" type="short" not-null="true" column="`SORT_ORDER`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+	</class>
+	
+	<!-- Returns correctional statuses. -->
+	<query name="findCorrectionalStatuses" cacheable="true" cache-region="supervision"><![CDATA[
+		select correctionalStatus
+		from omis.supervision.domain.CorrectionalStatus as correctionalStatus
+		where correctionalStatus.valid = true
+		order by
+			correctionalStatus.sortOrder, correctionalStatus.name
+	]]></query>
+	
+	<!-- Returns correctional status. -->
+	<query name="findCorrectionalStatus" cacheable="true" cache-region="supervision"><![CDATA[
+		select correctionalStatus
+		from omis.supervision.domain.CorrectionalStatus as correctionalStatus
+		where correctionalStatus.name = :name
+	]]></query>
+	
+	<!--  Returns allowed correctional statuses. -->
+	<query name="findAllowedCorrectionalStatuses"><![CDATA[
+	  select correctionalStatus
+	  from omis.supervision.domain.CorrectionalStatus as correctionalStatus
+	  where exists (
+		  select allowedCorrectionalStatusChange
+		  from omis.supervision.domain.AllowedCorrectionalStatusChange allowedCorrectionalStatusChange
+		  where (allowedCorrectionalStatusChange.fromCorrectionalStatus = :fromCorrectionalStatus
+		 		or (allowedCorrectionalStatusChange.fromCorrectionalStatus is null and :fromCorrectionalStatus is null))
+		 	and allowedCorrectionalStatusChange.toCorrectionalStatus = correctionalStatus
+	  )
+	  order by correctionalStatus.sortOrder, correctionalStatus.name
+	]]></query>
+</hibernate-mapping>

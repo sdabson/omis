@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workrestriction.report">
+	<query name="findWorkRestrictionSummariesByOffender"><![CDATA[
+		select new omis.workrestriction.report.WorkRestrictionSummary(
+			workRestriction.id,
+			oName.lastName,
+			oName.firstName,
+			oName.middleName,
+			oName.suffix,
+			offender.offenderNumber,
+			category.name,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			name.suffix,
+			userAccount.username,
+			workRestriction.authorizationSignature.date,
+			workRestriction.notes
+		)
+		from
+			omis.workrestriction.domain.WorkRestriction workRestriction
+			left outer join workRestriction.authorizationSignature.userAccount userAccount
+			left outer join userAccount.user user
+			left outer join user.name name
+			right join workRestriction.offender offender
+			right join offender.name oName
+			right join workRestriction.category category
+		where
+			workRestriction.offender = :offender
+	]]></query>
+	<query name="findWorkRestrictionCountByOffender"><![CDATA[
+	select count(*)
+	  from omis.workrestriction.domain.WorkRestriction workRestriction
+	 where workRestriction.offender = :offender
+	]]></query>
+</hibernate-mapping>

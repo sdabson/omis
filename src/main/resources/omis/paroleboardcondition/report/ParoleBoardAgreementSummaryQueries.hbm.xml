@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboardcondition.domain">
+<query name="summaryParoleBoardAgreement"><![CDATA[
+	select new omis.paroleboardcondition.report.ParoleBoardAgreementSummary(
+		paroleBoardAgreement.id,
+		category.name,
+		agreement.dateRange.startDate,
+		agreement.dateRange.endDate)
+	from
+		omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+	inner join
+		paroleBoardAgreement.agreement agreement
+	inner join
+		paroleBoardAgreement.category category
+	where
+		paroleBoardAgreement = :paroleBoardAgreement
+]]></query>
+<query name="findParoleBoardAgreementSummariesByOffender"><![CDATA[
+	select new omis.paroleboardcondition.report.ParoleBoardAgreementSummary(
+		paroleBoardAgreement.id,
+		category.name,
+		agreement.dateRange.startDate,
+		agreement.dateRange.endDate)
+	from
+		omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+	inner join
+		paroleBoardAgreement.agreement agreement
+	inner join
+		paroleBoardAgreement.category category
+	where
+		agreement.offender = :offender
+	and
+		((agreement.dateRange.startDate <= :effectiveDate)
+		and
+			(agreement.dateRange.endDate is null
+		or
+			agreement.dateRange.endDate > :effectiveDate))
+]]></query>
+<query name="findParoleBoardAgreementSummariesByOffenderOnDates"><![CDATA[
+	select new omis.paroleboardcondition.report.ParoleBoardAgreementSummary(
+		paroleBoardAgreement.id,
+		category.name,
+		agreement.dateRange.startDate,
+		agreement.dateRange.endDate)
+	from
+		omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+	inner join
+		paroleBoardAgreement.agreement agreement
+	inner join
+		paroleBoardAgreement.category category
+	where
+		agreement.offender = :offender
+	and
+		(agreement.dateRange.startDate <= :endDate or :endDate is null)
+		and
+		(agreement.dateRange.endDate > :startDate or :startDate is null
+		or agreement.dateRange.endDate is null)
+]]></query>
+
+</hibernate-mapping>

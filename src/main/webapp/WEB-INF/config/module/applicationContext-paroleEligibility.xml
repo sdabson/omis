@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+  <!-- Services -->
+  
+  <bean id="paroleEligibilityService"
+  		class="omis.paroleeligibility.service.impl.ParoleEligibilityServiceImpl">
+    <constructor-arg name="appearanceCategoryDelegate" ref="appearanceCategoryDelegate"/>
+    <constructor-arg name="eligibilityStatusReasonDelegate" ref="eligibilityStatusReasonDelegate"/>
+    <constructor-arg name="paroleEligibilityDelegate" ref="paroleEligibilityDelegate"/>
+    <constructor-arg name="paroleEligibilityNoteDelegate" ref="paroleEligibilityNoteDelegate"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="appearanceCategoryDelegate" class="omis.paroleeligibility.service.delegate.AppearanceCategoryDelegate">
+  	<constructor-arg name="appearanceCategoryInstanceFactory" ref="appearanceCategoryInstanceFactory"/>
+  	<constructor-arg name="appearanceCategoryDao" ref="appearanceCategoryDao"/>
+  </bean>
+  
+  <bean id="eligibilityStatusReasonDelegate" class="omis.paroleeligibility.service.delegate.EligibilityStatusReasonDelegate">
+  	<constructor-arg name="eligibilityStatusReasonInstanceFactory" ref="eligibilityStatusReasonInstanceFactory"/>
+  	<constructor-arg name="eligibilityStatusReasonDao" ref="eligibilityStatusReasonDao"/>
+  </bean>
+  
+  <bean id="paroleEligibilityDelegate" class="omis.paroleeligibility.service.delegate.ParoleEligibilityDelegate">
+  	<constructor-arg name="paroleEligibilityInstanceFactory" ref="paroleEligibilityInstanceFactory"/>
+  	<constructor-arg name="paroleEligibilityDao" ref="paroleEligibilityDao"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="paroleEligibilityNoteDelegate" class="omis.paroleeligibility.service.delegate.ParoleEligibilityNoteDelegate">
+  	<constructor-arg name="paroleEligibilityNoteInstanceFactory" ref="paroleEligibilityNoteInstanceFactory"/>
+  	<constructor-arg name="paroleEligibilityNoteDao" ref="paroleEligibilityNoteDao"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Report Services -->
+  
+  <bean id="paroleEligibilityReportService"
+  	  class="omis.paroleeligibility.report.impl.hibernate.ParoleEligibilityReportServiceHibernateImpl">
+  	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>		
+  </bean>
+  
+  <!-- Data access objects -->
+  
+  <bean id="appearanceCategoryDao"
+  		class="omis.paroleeligibility.dao.impl.hibernate.AppearanceCategoryDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.AppearanceCategory"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="eligibilityStatusReasonDao"
+  		class="omis.paroleeligibility.dao.impl.hibernate.EligibilityStatusReasonDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.EligibilityStatusReason"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="paroleEligibilityDao"
+  		class="omis.paroleeligibility.dao.impl.hibernate.ParoleEligibilityDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibility"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="paroleEligibilityNoteDao"
+  		class="omis.paroleeligibility.dao.impl.hibernate.ParoleEligibilityNoteDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibilityNote"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="appearanceCategoryInstanceFactory"
+  		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.AppearanceCategory"/>		
+  </bean>
+  
+  <bean id="eligibilityStatusReasonInstanceFactory"
+  		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.EligibilityStatusReason"/>		
+  </bean>
+  
+  <bean id="paroleEligibilityInstanceFactory"
+  		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibility"/>		
+  </bean>
+  
+  <bean id="paroleEligibilityNoteInstanceFactory"
+  		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibilityNote"/>		
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="appearanceCategoryPropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="appearanceCategoryDao"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.AppearanceCategory"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>		
+  </bean>
+  
+  <bean id="eligibilityStatusReasonPropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="eligibilityStatusReasonDao"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.EligibilityStatusReason"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>		
+  </bean>
+  
+  <bean id="paroleEligibilityPropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="paroleEligibilityDao"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibility"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>		
+  </bean>
+  
+  <bean id="paroleEligibilityNotePropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="paroleEligibilityNoteDao"/>
+  	<constructor-arg name="entityName" value="omis.paroleeligibility.domain.ParoleEligibilityNote"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>		
+  </bean>
+  
+</beans>

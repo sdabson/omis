@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.organization.domain">
+	<class entity-name="omis.organization.domain.Organization"
+	       proxy="omis.organization.domain.Organization"
+	       name="omis.organization.domain.impl.OrganizationImpl"
+		     table="`ORGANIZATION`"
+		     discriminator-value="O">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ORGANIZATION_SEQ`</param>
+			</generator>
+		</id>
+		<discriminator column="`ORGANIZATION_TYPE`" type="string"/>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true" unique="true"/>
+		<property name="alias" column="`ALIAS`" type="java.lang.String" not-null="false" unique="true"/>
+	    <many-to-one name="parent" column="`PARENT_ID`" not-null="false"
+	   			entity-name="omis.organization.domain.Organization"/>
+	</class>
+	<query name="findOrganizations"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		order by organization.name
+	]]></query>
+	<query name="findOrganizationsByParent"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		where organization.parent = :parent
+		order by organization.name
+	]]></query>
+	<query name="findOrganizationByName"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		where upper(organization.name) = upper(:name)
+	]]></query>
+	<query name="findOrganizationsByPartialName"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		where upper(organization.name) like concat('%', upper(:partialName), '%')
+	]]></query>
+	<query name="findOrganization"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		where upper(organization.name) = upper(:name)
+	]]></query>
+	<query name="findOrganizationExcluding"><![CDATA[
+		select organization
+		from omis.organization.domain.Organization organization
+		where upper(organization.name) = upper(:name)
+		  and organization not in (:excludedOrganizations)
+	]]></query>
+</hibernate-mapping>

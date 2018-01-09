@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Service -->
+	<bean id="financialProfileService"
+		class="omis.financial.service.impl.FinancialProfileServiceImpl">
+		<constructor-arg name="financialAssetDelegate" ref="financialAssetDelegate" />
+		<constructor-arg name="financialLiabilityDelegate" ref="financialLiabilityDelegate" />
+		<constructor-arg name="financialAssetCategoryDelegate" ref="financialAssetCategoryDelegate" />
+		<constructor-arg name="financialLiabilityCategoryDelegate" ref="financialLiabilityCategoryDelegate" />
+		<constructor-arg name="recurringDeductionDelegate" ref="recurringDeductionDelegate" />
+		<constructor-arg name="recurringDeductionCategoryDelegate" ref="recurringDeductionCategoryDelegate" />
+		<constructor-arg name="financialDocumentAssociationDelegate" ref="financialDocumentAssociationDelegate"/>
+		<constructor-arg name="documentDelegate" ref="documentDelegate"/>
+		<constructor-arg name="documentTagDelegate" ref="documentTagDelegate"/>
+	</bean>
+	
+	<bean id="financialProfileItemReportService" class="omis.financial.report.impl.hibernate.FinancialProfileItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/> 
+	</bean>
+	
+	<!-- DAOs -->
+	<bean id="financialAssetDao"
+		class="omis.financial.dao.impl.hibernate.FinancialAssetDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAsset" />
+	</bean>
+	
+	<bean id="financialAssetCategoryDao"
+		class="omis.financial.dao.impl.hibernate.FinancialAssetCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAssetCategory" />
+	</bean>
+	
+	<bean id="financialLiabilityDao"
+		class="omis.financial.dao.impl.hibernate.FinancialLiabilityDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiability" />
+	</bean>
+	
+	<bean id="financialLiabilityCategoryDao"
+		class="omis.financial.dao.impl.hibernate.FinancialLiabilityCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiabilityCategory" />
+	</bean>
+	
+	<bean id="recurringDeductionDao"
+		class="omis.financial.dao.impl.hibernate.RecurringDeductionDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeduction" />
+	</bean>
+	
+	<bean id="recurringDeductionCategoryDao"
+		class="omis.financial.dao.impl.hibernate.RecurringDeductionCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeductionCategory" />
+	</bean>
+	
+	<bean id="financialDocumentAssociationDao"
+		class="omis.financial.dao.impl.hibernate.FinancialDocumentAssociationDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialDocumentAssociation" />
+	</bean>
+	
+	<!-- Delegates -->
+	<bean id="financialAssetDelegate"
+		class="omis.financial.service.delegate.FinancialAssetDelegate">
+		<constructor-arg name="financialAssetInstanceFactory" ref="financialAssetInstanceFactory" />
+		<constructor-arg name="financialAssetDao" ref="financialAssetDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="financialAssetCategoryDelegate"
+		class="omis.financial.service.delegate.FinancialAssetCategoryDelegate">
+		<constructor-arg name="financialAssetCategoryInstanceFactory" ref="financialAssetCategoryInstanceFactory" />
+		<constructor-arg name="financialAssetCategoryDao" ref="financialAssetCategoryDao" />
+	</bean>
+	
+	<bean id="financialLiabilityDelegate"
+		class="omis.financial.service.delegate.FinancialLiabilityDelegate">
+		<constructor-arg name="financialLiabilityInstanceFactory" ref="financialLiabilityInstanceFactory" />
+		<constructor-arg name="financialLiabilityDao" ref="financialLiabilityDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="financialLiabilityCategoryDelegate"
+		class="omis.financial.service.delegate.FinancialLiabilityCategoryDelegate">
+		<constructor-arg name="financialLiabilityCategoryInstanceFactory" ref="financialLiabilityCategoryInstanceFactory" />
+		<constructor-arg name="financialLiabilityCategoryDao" ref="financialLiabilityCategoryDao" />
+	</bean>
+	
+	<bean id="recurringDeductionDelegate"
+		class="omis.financial.service.delegate.RecurringDeductionDelegate">
+		<constructor-arg name="recurringDeductionInstanceFactory" ref="recurringDeductionInstanceFactory" />
+		<constructor-arg name="recurringDeductionDao" ref="recurringDeductionDao" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	<bean id="recurringDeductionCategoryDelegate"
+		class="omis.financial.service.delegate.RecurringDeductionCategoryDelegate">
+		<constructor-arg name="recurringDeductionCategoryDao" ref="recurringDeductionCategoryDao" />
+		<constructor-arg name="recurringDeductionCategoryInstanceFactory" ref="recurringDeductionCategoryInstanceFactory" />
+	</bean>
+	<bean id="financialDocumentAssociationDelegate"
+		class="omis.financial.service.delegate.FinancialDocumentAssociationDelegate">
+		<constructor-arg name="financialDocumentAssociationDao" ref="financialDocumentAssociationDao" />
+		<constructor-arg name="financialDocumentAssociationInstanceFactory" ref="financialDocumentAssociationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<!-- Instance factories -->
+	<bean id="financialAssetInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAsset" />
+	</bean>
+	
+	<bean id="financialAssetCategoryInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAssetCategory" />
+	</bean>
+	
+	<bean id="financialLiabilityInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiability" />
+	</bean>
+	
+	<bean id="financialLiabilityCategoryInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiabilityCategory" />
+	</bean>
+	
+	<bean id="recurringDeductionInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeduction" />
+	</bean>
+	
+	<bean id="recurringDeductionCategoryInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeductionCategory" />
+	</bean>
+	
+	<bean id="financialDocumentAssociationInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialDocumentAssociation" />
+	</bean>
+	
+	<!-- Property editor factories -->
+	<bean id="financialAssetPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="financialAssetDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAsset" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="financialAssetCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="financialAssetCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialAssetCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+    <bean id="financialLiabilityPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="financialLiabilityDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiability" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="financialLiabilityCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="financialLiabilityCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialLiabilityCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="recurringDeductionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="recurringDeductionDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeduction" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="recurringDeductionCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="recurringDeductionCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.RecurringDeductionCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="financialDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="financialDocumentAssociationDao" />
+		<constructor-arg name="entityName"
+			value="omis.financial.domain.FinancialDocumentAssociation" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<!-- Document Beans -->
+	
+	<bean id="financialDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="financialDocumentLocator"/>
+		</bean>
+
+		<bean id="financialDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="financialDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="financialDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\FinancialDocuments"/>
+		</bean>
+		
+		<bean id="financialDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="financialDocumentLocator"/>
+		</bean>
+	    
+</beans>

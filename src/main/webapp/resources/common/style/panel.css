@@ -1,0 +1,15 @@
+/*
+ * Panel styling.
+ *
+ * Author: Stephen Abson
+ */
+
+/* Styling for all panels. */
+div.panel {
+	margin-top: 4px;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	margin-bottom: 4px;
+}

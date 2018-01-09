@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+        
+        <!-- Delegates -->
+        <bean name="communitySupervisionOfficeDelegate"
+        	class="omis.communitysupervision.service.delegate.CommunitySupervisionOfficeDelegate">
+        	<constructor-arg name="communitySupervisionOfficeDao" ref="communitySupervisionOfficeDao"/>
+        	<constructor-arg name="communitySupervisionOfficeInstanceFactory" ref="communitySupervisionOfficeInstanceFactory"/>
+        </bean>
+        
+        <!--  Data Access Objects -->
+        <bean id="communitySupervisionOfficeDao"
+	  		class="omis.communitysupervision.dao.impl.hibernate.CommunitySupervisionOfficeDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.communitysupervision.domain.CommunitySupervisionOffice"/>
+ 		</bean>
+ 		 
+        <!--   Instance factories -->
+    	<bean id="communitySupervisionOfficeInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    	<constructor-arg name="entityName" value="omis.communitysupervision.domain.CommunitySupervisionOffice"/>
+  		</bean>
+    	
+		<!--   Property editors -->
+		<bean id="communitySupervisionOfficePropertyEditorFactory"
+	        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		    <constructor-arg name="dao" ref="communitySupervisionOfficeDao"/>
+		    <constructor-arg name="entityName" value="omis.communitysupervision.domain.CommunitySupervisionOffice"/>
+		    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	  	</bean>  
+</beans>

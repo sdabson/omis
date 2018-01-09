@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Allowed location change reason rule.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.locationterm.domain">
+	<class entity-name="omis.locationterm.domain.AllowedLocationChangeReasonRule"
+	       proxy="omis.locationterm.domain.AllowedLocationChangeReasonRule"
+	       name="omis.locationterm.domain.impl.AllowedLocationChangeReasonRuleImpl"
+		   table="`ALLOWED_LOC_CNG_RSN_RL`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`ALLOWED_LOC_CNG_RSN_RL_SEQ`</param>
+        </generator>
+	  </id>
+      <properties name="uniqueAllowedLocationChangeReasonRule">
+        <many-to-one name="changeAction" entity-name="omis.locationterm.domain.LocationTermChangeAction" not-null="true" column="`CHANGE_ACTION_ID`"/>
+        <many-to-one name="reason" entity-name="omis.locationterm.domain.LocationReason" not-null="true" column="`REASON_ID`"/>
+      </properties>
+	</class>
+	<query name="findLocationReasonsForChangeAction"><![CDATA[
+		select reason
+		from omis.locationterm.domain.AllowedLocationChangeReasonRule rule
+		  inner join rule.reason reason
+		  inner join rule.changeAction changeAction
+		where changeAction = :changeAction
+		order by reason.sortOrder, reason.name
+	]]></query>
+</hibernate-mapping>

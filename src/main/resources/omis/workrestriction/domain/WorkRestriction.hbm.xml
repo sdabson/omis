@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workrestriction.domain">
+	<class entity-name="omis.workrestriction.domain.WorkRestriction"
+			proxy="omis.workrestriction.domain.WorkRestriction"
+			name="omis.workrestriction.domain.impl.WorkRestrictionImpl"
+			table="`WORK_RESTRICTION`">
+			
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WORK_RESTRICTION_SEQ`</param>
+				</generator>
+			</id>
+			
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true" />
+			<many-to-one name="category" column="`CATEGORY_ID`" entity-name="omis.workrestriction.domain.WorkRestrictionCategory" not-null="true" />
+			<component name="authorizationSignature">
+				<many-to-one name="userAccount" column="`AUTHORIZATION_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" />
+				<property name="date" column="`AUTHORIZATION_DATE`" type="java.util.Date" not-null="true" />
+			</component>
+			<property name="notes" column="`NOTES`" type="java.lang.String"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findWorkRestriction"><![CDATA[
+		select workRestriction
+		from
+			omis.workrestriction.domain.WorkRestriction workRestriction
+		where
+			workRestriction.offender = :offender
+		and
+			workRestriction.category = :category
+	]]></query>
+	
+	<query name="findWorkRestrictionExcluding"><![CDATA[
+		select workRestriction
+		from
+			omis.workrestriction.domain.WorkRestriction workRestriction
+		where
+			workRestriction.offender = :offender
+		and
+			workRestriction.category = :category
+		and
+			workRestriction != :workRestriction
+	]]></query>
+	
+	<query name="findWorkRestrictionsByOffender"><![CDATA[
+		select workRestriction
+		from
+			omis.workrestriction.domain.WorkRestriction workRestriction
+		where
+			workRestriction.offender = :offender
+	]]></query>
+</hibernate-mapping>

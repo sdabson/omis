@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Docket mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.docket.domain">
+	<class entity-name="omis.docket.domain.Docket"
+	       proxy="omis.docket.domain.Docket"
+	       name="omis.docket.domain.impl.DocketImpl"
+		   table="`DOCKET`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`DOCKET_SEQ`</param>
+        </generator>
+	  </id>
+      <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+      <properties name="uniqueDocket">
+      	<many-to-one name="person" entity-name="omis.person.domain.Person" column="`PERSON_ID`" not-null="true"/>
+      	<many-to-one name="court" entity-name="omis.court.domain.Court" column="`COURT_ID`" not-null="true"/>
+      	<property name="value" type="java.lang.String" column="`VALUE`" not-null="true"/>
+      </properties>
+	</class>
+	<query name="findDocket"><![CDATA[
+		select docket
+		from omis.docket.domain.Docket docket
+		where docket.person = :person
+		  and docket.court = :court
+		  and docket.value = :value
+	]]></query>
+	<query name="findDocketExcluding"><![CDATA[
+		select docket
+		from omis.docket.domain.Docket docket
+		where docket.person = :person
+		  and docket.court = :court
+		  and docket.value = :value
+		  and docket not in (:excludedDockets)
+	]]></query>
+	<query name="findDocketsByPerson"><![CDATA[
+		select docket
+		from omis.docket.domain.Docket docket
+		where docket.person = :person
+		order by docket.person.name.lastName, docket.value
+	]]></query>
+</hibernate-mapping>

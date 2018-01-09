@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Queries to summarize work assignment.
+  -
+  - Author: Yidong Li
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workassignment.domain">
+<query name="findWorkAssignmentByOffender"><![CDATA[
+	select new omis.workassignment.report.WorkAssignmentSummary(workassignment)
+    from
+    	omis.workassignment.domain.WorkAssignment workassignment
+    where 
+    	workassignment.offender = :offender
+    order by
+		workassignment.assignedDate desc
+	]]></query>
+</hibernate-mapping>

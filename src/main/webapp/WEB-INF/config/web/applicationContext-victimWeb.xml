@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+	<!-- Web configuration -->
+ 		 
+	<context:component-scan base-package="omis.victim.web.controller"/>
+ 	
+ 	<!-- Profile item -->
+ 	<bean id="victimProfileItem"
+ 		class="omis.victim.web.profile.VictimProfileItem">
+ 		<constructor-arg name="requiredAuthorizations">
+ 			<set>
+ 				<value>VICTIM_ASSOCIATION_LIST</value>
+ 				<value>ADMIN</value>
+ 			</set>
+ 		</constructor-arg>
+ 		<constructor-arg name="includePage" value="/WEB-INF/views/victim/offender/profile/includes/profileItem.jsp"/>
+ 		<constructor-arg name="name" value="victim"/>
+ 		<constructor-arg name="profileItemRegistry" ref="relationshipsProfileItemRegistry"/>
+ 		<constructor-arg name="victimProfileItemReportService" ref="victimProfileItemReportService"/>
+ 		<constructor-arg name="enabled" value="${victimProfileItemEnabled}"/>
+ 	</bean>
+ 		
+	<!-- Use controller transactions -->
+  
+	<aop:config>
+		<aop:pointcut id="reportVictimAssociationsControllerOperation" expression="execution(* omis.victim.web.controller.ReportVictimAssociationsController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportVictimAssociationsControllerOperation"/>
+	</aop:config>
+   
+   	<aop:config>
+		<aop:pointcut id="manageVictimAssociationControllerOperation" expression="execution(* omis.victim.web.controller.ManageVictimAssociationController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageVictimAssociationControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="reportVictimNotesControllerOperation" expression="execution(* omis.victim.web.controller.ReportVictimNotesController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportVictimNotesControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="manageVictimNoteControllerOperation" expression="execution(* omis.victim.web.controller.ManageVictimNoteController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageVictimNoteControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="victimDocumentControllerOperation" expression="execution(* omis.victim.web.controller.VictimDocumentController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="victimDocumentControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="victimOffenderSearchControllerOperation" expression="execution(* omis.victim.web.controller.VictimOffenderSearchController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="victimOffenderSearchControllerOperation"/>
+	</aop:config>
+	
+	<!-- Helpers -->
+	
+	<bean id="victimSummaryModelDelegate" class="omis.victim.web.controller.delegate.VictimSummaryModelDelegate">
+		<constructor-arg name="victimReportService" ref="victimReportService"/>
+		<constructor-arg name="contactReportService" ref="contactReportService"/>
+	</bean>
+	
+	<!-- Validators -->
+	
+	<bean id="victimAssociationFormValidator"
+		  class="omis.victim.web.validator.VictimAssociationFormValidator">
+	  <constructor-arg name="victimNoteItemValidatorDelegate" ref="victimNoteItemValidatorDelegate"/>
+	  <constructor-arg name="telephoneNumberFieldsValidatorDelegate" ref="telephoneNumberFieldsValidatorDelegate"/>
+	  <constructor-arg name="onlineAccountFieldsValidatorDelegate" ref="onlineAccountFieldsValidatorDelegate"/>
+	  <constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+	  <constructor-arg name="poBoxFieldsValidatorDelegate" ref="poBoxFieldsValidatorDelegate"/>
+	</bean>
+		  
+	<bean id="victimNoteFormValidator"
+	      class="omis.victim.web.validator.VictimNoteFormValidator"/>
+	      
+	<bean id="victimDocumentsFormValidator"
+	      class="omis.victim.web.validator.VictimDocumentsFormValidator"/>
+	
+	<bean id="victimOffenderSearchFormValidator"
+	      class="omis.victim.web.validator.VictimOffenderSearchFormValidator">
+	  <constructor-arg name="offenderSearchFieldsValidatorDelegate" ref="offenderSearchFieldsValidatorDelegate"/>
+	</bean>
+	
+	
+	
+	<!-- Validator helpers -->
+	
+	<bean id="victimNoteItemValidatorDelegate"
+	      class="omis.victim.web.validator.delegate.VictimNoteItemValidatorDelegate"/>
+
+</beans>

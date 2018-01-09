@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.BiographicAndContactSection"
+	       proxy="omis.presentenceinvestigation.domain.BiographicAndContactSection"
+	       name="omis.presentenceinvestigation.domain.impl.BiographicAndContactSectionImpl"
+	       table="`BIOGRAPHIC_AND_CONTACT_SECTION`">
+	       <id name="id" column="`ID`" type="java.lang.Long">
+	       		<generator class="sequence">
+					<param name="sequence">`BIOGRAPHIC_AND_CONTACT_SECTION_SEQ`</param>
+				</generator>
+	       </id>
+	       
+	       
+	       <many-to-one name="presentenceInvestigationRequest" column="`PRESENTNCE_INVESTIGTIN_RQST_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"/>
+	       
+	       
+	       
+	       <property name="name" column="`NAME`" type="java.lang.String"/>
+	       <property name="dateOfReport" column="`DATE_OF_REPORT`" type="java.util.Date"/>
+	       <property name="alsoKnownAs" column="`ALSO_KNOWN_AS`" type="java.lang.String"/>
+	       <property name="dateOfSentence" column="`DATE_OF_SENTENCE`" type="java.util.Date"/>
+	       <property name="address" column="`ADDRESS`" type="java.lang.String"/>
+	       <property name="phoneNumber" column="`PHONE_NUMBER`" type="java.lang.String"/>
+	       <property name="cellPhoneNumber" column="`CELL_PHONE_NUMBER`" type="java.lang.String"/>
+	       
+	       <component name="creationSignature">
+	       	<many-to-one name="userAccount" column="`CREATE_USER_ID`" not-null="true"/>
+	       	<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+	       </component>
+	       <component name="updateSignature">
+	       	<many-to-one name="userAccount" column="`UPDATE_USER_ID`" not-null="true"/>
+	       	<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+	       </component>
+	</class>
+	<query name="findBiographicAndContactSection"><![CDATA[
+		select bacs
+		  from omis.presentenceinvestigation.domain.BiographicAndContactSection bacs
+		 where bacs.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		   and bacs.name = :name
+		   and bacs.dateOfReport = :dateOfReport
+	]]></query>
+	<query name="findBiographicAndContactSectionExcluding"><![CDATA[
+		select bacs
+		  from omis.presentenceinvestigation.domain.BiographicAndContactSection bacs
+		 where bacs.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		   and bacs.name = :name
+		   and bacs.dateOfReport = :dateOfReport
+		   and bacs != :biographicAndContactSection
+	]]></query>
+</hibernate-mapping>

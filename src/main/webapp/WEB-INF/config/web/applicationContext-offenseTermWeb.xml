@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Web configuration for offense terms.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  
+  <bean id="offenseTermFormValidator" class="omis.offenseterm.web.validator.OffenseTermFormValidator">
+  	<constructor-arg name="courtCaseFieldsValidatorDelegate" ref="courtCaseFieldsValidatorDelegate"/>
+  	<constructor-arg name="convictionFieldsValidatorDelegate" ref="convictionFieldsValidatorDelegate"/>
+  	<constructor-arg name="sentenceFieldsValidatorDelegate" ref="sentenceFieldsValidatorDelegate"/>
+  	<constructor-arg name="sentencePropertyEditorFactory" ref="sentencePropertyEditorFactory"/>
+  </bean>
+  
+  <bean id="historicalOffenseTermFormValidator" class="omis.offenseterm.web.validator.HistoricalOffenseTermFormValidator">
+  	<constructor-arg name="sentenceFieldsValidatorDelegate" ref="sentenceFieldsValidatorDelegate"/>
+  </bean>
+  
+  <bean id="offenseTermDocketFormValidator" 
+  		class="omis.offenseterm.web.validator.OffenseTermDocketFormValidator"/>
+
+   <!-- Profile Items -->
+  
+  <bean id="offenseTermProfileItem" class="omis.offenseterm.web.profile.OffenseTermProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>OFFENSE_TERM_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/offenseTerm/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="offenseTerms"/>
+  	<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	<constructor-arg name="offenseTermProfileItemService" ref="offenseTermProfileItemService"/>
+  	<constructor-arg name="enabled" value="${offenseTermProfileItemEnabled}"/>
+  </bean>
+  
+  <bean id="currentOffenseTermProfileItem" class="omis.offenseterm.web.profile.CurrentOffenseTermProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>OFFENSE_TERM_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/offenseTerm/profile/includes/profileItemCurrent.jsp"/>
+  	<constructor-arg name="name" value="currentOffense"/>
+  	<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	<constructor-arg name="offenseTermProfileItemService" ref="offenseTermProfileItemService"/>
+  	<constructor-arg name="enabled" value="${currentOffenseTermProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.offenseterm.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+    <aop:pointcut id="manageOffenseTermControllerOperation" expression="execution(* omis.offenseterm.web.controller.ManageOffenseTermController.*(..))"/>
+    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+  	<aop:pointcut id="manageCurrentOffenseTermControllerOperation" expression="execution(* omis.offenseterm.web.controller.ManageCurrentOffenseTermController.*(..))"/>
+  	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageCurrentOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+  	<aop:pointcut id="manageHistoricalOffenseTermControllerOperation" expression="execution(* omis.offenseterm.web.controller.ManageHistoricalOffenseTermController.*(..))"/>
+  	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageHistoricalOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+  	<aop:pointcut id="reportOffenseTermControllerOperation" expression="execution(* omis.offenseterm.web.controller.ReportOffenseTermController.*(..))"/>
+  	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+  	<aop:pointcut id="reportCurrentOffenseTermControllerOperation" expression="execution(* omis.offenseterm.web.controller.ReportCurrentOffenseTermController.*(..))"/>
+  	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportCurrentOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+	<aop:pointcut id="reportHistoricalOffenseTermControllerOperation" expression="execution (* omis.offenseterm.web.controller.ReportHistoricalOffenseTermController.*(..))"/>
+	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportHistoricalOffenseTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+    <aop:pointcut id="manageOffenseTermDocketControllerOperation" expression="execution(* omis.offenseterm.web.controller.ManageOffenseTermDocketController.*(..))"/>
+    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageOffenseTermDocketControllerOperation"/>
+  </aop:config>
+  
+  
+</beans>

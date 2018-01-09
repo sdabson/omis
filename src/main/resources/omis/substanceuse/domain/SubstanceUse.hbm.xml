@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substanceuse.domain.SubstanceUse">
+	<class entity-name="omis.substanceuse.domain.SubstanceUse"
+		proxy="omis.substanceuse.domain.SubstanceUse"
+		name="omis.substanceuse.domain.impl.SubstanceUseImpl"
+		table="`SUBSTANCE_USE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SUBSTANCE_USE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<many-to-one name="substance" column="`SUBSTANCE_ID`" cascade="none" not-null="true"
+			entity-name="omis.substance.domain.Substance" unique="false"/>
+	</class>
+	<query name="findUsesByOffender"><![CDATA[
+		select use
+		from omis.substanceuse.domain.SubstanceUse use
+		where use.offender = :offender
+	]]></query>
+	<query name="findSubstanceUse"><![CDATA[
+		select use
+		from omis.substanceuse.domain.SubstanceUse use
+		where use.offender = :offender
+		and use.substance = :substance
+	]]></query>
+	<query name="findSubstanceUseExcluding"><![CDATA[
+		select use
+		from omis.substanceuse.domain.SubstanceUse use
+		where use.offender = :offender
+		and use.substance = :substance
+		and use <> :substanceUse
+	]]></query>
+</hibernate-mapping>

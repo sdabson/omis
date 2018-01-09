@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWorkRequirement"
+		proxy="omis.health.domain.LabWorkRequirement"
+		name="omis.health.domain.impl.LabWorkRequirementImpl"
+		table="`LAB_WORK_REQUIREMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_REQUIREMENT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offenderAppointmentAssociation" column="`OFFENDER_APPT_ASSOC_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.OffenderAppointmentAssociation" unique="false"/>
+		<many-to-one name="labWork" column="`LAB_WORK_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.LabWork" unique="false"/>
+	</class>
+	<query name="findLabWorkRequirement"><![CDATA[
+		from
+			omis.health.domain.LabWorkRequirement requirement
+		where
+			requirement.offenderAppointmentAssociation = :offenderAppointmentAssociation
+		and
+			requirement.labWork = :labWork
+	]]></query>
+	<query name="findLabWorkRequirementByAppointmentAssociation"><![CDATA[
+		from
+			omis.health.domain.LabWorkRequirement labWorkRequirement
+		where
+			labWorkRequirement.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findLabWorkRequirementByLabWork"><![CDATA[
+		from
+			omis.health.domain.LabWorkRequirement labWorkRequirement
+		where
+			labWorkRequirement.labWork = :labWork
+	]]></query>
+	<query name="findLabWorkRequirementByLabWorkExcluding"><![CDATA[
+		from
+			omis.health.domain.LabWorkRequirement labWorkRequirement
+		where
+			labWorkRequirement.labWork = :labWork
+		and
+			labWorkRequirement.offenderAppointmentAssociation <> :offenderAppointmentAssociation
+	]]></query>
+</hibernate-mapping>

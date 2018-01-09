@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.domain">
+	<class entity-name="omis.adaaccommodation.domain.Accommodation"
+		proxy="omis.adaaccommodation.domain.Accommodation" name="omis.adaaccommodation.domain.impl.AccommodationImpl"
+		table="`ADA_ACCOMMODATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADA_ACCOMMODATION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="description" column="`DESCRIPTION`"
+			not-null="true" type="string" />
+		<many-to-one name="disability" column="`DISABILITY_ID`"
+			entity-name="omis.adaaccommodation.domain.Disability" not-null="true" />
+		<many-to-one name="accommodationCategory" column="`ACCOMMODATION_CAT_ID`"
+			entity-name="omis.adaaccommodation.domain.AccommodationCategory"
+			not-null="true" />
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`CREATE_DATE`" not-null="true" />
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`UPDATE_DATE`" not-null="true" />
+		</component>
+	</class>
+	<query name="findAccommodation"><![CDATA[
+	select accommodation
+	from
+		omis.adaaccommodation.domain.Accommodation accommodation
+	where
+		accommodation.disability = :disability
+		and accommodation.description = :accommodationDescription
+		and accommodation.accommodationCategory = :accommodationCategory
+	]]></query>
+	<query name="findAccommodationExcluding"><![CDATA[
+	select accommodation
+	from 
+		omis.adaaccommodation.domain.Accommodation accommodation
+	where
+		accommodation.disability = :disability
+		and accommodation.description = :accommodationDescription
+		and accommodation.accommodationCategory = :accommodationCategory
+		and accommodation != :accommodation
+	]]></query>
+	<query name="findAccommodationCountByOffenderAndDate"><![CDATA[
+		select count(accommodation.id)
+		  from omis.adaaccommodation.domain.Authorization authorization
+right outer join authorization.accommodation accommodation
+left outer join accommodation.disability disability
+        where disability.offender = :offender
+          and ((authorization.authorizationTerm.startDate <= :effectiveDate
+              or authorization.authorizationTerm.startDate is null) 
+              and (authorization.authorizationTerm.endDate >= :effectiveDate
+              or  authorization.authorizationTerm.endDate is null))
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Sentence web configuration.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+	
+	<!-- Validators -->
+	
+	<bean id="sentenceFormValidator" class="omis.sentence.validator.SentenceFormValidator"/>
+	
+	<!-- Validator delegates -->
+	
+	<bean id="sentenceFieldsValidatorDelegate" class="omis.sentence.web.validator.delegate.SentenceFieldsValidatorDelegate"/>
+	
+	<!-- Web configuration -->
+	
+	<context:component-scan base-package="omis.sentence.web.controller"/>
+	
+	<!-- Use controller transactions -->
+  
+	<aop:config>
+	    <aop:pointcut id="sentenceControllerOperation" expression="execution(* omis.sentence.web.controller.SentenceController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="sentenceControllerOperation"/>
+	</aop:config>
+	       
+</beans>

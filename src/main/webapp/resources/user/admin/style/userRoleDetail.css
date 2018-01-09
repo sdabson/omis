@@ -1,0 +1,16 @@
+/*
+ * Style sheet for user role detail screen.
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Oct 18, 2012)
+ * Since: OMIS 3.0
+ */
+
+#userGroups {
+	float: left;
+	width: 75%;
+}
+
+#userGroups span {
+	display: inline-block;
+	min-width: 32%;
+}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!--
+    - Person delegate
+    -
+    - Separated from person application context so as not to require auditing
+    - as part of the security configuration.
+    -
+    - Stephen Abson
+    -->
+   
+  <bean id="personDelegate" class="omis.person.service.delegate.PersonDelegate">
+    <constructor-arg name="personDao" ref="personDao"/>
+    <constructor-arg name="personIdentityDao" ref="personIdentityDao"/>
+    <constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
+    <constructor-arg name="personInstanceFactory" ref="personInstanceFactory"/>
+    <constructor-arg name="personNameInstanceFactory" ref="personNameInstanceFactory"/>
+    <constructor-arg name="personIdentityInstanceFactory" ref="personIdentityInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    <constructor-arg name="personNameDelegate" ref="personNameDelegate"/>
+  </bean>
+  
+  <bean id="personIdentityDelegate" class="omis.person.service.delegate.PersonIdentityDelegate">
+    <constructor-arg name="personIdentityDao" ref="personIdentityDao"/>
+    <constructor-arg name="personIdentityInstanceFactory" ref="personIdentityInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+   
+  <bean id="suffixDelegate" class="omis.person.service.delegate.SuffixDelegate">
+    <constructor-arg name="suffixDao" ref="suffixDao"/>
+  </bean>
+  
+	<bean id="personNameDelegate" class="omis.person.service.delegate.PersonNameDelegate">
+		<constructor-arg name="personNameDao" ref="personNameDao" />
+		<constructor-arg name="personNameInstanceFactory" ref="personNameInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+	
+	<bean id="alternativeIdentityAssociationDelegate" class="omis.person.service.delegate.AlternativeIdentityAssociationDelegate">
+		<constructor-arg name="alternativeIdentityAssociationDao" ref="alternativeIdentityAssociationDao" />
+		<constructor-arg name="alternativeIdentityAssociationInstanceFactory" ref="alternativeIdentityAssociationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+	
+	<bean id="alternativeIdentityCategoryDelegate" class="omis.person.service.delegate.AlternativeIdentityCategoryDelegate">
+		<constructor-arg name="alternativeIdentityCategoryDao" ref="alternativeIdentityCategoryDao" />
+	</bean>
+	
+	<bean id="alternativeNameAssociationDelegate" class="omis.person.service.delegate.AlternativeNameAssociationDelegate">
+		<constructor-arg name="alternativeNameAssociationDao" ref="alternativeNameAssociationDao" />
+		<constructor-arg name="alternativeNameAssociationInstanceFactory" ref="alternativeNameAssociationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+	
+	<bean id="alternativeNameCategoryDelegate" class="omis.person.service.delegate.AlternativeNameCategoryDelegate">
+		<constructor-arg name="alternativeNameCategoryDao" ref="alternativeNameCategoryDao" />
+		<constructor-arg name="alternativeNameCategoryInstanceFactory" ref="alternativeNameCategoryInstanceFactory" />
+	</bean>
+   
+</beans>

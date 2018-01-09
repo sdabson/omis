@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.Person"
+	       proxy="omis.person.domain.Person"
+	       name="omis.person.domain.impl.PersonImpl"
+	       table="`PERSON`" lazy="true">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<join table="`PERSON_TO_IDENTITY`" optional="true">
+			<key column="`PERSON_ID`" unique="true"/>
+			<many-to-one name="identity" entity-name="omis.person.domain.PersonIdentity"
+		    	         column="`IDENTITY_ID`" cascade="all" unique="true" not-null="false"/>
+		</join>
+		<join table="`PERSON_TO_NAME`" optional="true">
+			<key column="`PERSON_ID`" unique="true"/>
+			<many-to-one name="name" entity-name="omis.person.domain.PersonName"
+		    	         column="`NAME_ID`" cascade="all" unique="true" not-null="true"/>
+		</join>
+	</class>
+</hibernate-mapping>

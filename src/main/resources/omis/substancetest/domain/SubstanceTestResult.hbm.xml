@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substancetest.domain">
+	<class entity-name="omis.substancetest.domain.SubstanceTestResult"
+			proxy="omis.substancetest.domain.SubstanceTestResult"
+			name="omis.substancetest.domain.impl.SubstanceTestResultImpl"
+			table="`SUBSTANCE_TEST_RESULT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SUBSTANCE_TEST_RESULT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="substance" column="`SUBSTANCE_ID`"
+				not-null="true" />
+			<many-to-one name="substanceTest" column="`SUBSTANCE_TEST_ID`"
+				not-null="true" />
+			<many-to-one name="value" column="`VALUE_ID`"
+				not-null="true" />
+			<property name="substanceUseAdmission" column="`SUBSTANCE_USE_ADMISSION`" not-null="false" type="yes_no"/>
+			<property name="admissionPriorToTest" column="`ADMISSION_PRIOR_TO_TEST`" not-null="false" type="yes_no"/>
+	</class>
+	<query name="findSubstanceTestResultsBySubstanceTest"><![CDATA[
+		from
+			omis.substancetest.domain.SubstanceTestResult result
+		where
+			result.substanceTest = :substanceTest
+		order by
+			result.substance.name
+	]]></query>
+	<query name="findSubstanceTestResult"><![CDATA[
+		from
+			omis.substancetest.domain.SubstanceTestResult result
+		where
+			result.substanceTest = :substanceTest
+		and
+			result.substance = :substance
+	]]></query>
+	<query name="removeBySubstanceTestExcluding"><![CDATA[
+		delete 
+			SubstanceTestResult result 
+		where 
+			result.substanceTest = :substanceTest
+		and
+			result not in (:results)
+	]]></query>
+	<query name="findSubstanceTestResultExcluding"><![CDATA[
+		from
+			omis.substancetest.domain.SubstanceTestResult result
+		where
+			result.substanceTest = :substanceTest
+		and
+			result.substance = :substance
+		and
+			result <> :substanceTestResult
+	]]></query>
+</hibernate-mapping>

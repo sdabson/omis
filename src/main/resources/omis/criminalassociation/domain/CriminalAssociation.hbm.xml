@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.criminalassociation.domain">
+	<class entity-name="omis.criminalassociation.domain.CriminalAssociation"
+		proxy="omis.criminalassociation.domain.CriminalAssociation"
+		name="omis.criminalassociation.domain.impl.CriminalAssociationImpl"
+		table="`CRIMINAL_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CRIMINAL_ASSOC_SEQ`</param>
+			</generator>
+		</id>	
+		<component name="dateRange" class="omis.datatype.DateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="false"/>
+			<property name="endDate" column="`END_DATE`" type="java.util.Date" not-null="false"/>
+		</component>
+		
+		<component name="criminalAssociationFlags" class="omis.criminalassociation.domain.component.CriminalAssociationFlags">
+			<property name="witness" type = "yes_no" column="`CRIMINAL_FlGS`"/>
+		</component>
+
+		<many-to-one name="criminalAssociationCategory" column="`CRIMINAL_CAT_ID`"
+			entity-name="omis.criminalassociation.domain.CriminalAssociationCategory" not-null="true" />
+		
+		<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`"
+			cascade="save-update" entity-name="omis.relationship.domain.Relationship"/>
+		
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+				
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findAssociationsByOffender">
+		from 
+			omis.criminalassociation.domain.CriminalAssociation association
+		where 
+			association.relationship.firstPerson = :offender
+		order by association.relationship.secondPerson.name.lastName
+	</query>
+	<query name="findAssociationsByOtherOffender">
+		from 
+			omis.criminalassociation.domain.CriminalAssociation association
+		where 
+			association.relationship.secondPerson = :offender
+		order by 
+			association.relationship.firstPerson.name.lastName
+	</query>
+	<query name="findCriminalAssociation"><![CDATA[
+		from
+			omis.criminalassociation.domain.CriminalAssociation association
+		where
+			association.relationship = :relationship
+		and
+			((association.dateRange.startDate = :startDate) or (association.dateRange.startDate is null and :startDate is null))
+		and
+			((association.dateRange.endDate = :endDate) or (association.dateRange.endDate is null and :endDate is null))
+	]]></query>
+	<query name="findCriminalAssociationCountByOffenderAndDate"><![CDATA[
+		select count(criminalAssociation.id)
+		  from omis.criminalassociation.domain.CriminalAssociation criminalAssociation
+		 where criminalAssociation.relationship.firstPerson = :offender
+		   and ((criminalAssociation.dateRange.startDate <= :effectiveDate
+		        or criminalAssociation.dateRange.startDate is null)
+		   and (criminalAssociation.dateRange.endDate >= :effectiveDate
+		       or criminalAssociation.dateRange.endDate is null))
+	]]></query>
+	</hibernate-mapping>

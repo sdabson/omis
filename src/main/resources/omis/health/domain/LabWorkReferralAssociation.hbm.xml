@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWorkReferralAssociation"
+		proxy="omis.health.domain.LabWorkReferralAssociation"
+		name="omis.health.domain.impl.LabWorkReferralAssociationImpl"
+		table="`LAB_WORK_REF_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_REF_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="referral" column="`REFERRAL_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.LabWorkReferral" unique="false"/>
+		<many-to-one name="labWork" column="`LAB_WORK_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.LabWork" unique="false"/>
+	</class>
+	<query name="findLabWorkReferralAssociation"><![CDATA[
+		from
+			omis.health.domain.LabWorkReferralAssociation association
+		where
+			association.labWork = :labWork
+		and
+			association.referral = :labWorkReferral
+	]]></query>
+</hibernate-mapping>

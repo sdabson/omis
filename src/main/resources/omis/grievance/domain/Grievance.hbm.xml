@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Grievance mapping.
+  -
+  - Author: Yidong Li
+  - Author: Stephen Abson 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<class entity-name="omis.grievance.domain.Grievance"
+		proxy="omis.grievance.domain.Grievance"
+		name="omis.grievance.domain.impl.GrievanceImpl"
+		table="`GRIEVANCE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`GRIEVANCE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<property name="grievanceNumber" column="`GRIEVANCE_NUMBER`" not-null="true" type="java.lang.Integer"/>
+		<property name="openedDate" column="`OPENED_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="informalFileDate" column="`INFORMAL_FILE_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="description" type="java.lang.String" not-null="false" column="`DESCRIPTION`"/>
+		<property name="initialComment" type="java.lang.String" not-null="false" column="`INITIAL_COMMENT`"/>
+		<property name="closedDate" column="`CLOSED_DATE`" type="java.util.Date" not-null="false"/>
+		<many-to-one name="subject" entity-name="omis.grievance.domain.GrievanceSubject" not-null="true" column="`SUBJECT_ID`"/>
+		<many-to-one name="complaintCategory" entity-name="omis.grievance.domain.GrievanceComplaintCategory" not-null="true" column="`COMPLAINT_CATEGORY_ID`"/>
+		<many-to-one name="unit" entity-name="omis.grievance.domain.GrievanceUnit" not-null="true" column="`UNIT_ID`"/>
+		<many-to-one name="location" entity-name="omis.grievance.domain.GrievanceLocation" not-null="true" column="`LOCATION_ID`"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findGrievanceByOffender"><![CDATA[
+		from
+			omis.grievance.domain.Grievance grievance
+		where
+			grievance.offender = :offender
+		order by grievance.openedDate, grievance.grievanceNumber
+	]]></query>
+	<query name="findGrievance"><![CDATA[
+		from
+			omis.grievance.domain.Grievance grievance
+		where
+			grievance.offender = :offender
+		and
+			grievance.location = :location
+		and
+			grievance.unit = :unit
+		and
+			grievance.openedDate = :openedDate
+		and
+			grievance.subject = :subject
+		and
+			grievance.grievanceNumber = :grievanceNumber
+		order by grievance.grievanceNumber
+	]]></query>
+	
+	<query name="findExcludingGrievance"><![CDATA[
+		from
+			omis.grievance.domain.Grievance grievance
+		where
+			grievance.offender = :offender
+		and
+			grievance.location = :location
+		and
+			grievance.unit = :unit
+		and
+			grievance.openedDate = :openedDate
+		and
+			grievance.subject = :subject
+		and
+			grievance.grievanceNumber = :grievanceNumber
+		and
+			grievance not in (:excludedGrievances)
+		order by grievance.grievanceNumber
+	]]></query>
+	<query name="findMaxGrievanceNumber"><![CDATA[
+	  select coalesce(max(grievance.grievanceNumber), 0)
+	  from omis.grievance.domain.Grievance grievance 
+	]]></query>
+	<query name="findGrievanceCountByOffenderAndDate"><![CDATA[
+		select count(grievance.id)
+		  from omis.grievance.domain.Grievance grievance
+		 where grievance.offender = :offender
+		   and (grievance.closedDate is null 
+		       or grievance.closedDate > :effectiveDate)
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<query name="summarizePerson">
+		<![CDATA[
+			select new omis.person.report.PersonSummary(
+				person, name, identity)
+			from 
+				omis.person.domain.Person person
+				right outer join person.name name
+				left outer join person.identity identity
+			where
+				person = :person
+		]]>
+	</query>
+</hibernate-mapping>

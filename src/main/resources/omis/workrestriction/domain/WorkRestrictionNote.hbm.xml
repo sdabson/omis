@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workrestriction.domain">
+	<class entity-name="omis.workrestriction.domain.WorkRestrictionNote"
+			proxy="omis.workrestriction.domain.WorkRestrictionNote"
+			name="omis.workrestriction.domain.impl.WorkRestrictionNoteImpl"
+			table="`WORK_RESTRICTION_NOTE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WORK_RESTRICTION_NOTE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="workRestriction" column="`WORK_RESTRICTION_ID`" entity-name="omis.workrestriction.domain.WorkRestriction" not-null="true" />
+			<property name="value" column="`VALUE`" type="java.lang.String" not-null="true"/>
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findWorkRestrictionNote"><![CDATA[
+		select workRestrictionNote
+		from
+			omis.workrestriction.domain.WorkRestrictionNote workRestrictionNote
+		where
+			workRestrictionNote.workRestriction = :workRestriction
+		and
+			workRestrictionNote.date = :date
+		and
+			workRestrictionNote.value = :value
+	]]></query>
+	<query name="findWorkRestrictionNoteExcluding"><![CDATA[
+		select workRestrictionNote
+		from
+			omis.workrestriction.domain.WorkRestrictionNote workRestrictionNote
+		where
+			workRestrictionNote.workRestriction = :workRestriction
+		and
+			workRestrictionNote.date = :date
+		and
+			workRestrictionNote.value = :value
+		and
+			workRestrictionNote != :workRestrictionNote
+	]]></query>
+	<query name="findNotesByWorkRestriction"><![CDATA[
+		select workRestrictionNote
+		from
+			omis.workrestriction.domain.WorkRestrictionNote workRestrictionNote
+		where
+			workRestrictionNote.workRestriction = :workRestriction
+	]]></query>
+</hibernate-mapping>

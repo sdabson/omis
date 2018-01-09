@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workassignment.domain">
+	<class entity-name="omis.workassignment.domain.WorkAssignmentCategory"
+	       proxy="omis.workassignment.domain.WorkAssignmentCategory"
+	       name="omis.workassignment.domain.impl.WorkAssignmentCategoryImpl"
+		   table="`WORK_ASSIGNMENT_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`WORK_ASSIGNMENT_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" column="`NAME`" not-null="true" unique="false"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`" unique="false"/>
+		<many-to-one name="group" column="`GROUP_ID`" cascade="none" not-null="false"
+			entity-name="omis.workassignment.domain.WorkAssignmentGroup" />
+	</class>
+	<!-- 	find all work assignment categories -->
+	<query name="findWorkAssignmentCategories"><![CDATA[
+		select workAssignmentCategory
+		from 
+			omis.workassignment.domain.WorkAssignmentCategory workAssignmentCategory	
+		order by
+			workAssignmentCategory.name
+	]]></query>
+	<query name="findWorkAssignmentCategory"><![CDATA[
+		select workAssignmentCategory
+		from 
+			omis.workassignment.domain.WorkAssignmentCategory workAssignmentCategory
+		where
+			workAssignmentCategory.name = :name
+		and
+			(workAssignmentCategory.group = :workAssignmentGroup
+			 or (workAssignmentCategory.group is null and :workAssignmentGroup is null))	
+	]]></query>
+	<query name="findWorkAssignmentCategoryExcluding"><![CDATA[
+		select workAssignmentCategory
+		from 
+			omis.workassignment.domain.WorkAssignmentCategory workAssignmentCategory
+		where
+			workAssignmentCategory.name = :name
+		and
+			(workAssignmentCategory.group = :workAssignmentGroup
+			 or (workAssignmentCategory.group is null and :workAssignmentGroup is null))
+		and 	
+			workAssignmentCategory <> :excludedWorkAssignmentCategory
+	]]></query>
+</hibernate-mapping>

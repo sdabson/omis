@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation"
+			proxy="omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation"
+			name="omis.presentenceinvestigation.domain.impl.VictimSectionSummaryDocumentAssociationImpl"
+			table="`VICTIM_SECTION_SUMMARY_DOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`VICTIM_SECTION_SUMMARY_DOC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="victimSectionSummary" column="`VICTIM_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.VictimSectionSummary" not-null="true" />
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findVictimSectionSummaryDocumentAssociation"><![CDATA[
+		select victimSectionSummaryDocumentAssociation
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation victimSectionSummaryDocumentAssociation
+		where
+			victimSectionSummaryDocumentAssociation.victimSectionSummary = :victimSectionSummary
+		and
+			victimSectionSummaryDocumentAssociation.document = :document
+	]]></query>
+	<query name="findVictimSectionSummaryDocumentAssociationExcluding"><![CDATA[
+		select victimSectionSummaryDocumentAssociation
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation victimSectionSummaryDocumentAssociation
+		where
+			victimSectionSummaryDocumentAssociation.victimSectionSummary = :victimSectionSummary
+		and
+			victimSectionSummaryDocumentAssociation.document = :document
+		and
+			victimSectionSummaryDocumentAssociation != :victimSectionSummaryDocumentAssociation
+	]]></query>
+	<query name="findVictimSectionSummaryDocumentAssociationsByVictimSectionSummary"><![CDATA[
+		select victimSectionSummaryDocumentAssociation
+		from
+			omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation victimSectionSummaryDocumentAssociation
+		where
+			victimSectionSummaryDocumentAssociation.victimSectionSummary = :victimSectionSummary
+	]]></query>
+</hibernate-mapping>

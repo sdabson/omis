@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.document.domain">
+	<class entity-name="omis.document.domain.DocumentTag"
+		name="omis.document.domain.impl.DocumentTagImpl"
+		table="`DOCUMENT_TAG`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`DOCUMENT_TAG_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="document" column="`DOCUMENT_ID`" not-null="true"/>
+		<property name="name" column="`NAME`" not-null="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findDocumentTagsByDocument"><![CDATA[
+		select documentTag
+		  from omis.document.domain.DocumentTag documentTag
+		 where documentTag.document = :document
+	]]></query>
+	<query name="findDocumentTagByTagNameAndDocumentExcluding"><![CDATA[
+		select documentTag
+		  from omis.document.domain.DocumentTag documentTag
+		 where upper(documentTag.name) = upper(:tagName)
+		   and documentTag.document = :document
+		   and documentTag not in (:excluding)
+	]]></query>
+	<query name="findDocumentTagByTagNameAndDocument"><![CDATA[
+		select documentTag
+		  from omis.document.domain.DocumentTag documentTag
+		 where documentTag.document = :document
+		   and upper(documentTag.name) = upper(:tagName)
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<query name="searchUserAccountsByQuery"><![CDATA[
+		select new omis.user.report.UserAccountSearchResult(userAccount.id,
+			userAccount.username, user.id, name.lastName, name.firstName)
+		from omis.user.domain.UserAccount as userAccount
+		  inner join userAccount.user as user
+		  inner join user.name as name
+		where upper(userAccount.username) like '%' || :query || '%'
+		  or  upper(name.lastName) like '%' || :query || '%'
+		  or  upper(name.firstName) like '%' || :query || '%'
+		  or  upper(name.firstName || '%' || name.lastName) like '%' || :query || '%'
+		  or  upper(name.lastName || '%' || name.firstName) like '%' || :query || '%'
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Apr 14, 2014)
+ - Since: OMIS 3.0
+ -->
+<hibernate-mapping package="omis.health.report">
+  <query name="findHealthRequestSummariesByStatus"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                   	 then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	   where facility = :facility
+	     and healthRequest.status = :status
+	order by healthRequest.date asc
+	]]></query>
+  <query name="findHealthRequestSummariesByOffenderStatus"><![CDATA[
+ 	select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                   	 then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	   where offender = :offender
+	     and healthRequest.status = :status
+	order by healthRequest.date asc
+  ]]></query>
+  <query name="findHealthRequestSummariesByStatusAndCategory"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                     then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.status = :status
+	    and healthRequest.category in (:categories)
+   order by healthRequest.date asc
+  ]]></query>
+  <query name="findHealthRequestSummariesExcludingStatus"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                     then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	   where facility = :facility
+	     and healthRequest.status <> :status
+	order by healthRequest.date asc
+  ]]></query>
+  <query name="findHealthRequestSummariesByCategoryExcludingStatus"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                     then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.status <> :status
+	    and healthRequest.category in (:categories)
+   order by healthRequest.date asc
+  ]]></query>
+  <query name="findHealthRequestSummaries"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                     then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	   where facility = :facility
+	order by healthRequest.date asc
+  ]]></query>
+  <query name="findHealthRequestSummariesByCategory"><![CDATA[
+	  select new omis.health.report.HealthRequestSummary(
+	        healthRequest.id,
+	        externalAuthorizationRequest.id,
+	        ( select innerExternalAuthorization.id
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        ( select case innerExternalAuthorization.status
+	                   when 'APPROVED'
+	                     then true
+	                   when 'PANEL_REVIEW_REQUIRED'
+	                     then
+	                       case innerExternalAuthorization.panelReviewDecision.status
+	                         when 'APPROVED' then true
+	                         when 'INTERNAL_ALTERNATIVE_TREATMENT' then true
+	                         when 'EXTERNAL_ATLERNATIVE_TREATMENT' then true
+	                         else false end
+	                   else false
+	                 end
+	          from omis.health.domain.ExternalReferralAuthorization innerExternalAuthorization
+	            inner join innerExternalAuthorization.request innerExternalAuthorizationRequest
+	          where innerExternalAuthorizationRequest = externalAuthorizationRequest),
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offender.offenderNumber,
+	        healthRequest.date,
+	        healthRequest.category,
+	        facility.name,
+	        healthRequest.asap,
+	        healthRequest.labsRequired,
+	        healthRequest.status,
+	        '',
+	        healthRequest.notes
+	      )
+	   from omis.health.domain.ExternalReferralRequestAuthorizationRequirement externalAuthorizationRequirement
+	   right outer join externalAuthorizationRequirement.authorizationRequest externalAuthorizationRequest
+	   right outer join externalAuthorizationRequirement.referralRequest healthRequest
+	   inner join healthRequest.offender offender
+	   inner join offender.name offenderName
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.category in (:categories)
+   order by healthRequest.date asc
+  ]]></query>
+</hibernate-mapping>

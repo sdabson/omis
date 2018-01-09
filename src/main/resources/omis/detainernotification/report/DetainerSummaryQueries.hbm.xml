@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.report">
+	<query name="findDetainersByOffender"><![CDATA[
+		select new omis.detainernotification.report.DetainerSummary(
+			detainer.id,
+			detainer.receiveDate, 
+			detainer.issueDate,
+			detainerType.name, 
+			detainerAgency.agencyName, 
+			detainer.courtCaseNumber, 
+			detainer.warrantNumber,
+			detainerWarrantProcessStatus.cancellation.date)
+		from 
+			omis.detainernotification.domain.DetainerWarrantProcessingStatus 
+				detainerWarrantProcessStatus
+			right outer join detainerWarrantProcessStatus.detainer detainer
+			left outer join detainer.detainerType detainerType
+			left outer join detainer.detainerAgency detainerAgency
+		where detainer.offender = :offender
+	]]></query>
+	<query name="summarizeDetainerAgency"><![CDATA[
+		select new omis.detainernotification.report.DetainerAgencySummary(
+			address,
+			detainerAgency.telephoneNumber)
+		from
+			omis.detainernotification.domain.DetainerAgency detainerAgency
+		inner join
+			detainerAgency.address address
+		where
+			detainerAgency = :detainerAgency
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PsychologicalSectionSummary"
+			proxy="omis.presentenceinvestigation.domain.PsychologicalSectionSummary"
+			name="omis.presentenceinvestigation.domain.impl.PsychologicalSectionSummaryImpl"
+			table="`PSYCHOLOGICAL_SCTION_SMMRY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PSYCHOLOGICAL_SCTION_SMMRY_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="presentenceInvestigationRequest" column="`PRESENTNCE_INVESTIGATN_RQST_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findPsychologicalSectionSummary"><![CDATA[
+		select psychologicalSectionSummary
+		from
+			omis.presentenceinvestigation.domain.PsychologicalSectionSummary psychologicalSectionSummary
+		where
+			psychologicalSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findPsychologicalSectionSummaryExcluding"><![CDATA[
+		select psychologicalSectionSummary
+		from
+			omis.presentenceinvestigation.domain.PsychologicalSectionSummary psychologicalSectionSummary
+		where
+			psychologicalSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			psychologicalSectionSummary != :psychologicalSectionSummary
+	]]></query>
+	
+</hibernate-mapping>

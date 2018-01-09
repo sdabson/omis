@@ -1,0 +1,16 @@
+/*
+ * Style sheet for user group detail screen.
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Oct 17, 2012)
+ * Since: OMIS 3.0
+ */
+
+span#userRoles span, span#groupMembers span.member {
+	display: inline-block;
+	min-width: 32%;
+}
+
+span#userRoles, span#groupMembers {
+	width: 60%;
+	float: left;
+}

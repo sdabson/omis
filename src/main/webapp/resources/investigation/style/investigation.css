@@ -1,0 +1,16 @@
+/*
+ * Investigation module styling
+ *
+ * Author: Joel Norris
+ */
+ a.investigationLink:before {
+	content: url('../images/investigation.png');
+}
+
+a.investigationLink:before {
+	vertical-align: -20%;
+}
+
+a.investigationLink {
+	vertical-align: middle;
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Queries for reporting parole eligibilities.
+ -
+ - Author: Trevor Isles
+ - Version: 0.1.0 (Dec 6, 2017)
+ - Since: OMIS 3.0
+ -->
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping package="omis.paroleeligibility.report">
+	<query name="findParoleEligibilitiesByOffender"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name
+			)
+		from omis.paroleeligibility.domain.ParoleEligibility as eligibility
+		  left join eligibility.appearanceCategory as appearanceCategory
+	 	  left join eligibility.status as status
+	  	  left join status.reason as reason
+		where eligibility.offender = :offender
+	]]></query>
+</hibernate-mapping>

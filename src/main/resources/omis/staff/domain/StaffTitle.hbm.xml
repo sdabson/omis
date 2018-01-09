@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.staff.domain">
+	<class	entity-name="omis.staff.domain.StaffTitle"
+			proxy="omis.staff.domain.StaffTitle"
+			name="omis.staff.domain.impl.StaffTitleImpl"
+			table="`STAFF_TITLE`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STAFF_TITLE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="string" not-null="true" unique="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="short" not-null="true" column="`SORT_ORDER`"/>
+	</class>
+	<query name="findAllStaffTitles"><![CDATA[
+		select staffTitle
+		from omis.staff.domain.StaffTitle staffTitle
+		order by staffTitle.sortOrder, staffTitle.name
+	]]></query>
+	<query name="findMaxStaffTitleSortOrder">
+		select coalesce(max(staffTitle.sortOrder), 0)
+		from omis.staff.domain.StaffTitle staffTitle
+	</query>
+	<query name="findStaffTitle">
+		select staffTitle
+		from omis.staff.domain.StaffTitle staffTitle
+		where staffTitle.name = :name
+	</query>
+	<query name="findStaffTitleExcluding">
+		select staffTitle
+		from omis.staff.domain.StaffTitle staffTitle
+		where staffTitle.name = :name
+		  and staffTitle not in (:excludedStaffTitles)
+	</query>
+</hibernate-mapping>

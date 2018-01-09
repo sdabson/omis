@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="paroleBoardConditionService" class="omis.paroleboardcondition.service.impl.ParoleBoardConditionServiceImpl">
+			<constructor-arg name="paroleBoardAgreementDelegate" ref="paroleBoardAgreementDelegate" />
+			<constructor-arg name="paroleBoardAgreementCategoryDelegate" ref="paroleBoardAgreementCategoryDelegate" />
+			<constructor-arg name="agreementNoteDelegate" ref="agreementNoteDelegate" />
+			<constructor-arg name="agreementDelegate" ref="agreementDelegate" />
+			<constructor-arg name="agreementAssociableDocumentDelegate" ref="agreementAssociableDocumentDelegate" />
+			<constructor-arg name="conditionDelegate" ref="conditionDelegate" />
+			<constructor-arg name="conditionClauseDelegate" ref="conditionClauseDelegate" />
+			<constructor-arg name="conditionGroupDelegate" ref="conditionGroupDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<!-- ParoleBoardAgreement Beans -->
+		
+		<bean id="paroleBoardAgreementDao" class="omis.paroleboardcondition.dao.impl.hibernate.ParoleBoardAgreementDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreement" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementDelegate" class="omis.paroleboardcondition.service.delegate.ParoleBoardAgreementDelegate">
+			<constructor-arg name="paroleBoardAgreementDao" ref="paroleBoardAgreementDao" />
+			<constructor-arg name="paroleBoardAgreementInstanceFactory" ref="paroleBoardAgreementInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreement" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="paroleBoardAgreementDao" />
+			<constructor-arg name="entityName"
+				value="omis.paroleboardcondition.domain.ParoleBoardAgreement" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- ParoleBoardAgreementCategory Beans -->
+		
+		<bean id="paroleBoardAgreementCategoryDao" class="omis.paroleboardcondition.dao.impl.hibernate.ParoleBoardAgreementCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementCategoryDelegate" class="omis.paroleboardcondition.service.delegate.ParoleBoardAgreementCategoryDelegate">
+			<constructor-arg name="paroleBoardAgreementCategoryDao" ref="paroleBoardAgreementCategoryDao" />
+			<constructor-arg name="paroleBoardAgreementCategoryInstanceFactory" ref="paroleBoardAgreementCategoryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="paroleBoardAgreementCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- ParoleBoardAgreementCondition Beans -->
+		
+		<bean id="paroleBoardAgreementConditionDao" class="omis.paroleboardcondition.dao.impl.hibernate.ParoleBoardAgreementConditionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreementCondition" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementConditionDelegate" class="omis.paroleboardcondition.service.delegate.ParoleBoardAgreementConditionDelegate">
+			<constructor-arg name="paroleBoardAgreementConditionDao" ref="paroleBoardAgreementConditionDao" />
+			<constructor-arg name="paroleBoardAgreementConditionInstanceFactory" ref="paroleBoardAgreementConditionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementConditionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.paroleboardcondition.domain.ParoleBoardAgreementCondition" />
+		</bean>
+		
+		<bean id="paroleBoardAgreementConditionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="paroleBoardAgreementConditionDao" />
+			<constructor-arg name="entityName"
+				value="omis.paroleboardcondition.domain.ParoleBoardAgreementCondition" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- Document Beans -->
+  
+		<bean id="paroleBoardConditionDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="paroleBoardConditionDocumentLocator"/>
+		</bean>
+	
+		<bean id="paroleBoardConditionDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="paroleBoardConditionDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+	
+		<bean id="paroleBoardConditionDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\ParoleBoardConditionDocuments"/>
+		</bean>
+		
+		<bean id="paroleBoardConditionDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="paroleBoardConditionDocumentLocator"/>
+		</bean>
+		
+</beans>

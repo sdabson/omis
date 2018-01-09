@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Queries to summarize program placements.
+  -
+  - Author: Stephen Abson 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.program.domain">
+	<query name="summarizeProgramPlacementsByOffender"><![CDATA[
+		select new omis.program.report.ProgramPlacementSummary(
+		    programPlacement.id,
+		    offenderName.lastName,
+		    offenderName.firstName,
+		    offenderName.middleName,
+		    offenderName.suffix,
+		    offender.offenderNumber,
+		    supervisoryOrganization.name,
+		    correctionalStatus.name,
+		    case when locationTerm is not null then true else false end,
+		    locationOrganization.name,
+		    program.name,
+		    programPlacement.dateRange.startDate,
+		    programPlacement.dateRange.endDate,
+		    cast(:effectiveDate as timestamp)
+		  )
+		  from omis.program.domain.ProgramPlacement programPlacement
+		    inner join programPlacement.placementTerm placementTerm
+		    inner join placementTerm.supervisoryOrganizationTerm
+		        supervisoryOrganizationTerm
+		    inner join supervisoryOrganizationTerm.supervisoryOrganization
+		        supervisoryOrganization
+		    inner join placementTerm.correctionalStatusTerm
+		        correctionalStatusTerm
+		    inner join correctionalStatusTerm.correctionalStatus
+		        correctionalStatus
+		    inner join programPlacement.offender offender
+		    inner join offender.name offenderName
+		    inner join programPlacement.program program
+		    left outer join programPlacement.locationTerm locationTerm
+		    left outer join locationTerm.location location
+		    left outer join location.organization locationOrganization
+		  where offender = :offender
+		  order by offenderName.lastName, offender.offenderNumber,
+		    programPlacement.dateRange.startDate, program.name
+	]]></query>
+</hibernate-mapping>

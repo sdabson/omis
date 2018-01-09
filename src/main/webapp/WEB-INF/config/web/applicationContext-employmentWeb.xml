@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  
+  <bean id="employmentFormValidator" class="omis.employment.web.validator.EmploymentFormValidator">
+  	<constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+  </bean>  
+  
+  <bean id="changeEmployerFormValidator" class="omis.employment.web.validator.ChangeEmployerFormValidator">
+  	<constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+  </bean>
+  
+  <bean id="employmentFormNoEmployerValidator" class="omis.employment.web.validator.EmploymentFormNoEmployerValidator">
+  </bean>
+  
+  <bean id="employerSearchFormValidator" class="omis.employment.web.validator.EmployerSearchFormValidator"/>
+  
+  <!-- Profile Items -->
+  <bean id="employmentProfileItem"
+  	class="omis.employment.web.profile.EmploymentProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>EMPLOYMENT_TERM_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/employment/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="employment"/>
+  	<constructor-arg name="profileItemRegistry" ref="caseManagementProfileItemRegistry"/>
+  	<constructor-arg name="employmentProfileItemReportService" ref="employmentProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${employmentProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Summary Item -->
+	<bean id="employmentSummaryItem"
+    	class="omis.employment.web.summary.EmploymentSummaryItem">
+    	<constructor-arg name="employmentSummaryItemReportService" ref="employmentSummaryItemReportService"/>
+    	<constructor-arg name="summaryItemRegistry" ref="communitySupervisionSummaryItemRegistry"/>
+    	<constructor-arg name="includedPageName" value="/WEB-INF/views/employment/summary/includes/summaryItem.jsp"/>
+    	<constructor-arg name="order" value="3"/>
+    	<constructor-arg name="enabled" value="${employmentSummaryItemEnabled}"/>
+    </bean>
+
+  <!-- Web controller packages -->
+  
+  <context:component-scan base-package="omis.employment.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="employmentControllerOperation" expression="execution(* omis.employment.web.controller.EmploymentController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="employmentControllerOperation"/>
+  </aop:config>
+  <aop:config>
+      <aop:pointcut id="employerSearchControllerOperation" expression="execution(* omis.employment.web.controller.EmployerSearchController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="employerSearchControllerOperation"/>
+  </aop:config>
+  <aop:config>
+		<aop:pointcut id="employerControllerOperation"
+			expression="execution(* omis.employment.web.controller.EmployerController.*(..))" />
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="employerControllerOperation" />
+	</aop:config>
+</beans>

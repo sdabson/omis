@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Instance factories -->
+  
+  <bean id="religiousPreferenceInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousPreference"/>
+  </bean>
+  
+  <bean id="religiousAccommodationAuthorizationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousAccommodationAuthorization"/>
+  </bean>
+  
+  <bean id="religiousAccommodationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousAccommodation"/>
+  </bean>
+  
+  <bean id="religionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.Religion"/>
+  </bean>
+  
+  <bean id="religionGroupInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligionGroup"/>
+  </bean>
+
+  <!-- Services -->
+  
+  <bean id="religiousPreferenceService"
+        class="omis.religion.service.impl.ReligiousPreferenceServiceImpl">
+    <constructor-arg name="religiousPreferenceDelegate" ref="religiousPreferenceDelegate"/>
+    <constructor-arg name="religionDelegate" ref="religionDelegate"/>
+    <constructor-arg name="religiousAccommodationDelegate" ref="religiousAccommodationDelegate"/>
+    <constructor-arg name="religiousAccommodationAuthorizationDelegate" ref="religiousAccommodationAuthorizationDelegate"/>
+    <constructor-arg name="verificationMethodDelegate" ref="verificationMethodDelegate"/>
+  </bean>
+  
+  <bean id="religionProfileItemReportService"
+  	class="omis.religion.report.impl.hibernate.ReligionProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Report services. -->
+  
+  <bean id="religiousPreferenceReportService"
+        class="omis.religion.report.impl.hibernate.ReligiousPreferenceReportServiceHibernateImpl">
+  	<constructor-arg name="religiousPreferenceDao" ref="religiousPreferenceDao"/>
+  	<constructor-arg name="religiousAccommodationAuthorizationDao" ref="religiousAccommodationAuthorizationDao"/>
+  	<constructor-arg name="religiousAccommodationDao" ref="religiousAccommodationDao"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="religionDao"
+        class="omis.religion.dao.impl.hibernate.ReligionDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.Religion"/>
+  </bean>
+
+  <bean id="religiousAccommodationDao"
+        class="omis.religion.dao.impl.hibernate.ReligiousAccommodationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousAccommodation"/>
+  </bean>
+
+  <bean id="religiousPreferenceDao"
+        class="omis.religion.dao.impl.hibernate.ReligiousPreferenceDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousPreference"/>
+  </bean>
+  
+  <bean id="religiousAccommodationAuthorizationDao"
+        class="omis.religion.dao.impl.hibernate.ReligiousAccommodationAuthorizationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousAccommodationAuthorization"/>
+  </bean>
+  
+  <bean id="religionGroupDao"
+        class="omis.religion.dao.impl.hibernate.ReligionGroupDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligionGroup"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="religionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="religionDao"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.Religion"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="religiousPreferencePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="religiousPreferenceDao"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousPreference"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="religiousAccommodationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="religiousAccommodationDao"/>
+    <constructor-arg name="entityName" value="omis.religion.domain.ReligiousAccommodation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <!-- Delegates -->
+  
+	<bean id="religionDelegate" class="omis.religion.service.delegate.ReligionDelegate">
+		<constructor-arg name="religionDao" ref="religionDao" />
+		<constructor-arg name="religionInstanceFactory" ref="religionInstanceFactory" />
+	</bean>
+	
+	<bean id="religiousPreferenceDelegate" class="omis.religion.service.delegate.ReligiousPreferenceDelegate">
+		<constructor-arg name="religiousPreferenceDao" ref="religiousPreferenceDao" />
+		<constructor-arg name="religiousPreferenceInstanceFactory" ref="religiousPreferenceInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="religiousAccommodationAuthorizationDelegate" class="omis.religion.service.delegate.ReligiousAccommodationAuthorizationDelegate">
+		<constructor-arg name="religiousAccommodationAuthorizationDao" ref="religiousAccommodationAuthorizationDao" />
+		<constructor-arg name="religiousAccommodationAuthorizationInstanceFactory" ref="religiousAccommodationAuthorizationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="religiousAccommodationDelegate" class="omis.religion.service.delegate.ReligiousAccommodationDelegate">
+		<constructor-arg name="religiousAccommodationDao" ref="religiousAccommodationDao" />
+		<constructor-arg name="religiousAccommodationInstanceFactory" ref="religiousAccommodationInstanceFactory" />
+	</bean>
+	
+	<bean id="religionGroupDelegate" class="omis.religion.service.delegate.ReligionGroupDelegate">
+		<constructor-arg name="religionGroupDao" ref="religionGroupDao" />
+		<constructor-arg name="religionGroupInstanceFactory" ref="religionGroupInstanceFactory" />
+	</bean>
+</beans>

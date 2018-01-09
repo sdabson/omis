@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.incident.report">
+	<query name="summarizeJurisdictions"><![CDATA[
+		select new omis.incident.report.JurisdictionSummary(
+		jurisdiction.id,
+		organization.name,
+		sum(case
+			 		when
+			 			statement is not null
+			 		then
+			 			0
+			 		else
+			 			0
+			 	end),
+		sum(case
+			 		when
+			 			statement is not null
+			 		then
+			 			1
+			 		else
+			 			0
+			 	end)
+		)
+		from
+			omis.incident.domain.IncidentStatement statement
+			right outer join statement.jurisdiction jurisdiction
+			inner join jurisdiction.organization organization
+		group by
+			jurisdiction.id, organization.name
+		order by
+			organization.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="hearingService" class="omis.hearing.service.impl.HearingServiceImpl">
+			<constructor-arg name="hearingDelegate" ref="hearingDelegate" />
+			<constructor-arg name="hearingNoteDelegate" ref="hearingNoteDelegate" />
+			<constructor-arg name="staffAttendanceDelegate" ref="staffAttendanceDelegate" />
+			<constructor-arg name="hearingStatusDelegate" ref="hearingStatusDelegate" />
+			<constructor-arg name="infractionDelegate" ref="infractionDelegate" />
+			<constructor-arg name="imposedSanctionDelegate" ref="imposedSanctionDelegate" />
+			<constructor-arg name="violationEventDelegate" ref="violationEventDelegate" />
+			<constructor-arg name="conditionViolationDelegate" ref="conditionViolationDelegate" />
+			<constructor-arg name="disciplinaryCodeViolationDelegate" ref="disciplinaryCodeViolationDelegate" />
+			<constructor-arg name="jailDelegate" ref="jailDelegate" />
+			<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
+			<constructor-arg name="locationDelegate" ref="locationDelegate" />
+			<constructor-arg name="treatmentCenterDao" ref="treatmentCenterDao" />
+			<constructor-arg name="preReleaseCenterDao" ref="preReleaseCenterDao" />
+			<constructor-arg name="communitySupervisionOfficeDao" ref="communitySupervisionOfficeDao" />
+			<constructor-arg name="supervisoryOrganizationDao" ref="supervisoryOrganizationDao" />
+		</bean>
+		
+		<bean id="resolutionService" class="omis.hearing.service.impl.ResolutionServiceImpl">
+			<constructor-arg name="hearingStatusDelegate" ref="hearingStatusDelegate" />
+			<constructor-arg name="infractionDelegate" ref="infractionDelegate" />
+			<constructor-arg name="imposedSanctionDelegate" ref="imposedSanctionDelegate" />
+			<constructor-arg name="conditionViolationDelegate" ref="conditionViolationDelegate" />
+			<constructor-arg name="disciplinaryCodeViolationDelegate" ref="disciplinaryCodeViolationDelegate" />
+		</bean>
+		
+		<bean id="hearingProfileItemService" class="omis.hearing.report.impl.hibernate.HearingProfileItemServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/> 
+		</bean>
+		
+		<bean id="violationProfileItemService" class="omis.hearing.report.impl.hibernate.ViolationProfileItemServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/> 
+		</bean>
+		
+		<!-- DAO -->
+		
+		<bean id="hearingDao" class="omis.hearing.dao.impl.hibernate.HearingDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.Hearing" />
+		</bean>
+		
+		<bean id="hearingNoteDao" class="omis.hearing.dao.impl.hibernate.HearingNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.HearingNote" />
+		</bean>
+		
+		<bean id="staffAttendanceDao" class="omis.hearing.dao.impl.hibernate.StaffAttendanceDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.StaffAttendance" />
+		</bean>
+		
+		<bean id="hearingStatusDao" class="omis.hearing.dao.impl.hibernate.HearingStatusDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.HearingStatus" />
+		</bean>
+		
+		<bean id="infractionDao" class="omis.hearing.dao.impl.hibernate.InfractionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.Infraction" />
+		</bean>
+		
+		<bean id="imposedSanctionDao" class="omis.hearing.dao.impl.hibernate.ImposedSanctionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.ImposedSanction" />
+		</bean>
+		
+		<!-- Delegate -->
+		
+		<bean id="hearingDelegate" class="omis.hearing.service.delegate.HearingDelegate">
+			<constructor-arg name="hearingDao" ref="hearingDao" />
+			<constructor-arg name="hearingInstanceFactory" ref="hearingInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="hearingNoteDelegate" class="omis.hearing.service.delegate.HearingNoteDelegate">
+			<constructor-arg name="hearingNoteDao" ref="hearingNoteDao" />
+			<constructor-arg name="hearingNoteInstanceFactory" ref="hearingNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="staffAttendanceDelegate" class="omis.hearing.service.delegate.StaffAttendanceDelegate">
+			<constructor-arg name="staffAttendanceDao" ref="staffAttendanceDao" />
+			<constructor-arg name="staffAttendanceInstanceFactory" ref="staffAttendanceInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="hearingStatusDelegate" class="omis.hearing.service.delegate.HearingStatusDelegate">
+			<constructor-arg name="hearingStatusDao" ref="hearingStatusDao" />
+			<constructor-arg name="hearingStatusInstanceFactory" ref="hearingStatusInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="infractionDelegate" class="omis.hearing.service.delegate.InfractionDelegate">
+			<constructor-arg name="infractionDao" ref="infractionDao" />
+			<constructor-arg name="infractionInstanceFactory" ref="infractionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="imposedSanctionDelegate" class="omis.hearing.service.delegate.ImposedSanctionDelegate">
+			<constructor-arg name="imposedSanctionDao" ref="imposedSanctionDao" />
+			<constructor-arg name="imposedSanctionInstanceFactory" ref="imposedSanctionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<!-- Instance Factory -->
+		
+		<bean id="hearingInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.Hearing" />
+		</bean>
+		
+		<bean id="hearingNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.HearingNote" />
+		</bean>
+		
+		<bean id="staffAttendanceInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.StaffAttendance" />
+		</bean>
+		
+		<bean id="hearingStatusInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.HearingStatus" />
+		</bean>
+		
+		<bean id="infractionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.Infraction" />
+		</bean>
+		
+		<bean id="imposedSanctionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.ImposedSanction" />
+		</bean>
+		
+		<!-- Property Editor Factory -->
+		
+		<bean id="hearingPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.Hearing" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="hearingNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.HearingNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="staffAttendancePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="staffAttendanceDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.StaffAttendance" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="hearingStatusPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingStatusDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.HearingStatus" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="infractionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="infractionDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.Infraction" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="imposedSanctionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="imposedSanctionDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.ImposedSanction" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

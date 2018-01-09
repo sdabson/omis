@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Application tags.
+  -
+  - Author: Stephen Abspm
+  - Version: 0.1.0 (Oct 30, 2013)
+  - Since: OMIS 3.0 
+  -->
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+				http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+		version="2.0">
+	<tlib-version>1.0</tlib-version>
+	<short-name>omis</short-name>
+	<tag>
+		<description>
+			Checks whether a variable is of a specified type.
+		</description>
+		<name>instanceof</name>
+		<tag-class>omis.web.taglib.InstanceofTag</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<name>var</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>className</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<description>
+			Template for a html report link.
+		</description>
+		<name>report</name>
+		<tag-class>omis.report.web.taglib.ReportTagImpl</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<name>decorate</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>reportPath</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>className</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>title</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<tag>
+		<description>
+			Template for a html report link.
+		</description>
+		<name>reportPro</name>
+		<tag-class>omis.report.web.taglib.ReportProTagImpl</tag-class>
+		<body-content>scriptless</body-content>
+		<attribute>
+			<name>decorate</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>reportPath</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>className</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>title</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+	<function>
+		<name>isInstanceOf</name>
+		<function-class>omis.web.function.InstanceofFunction</function-class>
+		<function-signature>boolean isInstanceof(java.lang.Object, java.lang.String)</function-signature>
+	</function>
+	<function>
+		<name>contains</name>
+		<function-class>omis.web.function.ContainsFunction</function-class>
+		<function-signature>boolean contains(java.util.Collection, java.lang.Object)</function-signature>
+	</function>
+	<function>
+		<name>isDateRangeActive</name>
+		<function-class>omis.web.function.DateRangeActiveFunction</function-class>
+		<function-signature>boolean isDateRangeActive(omis.datatype.DateRange, java.util.Date)</function-signature>
+	</function>
+	<function>
+		<name>getSystemProperty</name>
+		<function-class>omis.web.function.SystemPropertyFunction</function-class>
+		<function-signature>String getSystemProperty(java.lang.String)</function-signature>
+	</function>
+</taglib>

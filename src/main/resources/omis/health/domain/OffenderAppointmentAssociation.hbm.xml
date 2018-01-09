@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<typedef name="offenderAppointmentAction" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.OffenderAppointmentAction</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.health.domain.OffenderAppointmentAssociation"
+		proxy="omis.health.domain.OffenderAppointmentAssociation"
+		name="omis.health.domain.impl.OffenderAppointmentAssociationImpl"
+		table="`OFFENDER_APPOINTMENT_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`OFFENDER_APPOINTMENT_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<many-to-one name="appointment" column="`APPOINTMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.HealthAppointment" unique="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findOffenderAppointmentAssociationByOffenderAndAppointment"><![CDATA[
+		from omis.health.domain.OffenderAppointmentAssociation oaa
+	   where oaa.offender = :offender
+	     and oaa.appointment = :appointment
+	]]></query>
+	<query name="findOffenderAppointmentAssociationByOffenderAndAppointmentExcluding"><![CDATA[
+		from omis.health.domain.OffenderAppointmentAssociation oaa
+	   where oaa.offender = :offender
+	     and oaa.appointment = :appointment
+	     and oaa not in (:exclude)
+	]]></query>
+</hibernate-mapping>

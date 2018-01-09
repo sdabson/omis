@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument"
+			proxy="omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument"
+			name="omis.presentenceinvestigation.domain.impl.OffenseSectionSummaryAssociableDocumentImpl"
+			table="`OFFNSE_SCTN_SMMRY_ASSOC_DC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`OFFNSE_SCTN_SMMRY_ASSOC_DC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offenseSectionSummary" column="`OFFENSE_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.OffenseSectionSummary" not-null="true" />
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findOffenseSectionSummaryAssociableDocument"><![CDATA[
+		select offenseSectionSummaryAssociableDocument
+		from
+			omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument offenseSectionSummaryAssociableDocument
+		where
+			offenseSectionSummaryAssociableDocument.offenseSectionSummary = :offenseSectionSummary
+		and
+			offenseSectionSummaryAssociableDocument.document = :document
+	]]></query>
+	<query name="findOffenseSectionSummaryAssociableDocumentExcluding"><![CDATA[
+		select offenseSectionSummaryAssociableDocument
+		from
+			omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument offenseSectionSummaryAssociableDocument
+		where
+			offenseSectionSummaryAssociableDocument.offenseSectionSummary = :offenseSectionSummary
+		and
+			offenseSectionSummaryAssociableDocument.document = :document
+		and
+			offenseSectionSummaryAssociableDocument != :offenseSectionSummaryAssociableDocument
+	]]></query>
+	<query name="findOffenseSectionSummaryAssociableDocumentByOffenseSectionSummary"><![CDATA[
+		select offenseSectionSummaryAssociableDocument
+		from
+			omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument offenseSectionSummaryAssociableDocument
+		where
+			offenseSectionSummaryAssociableDocument.offenseSectionSummary = :offenseSectionSummary
+	]]></query>
+</hibernate-mapping>

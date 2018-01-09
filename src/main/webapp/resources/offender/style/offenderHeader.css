@@ -1,0 +1,533 @@
+/*
+ * Offender header.
+ * Author: Stephen Abson
+ * Author: Ryan Johns
+ * Author: Joel Norris
+ * Author: Annie Jacques
+ * Version: 0.1.3 (Sep 19, 2017)
+ * Since: OMIS 3.0
+ */
+
+.noSelect{
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/* Header container. */
+div#offenderHeader {
+	border: 0px solid;
+	padding: 0px;
+	margin: 4px 0px 4px 0px;
+	position: relative;
+}
+
+/* Clear fix header, for floated absolute or relative content. */
+div#offenderHeader:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+
+
+/* Floated container contents. */
+div#offenderHeaderDetails {
+	padding: 4px;
+	padding-bottom: 0px;
+	top: 0px;
+	bottom: 0px;
+}
+
+div.offenderHeaderPhoto {
+	float:left;
+	width:180px;
+	height:120px;
+	margin-left: 4px;
+	margin-top: 4px;
+}
+
+
+#offenderHeaderPhotoDetails{
+	clear: both;
+}
+
+div.offenderHeaderPhoto img {
+	border:1px;
+	border-style:solid;
+	width: 180px;
+	height: 120px;
+	display:inline-block;
+}
+
+div#offenderHeaderDetails {
+}
+
+/* Header section. */
+div.offenderHeaderDetailsSection {
+
+}
+
+div.itemsContainer{
+	height: 200px;
+}
+
+#badgeItemsContainer{
+	margin-left: 185px;
+}
+
+/* Header Cell. */
+div.headerCell {
+	margin-top: 4px;
+	margin-left: 4px;
+}
+
+/* Header non-Button Links */
+div.item a, .profileDetailsWrapper a{
+	border-bottom: 1px dashed #999;
+	color: inherit;
+}
+
+div.item a:hover, .profileDetailsWrapper a:hover{
+	opacity: .7;
+	text-decoration: none;
+}
+
+/* Summary Item Field label. */
+span.offenderHeaderFieldLabel {
+	font-weight: bold;
+}
+span.offenderHeaderFieldLabel:after {
+	content: ": ";
+}
+
+/* Field value. */
+span.offenderHeaderFieldValue {
+	white-space: normal;
+}
+
+span.offenderNameValue{
+	font-size: large;
+}
+
+/* Offender header toolbar. */
+ul#offenderHeaderNavigationToolbar {
+	clear: both;
+	padding: 4px;
+	margin: 0px;
+	list-style-type: none;
+}
+
+#offenderProfileLink:before {
+	margin-right: 4px;
+	vertical-align: top;
+}
+
+.offenderHeaderContainer {
+	/* border-radius: 5px; */
+}
+
+#offenderHeaderBadge{
+	width: 420px;
+	height: 185px;
+	float: left;
+}
+#offenderHeaderBadge div.item{
+	width: calc(420px - 10px);
+	margin: 5px;
+}
+
+#scrollWrapper {
+	height: 185px;
+	margin-left: 430px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* Summary Navigational Arrows */
+.arrow {
+	transition: .5s ease;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	opacity: 0;
+	position: absolute;
+	top: 30%;
+	z-index: 9999;
+}
+
+#leftArrow{
+	margin-left: 430px;
+	left: 1%;
+	border-width: 50px 30px 50px 0;
+	border-color: transparent #7c8085 transparent transparent;
+}
+
+#rightArrow{
+	left: 97%;
+	border-width: 50px 0 50px 30px;
+	border-color: transparent transparent transparent #7c8085;
+}
+
+.arrow:hover{
+	cursor: pointer;
+}
+
+.arrow:active {
+	transform:scale(0.75,.75);
+}
+
+#scrollWrapper:hover #rightArrow, #scrollWrapper:hover #leftArrow{
+	opacity: .3;
+}
+
+/* Dot Navigational Wrapper */
+#scroll {
+	position: absolute;
+	top: calc(185px - 10px);
+	left: 0;
+	right: 0;
+	margin-left: inherit;
+	text-align: center;
+}
+
+/* Summary Panes Container */
+#itemWrapper {
+	height: inherit;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	padding-bottom: 20px;
+	padding-left: 5px;
+	padding-top: 5px;
+	margin-right: 5px;
+}
+
+/* This is necessary for space to be added to the end of the Summary panes,
+it ensures that the last pane can scroll to the far left as needed */
+#space{
+	width: 2000px;
+	display: inline-block;
+}
+
+/* Navigational Dots */
+.scrollDot {
+	border: 2px solid #FFF;
+	border-radius: 50%;
+	width: 6px;
+	height: 6px;
+	margin: 3px;
+	display: inline-block;
+	opacity: .7;
+}
+
+.scrollDot:hover {
+	background: #FFF;
+	opacity: .7;
+	cursor: pointer;
+}
+
+#scroll .activeScrollDot:hover {
+	background: #FFF;
+	opacity: 1;
+}
+
+.activeScrollDot {
+	background-color: #FFF;
+	opacity: 1;
+}
+
+/* Summary Container */
+.item {
+	height: calc(185px - 17px);
+	width: 320px;
+	display: inline-block;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* Scrollable Summary Container */
+.scrollItem{
+	position: relative;
+}
+
+.itemTitle{
+	margin-right: 4px;
+	color: #555;
+	font-size: 7pt;
+	font-style: italic;
+	float:right;
+	position: absolute;
+	bottom:0;
+	right:0;
+}
+
+
+/* Profile Navigation Container */
+
+#fullNavBarWrapper{
+	width: auto;
+	height: 27px;
+	overflow: hidden;
+	position: relative;
+	white-space: nowrap;
+}
+
+#navBarWrapper{
+	width: auto;
+	margin-right: 45px;
+	margin-left: 50px;
+	height: inherit;
+	overflow: hidden;
+	position: relative;
+	white-space: nowrap;
+}
+
+#navBar {
+	position: absolute;
+	text-align: center;
+	padding-bottom: 20px;
+	overflow-x: scroll;
+	width: 100%;
+}
+
+
+#navLeftArrow {
+	left:35px;
+	border-width: 7.5px 10px 7.5px 0;
+	border-color: transparent #7c8085 transparent transparent;
+}
+#navRightArrow{
+	right: 15px;
+	border-width: 7.5px 0 7.5px 10px;
+	border-color: transparent transparent transparent #7c8085;
+}
+
+/* Profile Navigation Item */
+.navBarItem {
+	display: inline-block;
+	margin-bottom: 4px;
+	width: 120px;
+	padding: 4px;
+	position: relative;
+}
+
+
+@media only screen and (max-width:1200px ) {
+	#navLeftArrow, #navRightArrow{
+		opacity: 1;
+	}
+}
+
+.navBarItem:not(.activeNavItem ):hover {
+	opacity: .7;
+}
+
+.navBarItem:hover {
+	cursor: pointer;
+}
+
+.navBarItem, .navContent {
+	margin-left: 4px;
+	/* border-radius: 5px; */
+}
+
+.activeNavItem:after {
+	content: '';
+	height: 5px;
+	background: inherit;
+	display: block;
+}
+
+.activeNavItem {
+	filter: saturate(130%);
+	margin-bottom: 0px;
+	/* border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px; */
+}
+
+/* Profiles Content Containers */
+.navContentWrapper {
+	width: inherit;
+	padding-right: 8px;
+	position: relative;
+	margin-left: 4px;
+	margin-right: 4px;
+} 
+
+/* Profile Content Containers */
+.navContent {
+	box-sizing: border-box;
+    overflow: hidden;
+	height: 0;
+    transform:scaleY(0);
+	filter: saturate(130%);
+}
+
+.navContentShow {
+	height: auto;
+	width: 100%;
+	margin-left: 4px;
+	margin-right: 4px;
+	left: -4px;
+	/* transition:transform 0.3s ease;
+	transform-origin:top;  */
+    transform:scaleY(1);
+	display: inline-block;
+	padding: 4px;
+	position: absolute;
+}
+
+/* Profile Items Container */
+div.profileContainer {
+	display: inline-block;
+	vertical-align: top;
+	margin: 3px;
+	border: 1px solid #000;
+}
+
+
+/* Profile Items Container */
+div.profileItems {
+	display: inline-block;
+	margin: 0 auto;
+	float: left;
+	width: 41%;
+}
+
+/* Profile Item Container */
+div.profileItemContainer {
+	margin-left: 5px;
+	/* border-radius: 5px; */
+	display: inline-block;
+	margin-bottom: 4px;
+	text-align: center;
+	height: 20px;
+}
+
+div.profileItemContainer:hover {
+	opacity: .7;
+}
+
+/* Profile Item (Button Links) */
+div.profileItem {
+	display: inline-block;
+	vertical-align: top;
+	width: 100%;
+	overflow: auto;
+	padding: 2px;
+}
+
+
+div.profileItem a {
+	width: 90%;
+	margin: 1px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	text-decoration: none;
+	color: inherit;
+}
+
+div.profileItem:not(.inactive ) a:hover {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-right: 4px;
+	padding-left: 4px;
+	/* The following is specifically to override the styling in colors.jsp, 
+	I should either change class names in this and the new profileHeader (which would involve 
+	changing the profileItem.jsp's themselves!) or remove the styling from colors.jsp.
+	*/
+	border: 0;
+	margin: 2px;
+	background-color: inherit;
+}
+
+/* Profile Action Menu */
+div.profileActionMenuItemContainer{
+	float: left;
+}
+
+/* Profile Details Container */
+div.profileDetailsWrapper{
+	margin-left: 45%;
+}
+
+div.profileDetailsWrapper span{
+	display: inline-block;
+	margin: 0 auto;
+	float: left;
+	width: 50%;
+}
+
+/* Profile Detail Item */
+div.profileDetailsItem{
+	margin-bottom: 4px;
+}
+
+div.profileDetailsItem h1{
+	font-size: large;
+	color: inherit;
+}
+
+div.profileDetailsItem label{
+	float: left;
+	clear: both;
+	font-weight: bold;
+	margin-right: 20px;
+	width: 40%;
+	text-align: right;
+}
+
+div.profileDetailsItem label + span{
+	display: -ms-grid;
+	display: grid;
+}
+
+div.profileDetailsItem label::after{
+	content: ':';
+}
+
+@media only screen and (min-width:900px) and (max-width:1199px) {
+	
+	div.profileItemContainer, div.profileDetailsWrapper span{
+		width: calc(80% - 10px);
+		margin-left: 10%;
+	}
+	div.profileItem, div.profileDetailsWrapper span{
+		font-size: 1vw;
+	}
+}
+
+@media only screen and (min-width:1200px ) {
+	div.profileItemContainer {
+		width: 45%;
+	}
+	div.profileItem, div.profileDetailsWrapper span{
+		font-size: .75vw;
+	}
+}
+
+@media only screen and (min-width:1600px ) {
+	div.profileItems {
+		width: 30%;
+	}
+	div.profileDetailsWrapper{
+		margin-left: 35%;
+	}
+	div.profileItem, div.profileDetailsWrapper span{
+		font-size: .55vw;
+	}
+	div.profileDetailsWrapper {
+		width: 35%;
+	}
+}
+
+@media only screen and (min-width:2100px ) {
+	div.profileItem, div.profileDetailsWrapper span{
+		font-size: small;
+	}
+}

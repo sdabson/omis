@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="visitationService"
+        	class="omis.visitation.service.impl.VisitationServiceImpl">
+        	<constructor-arg name="visitationAssociationDao" ref="visitationAssociationDao"/>
+        	<constructor-arg name="relationshipDao" ref="relationshipDao"/>
+        	<constructor-arg name="facilityDao" ref="facilityDao"/>
+        	<constructor-arg name="visitationAssociationInstanceFactory" ref="visitationAssociationInstanceFactory"/>
+        	<constructor-arg name="relationshipInstanceFactory" ref="relationshipInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="visitationAssociationService"
+        	class="omis.visitation.service.impl.VisitationAssociationServiceImpl">
+        	<constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+        	<constructor-arg name="visitationAssociationCategoryDelegate" ref="visitationAssociationCategoryDelegate"/>
+        	<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+        	<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+        	<constructor-arg name="cityDelegate" ref="cityDelegate"/>	
+        	<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+        	<constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+        	<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        	<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+        	<constructor-arg name="contactDelegate" ref="contactDelegate"/>
+        	<constructor-arg name="personDelegate" ref="personDelegate"/>
+        	<constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+        </bean>
+        
+        <bean id="facilityVisitationService"
+        	class="omis.visitation.service.impl.FacilityVisitationServiceImpl">
+        	<constructor-arg name="facilityDao" ref="facilityDao"/>
+        	<constructor-arg name="visitDao" ref="visitDao"/>
+        	<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        </bean>
+        
+        <!--  Delegates -->
+    
+    	<bean id="visitationAssociationDelegate"
+    		class="omis.visitation.service.delegate.VisitationAssociationDelegate">
+    		<constructor-arg name="visitationAssociationDao" ref="visitationAssociationDao"/>
+    		<constructor-arg name="visitationAssociationInstanceFactory" ref="visitationAssociationInstanceFactory"/>
+    		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    	</bean>
+    	
+    	<bean id="visitDelegate"
+    		class="omis.visitation.service.delegate.VisitDelegate">
+    		<constructor-arg name="visitDao" ref="visitDao"/>
+    		<constructor-arg name="visitInstanceFactory" ref="visitInstanceFactory"/>
+    		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    	</bean>
+    	
+    	<bean id="visitationAssociationCategoryDelegate"
+    		class="omis.visitation.service.delegate.VisitationAssociationCategoryDelegate">
+    		<constructor-arg name="visitationAssociationCategoryDao" ref="visitationAssociationCategoryDao"/>
+    		<constructor-arg name="visitationAssociationCategoryInstanceFactory" ref="visitationAssociationCategoryInstanceFactory"/>
+    	</bean>
+        
+        <!-- Report Services -->  
+          
+        <bean id="visitationAssociationSummaryReportService"
+        	class="omis.visitation.report.impl.hibernate.VisitationAssociationSummaryReportServiceHibernateImpl">
+        	<property name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="visitSummaryReportService"
+        	class="omis.visitation.report.impl.hibernate.VisitSummaryReportServiceHibernateImpl">
+        	<property name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="visitationProfileItemReportService"
+        	class="omis.visitation.report.impl.hibernate.VisitationProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="facilityVisitationReportService"
+        	class="omis.visitation.report.impl.hibernate.FacilityVisitationReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        	<constructor-arg name="bedPlacementLookupDelegate" ref="bedPlacementLookupDelegate"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="visitationAssociationDao"
+        	class="omis.visitation.dao.impl.hibernate.VisitationAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="visitDao"
+        	class="omis.visitation.dao.impl.hibernate.VisitDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.visitation.domain.Visit"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="visitationAssociationCategoryDao"
+	  		class="omis.visitation.dao.impl.hibernate.VisitationAssociationCategoryDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociationCategory"/>	
+	  	</bean>
+	  	
+  		<!-- Instance factories -->
+  		 
+		<bean id="visitationAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociation"/>
+		</bean>
+		
+		<bean id="visitInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.visitation.domain.Visit"/>
+		</bean>
+		
+		<bean id="visitationAssociationCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociationCategory"/>
+		</bean>
+		
+		<!--Property editor factories -->
+        
+        <bean id="visitationAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="visitationAssociationDao"/>
+		</bean>
+		
+		<bean id="visitPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.visitation.domain.Visit"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="visitDao"/>
+		</bean>
+		
+		<bean id="visitationAssociationCategoryPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="visitationAssociationCategoryDao"/>
+				<constructor-arg name="entityName" value="omis.visitation.domain.VisitationAssociationCategory"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<!-- Profile specific services -->
+		
+		<beans profile="prod">
+			<bean id="visitService"
+        	 	class="omis.visitation.service.impl.VisitServiceImpl">
+        		<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        		<constructor-arg name="locationTermDao" ref="legacyLocationTermDao"/>
+        		<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        	</bean>
+		</beans>
+
+		<beans profile="preprod">
+			<bean id="visitService"
+        	 	class="omis.visitation.service.impl.VisitServiceImpl">
+        		<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        		<constructor-arg name="locationTermDao" ref="legacyLocationTermDao"/>
+        		<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        	</bean>
+		</beans>
+
+		<beans profile="test">
+			<bean id="visitService"
+        	 	class="omis.visitation.service.impl.VisitServiceImpl">
+        		<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        		<constructor-arg name="locationTermDao" ref="legacyLocationTermDao"/>
+        		<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        	</bean>
+		</beans>
+		
+		<beans profile="standalone">
+			<bean id="visitService"
+        	 	class="omis.visitation.service.impl.VisitServiceImpl">
+        		<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        		<constructor-arg name="locationTermDao" ref="locationTermDao"/>
+        		<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        	</bean>
+		</beans>
+		
+		<beans profile="dev">
+			<bean id="visitService"
+        	 	class="omis.visitation.service.impl.VisitServiceImpl">
+        		<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+        		<constructor-arg name="locationTermDao" ref="locationTermDao"/>
+        		<constructor-arg name="visitDelegate" ref="visitDelegate"/>
+        	</bean>
+		</beans>
+		
+</beans>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.domain">
+	<class entity-name="omis.adaaccommodation.domain.Authorization"
+		proxy="omis.adaaccommodation.domain.Authorization"
+		name="omis.adaaccommodation.domain.impl.AuthorizationImpl"
+		table="`ADA_ACCMDTN_AUTH`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADA_ACCMDTN_AUTH_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="authorizationSource" column="`AUTHORIZATION_SOURCE_CAT_ID`" entity-name="omis.adaaccommodation.domain.AuthorizationSourceCategory" not-null="true"/>
+		<many-to-one name="accommodation" column="`ACCOMMODATION_ID`" entity-name="omis.adaaccommodation.domain.Accommodation" not-null="true"/>
+		<property name="comments" column="`COMMENTS`" not-null="false" type="string"/>
+		<component name="authorizationSignature" class="omis.audit.domain.AuthorizationSignature">
+			<property name="date" type="java.util.Date" not-null="true" column="`AUTHORIZATION_DATE`"/>
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`AUTHORIZATION_USER_ID`"/>
+		</component>
+		<component name="authorizationTerm">
+			<property name="startDate" column="`START_DATE`" not-null="false" type="java.util.Date"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findAuthorization"><![CDATA[
+		select authorization
+		from
+			omis.adaaccommodation.domain.Authorization authorization
+		where
+			authorization.accommodation = :accommodation
+			and authorization.authorizationSignature.date = :authorizationDate
+			and authorization.authorizationSignature.userAccount = :authorizationUser
+			and authorization.authorizationSource = :authorizationSourceCategory	
+			and (authorization.authorizationTerm.startDate = :startDate
+				or 
+				(authorization.authorizationTerm.startDate is null and :startDate is null))
+			and (authorization.authorizationTerm.endDate = :endDate
+				or 
+				(authorization.authorizationTerm.endDate is null and :endDate is null))	
+	]]></query>
+	<query name="findAuthorizationExcluding"><![CDATA[
+		select authorization
+		from
+			omis.adaaccommodation.domain.Authorization authorization
+		where
+			authorization.accommodation = :accommodation
+			and authorization.authorizationSignature.date = :authorizationDate
+			and authorization.authorizationSignature.userAccount = :authorizationUser
+			and authorization.authorizationSource = :authorizationSourceCategory	
+			and (authorization.authorizationTerm.startDate = :startDate
+				or 
+				(authorization.authorizationTerm.startDate is null and :startDate is null))
+			and (authorization.authorizationTerm.endDate = :endDate
+				or 
+				(authorization.authorizationTerm.endDate is null and :endDate is null))	
+			and
+			authorization != :authorization
+	]]></query>
+	<query name="findAuthorizationsByAccommodation"><![CDATA[
+		select authorization
+		from 
+			omis.adaaccommodation.domain.Authorization authorization
+		where
+			authorization.accommodation = :accommodation
+	]]></query>
+</hibernate-mapping>

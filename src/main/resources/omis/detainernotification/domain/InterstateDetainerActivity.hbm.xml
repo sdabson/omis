@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.InterstateDetainerActivity"
+			proxy="omis.detainernotification.domain.InterstateDetainerActivity"
+			name="omis.detainernotification.domain.impl.InterstateDetainerActivityImpl"
+			table="`INTRSTE_DETAINER_ACTIVITY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`INTRSTE_DETAINER_ACTIVITY_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="interstateAgreementDetainer" column="`INTERSTTE_AGRMNT_DTNR_ID`" entity-name="omis.detainernotification.domain.InterstateAgreementDetainer" not-null="true" />
+			<property name="activityDate" column="`ACTIVITY_DATE`" type="java.util.Date" not-null="false" />
+			<property name="direction" column="`DIRECTION`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.detainernotification.domain.Direction</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="false" />
+			<many-to-one name="category" column="`DETAINR_ACTVTY_CTGRY_ID`" entity-name="omis.detainernotification.domain.DetainerActivityCategory" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findInterstateDetainerActivity"><![CDATA[
+		select interstateDetainerActivity
+		from
+			omis.detainernotification.domain.InterstateDetainerActivity interstateDetainerActivity
+		where
+			interstateDetainerActivity.interstateAgreementDetainer = :interstateAgreementDetainer
+		and
+			activityDate = :activityDate
+		and
+			document = :document
+	]]></query>
+	<query name="findInterstateDetainerActivityExcluding"><![CDATA[
+		select interstateDetainerActivity
+		from
+			omis.detainernotification.domain.InterstateDetainerActivity interstateDetainerActivity
+		where
+			interstateDetainerActivity.interstateAgreementDetainer = :interstateAgreementDetainer
+		and
+			activityDate = :activityDate
+		and
+			document = :document
+		and
+			interstateDetainerActivity != :interstateDetainerActivity
+	]]></query>
+	<query name="findInterstateDetainerActivitiesByInterstateAgreementDetainer"><![CDATA[
+		select interstateDetainerActivity
+		from
+			omis.detainernotification.domain.InterstateDetainerActivity interstateDetainerActivity
+		where
+			interstateDetainerActivity.interstateAgreementDetainer = :interstateAgreementDetainer
+	]]></query>
+</hibernate-mapping>

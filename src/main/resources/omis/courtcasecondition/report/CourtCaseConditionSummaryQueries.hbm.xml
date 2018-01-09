@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+<query name="summarizeCourtCaseAgreement"><![CDATA[
+	select new omis.courtcasecondition.report.CourtCaseAgreementSummary(
+		agreement.id,
+		courtCaseAgreement.id,
+		docket.id,
+		courtCaseAgreement.courtCaseAgreementCategory.name,
+		agreement.dateRange.startDate,
+		docket.value,
+		agreement.dateRange.endDate
+		)
+	from
+		omis.courtcasecondition.domain.CourtCaseAgreement courtCaseAgreement
+	inner join
+		courtCaseAgreement.agreement agreement
+	inner join
+		courtCaseAgreement.docket docket
+	where
+		courtCaseAgreement = :courtCaseAgreement
+]]></query>
+
+<query name="findCourtCaseAgreementSummariesByOffender"><![CDATA[
+	select new omis.courtcasecondition.report.CourtCaseAgreementSummary(
+		agreement.id,
+		courtCaseAgreement.id,
+		docket.id,
+		category.name,
+		agreement.dateRange.startDate,
+		docket.value,
+		agreement.dateRange.endDate
+	)
+	from
+		omis.courtcasecondition.domain.CourtCaseAgreement courtCaseAgreement
+	inner join
+		courtCaseAgreement.agreement agreement
+	inner join
+		courtCaseAgreement.docket docket
+	inner join
+		courtCaseAgreement.courtCaseAgreementCategory category
+	where
+		agreement.offender = :offender
+	and
+		((agreement.dateRange.startDate <= :effectiveDate)
+		and
+			(agreement.dateRange.endDate is null
+		or
+			agreement.dateRange.endDate > :effectiveDate))
+]]></query>
+<query name="findCourtCaseAgreementSummariesByOffenderOnDates"><![CDATA[
+	select new omis.courtcasecondition.report.CourtCaseAgreementSummary(
+		agreement.id,
+		courtCaseAgreement.id,
+		docket.id,
+		category.name,
+		agreement.dateRange.startDate,
+		docket.value,
+		agreement.dateRange.endDate
+	)
+	from
+		omis.courtcasecondition.domain.CourtCaseAgreement courtCaseAgreement
+	inner join
+		courtCaseAgreement.agreement agreement
+	inner join
+		courtCaseAgreement.docket docket
+	inner join
+		courtCaseAgreement.courtCaseAgreementCategory category
+	where
+		agreement.offender = :offender
+	and
+		(agreement.dateRange.startDate <= :endDate or :endDate is null)
+		and
+		(agreement.dateRange.endDate > :startDate or :startDate is null
+		or agreement.dateRange.endDate is null)
+]]></query>
+
+</hibernate-mapping>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Mapping and queries for probation terms.
+  -
+  - Author: Josh Divine
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.probationterm.domain">
+	<class entity-name="omis.probationterm.domain.ProbationTerm"
+		proxy="omis.probationterm.domain.ProbationTerm"
+		name="omis.probationterm.domain.impl.ProbationTermImpl"
+		table="`PROBATION_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROBATION_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+		    <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+		   	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+	    </component>
+	    <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+	    	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+	 	  	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+	  	</component>
+		<properties name="uniqueProbationTerm">       
+			<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+				entity-name="omis.offender.domain.Offender" unique="false"/>
+			<many-to-one name="courtCase" column="`COURT_CASE_ID`" cascade="none" not-null="true"
+				entity-name="omis.courtcase.domain.CourtCase" unique="false"/>
+	      	<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+	      	<property name="terminationDate" type="java.util.Date" not-null="false" column="`TERMINATION_DATE`"/>
+      	</properties>
+		<component name="term">
+			<property name="years" column="`YEARS`"/>
+			<property name="months" column="`MONTHS`"/>
+			<property name="days" column="`DAYS`"/>
+		</component>
+		<property name="expirationDate" type="java.util.Date" not-null="false" column="`EXPIRATION_DATE`"/>
+		<property name="jailCredit" column="`JAIL_CREDIT`" type="java.lang.Integer" not-null="false"/>
+		<property name="sentenceDays" column="`SENTENCE_DAYS`" type="java.lang.Integer" not-null="false"/>
+	</class>
+	<query name="findProbationTerm"><![CDATA[
+		select probationTerm
+		from
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where
+			probationTerm.offender = :offender
+		and
+			probationTerm.courtCase = :courtCase
+		and
+			probationTerm.startDate = :startDate
+	]]></query>
+	<query name="findExcludingProbationTerm"><![CDATA[
+		select probationTerm
+		from
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where
+			probationTerm.offender = :offender
+		and
+			probationTerm.courtCase = :courtCase
+		and
+			probationTerm.startDate = :startDate
+		and
+			probationTerm <> :excludedProbationTerm
+	]]></query>
+	<query name="findProbationTermByOffenderAndCourtCaseOnDate"><![CDATA[
+		select probationTerm
+		from
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where
+			probationTerm.offender = :offender
+		and
+			probationTerm.courtCase = :courtCase
+		and
+			(probationTerm.startDate <= :date
+			 and 
+				(probationTerm.terminationDate > :date 
+				 or probationTerm.terminationDate is null))
+	]]></query>
+	<query name="countProbationTermsAfterDateExcluding"><![CDATA[
+		select count(probationTerm)
+		from 
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where
+			probationTerm.offender = :offender
+		and
+			probationTerm.courtCase = :courtCase
+		and
+			probationTerm.startDate >= :date
+		and 
+			(probationTerm <> :excludedProbationTerm
+			 or :excludedProbationTerm is null)
+	]]></query>
+	<query name="countProbationTermsExcluding"><![CDATA[
+		select count(probationTerm)
+		from 
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where 
+			probationTerm.offender = :offender
+		and
+			probationTerm.courtCase = :courtCase
+		and (probationTerm.startDate <= :terminationDate
+		     or (probationTerm.startDate is null and :terminationDate is null))
+		and (probationTerm.terminationDate > :startDate
+		     or (probationTerm.terminationDate is null and :startDate is null))
+		and probationTerm not in (:excludedProbationTerms)
+	]]></query>
+	<query name="findProbationTermByCourtCase"><![CDATA[
+		select probationTerm
+		from
+			omis.probationterm.domain.ProbationTerm probationTerm
+		where
+			probationTerm.courtCase = :courtCase
+	]]></query>
+</hibernate-mapping>

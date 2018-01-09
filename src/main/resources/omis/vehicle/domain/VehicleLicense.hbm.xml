@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.vehicle.domain">
+	<class entity-name="omis.vehicle.domain.VehicleLicense"
+		proxy="omis.vehicle.domain.VehicleLicense"
+		name="omis.vehicle.domain.impl.VehicleLicenseImpl"
+		table="`VEHICLE_LICENSE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VEHICLE_LICENSE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="state" column="`STATE_ID`" cascade="none" not-null="true"
+			entity-name="omis.region.domain.State" unique="false"/>
+		<property name="plateNumber" column="`PLATE_NUMBER`" type="java.lang.String" not-null="true"/>
+		<many-to-one name="vehicleAssociation" column="`VEHICLE_ASSOCIATION_ID`" cascade="none" not-null="true" 
+			entity-name="omis.vehicle.domain.VehicleAssociation" unique="false"/>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component> 
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+ 	<query name="findLicenseByVehicleAssociation"><![CDATA[
+ 		select vehicleLicense
+		from
+			omis.vehicle.domain.VehicleLicense vehicleLicense
+		where
+			vehicleLicense.vehicleAssociation = :vehicleAssociation
+		order by
+			vehicleLicense.vehicleAssociation.offender.name
+	]]></query>
+</hibernate-mapping>

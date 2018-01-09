@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Queries to summarize sentences.
+  -
+  - Author: Josh Divine
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.sentence.report">
+
+	<!-- Summarizes sentences by defendant. -->
+	<query name="summarizeSentences"><![CDATA[
+		select new omis.sentence.report.SentenceSummary(
+			sentence.id,
+			defendant.id,
+			defendantName.lastName,
+			defendantName.firstName,
+			defendantName.middleName,
+			defendantName.suffix,
+			case when (select count(*) from omis.offender.domain.Offender offender where offender = defendant) > 0 then true else false end as defendantOffender,
+			(select offender.offenderNumber from omis.offender.domain.Offender offender where offender = defendant) as defendantOffenderNumber,
+			courtCase.id,
+			court.name,
+			docket.value,
+			legalDispositionCategory.name,
+			sentence.pronouncementDate,
+			judge.id,
+			judgeName.lastName,
+			judgeName.firstName,
+			judgeName.middleName,
+			judgeName.suffix,
+			conviction.id,
+			conviction.date,
+			offense.name,
+			offense.url,
+			conviction.counts,
+			category.id,
+			category.name,
+			category.prisonRequirement,
+			category.probationRequirement,
+			category.deferredRequirement,
+			sentence.effectiveDate,
+			sentence.connection.classification,
+			sentenceConnection.id,
+			sentence.prisonTerm.years,
+			sentence.prisonTerm.months,
+			sentence.prisonTerm.days,
+			sentence.probationTerm.years,
+			sentence.probationTerm.months,
+			sentence.probationTerm.days,
+			sentence.deferredTerm.years,
+			sentence.deferredTerm.months,
+			sentence.deferredTerm.days,
+			sentence.credit.jailTime,
+			sentence.credit.streetTime,
+			case when sentence.active = 'Y' then true else false end as active,
+			sentence.changeOrder)
+		from omis.sentence.domain.Sentence sentence
+		left join sentence.conviction conviction
+		left join conviction.courtCase courtCase
+		left join courtCase.docket docket
+		left join docket.person defendant
+		left join defendant.name defendantName
+		left join docket.court court
+		left join conviction.courtCase.personnel.judge judge
+		left join judge.name judgeName
+		left join sentence.connection.sentence sentenceConnection
+		left join conviction.offense offense
+		left join sentence.category category
+		left join sentence.legalDispositionCategory legalDispositionCategory
+		where
+			defendant = :person
+	]]></query>
+	
+	<!-- Summarizes inactive sentences by conviction. -->
+	<query name="summarizeInactiveSentencesByConviction"><![CDATA[
+		select new omis.sentence.report.SentenceSummary(
+			sentence.id,
+			defendant.id,
+			defendantName.lastName,
+			defendantName.firstName,
+			defendantName.middleName,
+			defendantName.suffix,
+			case when (select count(*) from omis.offender.domain.Offender offender where offender = defendant) > 0 then true else false end as defendantOffender,
+			(select offender.offenderNumber from omis.offender.domain.Offender offender where offender = defendant) as defendantOffenderNumber,
+			courtCase.id,
+			court.name,
+			docket.value,
+			legalDispositionCategory.name,
+			sentence.pronouncementDate,
+			judge.id,
+			judgeName.lastName,
+			judgeName.firstName,
+			judgeName.middleName,
+			judgeName.suffix,
+			conviction.id,
+			conviction.date,
+			offense.name,
+			offense.url,
+			conviction.counts,
+			category.id,
+			category.name,
+			category.prisonRequirement,
+			category.probationRequirement,
+			category.deferredRequirement,
+			sentence.effectiveDate,
+			sentence.connection.classification,
+			sentenceConnection.id,
+			sentence.prisonTerm.years,
+			sentence.prisonTerm.months,
+			sentence.prisonTerm.days,
+			sentence.probationTerm.years,
+			sentence.probationTerm.months,
+			sentence.probationTerm.days,
+			sentence.deferredTerm.years,
+			sentence.deferredTerm.months,
+			sentence.deferredTerm.days,
+			sentence.credit.jailTime,
+			sentence.credit.streetTime,
+			case when sentence.active = 'Y' then true else false end as active,
+			sentence.changeOrder)
+		from omis.sentence.domain.Sentence sentence
+		left join sentence.conviction conviction
+		left join conviction.courtCase courtCase
+		left join courtCase.docket docket
+		left join docket.person defendant
+		left join defendant.name defendantName
+		left join docket.court court
+		left join conviction.courtCase.personnel.judge judge
+		left join judge.name judgeName
+		left join sentence.connection.sentence sentenceConnection
+		left join conviction.offense offense
+		left join sentence.category category
+		left join sentence.legalDispositionCategory legalDispositionCategory
+		where
+			conviction = :conviction
+		and
+			sentence.active = 'N'
+	]]></query>
+	
+	<!--
+	  - Summarizes active sentences by defendant.
+	  -
+	  - To be active, the sentence and court case must both be active. For a
+	  - court case to be active, it must not be dismissed.
+	  -->
+	<query name="summarizeActiveSentences"><![CDATA[
+		select new omis.sentence.report.SentenceSummary(
+			sentence.id,
+			defendant.id,
+			defendantName.lastName,
+			defendantName.firstName,
+			defendantName.middleName,
+			defendantName.suffix,
+			case when (select count(*) from omis.offender.domain.Offender offender where offender = defendant) > 0 then true else false end as defendantOffender,
+			(select offender.offenderNumber from omis.offender.domain.Offender offender where offender = defendant) as defendantOffenderNumber,
+			courtCase.id,
+			court.name,
+			docket.value,
+			legalDispositionCategory.name,
+			sentence.pronouncementDate,
+			judge.id,
+			judgeName.lastName,
+			judgeName.firstName,
+			judgeName.middleName,
+			judgeName.suffix,
+			conviction.id,
+			conviction.date,
+			offense.name,
+			offense.url,
+			conviction.counts,
+			category.id,
+			category.name,
+			category.prisonRequirement,
+			category.probationRequirement,
+			category.deferredRequirement,
+			sentence.effectiveDate,
+			sentence.connection.classification,
+			sentenceConnection.id,
+			sentence.prisonTerm.years,
+			sentence.prisonTerm.months,
+			sentence.prisonTerm.days,
+			sentence.probationTerm.years,
+			sentence.probationTerm.months,
+			sentence.probationTerm.days,
+			sentence.deferredTerm.years,
+			sentence.deferredTerm.months,
+			sentence.deferredTerm.days,
+			sentence.credit.jailTime,
+			sentence.credit.streetTime,
+			case when sentence.active = 'Y' then true else false end as active,
+			sentence.changeOrder)
+		from omis.sentence.domain.Sentence sentence
+		left join sentence.conviction conviction
+		left join conviction.courtCase courtCase
+		left join courtCase.docket docket
+		left join docket.person defendant
+		left join defendant.name defendantName
+		left join docket.court court
+		left join conviction.courtCase.personnel.judge judge
+		left join judge.name judgeName
+		left join sentence.connection.sentence sentenceConnection
+		left join conviction.offense offense
+		left join sentence.category category
+		left join sentence.legalDispositionCategory legalDispositionCategory
+		where
+			defendant = :person
+		and
+			sentence.active = 'Y'
+		and
+			(courtCase.flags.dismissed is null or courtCase.flags.dismissed = 'N') 
+		order by docket.value, court.name, sentence.pronouncementDate, offense.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.sentence.domain">
+	<class	entity-name="omis.sentence.domain.LegalDispositionCategory"
+			proxy="omis.sentence.domain.LegalDispositionCategory"
+			name="omis.sentence.domain.impl.LegalDispositionCategoryImpl"
+			table="`LEGAL_DISP_CATEGORY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`LEGAL_DISP_CATEGORY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findLegalDispositionCategory"><![CDATA[
+		from 
+			omis.sentence.domain.LegalDispositionCategory legalDispositionCategory
+		where 
+			legalDispositionCategory.name = :name
+	]]></query>
+	<query name="findLegalDispositionCategoryExcluding"><![CDATA[
+		from 
+			omis.sentence.domain.LegalDispositionCategory legalDispositionCategory
+		where 
+			legalDispositionCategory.name = :name
+		and
+			legalDispositionCategory <> :excludedCategory
+	]]></query>
+</hibernate-mapping>

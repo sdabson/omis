@@ -1,0 +1,36 @@
+/*
+ * Contact summary styling.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (January 17, 2017)
+ * Since: OMIS 3.0
+ */
+ 
+ span.contactSummarySection {
+ 	display: block;
+ }
+ 
+ span.contactSummarySection span.contactSummarySubSection {
+	display: inline-block;
+  	vertical-align: top;
+  	width: 49%;
+  	margin: 3px 0px 3px 0px;
+  	word-wrap: break-word;
+ }
+ 
+ span.contactSummarySection span.subSectionLine {
+ 	display: block;
+ }
+ 
+ span.contactSummarySection span.subSectionLine span.lineCell {
+ 	display: inline-block;
+  	vertical-align: top;
+  	width: 24.5%;
+  	margin: 3px 0px 3px 0px;
+  	word-wrap: break-word;
+ }
+ 
+ span.contactSummarySection label.subSectionLabel {
+ 	display: block;
+ 	font-weight: bold;
+ }

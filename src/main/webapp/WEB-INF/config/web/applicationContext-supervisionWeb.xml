@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+  <!-- Helpers -->
+  
+  <bean id="placementControllerDelegate"
+        class="omis.placement.web.controller.delegate.PlacementControllerDelegate"/>
+        
+  <!-- Validators -->
+	
+  <bean id="placementTermFormValidator"
+	    class="omis.supervision.web.validator.PlacementTermFormValidator">
+	<constructor-arg name="placementTermNoteFieldsValidatorDelegate" ref="placementTermNoteFieldsValidatorDelegate"/>
+  </bean>
+  
+  <bean id="supervisoryOrganizationTermFormValidator"
+        class="omis.supervision.web.validator.SupervisoryOrganizationTermFormValidator"/>
+        
+  <bean id="correctionalStatusTermFormValidator"
+        class="omis.supervision.web.validator.CorrectionalStatusTermFormValidator"/>
+        
+  <bean id="endPlacementTermFormValidator"
+        class="omis.supervision.web.validator.EndPlacementTermFormValidator"/>
+
+  <!-- Validator delegates. -->
+
+  <bean id="placementTermNoteFieldsValidatorDelegate"
+        class="omis.supervision.web.validator.delegate.PlacementTermNoteFieldsValidatorDelegate"/>
+
+  <!-- Offender Summary item -->
+  
+  <bean id="placementTermProfileItem"
+  	class="omis.supervision.web.profile.PlacementTermProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>PLACEMENT_TERM_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/supervision/placementTerm/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="placementTerm"/>
+  	<constructor-arg name="profileItemRegistry" ref="placementProfileItemRegistry"/>
+  	<constructor-arg name="placementTermProfileItemReportService" ref="placementTermProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${placementTermProfileItemEnabled}"/>
+  </bean>
+	
+  <!-- Web configuration -->
+	
+  <context:component-scan base-package="omis.supervision.web.controller"/>
+	       
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="correctionalStatusTermControllerOperation" expression="execution(* omis.supervision.web.controller.CorrectionalStatusTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="correctionalStatusTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="supervisionProfileControllerOperation" expression="execution(* omis.supervision.web.controller.SupervisionProfileController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="supervisionProfileControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="placementTermControllerOperation" expression="execution(* omis.supervision.web.controller.PlacementTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="placementTermControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="supervisoryOrganizationTermControllerOperation" expression="execution(* omis.supervision.web.controller.SupervisoryOrganizationTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="supervisoryOrganizationTermControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="endPlacementTermControllerOperation" expression="execution(* omis.supervision.web.controller.EndPlacementTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="endPlacementTermControllerOperation"/>
+  </aop:config>
+  		       
+</beans>

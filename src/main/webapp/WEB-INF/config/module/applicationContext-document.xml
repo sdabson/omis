@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="documentProfileItemService"
+        	class="omis.offenderdocument.service.impl.DocumentProfileItemServiceImpl">
+        	<constructor-arg name="courtCaseDocumentAssociationDelegate" ref="courtCaseDocumentAssociationDelegate"/>
+        </bean>
+        
+        <!--  Report Services -->
+        <bean id="documentSummaryReportService" class="omis.document.report.impl.hibernate.DocumentSummaryReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        <!-- Helpers -->
+        <bean id="documentTagDelegate" class="omis.document.service.delegate.DocumentTagDelegate">
+        	<constructor-arg name="documentTagInstanceFactory" ref="documentTagInstanceFactory"/>
+        	<constructor-arg name="documentTagDao" ref="documentTagDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="documentDelegate" class="omis.document.service.delegate.DocumentDelegate">
+        	<constructor-arg name="documentDao" ref="documentDao"/>
+        	<constructor-arg name="documentInstanceFactory" ref="documentInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+
+		
+        
+        <!-- Instance Factories -->
+        <bean id="documentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+        	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.Document"/>
+        </bean>
+        
+        <bean id="documentTagInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+        	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.DocumentTag"/>
+        </bean>
+        
+        <bean id="documentFilenameGenerator" class="omis.document.io.impl.DocumentFilenameGenerator">
+        	<constructor-arg name="documentDao" ref="documentDao"/>
+        </bean>
+        
+        <bean id="documentPersistor" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+        	<constructor-arg name="fileLocator" ref="offenderDocumentLocator"/>
+        </bean>
+        
+        <bean id="documentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+        	<constructor-arg name="fileLocator" ref="offenderDocumentLocator"/>
+        	<constructor-arg name="defaultFilename" value="notFound"/>
+        </bean>
+        
+        <bean id="offenderDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+    		<constructor-arg name="path" value="${application.resource.path}\Documents\OffenderDocuments"/>
+    	</bean>
+        
+        <!-- Data access objects -->
+        <bean id="documentTagDao" class="omis.document.dao.impl.hibernate.DocumentTagDaoHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.DocumentTag"/>
+        </bean>
+        
+        <bean id="documentDao" class="omis.document.dao.impl.hibernate.DocumentDaoHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.Document"/>
+        </bean>
+        <!-- Property editor factories -->
+        <bean id="documentPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+        	<constructor-arg name="dao" ref="documentDao"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.Document"/>
+        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+        </bean>
+        <bean id="documentTagPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+        	<constructor-arg name="dao" ref="documentTagDao"/>
+        	<constructor-arg name="entityName" value="omis.document.domain.DocumentTag"/>
+        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+        </bean>
+        
+</beans>

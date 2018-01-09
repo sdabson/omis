@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Offender caution mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.caution.domain">
+	<class entity-name="omis.caution.domain.OffenderCaution"
+	       proxy="omis.caution.domain.OffenderCaution"
+	       name="omis.caution.domain.impl.OffenderCautionImpl"
+	       table="`CAUTION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CAUTION_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCaution">
+			<many-to-one name="offender" column="`OFFENDER_ID`" not-null="true"/>
+			<many-to-one name="description" column="`DESCRIPTION_ID`"
+						 not-null="true"
+						 entity-name="omis.caution.domain.CautionDescription"/>
+			<many-to-one name="source" column="`SOURCE_ID`" not-null="true"
+						 entity-name="omis.caution.domain.CautionSource"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" column="`START_DATE`" not-null="true"/>
+				<property name="endDate" type="java.util.Date" column="`END_DATE`" not-null="false"/>
+			</component>
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<property name="comment" column="`COMMENT`"
+				  type="java.lang.String" not-null="false"/>
+		<property name="sourceComment" column="`SOURCE_COMMENT`"
+				  type="java.lang.String" not-null="false"/>
+	</class>
+	<query name="findCautionsByOffender"><![CDATA[
+		from omis.caution.domain.OffenderCaution caution
+		where caution.offender = :offender
+		order by caution.dateRange.startDate, caution.dateRange.endDate
+	]]></query>
+	<query name="findCautionsByOffenderOnDate"><![CDATA[
+		from omis.caution.domain.OffenderCaution caution
+		where caution.offender = :offender
+			and ((caution.dateRange.startDate is null
+					or caution.dateRange.startDate <= :date)
+				 and caution.dateRange.endDate is null
+				 	or caution.dateRange.endDate >= :date)
+		order by caution.dateRange.startDate, caution.dateRange.endDate
+	]]></query>
+	<query name="findCaution"><![CDATA[
+	  select caution from omis.caution.domain.OffenderCaution caution
+	  where caution.offender = :offender
+	    and caution.dateRange.startDate = :startDate
+	    and ((caution.dateRange.endDate is null and :endDate is null) or caution.dateRange.endDate = :endDate)
+	    and caution.source = :source
+	    and caution.description = :description
+	]]></query>
+	<query name="findCautionExcluding"><![CDATA[
+	  select caution from omis.caution.domain.OffenderCaution caution
+	  where caution.offender = :offender
+	    and caution.dateRange.startDate = :startDate
+	    and ((caution.dateRange.endDate is null and :endDate is null) or caution.dateRange.endDate = :endDate)
+	    and caution.source = :source
+	    and caution.description = :description
+	    and caution <> :excludedCaution
+	]]></query>
+	<query name="findOffenderCautionCountByOffenderAndDate"><![CDATA[
+		select count(caution.id)
+	      from omis.caution.domain.OffenderCaution caution
+	     where caution.offender = :offender
+	       and ((caution.dateRange.startDate <= :effectiveDate
+	        or caution.dateRange.startDate is null)
+	       and (caution.dateRange.endDate >= :effectiveDate
+	        or caution.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

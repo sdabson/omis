@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary"
+			proxy="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary"
+			name="omis.presentenceinvestigation.domain.impl.OtherPertinentInformationSectionSummaryImpl"
+			table="`OTHR_PTNT_INFRMN_SCTN_SMRY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`OTHR_PTNT_INFRMN_SCTN_SMRY_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="presentenceInvestigationRequest" column="`PRESENTNCE_INVESTIGATN_RQST_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findOtherPertinentInformationSectionSummary"><![CDATA[
+		select otherPertinentInformationSectionSummary
+		from
+			omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary otherPertinentInformationSectionSummary
+		where
+			otherPertinentInformationSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findOtherPertinentInformationSectionSummaryExcluding"><![CDATA[
+		select otherPertinentInformationSectionSummary
+		from
+			omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary otherPertinentInformationSectionSummary
+		where
+			otherPertinentInformationSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			otherPertinentInformationSectionSummary != :otherPertinentInformationSectionSummary
+	]]></query>
+</hibernate-mapping>

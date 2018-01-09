@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.staff.domain">
+	<class	entity-name="omis.staff.domain.StaffAssignment"
+			proxy="omis.staff.domain.StaffAssignment"
+			name="omis.staff.domain.impl.StaffAssignmentImpl"
+			table="`STAFF_ASSIGNMENT`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STAFF_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueStaffAssignment">
+			<many-to-one name="staffMember" entity-name="omis.person.domain.Person" not-null="true" column="`STAFF_MEMBER_ID`"/>
+			<many-to-one name="supervisoryOrganization" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="true" column="`SUPERVISORY_ORGANIZATION_ID`"/>
+			<many-to-one name="location" not-null="false" entity-name="omis.location.domain.Location" column="`LOCATION_ID`"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
+				<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+			</component>					
+		</properties>
+		<many-to-one name="title" entity-name="omis.staff.domain.StaffTitle" not-null="true" column="`TITLE_ID`"/>
+		<property name="supervisory" type="yes_no" not-null="true" column="`SUPERVISORY`"/>
+		<many-to-one name="organizationDivision" entity-name="omis.organization.domain.OrganizationDivision" not-null="false" column="`ORGANIZATION_DIVISION_ID`"/>		
+		<property name="staffId" type="string" column="STAFF_ID"/>
+		<property name="telephoneNumber" type="java.lang.Long" column="`TELEPHONE_NUMBER`"/>
+		<property name="telephoneExtension" type="java.lang.Integer" column="`TELEPHONE_EXTENSION`"/>
+		<property name="emailAddress" type="string" column="`EMAIL_ADDRESS`"/>
+	</class>
+	<query name="findStaffAssignmentsBySupervisoryOrganizationOnDate"><![CDATA[
+		select staffAssignment
+		from omis.staff.domain.StaffAssignment staffAssignment
+		where staffAssignment.supervisoryOrganization = :supervisoryOrganization
+		and
+			(staffAssignment.dateRange is null
+				or ((staffAssignment.dateRange.startDate is null
+							or staffAssignment.dateRange.startDate <= :date) and
+				    (staffAssignment.dateRange.endDate is null
+				    	or staffAssignment.dateRange.endDate >= :date))
+			)
+		order by
+			staffAssignment.staffMember.name.lastName,
+			staffAssignment.staffMember.name.firstName,
+			staffAssignment.dateRange.startDate,
+			staffAssignment.dateRange.endDate,
+			staffAssignment.title.name
+	]]></query>
+	<query name="findStaffAssignmentsOnDate"><![CDATA[
+		select staffAssignment
+		from omis.staff.domain.StaffAssignment staffAssignment
+		where
+			staffAssignment.dateRange is null
+				or ((staffAssignment.dateRange.startDate is null
+							or staffAssignment.dateRange.startDate <= :date) and
+				    (staffAssignment.dateRange.endDate is null
+				    	or staffAssignment.dateRange.endDate >= :date))
+		order by
+			staffAssignment.staffMember.name.lastName,
+			staffAssignment.staffMember.name.firstName,
+			staffAssignment.dateRange.startDate,
+			staffAssignment.dateRange.endDate,
+			staffAssignment.title.name
+	]]></query>
+	<query name="findAllStaffAssignments"><![CDATA[
+		select staffAssignment
+		from omis.staff.domain.StaffAssignment staffAssignment
+		order by
+			staffAssignment.staffMember.name.lastName,
+			staffAssignment.staffMember.name.firstName,
+			staffAssignment.dateRange.startDate,
+			staffAssignment.dateRange.endDate,
+			staffAssignment.title.name
+	]]></query>
+	<query name="findStaffMembersUsingAssignmentsOnDate"><![CDATA[
+	select person
+	from omis.person.domain.Person person
+	where exists (
+			select staffAssignment
+			from omis.staff.domain.StaffAssignment staffAssignment
+			where staffAssignment.staffMember = person
+			and
+				(staffAssignment.dateRange is null
+					or ((staffAssignment.dateRange.startDate is null
+								or staffAssignment.dateRange.startDate <= :date) and
+					    (staffAssignment.dateRange.endDate is null
+					    	or staffAssignment.dateRange.endDate >= :date))
+				)
+		)
+		order by person.name.lastName, person.name.firstName
+	]]></query>
+	<query name="findSupervisoryStaffMembersUsingAssignmentsOnDate"><![CDATA[
+	select person
+	from omis.person.domain.Person person
+	where exists (
+			select staffAssignment
+			from omis.staff.domain.StaffAssignment staffAssignment
+			where staffAssignment.staffMember = person
+			and staffAssignment.supervisory = true
+			and
+				(staffAssignment.dateRange is null
+					or ((staffAssignment.dateRange.startDate is null
+								or staffAssignment.dateRange.startDate <= :date) and
+					    (staffAssignment.dateRange.endDate is null
+					    	or staffAssignment.dateRange.endDate >= :date))
+				)
+		)
+		order by person.name.lastName, person.name.firstName
+	]]></query>
+	<query name="findStaffAssignmentOnDate"><![CDATA[
+		from
+			omis.staff.domain.StaffAssignment staffAssignment
+		where
+			staffAssignment.supervisoryOrganization = :supervisoryOrganization
+		and
+			staffAssignment.staffMember = :person
+		and
+					(staffAssignment.dateRange is null
+				or 
+					((staffAssignment.dateRange.startDate is null
+				or 
+					staffAssignment.dateRange.startDate <= :date) 
+			and
+				    (staffAssignment.dateRange.endDate is null
+				or 
+					staffAssignment.dateRange.endDate >= :date)))
+	]]></query>
+	<query name="findStaffAssignment"><![CDATA[
+		select staffAssignment
+		from omis.staff.domain.StaffAssignment staffAssignment
+		where
+			staffAssignment.staffMember = :person
+		and 
+			staffAssignment.supervisoryOrganization = :supervisoryOrganization
+		and
+			((staffAssignment.location is null and :location is null) or
+			 staffAssignment.location = :location)
+		and
+			((staffAssignment.dateRange.startDate is null and :startDate is null) or
+			 staffAssignment.dateRange.startDate = :startDate)
+		and
+			((staffAssignment.dateRange.endDate is null and :endDate is null) or
+			 staffAssignment.dateRange.endDate = :endDate)
+	]]></query>
+	<query name="findStaffAssignmentExcluding"><![CDATA[
+		select staffAssignment
+		from omis.staff.domain.StaffAssignment staffAssignment
+		where
+			staffAssignment.staffMember = :person
+		and 
+			staffAssignment.supervisoryOrganization = :supervisoryOrganization
+		and
+			((staffAssignment.location is null and :location is null) or
+			 staffAssignment.location.id = :location)
+		and
+			((staffAssignment.dateRange.startDate is null and :startDate is null) or
+			 staffAssignment.dateRange.startDate = :startDate)
+		and
+			((staffAssignment.dateRange.endDate is null and :endDate is null) or
+			 staffAssignment.dateRange.endDate = :endDate)
+		and
+			staffAssignment <> :excludedAssignment
+	]]></query>
+</hibernate-mapping>

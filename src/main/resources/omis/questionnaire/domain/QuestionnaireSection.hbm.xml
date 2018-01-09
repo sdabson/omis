@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.QuestionnaireSection"
+			proxy="omis.questionnaire.domain.QuestionnaireSection"
+			name="omis.questionnaire.domain.impl.QuestionnaireSectionImpl"
+			table="`QUESTIONNAIRE_SECTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`QUESTIONNAIRE_SECTION_SEQ`</param>
+				</generator>
+			</id>
+			<property name="title" column="`TITLE`" type="java.lang.String" not-null="true"/>
+			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short" not-null="true"/>
+			<many-to-one name="questionnaireType" column="`QUESTIONNAIRE_TYPE_ID`" entity-name="omis.questionnaire.domain.QuestionnaireType" not-null="true"/>
+			<many-to-one name="sectionType" column="`SECTION_TYPE_ID`" entity-name="omis.questionnaire.domain.SectionType" not-null="true"/>
+			<property name="sectionNumber" column="`SECTION_NUMBER`" type="java.lang.Integer" not-null="true"/>
+			<property name="sectionHelp" column="`SECTION_HELP`" type="java.lang.String" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findQuestionnaireSection"><![CDATA[
+		select questionnaireSection
+		from
+			omis.questionnaire.domain.QuestionnaireSection questionnaireSection
+		where
+			questionnaireSection.title = :title
+		and
+			questionnaireSection.questionnaireType = :questionnaireType
+	]]></query>
+	<query name="findQuestionnaireSectionExcluding"><![CDATA[
+		select questionnaireSection
+		from
+			omis.questionnaire.domain.QuestionnaireSection questionnaireSection
+		where
+			questionnaireSection.title = :title
+		and
+			questionnaireSection.questionnaireType = :questionnaireType
+		and
+			questionnaireSection != :questionnaireSection
+	]]></query>
+	<query name="findQuestionnaireSectionByQuestionnaireType"><![CDATA[
+		select questionnaireSection
+		from
+			omis.questionnaire.domain.QuestionnaireSection questionnaireSection
+		where
+			questionnaireSection.questionnaireType = :questionnaireType
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,12 @@
+/*
+ * Styling for audit information.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Sept 18, 2013)
+ * Since: OMIS 3.0
+ */
+p.updateSignature, p.creationSignature, p.audit {
+	margin: 0px;
+	padding: 0px;
+	text-align: right;
+}

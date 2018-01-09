@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.military.domain">
+	<class entity-name="omis.military.domain.MilitaryBranch"
+		proxy="omis.military.domain.MilitaryBranch"
+		name="omis.military.domain.impl.MilitaryBranchImpl"
+		table="`MILITARY_BRANCH`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`MILITARY_BRANCH_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<property name="shortName" column="`SHORT_NAME`" not-null="true" type="string"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findAllMilitaryBranches"><![CDATA[
+		from
+			omis.military.domain.MilitaryBranch branch
+		where
+			branch.valid = true
+		order by
+			branch.name
+	]]></query>
+	<query name="findMilitaryBranch"><![CDATA[
+		select branch
+		from
+			omis.military.domain.MilitaryBranch branch
+		where
+			branch.valid = :valid
+		and
+			branch.name = :name
+		and
+			branch.shortName = :shortName
+	]]></query>
+</hibernate-mapping>

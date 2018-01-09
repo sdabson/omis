@@ -1,0 +1,55 @@
+@keyframes sampleKeyFramesBackground {
+    0%   {background-color: red;}
+    15%  {background-color: orange;}
+    30%  {background-color: yellow;}
+    45%  {background-color: green;}
+    60% {background-color: blue;}
+    85% {background-color: purple;}
+ 	100% {background-color: red;}
+}
+
+@keyframes sampleKeyFramesText{
+	0%   {color: green;}
+    15%  {color: blue;}
+    30%  {color: purple;}
+    45%  {color: red;}
+    60%  {color: orange;}
+    85%  {color: yellow;}
+ 	100%  {color: green;}
+}
+
+@keyframes fontbulger {
+  0% {
+    font-size: 15px;
+  }
+  30% {
+    font-size: 7px;
+  }
+  100% {
+    font-size: 15px;
+  }
+}
+
+@keyframes infinite-spinning {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes pulse {
+	from {
+    	transform: scale(.75);
+  	}
+	to {
+    	transform: scale(1);
+	}
+}
+
+table#substance.listTable tbody tr.sample td.randomSampleRequest {
+	animation-name: sampleKeyFramesBackground, sampleKeyFramesText;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}

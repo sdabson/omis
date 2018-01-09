@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+  - Mapping and queries for supervisory organization.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+	
+	<!-- Maps supervisory organization. -->
+	<subclass entity-name="omis.supervision.domain.SupervisoryOrganization"
+	          proxy="omis.supervision.domain.SupervisoryOrganization"
+	          name="omis.supervision.domain.impl.SupervisoryOrganizationImpl"
+		      discriminator-value="S"
+		      extends="omis.organization.domain.Organization">
+	</subclass>
+	
+	<!-- Returns supervisory organizations. -->
+	<query name="findAllSupervisoryOrganizationsOrderedByName"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organizations by parent. -->
+	<query name="findSupervisoryOrganizationsByParentOrderedByName"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization.parent = :parent
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organization by name. -->
+	<query name="findSupervisoryOrganizationByName"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization.name = :name
+	]]></query>
+	
+	<!-- Returns supervisory organization by partial name. -->
+	<query name="findSupervisoryOrganizationsByPartialNameOrderedByName"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization.name like concat('%', :partialName, '%')
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organizations allowed for correctional status. -->
+	<query name="findSupervisoryOrganizationsForCorrectionalStatus"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.AllowedSupervisoryOrganizationRule allowedSupervisoryOrganizationRule
+			inner join allowedSupervisoryOrganizationRule.supervisoryOrganization supervisoryOrganization
+		where allowedSupervisoryOrganizationRule.correctionalStatus = :correctionalStatus
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organization. -->
+	<query name="findSupervisoryOrganization"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization.name = :name
+	]]></query>
+	
+	<!-- Returns supervisory organizations by State. -->
+	<query name="findSupervisoryOrganizationsByState"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization in (
+		    select organization
+		    from omis.location.domain.Location location
+		      inner join location.organization organization
+		      inner join location.address address
+		    where address.zipCode.city.state = :state
+		  )
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organizations for correctional status by State. -->
+	<query name="findSupervisoryOrganizationsForCorrectionalStatusByState"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.AllowedSupervisoryOrganizationRule allowedSupervisoryOrganizationRule
+			inner join allowedSupervisoryOrganizationRule.supervisoryOrganization supervisoryOrganization
+		where allowedSupervisoryOrganizationRule.correctionalStatus = :correctionalStatus
+		  and supervisoryOrganization in (
+		    select organization
+		    from omis.location.domain.Location location
+		      inner join location.organization organization
+		      inner join location.address address
+		    where address.zipCode.city.state = :state
+		  )
+		order by supervisoryOrganization.name
+	]]></query>
+	
+	<!-- Returns supervisory organizations allowed for placement. -->
+	<query name="findSupervisoryOrganizationAllowedForPlacement"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization in (
+			select innerSupervisoryOrganization
+			from omis.supervision.domain.AllowedSupervisoryOrganizationRule rule
+				inner join rule.supervisoryOrganization innerSupervisoryOrganization
+			where innerSupervisoryOrganization = innerSupervisoryOrganization)
+		order by supervisoryOrganization.name 
+	]]></query>
+	
+	<!-- Returns supervisory organization allowed for placement in State. -->
+	<query name="findSupervisoryOrganizationAllowedForPlacementInState"><![CDATA[
+		select supervisoryOrganization
+		from omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+		where supervisoryOrganization in (
+			select innerSupervisoryOrganization
+			from omis.supervision.domain.AllowedSupervisoryOrganizationRule rule
+					inner join rule.supervisoryOrganization innerSupervisoryOrganization,
+				omis.location.domain.Location location
+		        	inner join location.organization organization
+		        	inner join location.address address
+			where innerSupervisoryOrganization = supervisoryOrganization
+				and address.zipCode.city.state = :state
+				and organization = innerSupervisoryOrganization)
+		order by supervisoryOrganization.name 
+	]]></query>
+</hibernate-mapping>

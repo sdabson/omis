@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"
+	       proxy="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"
+	       name="omis.presentenceinvestigation.domain.impl.PresentenceInvestigationRequestImpl"
+	       table="`PRESENTNCE_INVESTIGTN_REQ`">
+	       <id name="id" column="`ID`" type="java.lang.Long">
+	       		<generator class="sequence">
+					<param name="sequence">`PRESENTNCE_INVESTIGTN_REQ_SEQ`</param>
+				</generator>
+	       </id>
+	       
+	       <property name="requestDate" column="`REQUEST_DATE`" type="java.util.Date" not-null="true"/>
+	       <property name="expectedCompletionDate" column="`EXPECTED_COMPLETION_DATE`" type="java.util.Date" not-null="true"/>
+	       <property name="completionDate" column="`COMPLETION_DATE`" type="java.util.Date" not-null="false"/>
+	       <many-to-one name="assignedUser" column="`USER_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+	       <many-to-one name="docket" column="`DOCKET_ID`" entity-name="omis.docket.domain.Docket" not-null="true" />
+	       <property name="sentenceDate" column="`SENTENCE_DATE`" type="java.util.Date" not-null="false" />
+	       <many-to-one name="category" column="`CATEGORY_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationCategory" not-null="true" />
+	       <component name="creationSignature">
+	       	<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+	       	<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+	       </component>
+	       <component name="updateSignature">
+	       	<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+	       	<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+	       </component>
+	</class>
+	<query name="findPresentenceInvestigationRequest"><![CDATA[
+		select psir
+		  from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		 where psir.docket = :docket
+	]]></query>
+	<query name="findPresentenceInvestigationRequestExcluding"><![CDATA[
+		select psir
+		  from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		 where psir.docket = :docket
+		   and psir != :presentenceInvestigationRequest
+	]]></query>
+	<query name="findPresentenceInvestigationRequestCount"><![CDATA[
+		select count(psir.id)
+		  from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		 where psir.docket.person = :offender
+	]]></query>
+</hibernate-mapping>

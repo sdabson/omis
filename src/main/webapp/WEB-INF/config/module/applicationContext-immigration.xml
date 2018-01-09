@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Instance factories. -->
+  
+  <bean id="alienResidenceInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.immigration.domain.AlienResidence"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="immigrationStatusDao"
+        class="omis.immigration.dao.impl.hibernate.ImmigrationStatusDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.immigration.domain.ImmigrationStatus"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="alienResidenceDao"
+        class="omis.immigration.dao.impl.hibernate.AlienResidenceDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.immigration.domain.AlienResidence"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Services -->
+  
+  <bean id="alienResidenceService"
+        class="omis.immigration.service.impl.AlienResidenceServiceImpl">
+     <constructor-arg name="alienResidenceDao" ref="alienResidenceDao"/>
+     <constructor-arg name="alienResidenceInstanceFactory" ref="alienResidenceInstanceFactory"/>
+  </bean>
+
+	<!-- Delegates -->
+	
+	<bean id="alienResidenceDelegate" class="omis.immigration.service.delegate.AlienResidenceDelegate">
+		<constructor-arg name="alienResidenceDao" ref="alienResidenceDao" />
+		<constructor-arg name="alienResidenceInstanceFactory" ref="alienResidenceInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+</beans>

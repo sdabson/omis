@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.DetainerWarrantProcessingStatus"
+			proxy="omis.detainernotification.domain.DetainerWarrantProcessingStatus"
+			name="omis.detainernotification.domain.impl.DetainerWarrantProcessingStatusImpl"
+			table="`DETAINER_WRNT_PRC_STATUS`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`DETAINER_WRNT_PRC_STATUS_SEQ`</param>
+				</generator>
+			</id>
+			
+			<many-to-one name="detainer" column="`DETAINER_ID`" entity-name="omis.detainernotification.domain.Detainer" not-null="true" unique="true"/>
+			<property name="sentToFacilityDate" column="SENT_TO_FACILITY_DATE" type="java.util.Date"/>
+			<many-to-one name="facility" column="FACILITY_ID" entity-name="omis.facility.domain.Facility"/>
+			<property name="facilityName" column="FACILITY_NAME" type="java.lang.String"/>
+			<property name="inmateServedDate" column="INMATE_SERVED_DATE" type="java.util.Date"/>
+			<property name="refusedToSign" column="REFUSED_TO_SIGN" type="yes_no"/>
+			<property name="waiverRequired" column="WAIVER_REQUIRED" type="yes_no"/>
+			<many-to-one name="unit" column="UNIT_ID" entity-name="omis.facility.domain.Unit"/>
+			<many-to-one name="complex" column="COMPLEX_ID" entity-name="omis.facility.domain.Complex"/>
+			<component name="cancellation">
+				<property name="date" column="CANCELLATION_DATE" type="java.util.Date"/>
+				<property name="reason" column="`CANCELLATION_REASON`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.detainernotification.domain.DetainerWarrantCancellationReason</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			</component>
+			<property name="refusedToSignComment" column="`REFUSED_COMMENT`" type="java.lang.String" not-null="false" />
+			<property name="waiverRequiredComment" column="`WAIVER_COMMENT`" type="java.lang.String" not-null="false" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findDetainerWarrantProcessingStatus"><![CDATA[
+		select detainerWarrantProcessStatus
+		from
+			omis.detainernotification.domain.DetainerWarrantProcessingStatus detainerWarrantProcessStatus
+		where
+			detainerWarrantProcessStatus.detainer = :detainer
+	]]></query>
+	<query name="findDetainerWarrantProcessingStatusExcluding"><![CDATA[
+		select detainerWarrantProcessStatus
+		from
+			omis.detainernotification.domain.DetainerWarrantProcessingStatus detainerWarrantProcessStatus
+		where
+			detainerWarrantProcessStatus.detainer = :detainer
+		and
+			detainerWarrantProcessStatus != :detainerWarrantProcessStatus
+	]]></query>
+	
+</hibernate-mapping>

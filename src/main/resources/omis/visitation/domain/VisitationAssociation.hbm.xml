@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.visitation.domain">
+		<class entity-name="omis.visitation.domain.VisitationAssociation"
+			proxy="omis.visitation.domain.VisitationAssociation"
+			name="omis.visitation.domain.impl.VisitationAssociationImpl"
+			table="`VISITATION_ASSOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`VISIT_ASSOC_SEQ`</param>
+					</generator>
+			</id>
+			<component name="flags">
+				<property name="nonContact" column="`NON_CONTACT`"
+					type="yes_no" not-null="true"/>
+				<property name="courtOrder" column="`COURT_ORDER`"
+					type="yes_no" not-null="true"/>
+				<property name="specialVisit" column="`SPECIAL_VISIT`"
+					type="yes_no" not-null="true"/>
+				<property name="money" column="MONEY"
+					type="yes_no" not-null="true"/>
+			</component>
+			<component name="approval">
+				<property name="decisionDate" column="`DECISION_DATE`" not-null="false"/>
+				<property name="approved" column="`APPROVED`"
+					type="yes_no" not-null="true"/>
+			</component>
+			<property name="guardianship" column="`GUARDIANSHIP`" not-null="false" type="string"/>
+			<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`" entity-name="omis.relationship.domain.Relationship"/>
+			<component name="dateRange">
+					<property name="startDate" column="`START_DATE`" not-null="false"/>
+					<property name="endDate" column="`END_DATE`" not-null="false"/>
+			</component>
+			<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true"
+				entity-name="omis.visitation.domain.VisitationAssociationCategory" unique="false"/>
+			<property name="notes" column="`NOTES`" not-null="false" type="string"/>
+			<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+					<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+		</class>
+		<query name="findVisitationAssociationByDateRange"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation va
+			where
+				va.relationship = :relationship
+			and
+					((va.dateRange.startDate <= :startDate and va.dateRange.endDate >= :startDate or va.dateRange.endDate is null)
+				or
+					(:startDate <= va.dateRange.startDate and :endDate is null or va.dateRange.startDate <= :endDate))
+		]]></query>
+		<query name="findVisitationAssociation"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation va
+			where
+				va.relationship = :relationship
+			and
+				va.dateRange.startDate = :startDate
+		]]></query>
+		<query name="findVisitationAssociationByOffender"><![CDATA[
+			from 
+				omis.visitation.domain.VisitationAssociation va
+			where 
+				va.relationship.firstPerson = :offender
+			and
+				trunc(va.dateRange.startDate) <= trunc(:date)
+			and
+				(trunc(va.dateRange.endDate) >= trunc(:date)
+				or
+				va.dateRange.endDate = null)
+		]]></query>
+		<query name="findApprovedVisitationAssociationsByOffender"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation va
+			where
+				va.relationship.firstPerson = :offender
+			and 
+				va.approval.approved = true
+			and
+				trunc(va.dateRange.startDate) <= trunc(:date)
+			and
+				(trunc(va.dateRange.endDate) >= trunc(:date)
+				or
+				va.dateRange.endDate = null)
+		]]></query>
+		<query name="findSpecialVisitVisitationAssociationsByOffender"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation va
+			where
+				va.relationship.firstPerson = :offender
+			and
+				va.flags.specialVisit = true
+			and
+				trunc(va.dateRange.startDate) <= trunc(:date)
+			and
+				(trunc(va.dateRange.endDate) >= trunc(:date)
+				or
+				va.dateRange.endDate = null)
+		]]></query>
+		<query name="findVisitationAssociationExcluding"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation visitationAssociation
+			where
+				visitationAssociation.relationship = :relationship
+			and
+				visitationAssociation.dateRange.startDate = :startDate
+			and
+				visitationAssociation <> :visitationAssociation
+		]]></query>
+		<query name="findVisitationAssociaitonOnDate"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation visitationAssociation
+			where
+				visitationAssociation.relationship = :relationship
+			and
+					(visitationAssociation.dateRange.startDate is null
+				or
+					visitationAssociation.dateRange.startDate < :date)
+			and
+					(visitationAssociation.dateRange.endDate is null
+				or
+					visitationAssociation.dateRange.endDate > :date)
+		]]></query>
+		<query name="findVisitableVisitationAssociations"><![CDATA[
+			from
+				omis.visitation.domain.VisitationAssociation visitationAssociation
+			where
+				visitationAssociation.relationship.firstPerson = :offender
+			and
+				visitationAssociation.approval.decisionDate < :date
+			and
+					(visitationAssociation.dateRange.endDate is null
+				or
+					visitationAssociation.dateRange.endDate > :date)
+		]]></query>
+		<query name="findVisitationAssociationCountByOffenderAndDate"><![CDATA[
+			select count(visitationAssociation.id)
+			  from omis.visitation.domain.VisitationAssociation visitationAssociation
+			 where visitationAssociation.relationship.firstPerson = :offender
+			   and ((visitationAssociation.dateRange.startDate <= :effectiveDate
+			    or visitationAssociation.dateRange.startDate is null)
+			   and (visitationAssociation.dateRange.endDate > :effectiveDate
+			    or visitationAssociation.dateRange.endDate is null))
+		]]></query>
+		<query name="findVisitationAssociationDateRangeOverlap"><![CDATA[
+			select count(visitationAssociation)
+			from
+				omis.visitation.domain.VisitationAssociation visitationAssociation
+			where
+				visitationAssociation.relationship = :relationship
+			and
+				((visitationAssociation.dateRange.startDate is null   
+					and :startDate is null)
+				or
+	 			 (visitationAssociation.dateRange.endDate is null 
+	 				and :endDate is null)
+				or
+				 ( :startDate is not null
+					and visitationAssociation.dateRange.endDate is not null
+					and :endDate is null
+					and visitationAssociation.dateRange.endDate>=:startDate)
+				or
+				 ( :endDate is not null
+					and visitationAssociation.dateRange.startDate is not null
+					and :startDate is null
+					and visitationAssociation.dateRange.startDate<=:endDate)
+				or
+				 ( visitationAssociation.dateRange.endDate is not null
+					and :startDate is not null
+					and visitationAssociation.dateRange.startDate is null
+					and :startDate<=visitationAssociation.dateRange.endDate)
+				or
+				 ( visitationAssociation.dateRange.startDate is not null
+					and :endDate is not null
+					and visitationAssociation.dateRange.endDate is null
+					and :endDate>=visitationAssociation.dateRange.startDate)
+				or
+				 (visitationAssociation.dateRange.startDate is null
+					and visitationAssociation.dateRange.endDate is null)
+				or
+				 (:startDate is null
+					and :endDate is null)
+				or
+				 (visitationAssociation.dateRange.endDate is not null
+					and :endDate is not null
+					and visitationAssociation.dateRange.startDate is not null
+					and :startDate is not null
+					and (:endDate>=visitationAssociation.dateRange.startDate
+						or visitationAssociation.dateRange.endDate>=:startDate)))
+		]]></query>
+		<query name="findVisitationAssociationDateRangeOverlapExcluding"><![CDATA[
+			select count(visitationAssociation)
+			from
+				omis.visitation.domain.VisitationAssociation visitationAssociation
+			where
+				visitationAssociation.relationship = :relationship
+			and
+				visitationAssociation != :visitationAssociation
+			and
+				((visitationAssociation.dateRange.startDate is null   
+					and :startDate is null)
+				or
+	 			 (visitationAssociation.dateRange.endDate is null 
+	 				and :endDate is null)
+				or
+				 ( :startDate is not null
+					and visitationAssociation.dateRange.endDate is not null
+					and :endDate is null
+					and visitationAssociation.dateRange.endDate>=:startDate)
+				or
+				 ( :endDate is not null
+					and visitationAssociation.dateRange.startDate is not null
+					and :startDate is null
+					and visitationAssociation.dateRange.startDate<=:endDate)
+				or
+				 ( visitationAssociation.dateRange.endDate is not null
+					and :startDate is not null
+					and visitationAssociation.dateRange.startDate is null
+					and :startDate<=visitationAssociation.dateRange.endDate)
+				or
+				 ( visitationAssociation.dateRange.startDate is not null
+					and :endDate is not null
+					and visitationAssociation.dateRange.endDate is null
+					and :endDate>=visitationAssociation.dateRange.startDate)
+				or
+				 (visitationAssociation.dateRange.startDate is null
+					and visitationAssociation.dateRange.endDate is null)
+				or
+				 (:startDate is null
+					and :endDate is null)
+				or
+				 (visitationAssociation.dateRange.endDate is not null
+					and :endDate is not null
+					and visitationAssociation.dateRange.startDate is not null
+					and :startDate is not null
+					and (:endDate>=visitationAssociation.dateRange.startDate
+						or visitationAssociation.dateRange.endDate>=:startDate)))
+		]]></query>
+</hibernate-mapping>

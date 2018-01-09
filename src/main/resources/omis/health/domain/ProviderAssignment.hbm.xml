@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderAssignment" proxy="omis.health.domain.ProviderAssignment"
+		name="omis.health.domain.impl.ProviderAssignmentImpl" table="`PROVIDER_ASSIGNMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROVIDER_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="provider" column="`PROVIDER_ID`"
+			cascade="none" not-null="true" entity-name="omis.person.domain.Person"
+			unique="false" />
+		<many-to-one name="facility" column="`FACILITY_ID`"
+			cascade="none" not-null="true" entity-name="omis.facility.domain.Facility"
+			unique="false" />
+		<many-to-one name="title" column="`TITLE_ID`" cascade="none"
+			not-null="true" entity-name="omis.health.domain.ProviderTitle"
+			unique="false" />
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" not-null="false"
+				type="java.util.Date" />
+			<property name="endDate" column="`END_DATE`" not-null="false"
+				type="java.util.Date" />
+		</component>
+		<many-to-one name="medicalFacility" column="`MEDICAL_FACILITY_ID`"
+			cascade="none" not-null="false" entity-name="omis.health.domain.MedicalFacility"
+			unique="false" />
+		<property name="contracted" column="`CONTRACTED`" not-null="true"
+			type="yes_no" />
+	</class>
+	<query name="findProviderAssignment"><![CDATA[
+		select providerAssignment
+		from
+			omis.health.domain.ProviderAssignment providerAssignment
+		where
+			providerAssignment.facility = :facility
+		and
+			providerAssignment.dateRange.startDate = :startDate
+		and
+			providerAssignment.dateRange.endDate = :endDate
+		and 
+			providerAssignment.provider = :provider
+	]]></query>
+	<query name="findProviderAssignmentsByFacility"><![CDATA[
+		select
+			providerAssignment
+		from
+			omis.health.domain.ProviderAssignment providerAssignment
+			left outer join providerAssignment.medicalFacility medicalFacility
+		where
+			providerAssignment.facility = :facility
+		and
+			(providerAssignment.dateRange.startDate is null
+				or providerAssignment.dateRange.startDate <= :date) and
+			(providerAssignment.dateRange.endDate is null
+				or providerAssignment.dateRange.endDate >= :date)
+		order by
+	    	providerAssignment.provider.name.lastName, providerAssignment.provider.name.firstName,
+	    	medicalFacility.name
+	]]></query>
+	<query name="findExternalProviderAssignmentsByFacility"><![CDATA[
+		from
+			omis.health.domain.ProviderAssignment providerAssignment
+		where
+			providerAssignment.facility = :facility
+			and providerAssignment.medicalFacility is not null
+		and
+			(providerAssignment.dateRange.startDate is null
+				or providerAssignment.dateRange.startDate <= :date) and
+			(providerAssignment.dateRange.endDate is null
+				or providerAssignment.dateRange.endDate >= :date)
+	]]></query>
+	<query name="countProviderAssignmentsInDateRange"><![CDATA[
+		select
+			count(providerAssignment)
+		from
+			omis.health.domain.ProviderAssignment providerAssignment
+		where
+				((providerAssignment.dateRange.startDate >= :startDate
+					and (providerAssignment.dateRange.startDate <= :endDate or :endDate is null))
+			or
+				(providerAssignment.dateRange.startDate <= :startDate
+					and (:endDate is null or providerAssignment.dateRange.endDate >= :startDate)))
+		and
+			providerAssignment.provider = :provider
+		and
+			providerAssignment.facility = :facility
+	]]></query>
+	<query name="countProviderAssignmentsInDateRangeExcluding"><![CDATA[
+		select
+			count(assignment)
+		from
+			omis.health.domain.ProviderAssignment assignment
+		where
+				((assignment.dateRange.startDate >= :startDate and (assignment.dateRange.startDate <= :endDate or :endDate is null))
+			or
+				(assignment.dateRange.startDate <= :startDate and (:endDate is null or assignment.dateRange.endDate >= :startDate)))
+		and
+			assignment.provider = :provider
+		and
+			assignment.facility = :facility
+		and
+			assignment != :providerAssignment
+	]]></query>
+	<query name="findProviderAssignmentsByInternalReferral"><![CDATA[
+		select pira.providerAssignment 
+		  from omis.health.domain.ProviderInternalReferralAssociation pira
+		 where pira.internalReferral = :internalReferral
+	]]></query>
+	<query name="findProviderAssignmentExcluding"><![CDATA[
+		from
+			omis.health.domain.ProviderAssignment providerAssignment
+		where
+			providerAssignment.facility = :facility
+		and
+			providerAssignment.dateRange.startDate = :startDate
+		and
+			providerAssignment.dateRange.endDate = :endDate
+		and
+			providerAssignment.provider = :provider
+		and
+			providerAssignment != :providerAssignment
+	]]></query>
+	<query name="findExternalProviderAssignmentsByMedicalFacility"><![CDATA[
+	  select providerAssignment
+	  from omis.health.domain.ProviderAssignment providerAssignment
+	  where ((providerAssignment.dateRange.startDate <= :date or providerAssignment.dateRange.startDate is null)
+	     and (providerAssignment.dateRange.endDate >= :date or providerAssignment.dateRange.endDate is null))
+	    and providerAssignment.medicalFacility = :medicalFacility
+	]]></query>
+	<query name="findExternalProviderAssignmentsForFacilityByMedicalFacility"><![CDATA[
+	  select providerAssignment
+	  from omis.health.domain.ProviderAssignment providerAssignment
+	  where ((providerAssignment.dateRange.startDate <= :date or providerAssignment.dateRange.startDate is null)
+	     and (providerAssignment.dateRange.endDate >= :date or providerAssignment.dateRange.endDate is null))
+	    and providerAssignment.medicalFacility = :medicalFacility
+	    and providerAssignment.facility = :facility
+	]]></query>
+	<query name="findInternalProviderAssignmentForFacilityOnDate"><![CDATA[
+	  select providerAssignment
+	  from omis.health.domain.ProviderAssignment providerAssignment
+	  where ((providerAssignment.dateRange.startDate <= :date or providerAssignment.dateRange.startDate is null)
+	      and (providerAssignment.dateRange.endDate >= :date or providerAssignment.dateRange.endDate is null))
+	    and providerAssignment.medicalFacility is null
+	    and providerAssignment.contracted is false
+	    and providerAssignment.facility = :facility
+	]]></query>
+</hibernate-mapping>

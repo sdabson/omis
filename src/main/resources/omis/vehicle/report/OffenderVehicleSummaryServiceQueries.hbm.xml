@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Yidong Li
+ - Author: Ryan Johns
+ - Date:   Jun 2, 2016
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.vehicle.report">
+	<query name="findVehicleSummariesByOffender"><![CDATA[
+select new omis.vehicle.report.OffenderVehicleSummary(
+		vehicleAssociation.id,   
+		vehicleLicense.plateNumber,
+		(
+			select vehicleOwnerAssociation.ownerDescription
+			from omis.vehicle.domain.VehicleOwnerAssociation vehicleOwnerAssociation
+				right outer join vehicleOwnerAssociation.vehicleAssociation vehicleAssociationOwnerFirstName
+			where vehicleAssociationOwnerFirstName.offender = :offender
+				and vehicleAssociationOwnerFirstName = vehicleAssociation
+		),
+		vehicleColor.name,
+		vehicleMake.name,
+		vehicleModel.name,
+		vehicleAssociation.year,
+		vehicleAssociation.dateRange.startDate,
+		vehicleAssociation.dateRange.endDate,
+		state.name
+      ) 
+    from 
+    	omis.vehicle.domain.VehicleLicense vehicleLicense
+    	right outer join vehicleLicense.vehicleAssociation vehicleAssociation
+    	left outer join vehicleAssociation.vehicleColor vehicleColor
+      	left outer join vehicleAssociation.vehicleModel vehicleModel
+      	left outer join vehicleAssociation.vehicleMake vehicleMake   
+        left outer join vehicleLicense.state state
+        where vehicleAssociation.offender = :offender
+ 
+	]]></query>
+</hibernate-mapping>

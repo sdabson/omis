@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.domain">
+	<class entity-name="omis.employment.domain.EmploymentChangeReason"
+		proxy="omis.employment.domain.EmploymentChangeReason"
+		name="omis.employment.domain.impl.EmploymentChangeReasonImpl"
+		table="`EMPLOYMENT_CHANGE_REASON`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EMPLOYMENT_CHANGE_REASON_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true" unique="true"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+	</class>
+	<query name="findEmploymentChangeReasons"><![CDATA[
+		select endReason
+		from
+			omis.employment.domain.EmploymentChangeReason endReason
+		where
+			endReason.valid = true
+			order by endReason.name
+	]]></query>
+	<query name="findEmploymentChangeReason"><![CDATA[
+		select endReason
+		from
+			omis.employment.domain.EmploymentChangeReason endReason
+		where
+			endReason.name = :name
+	]]></query>
+	<query name="findEmploymentChangeReasonExcluding"><![CDATA[
+		select endReason
+		from
+			omis.employment.domain.EmploymentChangeReason endReason
+		where
+			endReason.name = :name
+		and
+			endReason <> :excludedChangeReason
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.conviction.report">
+	<query name="summarizeConvictionsByPerson"><![CDATA[
+		select new omis.conviction.report.ConvictionSummary(
+			conviction.id,
+			conviction.courtCase.id,
+			conviction.date,
+			offense.name,
+			conviction.counts,
+			conviction.severity,
+			case when conviction.flags.violentOffense = 'Y' then true else false end as violentOffense,
+			case when conviction.flags.sexualOffense = 'Y' then true else false end as sexualOffense,
+			case when conviction.flags.paroleIneligible = 'Y' then true else false end as paroleIneligible,
+			case when conviction.flags.supervisedReleaseIneligible = 'Y' then true else false end as supervisedReleaseIneligible)
+		from omis.conviction.domain.Conviction conviction
+		left join conviction.courtCase.docket docket
+		left join docket.person defendant
+		left join conviction.offense offense
+		where
+			defendant = :person
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.IrregularScheduleDay"
+		proxy="omis.health.domain.IrregularScheduleDay"
+		name="omis.health.domain.impl.IrregularScheduleDayImpl"
+		table="`IRREGULAR_SCHEDULE_DAY`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`IRREGULAR_SCHEDULE_DAY_SEQ`</param>
+			</generator>
+		</id>
+		<component name="timeRange">
+					<property name="startDate" column="`START_TIME`" not-null="true"/>
+					<property name="endDate" column="`END_TIME`" not-null="true"/>
+		</component>
+		<property name="day" column="`DAY`" not-null="true" type="date"/>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ProviderAssignment" unique="false"/>
+	</class>
+	<query name="findIrregularScheduleDay"><![CDATA[
+		from
+			omis.health.domain.IrregularScheduleDay irregularScheduleDay
+		where
+			irregularScheduleDay.day = :day
+		and
+			irregularScheduleDay.providerAssignment = :providerAssignment
+	]]></query>
+	<query name="findIrregularScheduleDayByProviderAndDateRange"><![CDATA[
+		from omis.health.domain.IrregularScheduleDay isd
+	   where isd.providerAssignment = :providerAssignment
+	     and (trunc(isd.day) >= trunc(:startDate)
+	      or :startDate is null)
+	     and (trunc(isd.day) <= trunc(:endDate)
+	      or :endDate is null)
+	   order by isd.day asc
+	]]></query>
+</hibernate-mapping>

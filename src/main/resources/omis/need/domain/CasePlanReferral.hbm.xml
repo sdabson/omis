@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.need.domain">
+	<typedef name="responseCategory" class="org.hibernate.type.EnumType">
+       <param name="enumClass">omis.need.domain.ResponseCategory</param>
+       <param name="useNamed">true</param>
+       <param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.need.domain.CasePlanReferral"
+		proxy="omis.need.domain.CasePlanReferral"
+		name="omis.need.domain.impl.CasePlanReferralImpl"
+		table="`CASE_PLAN_REFERRAL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CASE_PLAN_REFERRAL_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="objective" column="`OBJECTIVE_ID`" cascade="none" not-null="true"
+			entity-name="omis.need.domain.CasePlanObjective" unique="false"/>
+		<many-to-one name="organization" column="`ORGANIZATION_ID`" cascade="none" not-null="true"
+			entity-name="omis.organization.domain.Organization" unique="false"/>	
+		<many-to-one name="department" column="`ORGANIZATION_DEPT_ID`" cascade="none" not-null="false"
+			entity-name="omis.organization.domain.OrganizationDepartment" unique="false"/>	
+		<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="false"
+			entity-name="omis.need.domain.ReferralCategory" unique="false"/>	
+		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
+		<property name="comment" column="`COMMENT`" not-null="true" type="java.lang.String"/>
+		<component name="response">
+       		<property name="date" column="`RESPONSE_DATE`" not-null="false" type="java.util.Date"/>
+       		<property name="category" column="`RESPONSE_CATEGORY`" not-null="false" type="responseCategory"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findReferralsByCasePlanObjective">
+	<![CDATA[
+		from
+			omis.need.domain.CasePlanReferral referral
+		where
+			referral.objective = :objective
+		order by
+			referral.date desc
+	]]></query>
+	<query name="findCasePlanReferral">
+	<![CDATA[
+		from omis.need.domain.CasePlanReferral referral
+		where referral.objective = :objective
+		and referral.date = :date
+	 	and referral.organization = :organization
+	 	and (:department is null or referral.department = :department)
+	]]></query>
+		<query name="findCasePlanReferralExcluding">
+	<![CDATA[
+		from omis.need.domain.CasePlanReferral referral
+		where referral.objective = :objective
+		and referral.date = :date
+	 	and referral.organization = :organization
+	 	and referral != :referral
+	 	and (:department is null or referral.department = :department)
+	]]></query>
+</hibernate-mapping>
+	

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.security.domain">
+	<class entity-name="omis.security.domain.AccessAttempt"
+	       proxy="omis.security.domain.AccessAttempt"
+	       name="omis.security.domain.impl.AccessAttemptImpl"
+	       table="`ACCESS_ATTEMPT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`ACCESS_ATTEMPT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="username" type="string" column="`USERNAME`" not-null="true" />
+		<property name="date" type="timestamp" column="`DATE`" not-null="true" />
+		<property name="remoteAddress" type="string" column="`REMOTE_ADDRESS`" not-null="true"/>
+		<property name="remoteHost" type="string" column="`REMOTE_HOST`" not-null="true"/>
+		<property name="success" type="yes_no" column="`SUCCESS`" not-null="true"/>
+		<property name="userAgent" type="string" column="`USER_AGENT`" />
+	</class>
+	<query name="findAccessAttemptsByUsername"><![CDATA[
+	from omis.security.domain.AccessAttempt aa
+		where aa.username = :username
+	order by aa.date desc, aa.username, aa.remoteAddress
+	]]></query>
+</hibernate-mapping>

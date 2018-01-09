@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  <bean id="workAssignmentService" class="omis.workassignment.service.impl.WorkAssignmentServiceImpl">
+    <constructor-arg name="workAssignmentDelegate" ref="workAssignmentDelegate"/>
+    <constructor-arg name="fenceRestrictionDelegate" ref="fenceRestrictionDelegate"/>
+    <constructor-arg name="workAssignmentCategoryDelegate" ref="workAssignmentCategoryDelegate"/>
+    <constructor-arg name="workAssignmentChangeReasonDelegate" ref="workAssignmentChangeReasonDelegate"/>
+    <constructor-arg name="workAssignmentNoteDelegate" ref="workAssignmentNoteDelegate"/>
+  </bean>
+  
+  <bean id="workAssignmentReportService" class="omis.workassignment.report.impl.hibernate.WorkAssignmentReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="workAssignmentProfileItemReportService" class="omis.workassignment.report.impl.hibernate.WorkAssignmentProfileItemReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentSummaryItemReportService" class="omis.workassignment.report.impl.hibernate.WorkAssignmentSummaryItemReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Service delegates -->
+  <bean id="fenceRestrictionDelegate"
+        class="omis.workassignment.service.delegate.FenceRestrictionDelegate">
+    <constructor-arg name="fenceRestrictionDao" ref="fenceRestrictionDao"/>
+    <constructor-arg name="fenceRestrictionInstanceFactory" ref="fenceRestrictionInstanceFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentCategoryDelegate"
+        class="omis.workassignment.service.delegate.WorkAssignmentCategoryDelegate">
+    <constructor-arg name="workAssignmentCategoryDao" ref="workAssignmentCategoryDao"/>
+    <constructor-arg name="workAssignmentCategoryInstanceFactory" ref="workAssignmentCategoryInstanceFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentChangeReasonDelegate"
+        class="omis.workassignment.service.delegate.WorkAssignmentChangeReasonDelegate">
+    <constructor-arg name="workAssignmentChangeReasonDao" ref="workAssignmentChangeReasonDao"/>
+    <constructor-arg name="workAssignmentChangeReasonInstanceFactory" ref="workAssignmentChangeReasonInstanceFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentDelegate"
+        class="omis.workassignment.service.delegate.WorkAssignmentDelegate">
+    <constructor-arg name="workAssignmentInstanceFactory" ref="workAssignmentInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    <constructor-arg name="workAssignmentDao" ref="workAssignmentDao"/>
+  </bean>
+  
+  <bean id="workAssignmentGroupDelegate"
+        class="omis.workassignment.service.delegate.WorkAssignmentGroupDelegate">
+    <constructor-arg name="workAssignmentGroupDao" ref="workAssignmentGroupDao"/>
+    <constructor-arg name="workAssignmentGroupInstanceFactory" ref="workAssignmentGroupInstanceFactory"/>
+  </bean>
+  
+   <bean id="workAssignmentNoteDelegate"
+        class="omis.workassignment.service.delegate.WorkAssignmentNoteDelegate">
+    <constructor-arg name="workAssignmentNoteInstanceFactory" ref="workAssignmentNoteInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    <constructor-arg name="workAssignmentNoteDao" ref="workAssignmentNoteDao"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="fenceRestrictionDao" class="omis.workassignment.dao.impl.hibernate.FenceRestrictionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.FenceRestriction"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentCategoryDao" class="omis.workassignment.dao.impl.hibernate.WorkAssignmentCategoryDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentCategory"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentChangeReasonDao" class="omis.workassignment.dao.impl.hibernate.WorkAssignmentChangeReasonDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentChangeReason"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentDao" class="omis.workassignment.dao.impl.hibernate.WorkAssignmentDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignment"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentNoteDao" class="omis.workassignment.dao.impl.hibernate.WorkAssignmentNoteDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentNote"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="workAssignmentGroupDao" class="omis.workassignment.dao.impl.hibernate.WorkAssignmentGroupDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentGroup"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  <bean id="fenceRestrictionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.FenceRestriction"/>
+  </bean>
+  
+  <bean id="workAssignmentInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignment"/>
+  </bean>
+  
+  <bean id="workAssignmentCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentCategory"/>
+  </bean>
+  
+  <bean id="workAssignmentChangeReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentChangeReason"/>
+  </bean>
+  
+  <bean id="workAssignmentGroupInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentGroup"/>
+  </bean>
+  
+  <bean id="workAssignmentNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentNote"/>
+  </bean>
+  
+  <!-- Property editor factory -->
+  <bean id="fenceRestrictionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="fenceRestrictionDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.FenceRestriction"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+ <bean id="workAssignmentPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="workAssignmentDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignment"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="workAssignmentCategoryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="workAssignmentCategoryDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentCategory"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="workAssignmentChangeReasonPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="workAssignmentChangeReasonDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentChangeReason"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="workAssignmentGroupPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="workAssignmentGroupDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentGroup"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="workAssignmentNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="workAssignmentNoteDao"/>
+    <constructor-arg name="entityName" value="omis.workassignment.domain.WorkAssignmentNote"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

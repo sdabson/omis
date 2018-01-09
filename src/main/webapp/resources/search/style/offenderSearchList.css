@@ -1,0 +1,68 @@
+/*
+ * Offender search list styling
+ *
+ * Author: Ryan Johns
+ * Version: 0.1.0 (Oct 29, 2014)
+ * Since: OMIS 3.0
+ */
+ 
+ div.inlineBlock {
+ 	display:inline-block;
+ }
+ 
+ ul.ajaxList {
+	padding: 0px;
+	list-style-type:none;
+}
+ 
+ 
+ul.ajaxList > li {
+	padding: 2px;
+	margin: 2px;
+}
+ 
+ul.ajaxList > li {
+	border-style: solid;
+	border-width:  1px;
+}
+
+ul.ajaxList li img {
+    height: 50px;
+    margin: 0px 15px 0px 0px;
+    width: 50px;
+}
+ 
+ul.ajaxList li {
+  padding-top: 0px;
+  padding-bottom: 4px;
+}
+
+ul.ajaxList li p {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-top: 0px;
+	margin-bottom: 1px;
+}
+
+#offenderSearch {
+	width: 150px;
+	
+}
+
+#offenderSearchResults {
+	min-height: 50px;
+	max-height: 400px;
+}
+
+ul.ajaxList li h3, ul.ajaxList li p, ul.ajaxList li img {
+	display: inline;
+	vertical-align: middle;
+}
+
+#offenderSearchForm, #offenderSearchResults {
+}
+
+#offenderSearchForm p {
+	margin-top: 15px;	
+}
+

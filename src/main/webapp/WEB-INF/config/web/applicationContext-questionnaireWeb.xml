@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+		
+		<context:component-scan base-package="omis.questionnaire.web.controller" />
+		
+		<bean id="administeredQuestionnaireReportService" class="omis.questionnaire.report.impl.hibernate.AdministeredQuestionnaireReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<bean id="questionnaireReportService" class="omis.questionnaire.report.impl.hibernate.QuestionnaireReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<bean id="administeredQuestionnaireProfileSummaryReportService"
+			class="omis.questionnaire.report.impl.hibernate.AdministeredQuestionnaireProfileSummaryReportServiceHibernateImpl">
+				<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<bean id="questionnaireFormValidator"
+			class="omis.questionnaire.web.validator.QuestionnaireFormValidator">
+		</bean>
+		
+		<bean id="questionnaireReviewFormValidator"
+			class="omis.questionnaire.web.validator.QuestionnaireReviewFormValidator">
+		</bean>
+		
+		<bean id="questionnaireSectionFormValidator"
+			class="omis.questionnaire.web.validator.QuestionnaireSectionFormValidator">
+		</bean>
+		
+		<bean id="questionnaireTypeFormValidator"
+			class="omis.questionnaire.web.validator.QuestionnaireTypeFormValidator">
+		</bean>
+		
+		<bean id="questionAnswerEditFormValidator"
+			class="omis.questionnaire.web.validator.QuestionAnswerEditFormValidator">
+		</bean>
+		
+		<bean id="questionEditFormValidator"
+			class="omis.questionnaire.web.validator.QuestionEditFormValidator">
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionFormValidator"
+			class="omis.questionnaire.web.validator.AdministeredQuestionnaireSectionFormValidator">
+		</bean>
+		
+		<aop:config>
+			<aop:pointcut id="questionnaireSectionControllerOperation"
+				expression="execution(* omis.questionnaire.web.controller.QuestionnaireSectionController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="questionnaireSectionControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="questionnaireControllerOperation"
+				expression="execution(* omis.questionnaire.web.controller.QuestionnaireController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="questionnaireControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="administeredQuestionnaireControllerOperation"
+				expression="execution(* omis.questionnaire.web.controller.AdministeredQuestionnaireController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="administeredQuestionnaireControllerOperation"/>	
+		</aop:config>
+		
+	<!-- Profile Item -->
+
+		<bean id="administeredQuestionnaireProfileItem"
+			class="omis.questionnaire.web.profile.AdministeredQuestionnaireProfileItem">
+			<constructor-arg name="requiredAuthorizations">
+				<set>
+					<value>QUESTIONNAIRE_LIST</value>
+					<value>ADMIN</value>
+				</set>
+			</constructor-arg>
+			<constructor-arg name="includePage" value="/WEB-INF/views/questionnaire/includes/profileItem.jsp"/>
+			<constructor-arg name="name" value="questionnaire"/>
+			<constructor-arg name="profileItemRegistry" ref="caseManagementProfileItemRegistry"/>
+			<constructor-arg name="administeredQuestionnaireProfileSummaryReportService" ref="administeredQuestionnaireProfileSummaryReportService"/>
+			<constructor-arg name="enabled" value="${administeredQuestionnaireProfileItemEnabled}"/>
+		</bean>
+</beans>

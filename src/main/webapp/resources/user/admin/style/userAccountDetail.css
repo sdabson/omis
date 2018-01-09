@@ -1,0 +1,30 @@
+/*
+ * Style sheet for user account detail screen.
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Oct 19, 2012)
+ * Since: OMIS 3.0
+ */
+
+span#groups, span#roles, span#roleSpans {
+	display: block;
+}
+
+span#roleSpans, span#groups {
+	float: left;
+	width: 75%;
+}
+
+span#roles span.userRole, span#groups span {
+	display: inline-block;
+	min-width: 32%;
+}
+
+span.userRoleName {
+	display: none;
+}
+
+#accessAttemptsContainer {
+	height: 20em;
+	width: 100%;
+	overflow-y: scroll;
+}

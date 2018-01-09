@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - MisdemeanorCitation mapping.
+  -
+  - Author: Trevor Isles
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.citation.domain">
+	<class entity-name="omis.citation.domain.MisdemeanorCitation"
+		proxy="omis.citation.domain.MisdemeanorCitation"
+		name="omis.citation.domain.impl.MisdemeanorCitationImpl"
+		table="`MISDEMEANOR_CITATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`MISDEMEANOR_CITATION_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<many-to-one name="offense" column="`OFFENSE_ID`" not-null="true" 
+			 entity-name="omis.citation.domain.MisdemeanorOffense"/>
+		<many-to-one name="state" column="`STATE_ID`" not-null="false" 
+			entity-name="omis.region.domain.State"/>		
+		<many-to-one name="city" column="`CITY_ID`" not-null="false" 
+			entity-name="omis.region.domain.City"/>
+		
+		<property name="month" column="`MONTH`" not-null="false">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.datatype.Month</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<property name="day" column="`DAY`" type="java.lang.Integer" not-null="false"/>
+		<property name="year" column="`YEAR`" type="java.lang.Integer" not-null="true"/>
+		<property name="counts" column="`COUNTS`" type="java.lang.Integer" not-null="false"/>
+	
+		<property name="disposition" column="`DISPOSITION`" not-null="false">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.citation.domain.MisdemeanorDisposition</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findCitationByOffender"><![CDATA[
+		select misdemeanorCitation
+		from
+			omis.citation.domain.MisdemeanorCitation misdemeanorCitation
+		where
+			misdemeanorCitation.offender = :offender
+		order by misdemeanorCitation.offender.name.lastName, 
+		misdemeanorCitation.offender.name.firstName, misdemeanorCitation.offender.offenderNumber,
+		misdemeanorCitation.offense.name, misdemeanorCitation.year
+	]]></query>
+		<query name="findExcludingCitation"><![CDATA[
+		select misdemeanorCitation
+		from
+			omis.citation.domain.MisdemeanorCitation misdemeanorCitation
+		where
+			misdemeanorCitation.offender = :offender
+		and
+			misdemeanorCitation.year = :year
+		and
+			misdemeanorCitation.offense = :offense
+		and
+			(misdemeanorCitation.state = :state or (misdemeanorCitation.state is null and :state is null))	
+		and
+			(misdemeanorCitation.day = :day or (misdemeanorCitation.day is null and :day is null))
+		and
+			(misdemeanorCitation.month = :month or (misdemeanorCitation.month is null and :month is null))
+		and
+			misdemeanorCitation.disposition = :disposition
+		and
+			misdemeanorCitation <> :excludedCitation
+	]]></query>
+		<query name="findCitations"><![CDATA[
+		select misdemeanorCitation
+		from
+			omis.citation.domain.MisdemeanorCitation misdemeanorCitation
+		where
+			misdemeanorCitation.offender = :offender
+		and	
+			misdemeanorCitation.year = :year
+		and	
+			misdemeanorCitation.offense = :offense
+		and
+			(misdemeanorCitation.state = :state or (misdemeanorCitation.state is null and :state is null))	
+		and
+			(misdemeanorCitation.day = :day or (misdemeanorCitation.day is null and :day is null))
+		and
+			(misdemeanorCitation.month = :month or (misdemeanorCitation.month is null and :month is null))
+		and	
+			misdemeanorCitation.disposition = :disposition
+		order by 
+			misdemeanorCitation.offender.name.lastName, misdemeanorCitation.offender.name.firstName, 
+			misdemeanorCitation.offender.offenderNumber,misdemeanorCitation.offense.name, 
+			misdemeanorCitation.year, misdemeanorCitation.state, misdemeanorCitation.month,
+			misdemeanorCitation.day
+	]]></query>
+	<query name="findMisdemeanorCitationSummaryByOffender"><![CDATA[
+		select misdemeanorCitation
+		from
+			omis.citation.domain.MisdemeanorCitation misdemeanorCitation
+		where
+			misdemeanorCitation.offender = :offender
+		order by misdemeanorCitation.offender.name.lastName, 
+		misdemeanorCitation.offender.name.firstName, misdemeanorCitation.offender.offenderNumber,
+		misdemeanorCitation.offense.name, misdemeanorCitation.year desc, to_date(misdemeanorCitation.month, 'MONTH') desc,
+		misdemeanorCitation.day desc
+	]]></query>
+	<query name="findMisdemeanorCitationCountByCitations"><![CDATA[
+			select count(misdemeanorCitation.id)
+		from
+			omis.citation.domain.MisdemeanorCitation misdemeanorCitation
+		where
+			misdemeanorCitation.offender = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<class entity-name="omis.grievance.domain.GrievanceDisposition"
+		proxy="omis.grievance.domain.GrievanceDisposition"
+		name="omis.grievance.domain.impl.GrievanceDispositionImpl"
+		table="`GRIEVANCE_DISP`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`GRIEVANCE_DISP_SEQ`</param>
+			</generator>
+		</id>
+		<property name="receivedDate" column="`RECEIVED_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="responseDueDate" column="`RESPONSE_DUE_DATE`" type="java.util.Date" not-null="false"/>
+		<many-to-one name="responseBy" entity-name="omis.user.domain.UserAccount" column="`RESPONSE_BY_ID`" not-null="false"/>
+		<property name="responseToOffenderDate" column="`RESPONSE_TO_OFFENDER_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="appealDate" column="`APPEAL_DATE`" type="java.util.Date" not-null="false"/>
+		<property name="notes" type="java.lang.String" not-null="false" column="`NOTES`"/>
+		<many-to-one name="status" entity-name="omis.grievance.domain.GrievanceDispositionStatus" not-null="false" column="`STATUS_ID`"/>
+		<many-to-one name="grievance" entity-name="omis.grievance.domain.Grievance" not-null="true" column="`GRIEVANCE_ID`"/>
+		<many-to-one name="reason" entity-name="omis.grievance.domain.GrievanceDispositionReason" not-null="false" column="`REASON_ID`"/>
+		<property name="level" column="`LEVEL`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.grievance.domain.GrievanceDispositionLevel</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findGrievanceDispositionByGrievance"><![CDATA[
+		from
+			omis.grievance.domain.GrievanceDisposition grievanceDisposition
+		where
+			grievanceDisposition.grievance = :grievance
+	]]></query>
+	<query name="findGrievanceDisposition"><![CDATA[
+		from
+			omis.grievance.domain.GrievanceDisposition grievanceDisposition
+		where
+			grievanceDisposition.grievance = :grievance
+		and
+			grievanceDisposition.level = :grievanceDispositionLevel
+	]]></query>
+	<query name="findExcludingGrievanceDisposition"><![CDATA[
+		from
+			omis.grievance.domain.GrievanceDisposition grievanceDisposition
+		where
+			grievanceDisposition.grievance = :grievance
+		and
+			grievanceDisposition.level = :level
+		and
+			grievance not in (:excludedDispositions)
+	]]></query>
+</hibernate-mapping>

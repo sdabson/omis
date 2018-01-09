@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Query for reporting identification numbers.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.identificationnumber.domain">
+	<query name="summarizeIdentificationNumbersByOffenderOnDate"><![CDATA[
+		select new omis.identificationnumber.report.IdentificationNumberSummary(
+			identificationNumber.id,
+			offenderName.lastName,
+			offenderName.firstName,
+			offenderName.middleName,
+			offenderName.suffix,
+			offender.offenderNumber,
+			issuer.name,
+			category.name,
+			identificationNumber.value,
+			identificationNumber.issueDate,
+			identificationNumber.expireDate,
+			cast(:effectiveDate as timestamp))
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+			inner join identificationNumber.offender offender
+			inner join offender.name offenderName
+			inner join identificationNumber.issuer issuer
+			inner join identificationNumber.category category
+		where identificationNumber.offender = :offender
+	]]></query>
+	
+	<query name="summarizeIdentificationNumberCategories"><![CDATA[
+		select new omis.identificationnumber.report.IdentificationNumberCategorySummary(
+			category.id,
+			category.name,
+			category.valid)
+		from omis.identificationnumber.domain.IdentificationNumberCategory category
+		
+	]]></query>
+	<query name="findIdentificationNumberSummariesWithSingleMultitudeByOffender"><![CDATA[
+		select new omis.identificationnumber.report.IdentificationNumberSummary(
+			identificationNumber.id,
+			issuer.name,
+			category.name,
+			identificationNumber.value)
+		from omis.identificationnumber.domain.IdentificationNumber identificationNumber
+			inner join identificationNumber.issuer issuer
+			inner join identificationNumber.category category
+		where
+			identificationNumber.offender = :offender
+		and
+			category.multitude = 'SINGLE'
+		order by
+			category, identificationNumber.expireDate desc
+	]]></query>
+</hibernate-mapping>

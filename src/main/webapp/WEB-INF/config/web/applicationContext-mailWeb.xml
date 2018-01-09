@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  <!--  
+  <bean id="employmentFormValidator"
+        class="omis.employment.web.validator.EmploymentFormValidator"/>  
+	-->
+  <!-- Web controller packages -->
+  <!--  
+  <context:component-scan base-package="omis.employment.web.controller"/>
+  -->
+  <!-- Use controller transactions -->
+  <!--  
+  <aop:config>
+      <aop:pointcut id="employmentControllerOperation" expression="execution(* omis.employment.web.controller.EmploymentController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="employmentControllerOperation"/>
+  </aop:config>
+  <aop:config>
+      <aop:pointcut id="employerSearchControllerOperation" expression="execution(* omis.employment.web.controller.EmployerSearchController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="employerSearchControllerOperation"/>
+  </aop:config>
+  -->
+</beans>

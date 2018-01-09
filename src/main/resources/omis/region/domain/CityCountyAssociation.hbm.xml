@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.region.domain">
+	<class entity-name="omis.region.domain.CityCountyAssociation"
+	       proxy="omis.region.domain.CityCountyAssociation"
+	       name="omis.region.domain.impl.CityCountyAssociationImpl"
+	       table="`CITY_COUNTY_ASSOC`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`CITY_COUNTY_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCityCountyAssociation">
+		  <many-to-one name="city" column="`CITY_ID`" not-null="true"
+		               entity-name="omis.region.domain.City"/>
+		  <many-to-one name="county" column="`COUNTY_ID`" not-null="true"
+		              entity-name="omis.region.domain.County"/>
+		</properties>
+	</class>
+	<query name="findCityCountyAssociation"><![CDATA[
+		select cityCountyAssociation
+		from omis.region.domain.CityCountyAssociation as cityCountyAssociation
+		where cityCountyAssociation.city = :city
+		  and cityCountyAssociation.county = :county
+	]]></query>
+	<query name="findCityCountyAssociationExcluding"><![CDATA[
+		select cityCountyAssociation
+		from omis.region.domain.CityCountyAssociation as cityCountyAssociation
+		where cityCountyAssociation.city = :city
+		  and cityCountyAssociation.county = :county
+		  and cityCountAssociation not in (:excludedCityCountyAssociations)
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.domain">
+	<class entity-name="omis.adaaccommodation.domain.AccommodationCategory"
+		proxy="omis.adaaccommodation.domain.AccommodationCategory" name="omis.adaaccommodation.domain.impl.AccommodationCategoryImpl"
+		table="`ADA_ACCMDTN_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADA_ACCMDTN_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true" />
+		<property name="description" column="`DESCRIPTION`" not-null="true" unique="true"/>
+		<property name="valid" column="`VALID`" not-null="false"
+			type="yes_no" />
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`CREATE_DATE`" not-null="true" />
+		</component>
+	</class>
+	<query name="findAllAccommodationCategories"><![CDATA[
+	select category
+		from omis.adaaccommodation.domain.AccommodationCategory category
+		order by
+		category.name
+	]]></query>
+</hibernate-mapping>

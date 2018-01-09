@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.violationevent.domain">
+	<class entity-name="omis.violationevent.domain.DisciplinaryCodeViolation"
+			proxy="omis.violationevent.domain.DisciplinaryCodeViolation"
+			name="omis.violationevent.domain.impl.DisciplinaryCodeViolationImpl"
+			table="`DISCIPLINARY_CD_VIOLATN`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`DISCIPLINARY_CD_VIOLATN_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="disciplinaryCode" column="`DISCIPLINARY_CODE_ID`" entity-name="omis.disciplinaryCode.domain.DisciplinaryCode" not-null="true" />
+			<many-to-one name="violationEvent" column="`VIOLATION_EVENT_ID`" entity-name="omis.violationevent.domain.ViolationEvent" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findDisciplinaryCodeViolation"><![CDATA[
+		select disciplinaryCodeViolation
+		from
+			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+		where
+			disciplinaryCodeViolation.disciplinaryCode = :disciplinaryCode
+		and
+			disciplinaryCodeViolation.violationEvent = :violationEvent
+	]]></query>
+	<query name="findDisciplinaryCodeViolationExcluding"><![CDATA[
+		select disciplinaryCodeViolation
+		from
+			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+		where
+			disciplinaryCodeViolation.disciplinaryCode = :disciplinaryCode
+		and
+			disciplinaryCodeViolation.violationEvent = :violationEvent
+		and
+			disciplinaryCodeViolation != :disciplinaryCodeViolation
+	]]></query>
+	<query name="findDisciplinaryCodeViolationsByViolationEvent"><![CDATA[
+		select disciplinaryCodeViolation
+		from
+			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+		where
+			disciplinaryCodeViolation.violationEvent = :violationEvent
+	]]></query>
+	<query name="findUnresolvedDisciplinaryCodeViolationsByViolationEvent"><![CDATA[
+		select disciplinaryCodeViolation
+		from
+			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+		where
+			disciplinaryCodeViolation.violationEvent = :violationEvent
+		and
+			disciplinaryCodeViolation not in
+			(
+				select disciplinaryCodeViolationSub
+				from
+					omis.hearing.domain.Infraction infraction
+				inner join
+					infraction.disciplinaryCodeViolation disciplinaryCodeViolationSub
+				where
+					disciplinaryCodeViolationSub = disciplinaryCodeViolation
+			)
+	]]></query>
+</hibernate-mapping>

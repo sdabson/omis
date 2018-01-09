@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- Queries to report correctional status terms. -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+
+	<!--
+	  -Summarizes correctional status terms by offender.
+	  - Note: this query is incomplete - SA
+	  -->
+	<query name="findCorrectionalStatusTermSummariesByOffender"><![CDATA[
+		select new omis.supervision.report.CorrectionalStatusTermSummary(
+				correctionalStatusTerm.id,
+				offenderName.lastName,
+				offenderName.firstName,
+				offenderName.middleName,
+				offender.offenderNumber,
+				correctionalStatus.name,
+				correctionalStatusTerm.dateRange.startDate,
+				correctionalStatusTerm.dateRange.endDate,
+				(
+				  select startChangeReason.name
+				  from omis.supervision.domain.PlacementTerm placementTerm
+				  inner join placementTerm.startChangeReason startChangeReason
+				  where placementTerm.correctionalStatusTerm = correctionalStatusTerm
+				    and (placementTerm.dateRange.startDate = correctionalStatusTerm.dateRange.startDate
+				      or (placementTerm.dateRange.startDate is null and correctionalStatusTerm.dateRange.startDate is null))
+				),
+				(
+				  select endChangeReason.name
+				  from omis.supervision.domain.PlacementTerm placementTerm
+				  inner join placementTerm.endChangeReason endChangeReason
+				  where placementTerm.correctionalStatusTerm = correctionalStatusTerm
+				    and (placementTerm.dateRange.endDate = correctionalStatusTerm.dateRange.endDate
+				      or (placementTerm.dateRange.endDate is null and correctionalStatusTerm.dateRange.endDate is null))
+				),
+				cast(:effectiveDate as timestamp)
+			)
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		inner join correctionalStatusTerm.offender offender
+		inner join offender.name offenderName
+		inner join correctionalStatusTerm.correctionalStatus correctionalStatus
+		where
+			offender = :offender
+			and ((correctionalStatusTerm.dateRange.startDate is null
+				or :startDate is null
+				or correctionalStatusTerm.dateRange.startDate <= :startDate)
+			  and (correctionalStatusTerm.dateRange.endDate is null
+			    or :endDate is null
+				or correctionalStatusTerm.dateRange.endDate >= :endDate))
+		order by correctionalStatusTerm.dateRange.startDate desc
+	]]></query>
+</hibernate-mapping>

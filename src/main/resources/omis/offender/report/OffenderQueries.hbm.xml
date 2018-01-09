@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ - Offender reporting queries.
+ -
+ - Author: Stephen Abson
+ - Author: Ryan Johns
+ - Version: 0.1.0 (Oct 22, 2013)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offender.report">
+	<!-- Basic offender summary -->
+	<query name="summarizeOffender"><![CDATA[
+		 select new omis.offender.report.impl.OffenderSummaryImpl(offender.id,
+				 offender.offenderNumber, offender.name.lastName,
+				 offender.name.firstName, pi.birthDate, pi.sex)
+		    from omis.person.domain.PersonIdentity pi
+right outer join pi.person offender
+		   where offender = :offender
+	]]></query>
+	<!--
+	  - Summary with placement term
+	  -
+	  - This query does not work as Hibernate does not allow conditions on
+	  - right outer joins (with clause). An attempt is made in the where
+	  - clause is made in this query to stipulate the condition - which does
+	  - not work - if a record exists that does not meet the date range
+	  - condition no results are returned. This would not be the case if the
+	  - condition was stipulated in with clause (translates to ON).
+	  
+	<query name="summarizeOffenderOnDate_"><![CDATA[
+		select new omis.offender.report.impl.OffenderSummaryImpl(offender.id,
+				offender.offenderNumber, offender.name.lastName,
+				offender.name.firstName, offenderIdentity.birthDate,
+				offenderIdentity.sex,
+				offenderPhoto.date, association.id)
+		from
+			omis.offenderphoto.domain.OffenderPhotoAssociation as association
+			right outer join association.photo as offenderPhoto
+			right outer join association.person as offender
+			left outer join offender.identity as offenderIdentity
+			
+		where
+			offender = :offender and association.profile = true
+			
+	]]></query> -->
+	
+	<query name="summarizeOffenderOnDate">
+	<!-- Query table drivers are 
+		 Offender o for name and identity joins-->
+	<![CDATA[
+		  select new omis.offender.report.impl.OffenderSummaryImpl(o.id, 
+		  		 o.offenderNumber, name.lastName, name.firstName,
+		  		 name.middleName, name.suffix, pi.birthDate, pi.sex, pi.socialSecurityNumber)
+ 		    from omis.offender.domain.Offender o 
+ left outer join o.name name
+ left outer join o.identity pi               
+		   where o = :offender
+	]]></query>
+	<query name="summarizeOffendersByName"><![CDATA[
+	  select new omis.offender.report.impl.OffenderSummaryImpl(
+	  		offender.id, offender.offenderNumber, offenderName.lastName,
+	  		offenderName.firstName, offenderName.middleName,
+	  		offenderName.suffix, offenderIdentity.birthDate,
+	  		offenderIdentity.sex, offenderIdentity.socialSecurityNumber)
+	    from omis.offender.domain.Offender offender
+	      inner join offender.name offenderName
+	      left outer join offender.identity offenderIdentity
+	  where upper(offenderName.firstName) like upper('%' || :firstName || '%')
+	    and upper(offenderName.lastName) like upper('%' || :lastName || '%')
+	  order by offenderName.lastName, offenderName.firstName, offender.offenderNumber
+	]]></query>
+	<query name="summarizeOffendersByNameQuery"><![CDATA[
+	  select new omis.offender.report.impl.OffenderSummaryImpl(
+	  		offender.id, offender.offenderNumber, offenderName.lastName,
+	  		offenderName.firstName, offenderName.middleName,
+	  		offenderName.suffix, offenderIdentity.birthDate,
+	  		offenderIdentity.sex, offenderIdentity.socialSecurityNumber)
+	    from omis.offender.domain.Offender offender
+	      inner join offender.name offenderName
+	      left outer join offender.identity offenderIdentity
+	    where upper(offenderName.firstName) like upper('%' || :query || '%')
+	      or upper(offenderName.lastName) like upper('%' || :query || '%')
+	    order by offenderName.lastName, offenderName.firstName, offender.offenderNumber 
+	]]></query>
+	<query name="summarizeOffendersByOffenderNumber"><![CDATA[
+	  select new omis.offender.report.impl.OffenderSummaryImpl(
+	      offender.id, offender.offenderNumber, offenderName.lastName,
+	      offenderName.firstName, offenderName.middleName,
+	  	  offenderName.suffix, offenderIdentity.birthDate,
+	      offenderIdentity.sex, offenderIdentity.socialSecurityNumber)
+	  from omis.offender.domain.Offender offender
+	    inner join offender.name offenderName
+	    left outer join offender.identity offenderIdentity
+	  where offender.offenderNumber = :offenderNumber
+	  order by offenderName.lastName, offenderName.firstName, offender.offenderNumber
+	]]></query>
+	<query name="summarizeOffendersBySocialSecurityNumber"><![CDATA[
+	  select new omis.offender.report.impl.OffenderSummaryImpl(
+	      offender.id, offender.offenderNumber, offenderName.lastName,
+	      offenderName.firstName, offenderName.middleName,
+	  	  offenderName.suffix, offenderIdentity.birthDate,
+	      offenderIdentity.sex, offenderIdentity.socialSecurityNumber)
+	  from omis.offender.domain.Offender offender
+	    inner join offender.name offenderName
+	    left outer join offender.identity offenderIdentity
+	  where offenderIdentity.socialSecurityNumber = :socialSecurityNumber
+	  order by offenderName.lastName, offenderName.firstName, offender.offenderNumber
+	]]></query>
+	<query name="summarizeOffendersByBirthDate"><![CDATA[
+	  select new omis.offender.report.impl.OffenderSummaryImpl(
+	      offender.id, offender.offenderNumber, offenderName.lastName,
+	      offenderName.firstName, offenderName.middleName,
+	  	  offenderName.suffix, offenderIdentity.birthDate,
+	      offenderIdentity.sex, offenderIdentity.socialSecurityNumber)
+	  from omis.offender.domain.Offender offender
+	    inner join offender.name offenderName
+	    left outer join offender.identity offenderIdentity
+	  where offenderIdentity.birthDate = :birthDate
+	  order by offenderName.lastName, offenderName.firstName, offender.offenderNumber
+	]]></query>
+	<!-- <query name="findActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			name.lastName,
+			name.middleName,
+			name.firstName,
+			userAccount.username,
+			new date,
+			'module',
+			case
+				when
+					?.updateSignature.date is null
+				then
+					'CREATE'
+				else
+					'UPDATE'
+			end)
+		from
+			omis.offender.domain.Offender offender
+			omis.user.domain.UserAccount userAccount
+			inner join
+				userAccount.user user
+			inner join
+				user.name name
+		where
+			offender = :offender
+	]]></query> -->
+	<query name="findCourtCaseActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					courtCase.updateSignature.date
+				else
+					courtCase.creationSignature.date
+			end,
+			'courtCase',
+			case
+				when
+					courtCase.updateSignature.date > courtCase.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.courtcase.domain.CourtCase courtCase
+		inner join
+			courtCase.docket docket
+		inner join
+			docket.person offender
+		inner join
+			courtCase.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+				updateUser.name updateName
+		inner join
+			courtCase.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+				creationUser.name creationName
+		where
+			offender = :offender
+		order by courtCase.updateSignature.date desc
+	]]></query>
+	
+	<query name="findPresentenceInvestigationRequestActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					psir.updateSignature.date
+				else
+					psir.creationSignature.date
+			end,
+			'presentenceInvestigationRequest',
+			case
+				when
+					psir.updateSignature.date > psir.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		inner join
+			psir.docket docket
+		inner join
+			docket.person offender
+		inner join
+			psir.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			psir.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by psir.updateSignature.date desc
+	]]></query>
+	<query name="findPrisonTermActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					prisonTerm.updateSignature.date
+				else
+					prisonTerm.creationSignature.date
+			end,
+			'prisonTerm',
+			case
+				when
+					prisonTerm.updateSignature.date > prisonTerm.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		inner join
+			prisonTerm.offender offender
+		inner join
+			prisonTerm.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			prisonTerm.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by prisonTerm.updateSignature.date desc
+	]]></query>
+	<query name="findDetainerNotificationActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					detainerNotification.updateSignature.date
+				else
+					detainerNotification.creationSignature.date
+			end,
+			'detainerNotification',
+			case
+				when
+					detainerNotification.updateSignature.date > detainerNotification.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.detainernotification.domain.Detainer detainerNotification
+		inner join
+			detainerNotification.offender offender
+		inner join
+			detainerNotification.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			detainerNotification.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by detainerNotification.updateSignature.date desc
+	]]></query>
+	<query name="findCommitStatusActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					commitStatusTerm.updateSignature.date
+				else
+					commitStatusTerm.creationSignature.date
+			end,
+			'commitStatusTerm',
+			case
+				when
+					commitStatusTerm.updateSignature.date > commitStatusTerm.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.commitstatus.domain.CommitStatusTerm commitStatusTerm
+		inner join
+			commitStatusTerm.offender offender
+		inner join
+			commitStatusTerm.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			commitStatusTerm.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by commitStatusTerm.updateSignature.date desc
+	]]></query>
+	<query name="findCitationActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					citation.updateSignature.date
+				else
+					citation.creationSignature.date
+			end,
+			'citation',
+			case
+				when
+					citation.updateSignature.date > citation.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.citation.domain.MisdemeanorCitation citation
+		inner join
+			citation.offender offender
+		inner join
+			citation.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			citation.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by citation.updateSignature.date desc
+	]]></query>
+	<query name="findCourtCaseConditionActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					courtCaseAgreement.updateSignature.date
+				else
+					courtCaseAgreement.creationSignature.date
+			end,
+			'courtCaseAgreement',
+			case
+				when
+					courtCaseAgreement.updateSignature.date > courtCaseAgreement.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.courtcasecondition.domain.CourtCaseAgreement courtCaseAgreement
+		inner join
+			courtCaseAgreement.docket docket
+		inner join
+			docket.person offender
+		inner join
+			courtCaseAgreement.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			courtCaseAgreement.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by courtCaseAgreement.updateSignature.date desc
+	]]></query>
+	<query name="findTierDesignationActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					tierDesignation.updateSignature.date
+				else
+					tierDesignation.creationSignature.date
+			end,
+			'tierDesignation',
+			case
+				when
+					tierDesignation.updateSignature.date > tierDesignation.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.tierdesignation.domain.OffenderTierDesignation tierDesignation
+		inner join
+			tierDesignation.offender offender
+		inner join
+			tierDesignation.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			tierDesignation.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by tierDesignation.updateSignature.date desc
+	]]></query>
+	<query name="findOffenseTermActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					sentence.updateSignature.date
+				else
+					sentence.creationSignature.date
+			end,
+			'offenseTerm',
+			case
+				when
+					sentence.updateSignature.date > sentence.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.sentence.domain.Sentence sentence
+		inner join
+			sentence.conviction conviction
+		inner join
+			conviction.courtCase courtCase
+		inner join
+			courtCase.docket docket
+		inner join
+			docket.person offender
+		inner join
+			sentence.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			sentence.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName
+		where
+			offender = :offender
+		order by sentence.updateSignature.date desc
+	]]></query>
+	<query name="findChargesActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					charge.updateSignature.date
+				else
+					charge.creationSignature.date
+			end,
+			'charge',
+			case
+				when
+					charge.updateSignature.date > charge.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.courtcase.domain.Charge charge
+		inner join
+			charge.courtCase courtCase
+		inner join
+			courtCase.docket docket
+		inner join
+			docket.person offender
+		inner join
+			charge.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			charge.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName 
+		where
+			offender = :offender
+		order by charge.updateSignature.date desc
+	]]></query>
+	<query name="findCourtDocumentActivitySummariesByOffender"><![CDATA[
+		select new omis.offender.report.ActivitySummary(
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					updateName.lastName
+				else
+					creationName.lastName
+			end,
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					updateName.middleName
+				else
+					creationName.middleName
+			end,
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					updateName.firstName
+				else
+					creationName.firstName
+			end,
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					updateUserAccount.username
+				else
+					creationUserAccount.username
+			end,
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					courtDocument.updateSignature.date
+				else
+					courtDocument.creationSignature.date
+			end,
+			'courtDocument',
+			case
+				when
+					courtDocument.updateSignature.date > courtDocument.creationSignature.date
+				then
+					'UPDATED'
+				else
+					'CREATED'
+			end)
+		from
+			omis.courtdocument.domain.CourtCaseDocumentAssociation courtDocument
+		inner join
+			courtDocument.courtCase courtCase
+		inner join
+			courtCase.docket docket
+		inner join
+			docket.person offender
+		inner join
+			courtDocument.updateSignature.userAccount updateUserAccount
+		inner join
+			updateUserAccount.user updateUser
+		inner join
+			updateUser.name updateName
+		inner join
+			courtDocument.creationSignature.userAccount creationUserAccount
+		inner join
+			creationUserAccount.user creationUser
+		inner join
+			creationUser.name creationName 
+		where
+			offender = :offender
+		order by courtDocument.updateSignature.date desc
+	]]></query>
+</hibernate-mapping>

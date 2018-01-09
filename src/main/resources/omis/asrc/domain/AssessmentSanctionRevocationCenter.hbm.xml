@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Josh Divine
+  - Version: 0.1.0 (Jan 13, 2017)
+  - Since: OMIS 3.0 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.asrc.domain">
+	<class entity-name="omis.asrc.domain.AssessmentSanctionRevocationCenter"
+	       proxy="omis.asrc.domain.AssessmentSanctionRevocationCenter"
+	       name="omis.asrc.domain.impl.AssessmentSanctionRevocationCenterImpl"
+		   table="`ASSESS_SANC_REV_CTR`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`ASSESS_SANC_REV_CTR_SEQ`</param>
+        </generator>
+	  </id>
+	  <properties name="uniqueAssessmentSanctionRevocationCenter">
+	  	<many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+      	<property name="name" type="string" not-null="true" column="`NAME`"/>
+      </properties>
+      <property name="telephoneNumber" type="java.lang.Long" not-null="false" column="`TELEPHONE_NUMBER`"/>
+	</class>
+	<query name="findAssessmentSanctionRevocationCenter"><![CDATA[
+		from
+			omis.asrc.domain.AssessmentSanctionRevocationCenter as assessmentCenter
+		where
+			assessmentCenter.location = :location
+		and
+			assessmentCenter.name = :name
+		and
+			assessmentCenter.telephoneNumber = :telephoneNumber
+	]]></query>
+	<query name="findAssessmentSanctionRevocationCenterExcluding"><![CDATA[
+		from
+			omis.asrc.domain.AssessmentSanctionRevocationCenter as assessmentCenter
+		where
+			assessmentCenter.location = :location
+		and
+			assessmentCenter.name = :name
+		and
+			assessmentCenter.telephoneNumber = :telephoneNumber
+		and
+			assessmentCenter <> :excludedAssessmentSanctionRevocationCenter
+	]]></query>
+</hibernate-mapping>

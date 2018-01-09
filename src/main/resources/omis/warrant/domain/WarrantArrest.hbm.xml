@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.warrant.domain">
+	<class entity-name="omis.warrant.domain.WarrantArrest"
+			proxy="omis.warrant.domain.WarrantArrest"
+			name="omis.warrant.domain.impl.WarrantArrestImpl"
+			table="`WARRANT_ARREST`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WARRANT_ARREST_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="warrant" column="`WARRANT_ID`" entity-name="omis.warrant.domain.Warrant" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<many-to-one name="jail" column="`JAIL_ID`" entity-name="omis.jail.domain.Jail" not-null="true" />
+			<property name="contactByDate" column="`CONTACT_BY_DATE`" type="java.util.Date" not-null="false" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findWarrantArrest"><![CDATA[
+		select warrantArrest
+		from
+			omis.warrant.domain.WarrantArrest warrantArrest
+		where
+			warrantArrest.warrant = :warrant
+	]]></query>
+	<query name="findWarrantArrestExcluding"><![CDATA[
+		select warrantArrest
+		from
+			omis.warrant.domain.WarrantArrest warrantArrest
+		where
+			warrantArrest.warrant = :warrant
+		and
+			warrantArrest != :warrantArrest
+	]]></query>
+</hibernate-mapping>

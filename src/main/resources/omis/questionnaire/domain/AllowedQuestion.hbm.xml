@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.AllowedQuestion"
+			proxy="omis.questionnaire.domain.AllowedQuestion"
+			name="omis.questionnaire.domain.impl.AllowedQuestionImpl"
+			table="`ALLOWED_QUESTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`ALLOWED_QUESTION_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="questionnaireSection" column="`QUESTIONNAIRE_SECTION_ID`" entity-name="omis.questionnaire.domain.QuestionnaireSection"  not-null="true"/>
+			<many-to-one name="question" column="`QUESTION_ID`" entity-name="omis.questionnaire.domain.Question"  not-null="true"/>
+			<property name="valid" column="`VALID`" type="yes_no"  not-null="true"/>
+			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short"  not-null="true"/>
+			<property name="questionNumber" column="`QUESTION_NUMBER`" type="java.lang.String"  not-null="true"/>
+			<property name="questionConditionality" column="`QUESTION_CONDITIONALITY`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.questionnaire.domain.QuestionConditionality</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="answerCardinality" column="`ANSWER_CARDINALITY`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.questionnaire.domain.AnswerCardinality</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="questionHelp" column="`QUESTION_HELP`" type="java.lang.String" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+			
+	</class>
+	<query name="findAllowedQuestion"><![CDATA[
+		select allowedQuestion
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+		where
+			allowedQuestion.questionnaireSection = :questionnaireSection
+		and
+			allowedQuestion.question = :question
+		and
+			allowedQuestion.questionNumber = :questionNumber
+	]]></query>
+	<query name="findAllowedQuestionExcluding"><![CDATA[
+		select allowedQuestion
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+		where
+			allowedQuestion.questionnaireSection = :questionnaireSection
+		and
+			allowedQuestion.question = :question
+		and
+			allowedQuestion.questionNumber = :questionNumber
+		and
+			allowedQuestion != :allowedQuestion
+	]]></query>
+	<query name="findByQuestionnaireSection"><![CDATA[
+		select allowedQuestion
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+		where
+			allowedQuestion.questionnaireSection = :questionnaireSection
+		and
+			allowedQuestion.valid = true
+		order by
+			allowedQuestion.sortOrder
+	]]></query>
+	<query name="findByQuestionnaireSectionIncludingInvalid"><![CDATA[
+		select allowedQuestion
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+		where
+			allowedQuestion.questionnaireSection = :questionnaireSection
+		order by
+			allowedQuestion.sortOrder
+	]]></query>
+	
+	
+</hibernate-mapping>

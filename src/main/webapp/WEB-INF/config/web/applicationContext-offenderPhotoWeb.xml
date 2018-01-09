@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  
+  <bean id="createOffenderPhotoFormValidator"
+       class="omis.offenderphoto.web.validator.OffenderPhotoFormValidator">
+    <constructor-arg name="requirePhotoData" value="true"/>
+    <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+  </bean>
+
+  <bean id="editOffenderPhotoFormValidator"
+       class="omis.offenderphoto.web.validator.OffenderPhotoFormValidator">   
+    <constructor-arg name="requirePhotoData" value="false"/>
+    <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+  </bean>
+  
+  <!-- Profile items -->
+  <bean id="offenderPhotoProfileItem"
+  	class="omis.offenderphoto.web.profile.OffenderPhotoProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>OFFENDER_PHOTO_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/offenderPhoto/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="photo"/>
+  	<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+  	<constructor-arg name="offenderPhotoAssociationProfileItemReportService" ref="offenderPhotoAssociationProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${offenderPhotoProfileItemEnabled}"/>	
+  </bean>
+  
+  
+  <!-- Offender summary item -->
+  
+  <bean id="offenderPhotoAssociationSummaryItem"
+ 	class="omis.offenderphoto.web.summary.OffenderPhotoAssociationSummaryItem">
+ 	<constructor-arg name="offenderPhotoAssociationSummaryReportService" ref="offenderPhotoAssociationSummaryReportService"/>
+ 	<constructor-arg name="summaryItemRegistry" ref="basicInformationSummaryItemRegistry"/>
+ 	<constructor-arg name="includedPageName" value="/WEB-INF/views/offenderPhoto/summary/includes/summaryItem.jsp"/>
+ 	<constructor-arg name="order" value="0"/>
+ 	<constructor-arg name="enabled" value="${offenderPhotoAssociationSummaryItemEnabled}"/>
+ </bean>
+  
+  <!-- Web configuration -->
+
+  <context:component-scan base-package="omis.offenderphoto.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="offenderPhotoControllerOperation" expression="execution(* omis.offenderphoto.web.controller.OffenderPhotoController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderPhotoControllerOperation"/>
+  </aop:config>
+  
+</beans>

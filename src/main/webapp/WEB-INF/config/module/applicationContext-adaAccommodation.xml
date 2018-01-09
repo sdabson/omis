@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Services -->
+
+	<bean id="accommodationService"
+		class="omis.adaaccommodation.service.impl.AccommodationServiceImpl">
+		<constructor-arg name="accommodationDao" ref="accommodationDao" />
+		<constructor-arg name="accommodationNoteDao" ref="accommodationNoteDao" />
+		<constructor-arg name="accommodationCategoryDao" ref="accommodationCategoryDao" />
+		<constructor-arg name="accommodationNoteInstanceFactory"
+			ref="accommodationNoteInstanceFactory" />
+		<constructor-arg name="accommodationInstanceFactory"
+			ref="accommodationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+
+	<bean id="disabilityService"
+		class="omis.adaaccommodation.service.impl.DisabilityServiceImpl">
+		<constructor-arg name="disabilityDao" ref="disabilityDao" />
+		<constructor-arg name="disabilityClassificationCategoryDao"
+			ref="disabilityClassificationCategoryDao" />
+		<constructor-arg name="disabilityInstanceFactory" ref="disabilityInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+
+	<bean id="authorizationService"
+		class="omis.adaaccommodation.service.impl.AuthorizationServiceImpl">
+		<constructor-arg name="authorizationDao" ref="authorizationDao" />
+		<constructor-arg name="authorizationSourceCategoryDao"
+			ref="authorizationSourceCategoryDao" />
+		<constructor-arg name="authorizationInstanceFactory"
+			ref="authorizationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="accommodationIssuanceService"
+		class="omis.adaaccommodation.service.impl.AccommodationIssuanceServiceImpl">
+		<constructor-arg name="issuanceDao" ref="issuanceDao"/>
+		<constructor-arg name="issuanceInstanceFactory" ref="issuanceInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+
+	<!-- Report Services -->
+
+	<bean id="accommodationReportService"
+		class="omis.adaaccommodation.report.impl.hibernate.AccommodationReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="issuanceReportService"
+		class="omis.adaaccommodation.report.impl.hibernate.AccommodationIssuanceReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="adaProfileItemReportService"
+		class="omis.adaaccommodation.report.impl.hibernate.AdaProfileItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	
+	<!-- Data Access Objects -->
+
+	<bean id="accommodationDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AccommodationDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Accommodation" />
+	</bean>
+	
+	<bean id="accommodationNoteDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AccommodationNoteDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationNote" />
+	</bean>
+
+	<bean id="accommodationCategoryDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AccommodationCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationCategory" />
+	</bean>
+
+	<bean id="disabilityDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.DisabilityDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Disability" />
+	</bean>
+
+	<bean id="disabilityClassificationCategoryDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.DisabilityClassificationCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.DisabilityClassificationCategory" />
+	</bean>
+
+	<bean id="authorizationDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AuthorizationDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Authorization" />
+	</bean>
+	
+	<bean id="authorizationSourceCategoryDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AuthorizationSourceCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AuthorizationSourceCategory" />
+	</bean>
+
+	<bean id="issuanceDao"
+		class="omis.adaaccommodation.dao.impl.hibernate.AccommodationIssuanceDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationIssuance" />
+	</bean>
+	
+	<!-- Instance factories -->
+
+	<bean id="accommodationInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Accommodation" />
+	</bean>
+
+	<bean id="accommodationNoteInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationNote" />
+	</bean>
+
+	<bean id="disabilityInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Disability" />
+	</bean>
+
+	<bean id="authorizationInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Authorization" />
+	</bean>
+
+	<bean id="issuanceInstanceFactory"
+		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationIssuance" />
+	</bean>
+	
+	<!-- Property editors -->
+
+	<bean id="accommodationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="accommodationDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Accommodation" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="accommodationNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="accommodationNoteDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationNote" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	<bean id="accommodationCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="accommodationCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="disabilityPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="disabilityDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Disability" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="disabilityCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="disabilityClassificationCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.DisabilityClassificationCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="authorizationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="authorizationDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.Authorization" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+
+	<bean id="authorizationCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="authorizationSourceCategoryDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AuthorizationSourceCategory" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	<bean id="accommodationIssuancePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="issuanceDao" />
+		<constructor-arg name="entityName"
+			value="omis.adaaccommodation.domain.AccommodationIssuance" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+</beans>

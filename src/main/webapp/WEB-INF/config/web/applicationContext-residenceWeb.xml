@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  
+  <bean id="residenceFormValidator" class="omis.residence.web.validator.ResidenceFormValidator"/>
+  <bean id="residenceSearchFormValidator" class="omis.residence.web.validator.ResidenceSearchFormValidator"/>
+  
+  <!-- Profile Item -->
+  
+  <bean id="residenceProfileItem"
+  	class="omis.residence.web.profile.ResidenceProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>RESIDENCE_TERM_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/residence/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="residence"/>
+  	<constructor-arg name="profileItemRegistry" ref="caseManagementProfileItemRegistry"/>
+  	<constructor-arg name="residenceProfileItemReportService" ref="residenceProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${residenceProfileItemEnabled}"/>	
+  </bean>
+  
+  <!-- Summary Item -->
+	<bean id="residenceSummaryItem"
+    	class="omis.residence.web.summary.ResidenceSummaryItem">
+    	<constructor-arg name="residenceSummaryItemReportService" ref="residenceSummaryItemReportService"/>
+    	<constructor-arg name="summaryItemRegistry" ref="communitySupervisionSummaryItemRegistry"/>
+    	<constructor-arg name="includedPageName" value="/WEB-INF/views/residence/summary/includes/summaryItem.jsp"/>
+    	<constructor-arg name="order" value="2"/>
+    	<constructor-arg name="enabled" value="${residenceSummaryItemEnabled}"/>
+    </bean>
+  
+  
+  <!--  Web configuration -->
+  
+  <context:component-scan base-package="omis.residence.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="residenceControllerOperation" expression="execution(* omis.residence.web.controller.ResidenceController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="residenceControllerOperation"/>
+  </aop:config>
+  <aop:config>
+      <aop:pointcut id="residenceSearchControllerOperation" expression="execution(* omis.residence.web.controller.ResidenceSearchController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="residenceSearchControllerOperation"/>
+  </aop:config>
+</beans>

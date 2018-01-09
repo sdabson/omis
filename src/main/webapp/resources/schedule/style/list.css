@@ -1,0 +1,30 @@
+/*
+ * List specific view style sheet.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Feb 12, 2012)
+ * Since: OMIS 3.0
+ */
+#schedule-dateHeader {
+	width: 80px;
+}
+
+#schedule-timeHeader {
+	width: 80px;
+}
+
+#schedule-eventHeader {
+
+}
+
+.dateData {
+	text-align: center;
+}
+
+.timeData {
+	text-align: center;
+}
+
+.eventData {
+
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<!-- <query name="summarizeVictimByName"><![CDATA[
+		select new omis.victim.report.VictimSummary(
+		  victim,
+		  (select offender from omis.offender.domain.Offender offender where offender = victim),
+		  count(association),
+		  (select count(note) from omis.victim.domain.VictimNote note where note.victim = victim),
+		  (select max(note.date))
+		)
+		from omis.victim.domain.VictimNote note
+		  right outer join note.association as association
+		  inner join association.relationship as relationship
+		  inner join relationship.secondPerson as victim
+		  inner join victim.name as victimName
+		  left outer join victim.identity as victimIdentity
+		where upper(victimName.lastName) like upper('%' || :lastName || '%')
+		  and upper(victimName.firstName) like upper('%' || :firstName || '%')
+		group by victim
+		having count(association) > 0
+	]]></query> -->
+	<query name="summarizeVictim"><![CDATA[
+		select new omis.victim.report.VictimSummary(
+		  victim,
+		  (select offender from omis.offender.domain.Offender offender where offender = victim),
+		  count(association),
+		  (select count(note) from omis.victim.domain.VictimNote note where note.victim = victim),
+		  (select max(note.date) from omis.victim.domain.VictimNote note inner join note.category as category where category.contact = true and note.victim = victim),
+		  (select count(vDAssociation) from omis.victim.domain.VictimDocumentAssociation vDAssociation where vDAssociation.victim = victim) 		  
+		)
+		from omis.victim.domain.VictimAssociation as association
+		  right outer join association.relationship as relationship
+		  right outer join relationship.secondPerson as victim
+		  inner join victim.name as victimName
+		  left outer join victim.identity as victimIdentity
+		where victim = :victim
+		group by victim
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,29 @@
+/*
+ * Cascading style sheet for interactive images.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (4/6/2017)
+ */
+ 
+ /* Hoverable image styling */
+ img.hoverableImage:hover {
+	opacity: .5;
+	cursor: pointer;
+}
+
+/* Viewable image wrapper styling */
+span.viewableImageWrapper {
+	display: inline-block;
+}
+
+span.viewableImageWrapper:hover {
+	background-image: url('../images/whiteMagnifyingGlass.png');
+	background-color: hsla(255, 100%, 0%, 1);
+	background-repeat: no-repeat;
+	padding: 0px;
+	overflow: auto;
+}
+
+body span.viewableImageWrapper img.viewableImage {
+	display: block;
+}

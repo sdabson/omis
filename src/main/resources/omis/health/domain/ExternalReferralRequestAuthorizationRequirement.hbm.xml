@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ExternalReferralRequestAuthorizationRequirement"
+		proxy="omis.health.domain.ExternalReferralRequestAuthorizationRequirement"
+		name="omis.health.domain.impl.ExternalReferralRequestAuthorizationRequirementImpl"
+		table="`EXTERNAL_REF_REQ_AUTH_RQMT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EXTERNAL_REF_REQ_AUTH_RQMT_SEQ`</param>
+			</generator>
+		</id>
+	  <many-to-one name="referralRequest" entity-name="omis.health.domain.HealthRequest" unique="true" not-null="true" column="`REFERRAL_REQUEST_ID`"/>
+	  <many-to-one name="authorizationRequest" entity-name="omis.health.domain.ExternalReferralAuthorizationRequest" unique="true" not-null="true" column="`AUTHORIZATION_REQUEST_ID`"/>
+	</class>
+	<query name="findExternalReferralRequestAuthroizationRequirement"><![CDATA[
+	  select requirement
+	  from omis.health.domain.ExternalReferralRequestAuthorizationRequirement requirement
+	  where requirement.referralRequest = :healthRequest
+	]]></query>
+	<query name="findExternalReferralRequestAuthroizationRequirementByAuthorizationRequest"><![CDATA[
+	  select requirement
+	  from omis.health.domain.ExternalReferralRequestAuthorizationRequirement requirement
+	  where requirement.authorizationRequest = :authorizationRequest
+	]]></query>
+</hibernate-mapping>

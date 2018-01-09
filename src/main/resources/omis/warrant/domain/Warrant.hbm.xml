@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.warrant.domain">
+	<class entity-name="omis.warrant.domain.Warrant"
+			proxy="omis.warrant.domain.Warrant"
+			name="omis.warrant.domain.impl.WarrantImpl"
+			table="`WARRANT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WARRANT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<many-to-one name="issuedBy" column="`PERSON_ID`" entity-name="omis.person.domain.Person" not-null="true" />
+			<property name="addressee" column="`ADDRESSEE`" type="java.lang.String" not-null="true" />
+			<property name="warrantReason" column="`WARRANT_REASON_CATEGORY`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.warrant.domain.WarrantReasonCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="bondable" column="`BONDABLE`" type="yes_no" not-null="true" />
+			<property name="bondRecommendation" column="`BOND_RECOMMENDATION_AMOUNT`" type="java.math.BigDecimal" not-null="false" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findWarrant"><![CDATA[
+		select warrant
+		from
+			omis.warrant.domain.Warrant warrant
+		where
+			warrant.offender = :offender
+		and
+			warrant.date = :date
+	]]></query>
+	<query name="findWarrantExcluding"><![CDATA[
+		select warrant
+		from
+			omis.warrant.domain.Warrant warrant
+		where
+			warrant.offender = :offender
+		and
+			warrant.date = :date
+		and
+			warrant != :warrant
+	]]></query>
+	<query name="findWarrantsByOffender"><![CDATA[
+		select warrant
+		from
+			omis.warrant.domain.Warrant warrant
+		where
+			warrant.offender = :offender
+	]]></query>
+</hibernate-mapping>

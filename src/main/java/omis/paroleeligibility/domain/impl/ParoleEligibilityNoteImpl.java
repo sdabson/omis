@@ -1,0 +1,184 @@
+package omis.paroleeligibility.domain.impl;
+
+import java.util.Date;
+
+import omis.audit.domain.CreationSignature;
+import omis.audit.domain.UpdateSignature;
+import omis.paroleeligibility.domain.ParoleEligibility;
+import omis.paroleeligibility.domain.ParoleEligibilityNote;
+
+/**
+ * Parole eligibility note implementation.
+ *
+ * @author Trevor Isles
+ * @version 0.1.0 (Nov 7, 2017)
+ * @since OMIS 3.0
+ */
+public class ParoleEligibilityNoteImpl implements ParoleEligibilityNote {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long id;
+	
+	private String description;
+	
+	private Date date;
+	
+	private ParoleEligibility paroleEligibility;
+	
+	private CreationSignature creationSignature;
+	
+	private UpdateSignature updateSignature;
+	
+	/**
+	 * Instantiates an implementation of parole eligibility note.
+	 */
+	public ParoleEligibilityNoteImpl() {
+		// Default constructor
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Long getId() {
+		return this.id; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setId(Long id) {
+		this.id = id; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getDescription() {
+		return this.description; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setDescription(String description) {
+		this.description = description; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Date getDate() {
+		return this.date; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setDate(Date date) {
+		this.date = date; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ParoleEligibility getParoleEligibility() {
+		return this.paroleEligibility; 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setParoleEligibility(ParoleEligibility paroleEligibility) {
+		this.paroleEligibility = paroleEligibility; 
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public CreationSignature getCreationSignature() {
+		return creationSignature;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setCreationSignature(CreationSignature creationSignature) {
+		this.creationSignature = creationSignature;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public UpdateSignature getUpdateSignature() {
+		return updateSignature;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void setUpdateSignature(UpdateSignature updateSignature) {
+		this.updateSignature = updateSignature;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ParoleEligibilityNote)) {
+			return false;
+		}
+		ParoleEligibilityNote that = (ParoleEligibilityNote) obj;
+		if (this.getId() == null) {
+			throw new IllegalStateException("Id required");
+		}
+		if (!this.getId().equals(that.getId())) {
+			return false;
+		}
+		if (this.getDescription() == null) {
+			throw new IllegalStateException("Description required");
+		}
+		if (!this.getDescription().equals(that.getDescription())) {
+			return false;
+		}
+		if (this.getDate() == null) {
+			throw new IllegalStateException("Date required");
+		}
+		if (!this.getDate().equals(that.getDate())) {
+			return false;
+		}
+		if (this.getParoleEligibility() == null) {
+			throw new IllegalStateException("Parole eligibility required");
+		}
+		if (!this.getParoleEligibility().equals(that.getParoleEligibility())) {
+			return false;
+		}
+		return true;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public int hashCode() {
+		if (this.getId() == null) {
+			throw new IllegalStateException("Id required.");
+		}
+		if (this.getDescription() == null) {
+			throw new IllegalStateException("Description required.");
+		}
+		if (this.getDate() == null) {
+			throw new IllegalStateException("Date required.");
+		}
+		if (this.getParoleEligibility() == null) {
+			throw new IllegalStateException("Parole eligibility required.");
+		}
+		int hashCode = 14;
+		
+		hashCode = 29 * hashCode + this.getId().hashCode();
+		hashCode = 29 * hashCode + this.getDescription().hashCode();
+		hashCode = 29 * hashCode + this.getDate().hashCode();
+		hashCode = 29 * hashCode + this.getParoleEligibility().hashCode();
+		return hashCode;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString() {
+		return String.format(
+				"Id: %s, Description: %s, Date: %s, Parole Eligibility: %s",
+				this.getId(),
+				this.getDescription(),
+				this.getDate(),
+				this.getParoleEligibility());
+	}
+	
+}

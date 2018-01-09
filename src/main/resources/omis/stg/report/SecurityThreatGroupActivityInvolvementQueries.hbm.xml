@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Trevor Isles
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<query name="summarizeSecurityThreatGroupActivityInvolvementByActivity"><![CDATA[
+		select new omis.stg.report.SecurityThreatGroupActivityInvolvementSummary(
+				involvement.id,
+				involvement,
+				offender,
+				offenderName
+			)
+		from omis.stg.domain.SecurityThreatGroupActivityInvolvement as involvement
+		  inner join involvement.offender as offender
+		  inner join offender.name as offenderName
+		where involvement.activity = :activity
+	]]></query>
+</hibernate-mapping>

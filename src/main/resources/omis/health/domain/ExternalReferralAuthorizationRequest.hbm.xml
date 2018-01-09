@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ExternalReferralAuthorizationRequest"
+		proxy="omis.health.domain.ExternalReferralAuthorizationRequest"
+		name="omis.health.domain.impl.ExternalReferralAuthorizationRequestImpl"
+		table="`EXTERNAL_REFERRAL_AUTH_REQ`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EXTERNAL_REFERRAL_AUTH_REQ_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueExternalReferralAuthorizationRequest">
+		  <many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+		  <many-to-one name="facility" entity-name="omis.facility.domain.Facility" not-null="true" column="`FACILITY_ID`"/>
+		  <property name="date" type="java.util.Date" not-null="false" column="`DATE`"/>
+		  <many-to-one name="medicalFacility" entity-name="omis.health.domain.MedicalFacility" not-null="true" column="`MEDICAL_FACILITY_ID`"/>
+		</properties>
+		<many-to-one name="providerAssignment" entity-name="omis.health.domain.ProviderAssignment" not-null="false" column="`PROVIDER_ASSIGNMENT_ID`"/>
+		<many-to-one name="reason" entity-name="omis.health.domain.ExternalReferralReason" not-null="true" column="`REASON_ID`"/>
+		<property name="reasonNotes" type="string" not-null="false" column="`REASON_NOTES`"/>
+		<many-to-one name="referredByProviderAssignment" entity-name="omis.health.domain.ProviderAssignment" not-null="false" column="`REF_BY_PROVIDER_ASSIGNMENT_ID`"/>
+		<property name="referredDate" type="java.util.Date" not-null="false" column="`REFERRED_DATE`"/>
+	</class>
+</hibernate-mapping>

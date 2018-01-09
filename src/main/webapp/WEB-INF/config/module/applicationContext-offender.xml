@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+   
+  <bean id="offenderService"
+        class="omis.offender.service.impl.OffenderServiceImpl">
+    <constructor-arg name="offenderDao" ref="offenderDao"/>
+  </bean>
+
+  <bean id="alternativeOffenderNameService"
+        class="omis.offender.service.impl.AlternativeOffenderNameServiceImpl">
+     <constructor-arg name="alternativeNameAssociationDelegate" ref="alternativeNameAssociationDelegate"/>
+     <constructor-arg name="personNameDelegate" ref="personNameDelegate"/>
+     <constructor-arg name="alternativeNameCategoryDelegate" ref="alternativeNameCategoryDelegate"/>
+     <constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+  </bean>
+  
+  <bean id="alternativeOffenderIdentityService"
+        class="omis.offender.service.impl.AlternativeOffenderIdentityServiceImpl">
+     <constructor-arg name="alternativeIdentityAssociationDelegate" ref="alternativeIdentityAssociationDelegate"/>
+     <constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
+     <constructor-arg name="alternativeIdentityCategoryDelegate" ref="alternativeIdentityCategoryDelegate"/>
+     <constructor-arg name="countryDelegate" ref="countryDelegate"/>
+     <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+     <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+     <constructor-arg name="alternativeNameAssociationDelegate" ref="alternativeNameAssociationDelegate"/>
+  </bean>
+
+  <bean id="offenderDemographicsService"
+        class="omis.offender.service.impl.OffenderDemographicsServiceImpl">
+    <constructor-arg name="personDemographicsDelegate" ref="personDemographicsDelegate"/>
+    <constructor-arg name="eyeColorDelegate" ref="eyeColorDelegate"/>
+    <constructor-arg name="hairColorDelegate" ref="hairColorDelegate"/>
+    <constructor-arg name="complexionDelegate" ref="complexionDelegate"/>
+    <constructor-arg name="buildDelegate" ref="buildDelegate"/>
+    <constructor-arg name="raceDelegate" ref="raceDelegate"/>
+    <constructor-arg name="tribeDelegate" ref="tribeDelegate"/>
+    <constructor-arg name="maritalStatusDelegate" ref="maritalStatusDelegate"/>
+    <constructor-arg name="citizenshipDelegate" ref="citizenshipDelegate"/>
+    <constructor-arg name="religionDelegate" ref="religionDelegate"/>
+    <constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+    <constructor-arg name="alienResidenceDelegate" ref="alienResidenceDelegate"/>
+    <constructor-arg name="countryDelegate" ref="countryDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  </bean>
+  
+  <bean id="createOffenderService"
+  	class="omis.offender.service.impl.CreateOffenderServiceImpl">
+  	<constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+  	<constructor-arg name="personDemographicsDelegate" ref="personDemographicsDelegate"/>
+  	<constructor-arg name="religiousPreferenceDelegate" ref="religiousPreferenceDelegate"/>
+  	<constructor-arg name="citizenshipDelegate" ref="citizenshipDelegate"/>
+  	<constructor-arg name="alienResidenceDelegate" ref="alienResidenceDelegate"/>
+  	<constructor-arg name="offenderFlagDelegate" ref="offenderFlagDelegate"/>
+  	<constructor-arg name="offenderPhotoAssociationDelegate" ref="offenderPhotoAssociationDelegate"/>
+  	<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+  	<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  	<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+  	<constructor-arg name="buildDelegate" ref="buildDelegate"/>
+  	<constructor-arg name="complexionDelegate" ref="complexionDelegate"/>
+  	<constructor-arg name="eyeColorDelegate" ref="eyeColorDelegate"/>
+  	<constructor-arg name="hairColorDelegate" ref="hairColorDelegate"/>
+  	<constructor-arg name="maritalStatusDelegate" ref="maritalStatusDelegate"/>
+  	<constructor-arg name="raceDelegate" ref="raceDelegate"/>
+  	<constructor-arg name="tribeDelegate" ref="tribeDelegate"/>
+  	<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+  	<constructor-arg name="religionDelegate" ref="religionDelegate"/>
+  	<constructor-arg name="offenderFlagCategoryDelegate" ref="offenderFlagCategoryDelegate"/>
+  </bean>
+  
+  <bean id="offenderPersonalDetailsService"
+  	class="omis.offender.service.impl.OffenderPersonalDetailsServiceImpl">
+  	<constructor-arg name="personNameDelegate" ref="personNameDelegate"/>
+  	<constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
+  	<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+  	<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+  	<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  	<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+  	<constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+  </bean>
+  
+	<bean id="changeOffenderNameService" class="omis.offender.service.impl.ChangeOffenderNameServiceImpl">
+		<constructor-arg name="alternativeNameAssociationDelegate" ref="alternativeNameAssociationDelegate" />
+		<constructor-arg name="personNameDelegate" ref="personNameDelegate" />
+		<constructor-arg name="offenderDelegate" ref="offenderDelegate" />
+		<constructor-arg name="alternativeNameCategoryDelegate" ref="alternativeNameCategoryDelegate" />
+		<constructor-arg name="suffixDelegate" ref="suffixDelegate" />
+	</bean>
+
+  <!-- Report services -->
+  
+  <bean id="offenderReportService"
+  		  class="omis.offender.report.impl.OffenderReportServiceImpl">
+    <constructor-arg name="offenderDao" ref="offenderDao"/>		  
+  </bean>
+  
+  <bean id="alternativeOffenderIdentityProfileItemReportService"
+  	class="omis.offender.report.impl.hibernate.AlternativeOffenderIdentityProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="alternativeOffenderNameProfileItemReportService"
+  	class="omis.offender.report.impl.hibernate.AlternativeOffenderNameProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="offenderSearchSummaryService" class="omis.offender.report.impl.hibernate.OffenderSearchSummaryReportServiceHibernateImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="activitySummaryReportService"
+		class="omis.offender.report.impl.hibernate.ActivitySummaryReportServiceHibernateImpl">
+	<constructor-arg name="basicInformationActivitySummaryReportDelegate" ref="basicInformationActivitySummaryReportDelegate" />
+	<constructor-arg name="placementActivitySummaryReportDelegate" ref="placementActivitySummaryReportDelegate" />
+	<constructor-arg name="legalActivitySummaryReportDelegate" ref="legalActivitySummaryReportDelegate" />
+	<constructor-arg name="caseManagementActivitySummaryReportDelegate" ref="caseManagementActivitySummaryReportDelegate" />
+	<constructor-arg name="safetyActivitySummaryReportDelegate" ref="safetyActivitySummaryReportDelegate" />
+	<constructor-arg name="complianceActivitySummaryReportDelegate" ref="complianceActivitySummaryReportDelegate" />
+	<constructor-arg name="healthActivitySummaryReportDelegate" ref="healthActivitySummaryReportDelegate" />
+	<constructor-arg name="relationshipsActivitySummaryReportDelegate" ref="relationshipsActivitySummaryReportDelegate" />
+	<constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <!-- Report helpers -->
+  
+  <bean id="offenderReportDelegate"
+        class="omis.offender.report.delegate.hibernate.OffenderReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="basicInformationActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.BasicInformationActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="placementActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.PlacementActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="legalActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.LegalActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="caseManagementActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.CaseManagementActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="safetyActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.SafetyActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="complianceActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.ComplianceActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="healthActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.HealthActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+  <bean id="relationshipsActivitySummaryReportDelegate"
+        class="omis.offender.report.delegate.hibernate.RelationshipsActivitySummaryReportDelegate">
+    <constructor-arg name="sessionFactory" ref="sessionFactory" />
+  </bean>
+  
+   <!--  Summary Item registry -->
+  
+  <bean id="summaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
+ 
+    
+  <!-- Data access objects -->
+  
+  <bean id="offenderDao"
+        class="omis.offender.dao.impl.hibernate.OffenderDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.offender.domain.Offender"/>      
+  </bean>
+
+  <!-- Service delegates -->
+  
+  <bean id="offenderDelegate"
+        class="omis.offender.service.delegate.OffenderDelegate">
+    <constructor-arg name="personNameInstanceFactory" ref="personNameInstanceFactory"/>
+    <constructor-arg name="personIdentityInstanceFactory" ref="personIdentityInstanceFactory"/>
+    <constructor-arg name="offenderInstanceFactory" ref="offenderInstanceFactory"/>
+    <constructor-arg name="offenderDao" ref="offenderDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>      
+  </bean>
+
+  <!-- Instance factories -->
+  
+  <bean id="offenderInstanceFactory"
+  		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+  	<constructor-arg name="entityName" value="omis.offender.domain.Offender"/>
+  </bean>
+
+  <!-- Property editor factories -->
+  
+  <bean id="offenderPropertyEditorFactory"
+        class="omis.offender.beans.factory.impl.OffenderPropertyEditorFactoryImpl">
+    <constructor-arg name="offenderDao" ref="offenderDao"/>
+  </bean>
+  
+</beans>

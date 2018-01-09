@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.config.domain">
+	<typedef name="configurationSettingType" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.config.datatype.ConfigurationSettingType</param>
+		<param name="type">12</param>
+	</typedef>
+	<class	entity-name="omis.config.domain.ConfigurationSetting"
+			proxy="omis.config.domain.ConfigurationSetting"
+			name="omis.config.domain.impl.ConfigurationSettingImpl"
+			table="`CONFIGURATION_SETTING`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`CONFIGURATION_SETTING_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<property name="value" column="`VALUE`" not-null="true" type="string"/>
+		<property name="type" column="`TYPE`" not-null="true" type="configurationSettingType"/>
+	</class>
+	<query name="findConfigurationSettingByName"><![CDATA[
+	select configurationSetting
+	from omis.config.domain.ConfigurationSetting as configurationSetting
+	where configurationSetting.name = :name
+	order by configurationSetting.name
+	]]></query>
+	<query name="findAllConfigurationSettings"><![CDATA[
+	select configurationSetting
+	from omis.config.domain.ConfigurationSetting as configurationSetting
+	order by configurationSetting.name
+	]]></query>
+</hibernate-mapping>

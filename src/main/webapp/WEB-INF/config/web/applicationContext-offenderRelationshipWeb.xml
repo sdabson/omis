@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+  <!-- Validators -->
+	
+	<bean id="createRelationshipsFormValidator" 
+		class="omis.offenderrelationship.web.validator.CreateRelationshipsFormValidator">
+		<constructor-arg name="personFieldsValidatorDelegate" ref="personFieldsValidatorDelegate"/>
+		<constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+		<constructor-arg name="poBoxFieldsValidatorDelegate" ref="poBoxFieldsValidatorDelegate"/>
+		<constructor-arg name="telephoneNumberFieldsValidatorDelegate" ref="telephoneNumberFieldsValidatorDelegate"/>
+		<constructor-arg name="onlineAccountFieldsValidatorDelegate" ref="onlineAccountFieldsValidatorDelegate"/>
+		<constructor-arg name="familyAssociationFieldsCreateValidatorDelegate" ref="familyAssociationFieldsCreateValidatorDelegate"/>
+		<constructor-arg name="visitationAssociationFieldsValidatorDelegate" ref="visitationAssociationFieldsValidatorDelegate"/>
+	</bean>     
+	<bean id="editRelationshipsFormValidator" class="omis.offenderrelationship.web.validator.EditRelationshipsFormValidator">
+		<constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+		<constructor-arg name="poBoxFieldsValidatorDelegate" ref="poBoxFieldsValidatorDelegate"/>
+		<constructor-arg name="personFieldsValidatorDelegate" ref="personFieldsValidatorDelegate"/>
+		<constructor-arg name="telephoneNumberFieldsValidatorDelegate" ref="telephoneNumberFieldsValidatorDelegate"/>
+		<constructor-arg name="onlineAccountFieldsValidatorDelegate" ref="onlineAccountFieldsValidatorDelegate"/>
+	</bean>
+	<bean id="createRelationshipsFromSearchFormValidator" 
+		class="omis.offenderrelationship.web.validator.CreateRelationshipsFromSearchFormValidator">
+		<constructor-arg name="familyAssociationFieldsCreateValidatorDelegate" ref="familyAssociationFieldsCreateValidatorDelegate"/>
+		<constructor-arg name="visitationAssociationFieldsValidatorDelegate" ref="visitationAssociationFieldsValidatorDelegate"/>
+	</bean> 
+	<bean id="offenderRelationshipSearchFormValidator" class="omis.offenderrelationship.web.validator.OffenderRelationshipSearchFormValidator"/>
+	
+  <!--  Controller Delegate -->
+  
+  <!-- Helpers -->
+  
+   <bean id="offenderRelationshipSummaryModelDelegate" 
+		class="omis.offenderrelationship.web.controller.delegate.OffenderRelationshipSummaryModelDelegate">
+		<constructor-arg name="offenderRelationshipSummaryReportService" ref="offenderRelationshipSummaryReportService"/>
+	</bean>      
+	
+	<bean id="offenderRelationshipProfileItem"
+		class="omis.offenderrelationship.web.profile.OffenderRelationshipsProfileItem">
+		<constructor-arg name="relationshipProfileItemReportService" ref="relationshipProfileItemReportService"/>
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>OFFENDER_RELATIONSHIP_LIST</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/offenderRelationship/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="relationships"/>
+		<constructor-arg name="profileItemRegistry" ref="relationshipsProfileItemRegistry"/>
+		<constructor-arg name="enabled" value="${offenderRelationshipProfileItemEnabled}"/>
+	</bean>
+        
+  <!-- Web configuration -->
+ 		 
+ <context:component-scan base-package="omis.offenderrelationship.web.controller"/>
+  	      
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="createOffenderRelationshipControllerOperation" expression="execution(* omis.offenderrelationship.web.controller.CreateOffenderRelationshipController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="createOffenderRelationshipControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="updateOffenderRelationControllerOperation" expression="execution(* omis.offenderrelationship.web.controller.UpdateOffenderRelationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="updateOffenderRelationControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="reportOffenderRelationshipControllerOperation" expression="execution(* omis.offenderrelationship.web.controller.ReportOffenderRelationshipController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportOffenderRelationshipControllerOperation"/>
+  </aop:config>
+</beans>        

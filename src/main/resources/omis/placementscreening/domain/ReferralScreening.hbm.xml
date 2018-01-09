@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placementscreening.domain">
+	<class entity-name="omis.placementscreening.domain.ReferralScreening"
+		proxy="omis.placementscreening.domain.ReferralScreening"
+		name="omis.placementscreening.domain.impl.ReferralScreeningImpl"
+		table="`REFERRAL_SCREENING`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`REFERRAL_SCREENING_SEQ`</param>
+			</generator>
+		</id> 
+		<many-to-one name="referralScreeningCenter" column="`REFERRAL_SCREENING_CENTER_ID`"  entity-name="omis.placementscreening.domain.ReferralScreeningCenter" not-null="true"/>
+		<properties name="facilityOrder" unique="true">
+			<many-to-one name="placementReferral" column="`PLACEMENT_REFERRAL_ID`" entity-name="omis.placementscreening.domain.PlacementReferral" not-null="true"/>			
+			<property name="screeningOrder" column="`SCREENING_ORDER`" type="java.lang.Integer" not-null="true"/>
+		</properties>
+		<property name="screeningLevelCategory" column="`SCREENING_LEVEL_CATEGORY`">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.placementscreening.domain.ScreeningLevelCategory</param>
+				<param name="type">12</param>
+				<param name="useNamed">true</param>
+			</type>
+		</property>
+		<component name="screeningWindow">
+			<property name="startDate" column="`START_DATE`" not-null="true"/>
+			<property name="endDate" column="`END_DATE`" not-null="true"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+</hibernate-mapping>

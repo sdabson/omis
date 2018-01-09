@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       
+        <!-- Service -->
+        <bean id="presentenceInvestigationRequestService"
+        	class="omis.presentenceinvestigation.service.impl.PresentenceInvestigationRequestServiceImpl">
+        	<constructor-arg name="presentenceInvestigationRequestDelegate" ref="presentenceInvestigationRequestDelegate"/>
+        	<constructor-arg name="presentenceInvestigationRequestNoteDelegate" ref="presentenceInvestigationRequestNoteDelegate" />
+        	<constructor-arg name="presentenceInvestigationCategoryDelegate" ref="presentenceInvestigationCategoryDelegate" />
+        	<constructor-arg name="personDelegate" ref="personDelegate" />
+        	<constructor-arg name="docketDelegate" ref="docketDelegate" />
+        	<constructor-arg name="suffixDelegate" ref="suffixDelegate" />
+        	<constructor-arg name="courtDelegate" ref="courtDelegate" />
+        	<constructor-arg name="offenderDelegate" ref="offenderDelegate" />
+        	<constructor-arg name="userAccountDelegate" ref="userAccountDelegate" />
+        </bean>
+        
+		<bean id="presentenceInvestigationTaskService" class="omis.presentenceinvestigation.service.impl.PresentenceInvestigationTaskServiceImpl">
+			<constructor-arg name="presentenceInvestigationTaskSourceDelegate" ref="presentenceInvestigationTaskSourceDelegate" />
+			<constructor-arg name="presentenceInvestigationTaskAssociationDelegate" ref="presentenceInvestigationTaskAssociationDelegate" />
+			<constructor-arg name="presentenceInvestigationTaskGroupDelegate" ref="presentenceInvestigationTaskGroupDelegate" />
+			<constructor-arg name="taskDelegate" ref="taskDelegate" />
+			<constructor-arg name="taskAssignmentDelegate" ref="taskAssignmentDelegate" />
+			<constructor-arg name="taskParameterValueDelegate" ref="taskParameterValueDelegate" />
+			<constructor-arg name="taskTemplateParameterValueDelegate" ref="taskTemplateParameterValueDelegate" />
+		</bean>
+		
+		<bean id="jailAdjustmentSectionSummaryService" class="omis.presentenceinvestigation.service.impl.JailAdjustmentSectionSummaryServiceImpl">
+			<constructor-arg name="jailAdjustmentSectionSummaryDelegate" ref="jailAdjustmentSectionSummaryDelegate" />
+			<constructor-arg name="jailAdjustmentSectionSummaryNoteDelegate" ref="jailAdjustmentSectionSummaryNoteDelegate" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryService" class="omis.presentenceinvestigation.service.impl.PsychologicalSectionSummaryServiceImpl">
+			<constructor-arg name="psychologicalSectionSummaryDelegate" ref="psychologicalSectionSummaryDelegate" />
+			<constructor-arg name="psychologicalSectionSummaryNoteDelegate" ref="psychologicalSectionSummaryNoteDelegate" />
+			<constructor-arg name="psychologicalSectionSummaryDocumentDelegate" ref="psychologicalSectionSummaryDocumentDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<bean id="educationSectionSummaryService" class="omis.presentenceinvestigation.service.impl.EducationSectionSummaryServiceImpl">
+			<constructor-arg name="educationSectionSummaryDelegate" ref="educationSectionSummaryDelegate" />
+			<constructor-arg name="educationSectionSummaryNoteDelegate" ref="educationSectionSummaryNoteDelegate" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryService" class="omis.presentenceinvestigation.service.impl.OffenseSectionSummaryServiceImpl">
+			<constructor-arg name="offenseSectionSummaryDelegate" ref="offenseSectionSummaryDelegate" />
+			<constructor-arg name="offenseSectionSummaryAssociableDocumentDelegate" ref="offenseSectionSummaryAssociableDocumentDelegate" />
+			<constructor-arg name="circumstanceOfOffenseDelegate" ref="circumstanceOfOffenseDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryService" class="omis.presentenceinvestigation.service.impl.PleaAgreementSectionSummaryServiceImpl">
+			<constructor-arg name="pleaAgreementSectionSummaryDelegate" ref="pleaAgreementSectionSummaryDelegate" />
+			<constructor-arg name="pleaAgreementSectionSummaryNoteDelegate" ref="pleaAgreementSectionSummaryNoteDelegate" />
+			<constructor-arg name="pleaAgreementSectionSummaryAssociableDocumentDelegate" ref="pleaAgreementSectionSummaryAssociableDocumentDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryService" class="omis.presentenceinvestigation.service.impl.ChemicalUseSectionSummaryServiceImpl">
+			<constructor-arg name="chemicalUseSectionSummaryDelegate" ref="chemicalUseSectionSummaryDelegate" />
+			<constructor-arg name="chemicalUseSectionSummaryNoteDelegate" ref="chemicalUseSectionSummaryNoteDelegate" />
+			<constructor-arg name="chemicalUseSectionSummaryDocumentAssociationDelegate" ref="chemicalUseSectionSummaryDocumentAssociationDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryService" class="omis.presentenceinvestigation.service.impl.OtherPertinentInformationSectionSummaryServiceImpl">
+			<constructor-arg name="otherPertinentInformationSectionSummaryDelegate" ref="otherPertinentInformationSectionSummaryDelegate" />
+			<constructor-arg name="otherPertinentInformationSectionSummaryNoteDelegate" ref="otherPertinentInformationSectionSummaryNoteDelegate" />
+		</bean>
+		
+		<bean id="victimSectionSummaryService" class="omis.presentenceinvestigation.service.impl.VictimSectionSummaryServiceImpl">
+			<constructor-arg name="victimSectionSummaryDelegate" ref="victimSectionSummaryDelegate" />
+			<constructor-arg name="victimSectionSummaryNoteDelegate" ref="victimSectionSummaryNoteDelegate" />
+			<constructor-arg name="victimSectionSummaryDocumentAssociationDelegate" ref="victimSectionSummaryDocumentAssociationDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+			<constructor-arg name="victimDocketAssociationDelegate" ref="victimDocketAssociationDelegate" />
+			<constructor-arg name="victimAssociationDelegate" ref="victimAssociationDelegate" />
+		</bean>
+		
+		<bean id="healthSectionService" class="omis.presentenceinvestigation.service.impl.HealthSectionServiceImpl">
+			<constructor-arg name="healthSectionSummaryDelegate" ref="healthSectionSummaryDelegate" />
+			<constructor-arg name="healthSectionSummaryNoteDelegate" ref="healthSectionSummaryNoteDelegate" />
+			<constructor-arg name="healthSectionSummaryDocumentAssociationDelegate" ref="healthSectionSummaryDocumentAssociationDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<bean id="financialSectionSummaryService" class="omis.presentenceinvestigation.service.impl.FinancialSectionSummaryServiceImpl">
+			<constructor-arg name="financialSectionSummaryDelegate" ref="financialSectionSummaryDelegate" />
+			<constructor-arg name="financialSectionSummaryNoteDelegate" ref="financialSectionSummaryNoteDelegate" />
+			<constructor-arg name="financialSectionSummaryDocumentAssociationDelegate" ref="financialSectionSummaryDocumentAssociationDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+        
+        <bean id="supervisionHistorySummaryService" class="omis.presentenceinvestigation.service.impl.SupervisionHistorySummaryServiceImpl">
+        	<constructor-arg name="supervisionHistorySummaryDelegate" ref="supervisionHistorySummaryDelegate"/>
+        	<constructor-arg name="supervisionHistoryNoteDelegate" ref="supervisionHistoryNoteDelegate"/>
+        </bean>
+        
+		<bean id="evaluationRecommendationSectionSummaryService" class="omis.presentenceinvestigation.service.impl.EvaluationRecommendationSectionSummaryServiceImpl">
+			<constructor-arg name="evaluationRecommendationSectionSummaryDelegate" ref="evaluationRecommendationSectionSummaryDelegate" />
+			<constructor-arg name="evaluationRecommendationSectionSummaryNoteDelegate" ref="evaluationRecommendationSectionSummaryNoteDelegate" />
+		</bean>
+        
+        <!-- Instance factories -->
+        <bean id="presentenceInvestigationRequestInstanceFactory"
+        	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+        	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+        	<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"/>	
+        </bean>
+        
+        <bean id="presentenceInvestigationRequestNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequestNote" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskGroupInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskSourceInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource" />
+		</bean>
+		
+		<bean id="presentenceInvestigationCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationCategory" />
+		</bean>
+		
+        <bean id="jailAdjustmentSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary" />
+		</bean>
+        
+        <bean id="jailAdjustmentSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummaryNote" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummary" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryNote" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryDocumentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument" />
+		</bean>
+		
+		<bean id="educationSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EducationSectionSummary" />
+		</bean>
+		
+		<bean id="educationSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EducationSectionSummaryNote" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OffenseSectionSummary" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryAssociableDocumentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument" />
+		</bean>
+		
+		<bean id="circumstanceOfOffenseInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.CircumstanceOfOffense" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummary" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryNote" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryAssociableDocumentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryAssociableDocument" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummary" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummaryNote" />
+		</bean>
+		
+		<bean id="victimSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummary" />
+		</bean>
+		
+		<bean id="victimSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummaryNote" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="healthSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummary" />
+		</bean>
+		
+		<bean id="healthSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummaryNote" />
+		</bean>
+		
+		<bean id="healthSectionSummaryDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="financialSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummary" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="financialSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummaryNote" />
+		</bean>
+		
+		<bean id="supervisionHistorySectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary"/>
+		</bean>
+		
+		<bean id="supervisionHistoryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.SupervisionHistoryNote"/>		
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummary" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummaryNote" />
+		</bean>
+		
+        
+        <!--  Service delegates -->
+        <bean id="presentenceInvestigationRequestDelegate"
+        	class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationRequestDelegate">
+        	<constructor-arg name="presentenceInvestigationRequestDao" ref="presentenceInvestigationRequestDao"/>
+        	<constructor-arg name="presentenceInvestigationRequestInstanceFactory" ref="presentenceInvestigationRequestInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>	
+        </bean>
+        
+        <bean id="presentenceInvestigationRequestNoteDelegate" class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationRequestNoteDelegate">
+			<constructor-arg name="presentenceInvestigationRequestNoteDao" ref="presentenceInvestigationRequestNoteDao" />
+			<constructor-arg name="presentenceInvestigationRequestNoteInstanceFactory" ref="presentenceInvestigationRequestNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskGroupDelegate" class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationTaskGroupDelegate">
+			<constructor-arg name="presentenceInvestigationTaskGroupDao" ref="presentenceInvestigationTaskGroupDao" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskAssociationDelegate" class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationTaskAssociationDelegate">
+			<constructor-arg name="presentenceInvestigationTaskAssociationDao" ref="presentenceInvestigationTaskAssociationDao" />
+			<constructor-arg name="presentenceInvestigationTaskAssociationInstanceFactory" ref="presentenceInvestigationTaskAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskSourceDelegate" class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationTaskSourceDelegate">
+			<constructor-arg name="presentenceInvestigationTaskSourceDao" ref="presentenceInvestigationTaskSourceDao" />
+			<constructor-arg name="presentenceInvestigationTaskSourceInstanceFactory" ref="presentenceInvestigationTaskSourceInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="presentenceInvestigationCategoryDelegate" class="omis.presentenceinvestigation.service.delegate.PresentenceInvestigationCategoryDelegate">
+			<constructor-arg name="presentenceInvestigationCategoryDao" ref="presentenceInvestigationCategoryDao" />
+			<constructor-arg name="presentenceInvestigationCategoryInstanceFactory" ref="presentenceInvestigationCategoryInstanceFactory" />
+		</bean>
+        
+        <bean id="jailAdjustmentSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.JailAdjustmentSectionSummaryDelegate">
+			<constructor-arg name="jailAdjustmentSectionSummaryDao" ref="jailAdjustmentSectionSummaryDao" />
+			<constructor-arg name="jailAdjustmentSectionSummaryInstanceFactory" ref="jailAdjustmentSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+        
+        <bean id="jailAdjustmentSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.JailAdjustmentSectionSummaryNoteDelegate">
+			<constructor-arg name="jailAdjustmentSectionSummaryNoteDao" ref="jailAdjustmentSectionSummaryNoteDao" />
+			<constructor-arg name="jailAdjustmentSectionSummaryNoteInstanceFactory" ref="jailAdjustmentSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+        
+        <bean id="psychologicalSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.PsychologicalSectionSummaryDelegate">
+			<constructor-arg name="psychologicalSectionSummaryDao" ref="psychologicalSectionSummaryDao" />
+			<constructor-arg name="psychologicalSectionSummaryInstanceFactory" ref="psychologicalSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+        
+        <bean id="psychologicalSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.PsychologicalSectionSummaryNoteDelegate">
+			<constructor-arg name="psychologicalSectionSummaryNoteDao" ref="psychologicalSectionSummaryNoteDao" />
+			<constructor-arg name="psychologicalSectionSummaryNoteInstanceFactory" ref="psychologicalSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+        
+        <bean id="psychologicalSectionSummaryDocumentDelegate" class="omis.presentenceinvestigation.service.delegate.PsychologicalSectionSummaryDocumentDelegate">
+			<constructor-arg name="psychologicalSectionSummaryDocumentDao" ref="psychologicalSectionSummaryDocumentDao" />
+			<constructor-arg name="psychologicalSectionSummaryDocumentInstanceFactory" ref="psychologicalSectionSummaryDocumentInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+        
+        <bean id="educationSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.EducationSectionSummaryDelegate">
+			<constructor-arg name="educationSectionSummaryDao" ref="educationSectionSummaryDao" />
+			<constructor-arg name="educationSectionSummaryInstanceFactory" ref="educationSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="educationSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.EducationSectionSummaryNoteDelegate">
+			<constructor-arg name="educationSectionSummaryNoteDao" ref="educationSectionSummaryNoteDao" />
+			<constructor-arg name="educationSectionSummaryNoteInstanceFactory" ref="educationSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.OffenseSectionSummaryDelegate">
+			<constructor-arg name="offenseSectionSummaryDao" ref="offenseSectionSummaryDao" />
+			<constructor-arg name="offenseSectionSummaryInstanceFactory" ref="offenseSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryAssociableDocumentDelegate" class="omis.presentenceinvestigation.service.delegate.OffenseSectionSummaryAssociableDocumentDelegate">
+			<constructor-arg name="offenseSectionSummaryAssociableDocumentDao" ref="offenseSectionSummaryAssociableDocumentDao" />
+			<constructor-arg name="offenseSectionSummaryAssociableDocumentInstanceFactory" ref="offenseSectionSummaryAssociableDocumentInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="circumstanceOfOffenseDelegate" class="omis.presentenceinvestigation.service.delegate.CircumstanceOfOffenseDelegate">
+			<constructor-arg name="circumstanceOfOffenseDao" ref="circumstanceOfOffenseDao" />
+			<constructor-arg name="circumstanceOfOffenseInstanceFactory" ref="circumstanceOfOffenseInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.PleaAgreementSectionSummaryDelegate">
+			<constructor-arg name="pleaAgreementSectionSummaryDao" ref="pleaAgreementSectionSummaryDao" />
+			<constructor-arg name="pleaAgreementSectionSummaryInstanceFactory" ref="pleaAgreementSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.PleaAgreementSectionSummaryNoteDelegate">
+			<constructor-arg name="pleaAgreementSectionSummaryNoteDao" ref="pleaAgreementSectionSummaryNoteDao" />
+			<constructor-arg name="pleaAgreementSectionSummaryNoteInstanceFactory" ref="pleaAgreementSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryAssociableDocumentDelegate" class="omis.presentenceinvestigation.service.delegate.PleaAgreementSectionSummaryAssociableDocumentDelegate">
+			<constructor-arg name="pleaAgreementSectionSummaryAssociableDocumentDao" ref="pleaAgreementSectionSummaryAssociableDocumentDao" />
+			<constructor-arg name="pleaAgreementSectionSummaryAssociableDocumentInstanceFactory" ref="pleaAgreementSectionSummaryAssociableDocumentInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.ChemicalUseSectionSummaryDelegate">
+			<constructor-arg name="chemicalUseSectionSummaryDao" ref="chemicalUseSectionSummaryDao" />
+			<constructor-arg name="chemicalUseSectionSummaryInstanceFactory" ref="chemicalUseSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.ChemicalUseSectionSummaryNoteDelegate">
+			<constructor-arg name="chemicalUseSectionSummaryNoteDao" ref="chemicalUseSectionSummaryNoteDao" />
+			<constructor-arg name="chemicalUseSectionSummaryNoteInstanceFactory" ref="chemicalUseSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDocumentAssociationDelegate" class="omis.presentenceinvestigation.service.delegate.ChemicalUseSectionSummaryDocumentAssociationDelegate">
+			<constructor-arg name="chemicalUseSectionSummaryDocumentAssociationDao" ref="chemicalUseSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="chemicalUseSectionSummaryDocumentAssociationInstanceFactory" ref="chemicalUseSectionSummaryDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.OtherPertinentInformationSectionSummaryDelegate">
+			<constructor-arg name="otherPertinentInformationSectionSummaryDao" ref="otherPertinentInformationSectionSummaryDao" />
+			<constructor-arg name="otherPertinentInformationSectionSummaryInstanceFactory" ref="otherPertinentInformationSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.OtherPertinentInformationSectionSummaryNoteDelegate">
+			<constructor-arg name="otherPertinentInformationSectionSummaryNoteDao" ref="otherPertinentInformationSectionSummaryNoteDao" />
+			<constructor-arg name="otherPertinentInformationSectionSummaryNoteInstanceFactory" ref="otherPertinentInformationSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.VictimSectionSummaryDelegate">
+			<constructor-arg name="victimSectionSummaryDao" ref="victimSectionSummaryDao" />
+			<constructor-arg name="victimSectionSummaryInstanceFactory" ref="victimSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="victimSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.VictimSectionSummaryNoteDelegate">
+			<constructor-arg name="victimSectionSummaryNoteDao" ref="victimSectionSummaryNoteDao" />
+			<constructor-arg name="victimSectionSummaryNoteInstanceFactory" ref="victimSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDocumentAssociationDelegate" class="omis.presentenceinvestigation.service.delegate.VictimSectionSummaryDocumentAssociationDelegate">
+			<constructor-arg name="victimSectionSummaryDocumentAssociationDao" ref="victimSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="victimSectionSummaryDocumentAssociationInstanceFactory" ref="victimSectionSummaryDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+        <bean id="healthSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.HealthSectionSummaryDelegate">
+			<constructor-arg name="healthSectionSummaryDao" ref="healthSectionSummaryDao" />
+			<constructor-arg name="healthSectionSummaryInstanceFactory" ref="healthSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="healthSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.HealthSectionSummaryNoteDelegate">
+			<constructor-arg name="healthSectionSummaryNoteDao" ref="healthSectionSummaryNoteDao" />
+			<constructor-arg name="healthSectionSummaryNoteInstanceFactory" ref="healthSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="healthSectionSummaryDocumentAssociationDelegate" class="omis.presentenceinvestigation.service.delegate.HealthSectionSummaryDocumentAssociationDelegate">
+			<constructor-arg name="healthSectionSummaryDocumentAssociationDao" ref="healthSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="healthSectionSummaryDocumentAssociationInstanceFactory" ref="healthSectionSummaryDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.FinancialSectionSummaryDelegate">
+			<constructor-arg name="financialSectionSummaryDao" ref="financialSectionSummaryDao" />
+			<constructor-arg name="financialSectionSummaryInstanceFactory" ref="financialSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDocumentAssociationDelegate" class="omis.presentenceinvestigation.service.delegate.FinancialSectionSummaryDocumentAssociationDelegate">
+			<constructor-arg name="financialSectionSummaryDocumentAssociationDao" ref="financialSectionSummaryDocumentAssociationDao" />
+			<constructor-arg name="financialSectionSummaryDocumentAssociationInstanceFactory" ref="financialSectionSummaryDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="financialSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.FinancialSectionSummaryNoteDelegate">
+			<constructor-arg name="financialSectionSummaryNoteDao" ref="financialSectionSummaryNoteDao" />
+			<constructor-arg name="financialSectionSummaryNoteInstanceFactory" ref="financialSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="supervisionHistorySummaryDelegate" class="omis.presentenceinvestigation.service.delegate.SupervisionHistorySummaryDelegate">
+			<constructor-arg name="supervisionHistorySectionSummaryDao" ref="supervisionHistorySectionSummaryDao"/>
+			<constructor-arg name="supervisionHistorySectionSummaryInstanceFactory" ref="supervisionHistorySectionSummaryInstanceFactory"/>
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="supervisionHistoryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.SupervisionHistoryNoteDelegate">
+			<constructor-arg name="supervisionHistoryNoteDao" ref="supervisionHistoryNoteDao"/>
+			<constructor-arg name="supervisionHistoryNoteInstanceFactory" ref="supervisionHistoryNoteInstanceFactory"/>
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryDelegate" class="omis.presentenceinvestigation.service.delegate.EvaluationRecommendationSectionSummaryDelegate">
+			<constructor-arg name="evaluationRecommendationSectionSummaryDao" ref="evaluationRecommendationSectionSummaryDao" />
+			<constructor-arg name="evaluationRecommendationSectionSummaryInstanceFactory" ref="evaluationRecommendationSectionSummaryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryNoteDelegate" class="omis.presentenceinvestigation.service.delegate.EvaluationRecommendationSectionSummaryNoteDelegate">
+			<constructor-arg name="evaluationRecommendationSectionSummaryNoteDao" ref="evaluationRecommendationSectionSummaryNoteDao" />
+			<constructor-arg name="evaluationRecommendationSectionSummaryNoteInstanceFactory" ref="evaluationRecommendationSectionSummaryNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+        <!-- Daos -->
+        <bean id="presentenceInvestigationRequestDao"
+			class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationRequestDaoHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        	<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest"/>	
+        </bean>
+        
+        <bean id="presentenceInvestigationRequestNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationRequestNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationRequestNote" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskGroupDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationTaskGroupDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskAssociationDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationTaskAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation" />
+		</bean>
+		
+		<bean id="presentenceInvestigationTaskSourceDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationTaskSourceDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource" />
+		</bean>
+		
+		<bean id="presentenceInvestigationCategoryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PresentenceInvestigationCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PresentenceInvestigationCategory" />
+		</bean>
+        
+        <bean id="jailAdjustmentSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.JailAdjustmentSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary" />
+		</bean>
+		
+		<bean id="jailAdjustmentSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.JailAdjustmentSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummaryNote" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PsychologicalSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummary" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PsychologicalSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryNote" />
+		</bean>
+		
+		<bean id="psychologicalSectionSummaryDocumentDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PsychologicalSectionSummaryDocumentDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument" />
+		</bean>
+		
+		<bean id="educationSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.EducationSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EducationSectionSummary" />
+		</bean>
+		
+		<bean id="educationSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.EducationSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EducationSectionSummaryNote" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.OffenseSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OffenseSectionSummary" />
+		</bean>
+		
+		<bean id="offenseSectionSummaryAssociableDocumentDao" class="omis.presentenceinvestigation.dao.impl.hibernate.OffenseSectionSummaryAssociableDocumentDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OffenseSectionSummaryAssociableDocument" />
+		</bean>
+		
+		<bean id="circumstanceOfOffenseDao" class="omis.presentenceinvestigation.dao.impl.hibernate.CircumstanceOfOffenseDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.CircumstanceOfOffense" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PleaAgreementSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummary" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PleaAgreementSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryNote" />
+		</bean>
+		
+		<bean id="pleaAgreementSectionSummaryAssociableDocumentDao" class="omis.presentenceinvestigation.dao.impl.hibernate.PleaAgreementSectionSummaryAssociableDocumentDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.PleaAgreementSectionSummaryAssociableDocument" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.ChemicalUseSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummary" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.ChemicalUseSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryNote" />
+		</bean>
+		
+		<bean id="chemicalUseSectionSummaryDocumentAssociationDao" class="omis.presentenceinvestigation.dao.impl.hibernate.ChemicalUseSectionSummaryDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.ChemicalUseSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.OtherPertinentInformationSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummary" />
+		</bean>
+		
+		<bean id="otherPertinentInformationSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.OtherPertinentInformationSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.OtherPertinentInformationSectionSummaryNote" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.VictimSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummary" />
+		</bean>
+		
+		<bean id="victimSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.VictimSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummaryNote" />
+		</bean>
+		
+		<bean id="victimSectionSummaryDocumentAssociationDao" class="omis.presentenceinvestigation.dao.impl.hibernate.VictimSectionSummaryDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.VictimSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="healthSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.HealthSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummary" />
+		</bean>
+		
+		<bean id="healthSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.HealthSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummaryNote" />
+		</bean>
+		
+		<bean id="healthSectionSummaryDocumentAssociationDao" class="omis.presentenceinvestigation.dao.impl.hibernate.HealthSectionSummaryDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.FinancialSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummary" />
+		</bean>
+		
+		<bean id="financialSectionSummaryDocumentAssociationDao" class="omis.presentenceinvestigation.dao.impl.hibernate.FinancialSectionSummaryDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummaryDocumentAssociation" />
+		</bean>
+		
+		<bean id="financialSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.FinancialSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.FinancialSectionSummaryNote" />
+		</bean>
+		
+		<bean id="supervisionHistorySectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.SupervisionHistorySectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.SupervisionHistorySectionSummary" />
+		</bean>
+		
+		<bean id="supervisionHistoryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.SupervisionHistoryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.SupervisionHistoryNote" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryDao" class="omis.presentenceinvestigation.dao.impl.hibernate.EvaluationRecommendationSectionSummaryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummary" />
+		</bean>
+		
+		<bean id="evaluationRecommendationSectionSummaryNoteDao" class="omis.presentenceinvestigation.dao.impl.hibernate.EvaluationRecommendationSectionSummaryNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.presentenceinvestigation.domain.EvaluationRecommendationSectionSummaryNote" />
+		</bean>
+		
+		<!-- Document Beans -->
+		
+		<bean id="presentenceInvestigationDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="presentenceInvestigationDocumentLocator"/>
+		</bean>
+
+		<bean id="presentenceInvestigationDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="presentenceInvestigationDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="presentenceInvestigationDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\PresentenceInvestigationDocuments"/>
+		</bean>
+		
+		<bean id="presentenceInvestigationDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="presentenceInvestigationDocumentLocator"/>
+		</bean>		
+</beans>

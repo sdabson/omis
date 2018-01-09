@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.immigration.domain">
+	<class entity-name="omis.immigration.domain.AlienResidence"
+	       proxy="omis.immigration.domain.AlienResidence"
+	       name="omis.immigration.domain.impl.AlienResidenceImpl"
+	       table="`ALIEN_RESIDENCE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`ALIEN_RESIDENCE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueAlienResidence">
+		  <component name="dateRange" class="omis.datatype.DateRange">
+            <property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
+            <property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+          </component>
+          <many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+          <many-to-one name="immigrationStatus" entity-name="omis.immigration.domain.ImmigrationStatus" not-null="false" column="`IMMIGRATION_STATUS_ID`"/>
+          <property name="legal" type="yes_no" not-null="false" column="`LEGAL`"/>
+          <property name="insNumber" type="java.lang.String" not-null="false" column="`INS_NUMBER`"/>
+		</properties>
+	    <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+      	  <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+      	  <property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+        </component>
+        <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	  <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	  <property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+        </component>
+	</class>
+	<query name="findAlienResidenceByOffender"><![CDATA[
+	  select alienResidence from omis.immigration.domain.AlienResidence alienResidence
+	  where alienResidence.offender = :offender
+	]]></query>
+</hibernate-mapping>

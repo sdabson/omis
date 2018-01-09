@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- Services -->
+	 
+	<bean id="grievanceService"
+		class="omis.grievance.service.impl.GrievanceServiceImpl">
+		<constructor-arg name="grievanceDelegate" ref="grievanceDelegate"/>
+		<constructor-arg name="grievanceDispositionDelegate" ref="grievanceDispositionDelegate"/>
+		<constructor-arg name="grievanceNoteDelegate" ref="grievanceNoteDelegate"/>
+		<constructor-arg name="grievanceSubjectDelegate" ref="grievanceSubjectDelegate"/>
+		<constructor-arg name="grievanceComplaintCategoryDelegate" ref="grievanceComplaintCategoryDelegate"/>
+		<constructor-arg name="grievanceDispositionReasonDelegate" ref="grievanceDispositionReasonDelegate"/>
+		<constructor-arg name="grievanceDispositionStatusDelegate" ref="grievanceDispositionStatusDelegate"/>
+		<constructor-arg name="grievanceLocationDelegate" ref="grievanceLocationDelegate"/>
+		<constructor-arg name="grievanceUnitDelegate" ref="grievanceUnitDelegate"/>
+		<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+		<constructor-arg name="grievanceResponseDueDateCalculatorDelegate" ref="grievanceResponseDueDateCalculatorDelegate"/>
+	 </bean>
+	 
+	 <!-- Report services -->
+	 
+	 <bean id="grievanceReportService" class="omis.grievance.report.impl.hibernate.GrievanceReportServiceHibernateImpl">
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 	<constructor-arg name="offenderReportDelegate" ref="offenderReportDelegate"/>
+	 </bean>
+	 
+	 <bean id="grievanceProfileItemReportService" class="omis.grievance.report.impl.hibernate.GrievanceProfileItemReportServiceHibernateImpl">
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	 
+	 <!-- DAOs -->
+	 
+	 <bean name="grievanceComplaintCategoryDao" class="omis.grievance.dao.impl.hibernate.GrievanceComplaintCategoryDaoHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceComplaintCategory"/>
+	    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	
+	 <bean id="grievanceDao" class="omis.grievance.dao.impl.hibernate.GrievanceDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.Grievance"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceDispositionDao" class="omis.grievance.dao.impl.hibernate.GrievanceDispositionDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDisposition"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceDispositionReasonDao" class="omis.grievance.dao.impl.hibernate.GrievanceDispositionReasonDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionReason"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceDispositionStatusDao" class="omis.grievance.dao.impl.hibernate.GrievanceDispositionStatusDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionStatus"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceLocationDao" class="omis.grievance.dao.impl.hibernate.GrievanceLocationDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceLocation"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceNoteDao" class="omis.grievance.dao.impl.hibernate.GrievanceNoteDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceNote"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceSubjectDao" class="omis.grievance.dao.impl.hibernate.GrievanceSubjectDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceSubject"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <bean id="grievanceUnitDao" class="omis.grievance.dao.impl.hibernate.GrievanceUnitDaoHibernateImpl">
+	 	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceUnit"/>
+	 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	 </bean>
+	  
+	 <!-- Instance factories -->
+	 
+	 <bean name="grievanceInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.Grievance"/>
+	 </bean>
+	 
+	 <bean name="grievanceComplaintCategoryInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceComplaintCategory"/>
+	 </bean>
+	 
+	 <bean name="grievanceDispositionInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDisposition"/>
+	 </bean>
+	 
+	 <bean name="grievanceDispositionReasonInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionReason"/>
+	 </bean>
+	 
+	 <bean name="grievanceDispositionStatusInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionStatus"/>
+	 </bean>
+	 
+	 <bean name="grievanceLocationInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceLocation"/>
+	 </bean>
+	 
+	 <bean name="grievanceNoteInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceNote"/>
+	 </bean>
+	 
+	 <bean name="grievanceSubjectInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceSubject"/>
+	 </bean>
+	 
+	 <bean name="grievanceUnitInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceUnit"/>
+	 </bean>
+	  
+	 <!--Property editor factories -->
+	    
+	<bean id="grievanceComplaintCategoryPropertyEditorFactory"
+	   	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceComplaintCategory"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceComplaintCategoryDao"/>
+	</bean>
+	
+	<bean id="grievancePropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.Grievance"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDisposition"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceDispositionDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionReasonPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionReason"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceDispositionReasonDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionStatusPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceDispositionStatus"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceDispositionStatusDao"/>
+	</bean>
+	
+	<bean id="grievanceLocationPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceLocation"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceLocationDao"/>
+	</bean>
+	
+	<bean id="grievanceNotePropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceNote"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceNoteDao"/>
+	</bean>
+	
+	<bean id="grievanceSubjectPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceSubject"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceSubjectDao"/>
+	</bean>
+	
+	<bean id="grievanceUnitPropertyEditorFactory"
+	    class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.grievance.domain.GrievanceUnit"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="grievanceUnitDao"/>
+	</bean>
+	
+	<!-- Helper classes -->
+	
+	<bean id="grievanceDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceDelegate">
+	   	<constructor-arg name="grievanceInstanceFactory" ref="grievanceInstanceFactory"/>
+	   	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	   	<constructor-arg name="grievanceDao" ref="grievanceDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionDelegate"
+	  	class="omis.grievance.service.delegate.GrievanceDispositionDelegate">
+	  	<constructor-arg name="grievanceDispositionInstanceFactory" ref="grievanceDispositionInstanceFactory"/>
+	  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  	<constructor-arg name="grievanceDispositionDao" ref="grievanceDispositionDao"/>
+	</bean>
+	
+	<bean id="grievanceNoteDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceNoteDelegate">
+	   	<constructor-arg name="grievanceNoteInstanceFactory" ref="grievanceNoteInstanceFactory"/>
+	   	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	   	<constructor-arg name="grievanceNoteDao" ref="grievanceNoteDao"/>
+	</bean>
+
+	<bean id="grievanceComplaintCategoryDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceComplaintCategoryDelegate">
+	   	<constructor-arg name="grievanceComplaintCategoryInstanceFactory" ref="grievanceComplaintCategoryInstanceFactory"/>
+	   	<constructor-arg name="grievanceComplaintCategoryDao" ref="grievanceComplaintCategoryDao"/>
+	</bean>
+	
+	<bean id="grievanceSubjectDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceSubjectDelegate">
+	   	<constructor-arg name="grievanceSubjectInstanceFactory" ref="grievanceSubjectInstanceFactory"/>
+	   	<constructor-arg name="grievanceSubjectDao" ref="grievanceSubjectDao"/>
+	</bean>
+	
+	<bean id="grievanceLocationDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceLocationDelegate">
+	   	<constructor-arg name="grievanceLocationInstanceFactory" ref="grievanceLocationInstanceFactory"/>
+	   	<constructor-arg name="grievanceLocationDao" ref="grievanceLocationDao"/>
+	</bean>
+	
+	<bean id="grievanceUnitDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceUnitDelegate">
+	   	<constructor-arg name="grievanceUnitInstanceFactory" ref="grievanceUnitInstanceFactory"/>
+	   	<constructor-arg name="grievanceUnitDao" ref="grievanceUnitDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionReasonDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceDispositionReasonDelegate">
+	   	<constructor-arg name="grievanceDispositionReasonInstanceFactory" ref="grievanceDispositionReasonInstanceFactory"/>
+	   	<constructor-arg name="grievanceDispositionReasonDao" ref="grievanceDispositionReasonDao"/>
+	</bean>
+	
+	<bean id="grievanceDispositionStatusDelegate"
+	   	class="omis.grievance.service.delegate.GrievanceDispositionStatusDelegate">
+	   	<constructor-arg name="grievanceDispositionStatusInstanceFactory" ref="grievanceDispositionStatusInstanceFactory"/>
+	   	<constructor-arg name="grievanceDispositionStatusDao" ref="grievanceDispositionStatusDao"/>
+	</bean>
+	
+	<bean id="grievanceResponseDueDateCalculatorDelegate"
+	      class="omis.grievance.service.delegate.GrievanceResponseDueDateCalculatorDelegate">
+	  <constructor-arg name="daysUntilResponseDue" value="20"/>      
+	</bean>
+	
+</beans>

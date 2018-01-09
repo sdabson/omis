@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcasecondition.domain">
+	<class entity-name="omis.courtcasecondition.domain.CourtCaseCondition"
+	       proxy="omis.courtcasecondition.domain.CourtCaseCondition"
+	       name="omis.courtcasecondition.domain.impl.CourtCaseConditionImpl"
+	       table="`COURT_CASE_CONDITION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`COURT_CASE_CONDITION_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<many-to-one name="conditionClause" class="omis.condition.domain.ConditionClause" column="`CONDITION_CLAUSE_ID`" not-null="true"/>
+			<many-to-one name="courtCaseAgreementCategory" class="omis.courtcasecondition.domain.CourtCaseAgreementCategory" column="`COURT_CASE_AGREEMENT_CAT_ID`" not-null="true"/>
+		</properties>
+	</class>
+	<query name="findCourtCaseConditionsCountByOffenderAndEffectiveDate"><![CDATA[
+		select count(condition.id)
+			from omis.condition.domain.Condition condition
+		inner join
+			condition.agreement agreement
+		where
+			agreement.offender = :offender
+		and
+			(agreement.dateRange.startDate <= :effectiveDate)
+			and (agreement.dateRange.endDate > :effectiveDate
+				or agreement.dateRange.endDate is null)
+		and
+			condition.waived != true
+]]></query>
+</hibernate-mapping>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.report">
+
+<!--    Employer/Name searches -->
+	<query name="findEmployerByName"><![CDATA[
+
+	select new omis.search.report.EmployerSearchResult(
+		organization.name,
+		employer.id, 
+		address.value, 
+		city.name,
+		case
+			when state is not null
+			then
+				state.name
+			else
+				null
+		end 
+	)
+
+	from
+		omis.employment.domain.Employer employer
+		inner join employer.location location
+		inner join location.organization organization
+		inner join location.address address
+		inner join address.zipCode zipCode
+		inner join zipCode.city city
+		left join city.state state
+	where
+		upper(employer.location.organization.name) like upper(:employerName || '%' )
+	]]></query>  
+	
+	<query name="findEmployerSummaryByName"><![CDATA[ 
+ 		select new omis.employment.report.EmployerSummary( 
+ 			employer.id, 
+ 			organization.name, 
+ 			location.dateRange.startDate, 
+			location.dateRange.endDate, 
+   			address,
+   			case
+   				when employer.telephoneNumber is not null
+   				then
+   					employer.telephoneNumber
+   				else
+   					null
+   			end
+ 		)
+ 		from 
+ 			omis.employment.domain.Employer employer 
+ 			inner join employer.location location
+ 			inner join location.organization organization 
+ 			inner join location.address address
+ 		where 
+ 			upper(organization.name) like upper('%'||:employerName || '%' )
+ 		
+ 	]]></query>
+</hibernate-mapping>
+
+
+

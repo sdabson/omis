@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+<query name="findPresentenceInvestigationRequestSummariesByUser"><![CDATA[
+	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+		   psir.id,
+		   offender.id,
+			docket.value,
+		   psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
+		   psir.expectedCompletionDate, psir.completionDate,
+		   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+		   psir.sentenceDate, category.name)
+      from
+	omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		inner join psir.category category
+		inner join psir.docket docket
+		inner join psir.assignedUser userAccount
+		inner join userAccount.user user
+		left outer join user.name personName
+		left outer join docket.person offender
+		left outer join offender.name offenderName
+		where userAccount = :assignedUser
+	 
+]]></query>
+<query name="findPresentenceInvestigationRequestSummariesByOffender"><![CDATA[
+	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+		   psir.id,
+		   offender.id,
+			docket.value,
+		   psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
+		   psir.expectedCompletionDate, psir.completionDate,
+		   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+		   psir.sentenceDate, category.name)
+      from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		inner join psir.category category
+		inner join psir.docket docket
+		inner join psir.assignedUser userAccount
+		inner join userAccount.user user
+		left outer join user.name personName
+		inner join docket.person offender
+		left outer join offender.name offenderName
+		where offender = :offender
+]]></query>
+<query name="findPresentenceInvestigationRequestSummary"><![CDATA[
+	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			psir.id,
+			offender.id,
+			docket.value,
+			psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
+			psir.expectedCompletionDate, psir.completionDate,
+			offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+		   psir.sentenceDate, category.name)
+	from
+	omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+		inner join psir.category category
+		inner join psir.docket docket
+		inner join psir.assignedUser userAccount
+		inner join userAccount.user user
+		left outer join user.name personName
+		left outer join docket.person offender
+		left outer join offender.name offenderName
+	where psir = :presentenceInvestigationRequest
+]]></query>
+</hibernate-mapping>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.court.domain">
+	<class	entity-name="omis.court.domain.CourtJudgeAssignment"
+			proxy="omis.court.domain.CourtJudgeAssignment"
+			name="omis.court.domain.impl.CourtJudgeAssignmentImpl"
+			table="`COURT_JUDGE_ASSIGNMENT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COURT_JUDGE_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" not-null="false"/>
+			<property name="endDate" column="`END_DATE`" not-null="false"/>
+		</component>
+		<many-to-one name="judge" entity-name="omis.person.domain.Person"
+		             not-null="true" column="`JUDGE_ID`"/>
+		<many-to-one name="court" entity-name="omis.court.domain.Court"
+		             not-null="true" column="`COURT_ID`"/>
+	</class>
+	<query name="findJudgesByCourtOnDate"><![CDATA[
+	  select assignment.judge
+	  from omis.court.domain.CourtJudgeAssignment as assignment
+	  where assignment.court = :court
+	    and ((assignment.dateRange.startDate is null or assignment.dateRange.startDate <= :date)
+	     and (assignment.dateRange.endDate is null or assignment.dateRange.endDate >= :date))
+	]]></query>
+</hibernate-mapping>

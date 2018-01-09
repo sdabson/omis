@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Placement application configuration.
+  -
+  - Author: Stephen Abson 
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+    <!-- Services -->
+    
+    <bean id="changeCorrectionalStatusService"
+        class="omis.placement.service.impl.ChangeCorrectionalStatusServiceImpl">
+      <constructor-arg name="placementTermDelegate" ref="placementTermDelegate"/>
+      <constructor-arg name="correctionalStatusTermDelegate" ref="correctionalStatusTermDelegate"/>
+      <constructor-arg name="supervisoryOrganizationTermDelegate" ref="supervisoryOrganizationTermDelegate"/>
+      <constructor-arg name="supervisoryOrganizationDelegate" ref="supervisoryOrganizationDelegate"/>
+      <constructor-arg name="allowedCorrectionalStatusChangeDelegate" ref="allowedCorrectionalStatusChangeDelegate"/>
+      <constructor-arg name="placementTermChangeReasonDelegate" ref="placementTermChangeReasonDelegate"/>
+      <constructor-arg name="allowedCorrectionalStatusChangeReasonRuleDelegate" ref="allowedCorrectionalStatusChangeReasonRuleDelegate"/>
+      <constructor-arg name="locationDelegate" ref="locationDelegate"/>
+      <constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
+      <constructor-arg name="locationReasonTermDelegate" ref="locationReasonTermDelegate"/>
+      <constructor-arg name="programPlacementDelegate" ref="programPlacementDelegate"/>
+      <constructor-arg name="programDelegate" ref="programDelegate"/>
+    </bean>
+    
+    <bean id="changeProgramPlacementService"
+          class="omis.placement.service.impl.ChangeProgramPlacementServiceImpl">
+      <constructor-arg name="programPlacementDelegate" ref="programPlacementDelegate"/>
+      <constructor-arg name="placementTermDelegate" ref="placementTermDelegate"/>
+      <constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
+      <constructor-arg name="programDelegate" ref="programDelegate"/>
+    </bean>
+    
+    <bean id="changeLocationService"
+        class="omis.placement.service.impl.ChangeLocationServiceImpl">
+      <constructor-arg name="locationReasonDelegate" ref="locationReasonDelegate"/>
+      <constructor-arg name="allowedLocationChangeDelegate" ref="allowedLocationChangeDelegate"/>
+      <constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
+      <constructor-arg name="locationReasonTermDelegate" ref="locationReasonTermDelegate"/>
+      <constructor-arg name="allowedLocationChangeReasonRuleDelegate" ref="allowedLocationChangeReasonRuleDelegate"/>
+    </bean>
+    
+    <!-- Report services -->
+	
+	<bean id="placementReportService"
+	      class="omis.placement.report.impl.hibernate.PlacementReportServiceHibernateImpl">
+	   	<constructor-arg name="locationTermSummaryDelegate" ref="locationTermSummaryDelegate"/>
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="placementProfileItemReportService"
+		  class="omis.placement.report.impl.hibernate.PlacementProfileItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+</beans>

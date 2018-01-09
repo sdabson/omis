@@ -1,0 +1,14 @@
+/*
+ * Styling for information display.
+ *
+ * Author: Stephen Abson
+ */
+
+table.dataTable {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table.dataTable tbody tr td.date {
+	width: 96px;
+}

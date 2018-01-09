@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.demographics.domain">
+	<class entity-name="omis.demographics.domain.MaritalStatus"
+		   proxy="omis.demographics.domain.MaritalStatus"
+		   name="omis.demographics.domain.impl.MaritalStatusImpl"
+		   table="`MARITAL_STATUS`">
+		<cache usage="transactional" region="demographics"/>
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`MARITAL_STATUS_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findMaritalStatuses" cacheable="true" cache-region="demographics"><![CDATA[
+	  select maritalStatus from omis.demographics.domain.MaritalStatus maritalStatus order by maritalStatus.name
+	]]></query>
+</hibernate-mapping>

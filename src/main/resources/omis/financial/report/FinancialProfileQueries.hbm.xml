@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.report">
+	<query name="findFinancialProfileItemSummayByOffender"><![CDATA[
+		  select new omis.financial.report.FinancialProfileItemSummary(
+		         (select sum(
+		        	         case 
+		       			         when financialAsset is null then 0
+		       			         else 1
+		       		         end) 
+		       		     from omis.financial.domain.FinancialAsset financialAsset
+             right outer join financialAsset.offender offender1
+                        where offender1 = offender),
+		         (select sum(
+					         case 
+						          when financialLiability is null then 0
+						          else 1
+					     end) 
+					from omis.financial.domain.FinancialLiability financialLiability
+        right outer join financialLiability.offender offender2
+				   where offender2 = offender))
+		    from omis.offender.domain.Offender offender
+           where offender = :offender 
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,12 @@
+/*
+ * Cascading style sheet for interactive images.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (5/11/2017)
+ */
+ 
+ /* Hoverable image styling */
+ table thead tr th.sortable:hover {
+	opacity: .5;
+	cursor: pointer;
+}

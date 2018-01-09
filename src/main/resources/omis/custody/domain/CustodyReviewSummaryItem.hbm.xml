@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.custody.domain">
+<query name="findCustodyReviewByOffenderAndDate"><![CDATA[
+
+	 select new omis.custody.report.CustodySummary(
+	 	        case when overrideCustodyLevel is not null
+		 	      then overrideCustodyLevel.name
+		 	      else custodyLevel.name 
+		         end,
+		 	     max(custodyReview.actionDate))
+		    from omis.custody.domain.CustodyOverride as custodyOverride
+right outer join custodyOverride.custodyReview as custodyReview
+	  inner join custodyReview.custodyLevel custodyLevel
+ left outer join custodyOverride.custodyLevel as overrideCustodyLevel					
+		   where custodyReview.offender = :offender
+		     and custodyReview.actionDate < :effectiveDate
+        group by overrideCustodyLevel, overrideCustodyLevel.name, custodyLevel, custodyLevel.name, custodyReview.actionDate
+        order by custodyReview.actionDate desc   
+ ]]></query>
+</hibernate-mapping>

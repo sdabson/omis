@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<query name="summarizeSecurityThreatGroupAffiliationsByOffender"><![CDATA[
+		select new omis.stg.report.SecurityThreatGroupAffiliationSummary(
+				affiliation.id,
+				affiliation,
+				offender,
+				offenderName,
+				city,
+				state,
+				group,
+				activityLevel,
+				chapter,
+				rank,
+				cast(:effectiveDate as timestamp)
+			)
+		from omis.stg.domain.SecurityThreatGroupAffiliation as affiliation
+		  inner join affiliation.offender as offender
+		  inner join offender.name as offenderName
+		  left join affiliation.city as city
+		  left join affiliation.state as state
+		  left join affiliation.group as group
+		  left join affiliation.activityLevel as activityLevel
+		  left join affiliation.chapter as chapter
+		  left join affiliation.rank as rank
+		where offender = :offender
+	]]></query>
+</hibernate-mapping>

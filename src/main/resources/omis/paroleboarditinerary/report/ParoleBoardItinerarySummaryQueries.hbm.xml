@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Queries for reporting parole board itineraries.
+ -
+ - Author: Josh Divine
+ - Version: 0.1.0 (Dec 5, 2017)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="omis.paroleboarditinerary.report">
+	<query name="findParoleBoardItinerariesByEffectiveDate"><![CDATA[
+	 	SELECT paroleBoardItinerary
+		  FROM omis.paroleboarditinerary.domain.ParoleBoardItinerary as paroleBoardItinerary 
+         WHERE 
+         	   ((paroleBoardItinerary.dateRange.startDate is null or
+         	    paroleBoardItinerary.dateRange.startDate <= :effectiveDate)
+          AND
+          	   (paroleBoardItinerary.dateRange.endDate is null or
+          	    paroleBoardItinerary.dateRange.endDate >= :effectiveDate))
+           OR
+           		:effectiveDate is null	    
+      ORDER BY
+      			paroleBoardItinerary.dateRange.startDate, 
+      			paroleBoardItinerary.dateRange.endDate desc
+	]]></query>
+	<query name="findParoleBoardItinerariesByDateRange"><![CDATA[
+	 	SELECT paroleBoardItinerary
+		  FROM omis.paroleboarditinerary.domain.ParoleBoardItinerary as paroleBoardItinerary 
+         WHERE 
+         	   (:startDate is null and :endDate is null)
+           OR
+           	   (paroleBoardItinerary.dateRange.startDate is null and
+           	    paroleBoardItinerary.dateRange.endDate is null)
+           OR
+         	   ((paroleBoardItinerary.dateRange.startDate is null or
+         	    paroleBoardItinerary.dateRange.startDate <= :endDate or 
+         	    :endDate is null) and
+         	    (paroleBoardItinerary.dateRange.endDate is null or
+         	     paroleBoardItinerary.dateRange.endDate >= :startDate or
+         	     :startDate is null))
+      ORDER BY
+      			paroleBoardItinerary.dateRange.startDate, 
+      			paroleBoardItinerary.dateRange.endDate desc
+	]]></query>
+	<query name="findParoleBoardItinerarySummaryByParoleBoardItinerary"><![CDATA[
+	 	SELECT new omis.paroleboarditinerary.report.ParoleBoardItinerarySummary(
+	 			paroleBoardItinerary.id,
+	 			paroleBoardItinerary.dateRange.startDate,
+	 			paroleBoardItinerary.dateRange.endDate,
+	 			organization.name)
+		FROM omis.paroleboarditinerary.domain.ParoleBoardItinerary as paroleBoardItinerary
+		INNER JOIN paroleBoardItinerary.location location
+		INNER JOIN location.organization organization
+        WHERE
+        		paroleBoardItinerary = :boardItinerary
+	]]></query>
+	<query name="findParoleBoardAttendeeSummariesByParoleBoardItinerary"><![CDATA[
+	 	SELECT new omis.paroleboarditinerary.report.BoardAttendeeSummary(
+	 			boardAttendee.id,
+	 			name.lastName,
+	 			name.firstName,
+	 			name.middleName,
+	 			boardAttendee.role)
+		FROM omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
+		INNER JOIN boardAttendee.boardMember boardMember
+		INNER JOIN boardMember.staffAssignment staffAssignment
+		INNER JOIN staffAssignment.staffMember staffMember
+		INNER JOIN staffMember.name name  
+		where
+			boardAttendee.boardItinerary = :boardItinerary
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary"
+			proxy="omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary"
+			name="omis.presentenceinvestigation.domain.impl.JailAdjustmentSectionSummaryImpl"
+			table="`JAIL_ADJUSTMENT_SECTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`JAIL_ADJUSTMENT_SECTION_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="presentenceInvestigationRequest" column="`PRESENTENCE_INVESTIGTN_REQT_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findJailAdjustmentSectionSummary"><![CDATA[
+		select jailAdjustmentSectionSummary
+		from
+			omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary jailAdjustmentSectionSummary
+		where
+			jailAdjustmentSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findJailAdjustmentSectionSummaryExcluding"><![CDATA[
+		select jailAdjustmentSectionSummary
+		from
+			omis.presentenceinvestigation.domain.JailAdjustmentSectionSummary jailAdjustmentSectionSummary
+		where
+			jailAdjustmentSectionSummary.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			jailAdjustmentSectionSummary != :jailAdjustmentSectionSummary
+	]]></query>
+</hibernate-mapping>

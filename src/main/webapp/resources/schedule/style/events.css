@@ -1,0 +1,36 @@
+/*
+ * Style sheet for event scheduler.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.1 (Nov 15, 2012)
+ * Since: OMIS 3.0
+ */
+.scheduleTableClass {
+	width: 97%;
+	min-width: 340px;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+table.scheduleTableClass, table.scheduleTableClass th, table.scheduleTableClass td {
+	border: 1px solid;
+}
+.viewTypeList, .navLinkList {
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+}
+.viewTypeList li, .navLinkList li {
+	padding: 2px;
+	margin: 2px;
+	display: inline;
+}
+.viewTypeList li.selected, .navLinkList li.selected {
+	text-decoration: underline;
+}
+a {
+	outline: none;
+	text-decoration: none;
+}
+.weekendDay {
+	background-color: #DDDDDD;
+}

@@ -1,0 +1,26 @@
+/* Provider Schedule form style.
+ * Author: Ryan Johns
+ * Version: 0.1.0 (Jun 3, 2014)
+ * Since: OMIS 3.0 */
+ 
+ .hidden {
+ 	display:none;
+ }
+ .timeRangeFieldLabel {
+ 	float:left;
+ 	margin-left:5px;
+ 	margin-right:5px;
+ }
+ 
+ form.editForm input {
+    float: left;
+}
+
+p.buttons span input, ul.toolbar li input {
+	float: none;	
+}
+
+ul.toolbar li label {
+	vertical-align: middle;
+	text-transform: lowercase;
+}

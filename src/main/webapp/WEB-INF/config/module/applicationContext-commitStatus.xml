@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+ <!-- DAOs -->
+  <bean name="commitStatusTermDao" class="omis.commitstatus.dao.impl.hibernate.CommitStatusTermDaoHibernateImpl">
+ 	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatusTerm"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  <bean id="commitStatusDao" class="omis.commitstatus.dao.impl.hibernate.CommitStatusDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatus"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  <bean id="commitStatusTermDelegate"
+        class="omis.commitstatus.service.delegate.CommitStatusTermDelegate">
+    <constructor-arg name="commitStatusTermDao" ref="commitStatusTermDao"/>
+    <constructor-arg name="commitStatusTermInstanceFactory" ref="commitStatusTermInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  <bean id="commitStatusDelegate"
+        class="omis.commitstatus.service.delegate.CommitStatusDelegate">
+    <constructor-arg name="commitStatusDao" ref="commitStatusDao"/>
+    <constructor-arg name="commitStatusInstanceFactory" ref="commitStatusInstanceFactory"/>
+  </bean>
+        
+ <!-- Property editor factories -->
+    <bean id="commitStatusTermPropertyEditorFactory"
+    	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    	<constructor-arg name="dao" ref="commitStatusTermDao"/>
+    	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatusTerm"/>
+    	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    </bean>
+ 
+	<bean id="commitStatusPropertyEditorFactory"
+     	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     	<constructor-arg name="dao" ref="commitStatusDao"/>
+     	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatus"/>
+     	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+     </bean>
+  
+
+<!-- Commit status related services -->
+ <bean id="commitStatusTermService"
+ 		class="omis.commitstatus.service.impl.CommitStatusTermServiceImpl">
+   		<constructor-arg name="commitStatusTermDelegate" ref="commitStatusTermDelegate"/>
+   		<constructor-arg name="commitStatusDelegate" ref="commitStatusDelegate"/>
+ </bean>
+
+ <bean id="commitStatusTermProfileItemReportService"
+ 		class="omis.commitstatus.report.impl.hibernate.CommitStatusTermProfileItemReportServiceHibernateImpl">
+   		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <!-- Report Services --> 
+ <bean id="commitStatusReportService"
+ 		class="omis.commitstatus.report.impl.hibernate.CommitStatusReportServiceHibernateImpl">
+   		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+
+  <!-- Instance factories -->
+  <bean id="commitStatusTermInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatusTerm"/>
+  </bean>
+  
+  <bean id="commitStatusInstanceFactory"
+     	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+     	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+     	<constructor-arg name="entityName" value="omis.commitstatus.domain.CommitStatus"/>
+  </bean>
+ 
+</beans>

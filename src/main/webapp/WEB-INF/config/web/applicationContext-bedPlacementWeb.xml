@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+     <!-- Validators -->
+	
+	<bean id="bedPlacementFormValidator" 
+		class="omis.bedplacement.web.validator.BedPlacementFormValidator">
+	</bean>
+	<!-- Offender summary item -->
+	 <bean id="bedPlacementSummaryItem"
+    	class="omis.bedplacement.web.summary.BedPlacementSummaryItem">
+    	<constructor-arg name="bedPlacementSummaryReportService" ref="bedPlacementSummaryReportService"/>
+    	<constructor-arg name="summaryItemRegistry" ref="facilitySummaryItemRegistry"/>
+    	<constructor-arg name="includedPageName" value="/WEB-INF/views/bedPlacement/summary/includes/summaryItem.jsp"/>
+    	<constructor-arg name="order" value="0"/>
+    	<constructor-arg name="enabled" value="${bedPlacementSummaryItemEnabled}"/>
+    </bean>
+    
+    <!-- Profile Item -->
+    <bean id="bedPlacementProfileItem"
+    	class="omis.bedplacement.web.profile.BedPlacementProfileItem">
+    	<constructor-arg name="requiredAuthorizations">
+    		<set>
+    		 	<value>BED_PLACEMENT_LIST</value>
+    		 	<value>ADMIN</value>
+    		 </set>
+    	</constructor-arg>
+    	<constructor-arg name="includePage" value="/WEB-INF/views/bedPlacement/profile/includes/profileItem.jsp"/>
+    	<constructor-arg name="name" value="bedPlacement"/>
+    	<constructor-arg name="profileItemRegistry" ref="placementProfileItemRegistry"/>
+    	<constructor-arg name="bedPlacementProfileItemReportService" ref="bedPlacementProfileItemReportService"/>
+    	<constructor-arg name="enabled" value="${bedPlacementProfileItemEnabled}"/>	
+    </bean>
+    	
+	<!-- Web configuration -->
+ 		 
+ 	<context:component-scan base-package="omis.bedplacement.web.controller"/>
+ 	
+ 	<!-- Use controller transactions -->
+  
+	<aop:config>
+	    <aop:pointcut id="bedPlacementControllerOperation" expression="execution(* omis.bedplacement.web.controller.BedPlacementController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="bedPlacementControllerOperation"/>
+	</aop:config>
+	   
+</beans>

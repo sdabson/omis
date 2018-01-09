@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcasecondition.domain">
+	<class entity-name="omis.courtcasecondition.domain.CourtCaseAgreementCategory"
+	       proxy="omis.courtcasecondition.domain.CourtCaseAgreementCategory"
+	       name="omis.courtcasecondition.domain.impl.CourtCaseAgreementCategoryImpl"
+	       table="`COURT_CASE_AGREEMENT_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`COURT_CASE_AGREEMENT_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<property name="name" column="`NAME`" not-null="true"/>
+		</properties>
+	</class>
+</hibernate-mapping>

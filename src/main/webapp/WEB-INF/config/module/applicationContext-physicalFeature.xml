@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="featureClassificationService"
+        	class="omis.physicalfeature.service.impl.FeatureClassificationServiceImpl">
+        	<constructor-arg name="featureClassificationDao" ref="featureClassificationDao"/>
+        </bean>
+        
+        <bean id="physicalFeatureService"
+        	class="omis.physicalfeature.service.impl.PhysicalFeatureServiceImpl">
+        	<constructor-arg name="physicalFeatureDao" ref="physicalFeatureDao"/>
+        </bean>
+        
+       <bean id="physicalFeatureAssociationService"
+        	class="omis.physicalfeature.service.impl.PhysicalFeatureAssociationServiceImpl">
+        	<constructor-arg name="physicalFeatureAssociationDao" ref="physicalFeatureAssociationDao" />
+        	<constructor-arg name="photoDao" ref="photoDao" />
+        	<constructor-arg name="physicalFeaturePhotoAssociationDao" ref="physicalFeaturePhotoAssociationDao" />
+        	<constructor-arg name="featureClassificationDao" ref="featureClassificationDao" />
+        	<constructor-arg name="physicalFeatureDao" ref="physicalFeatureDao" />
+        	<constructor-arg name="physicalFeatureAssociationNoteDao" ref="physicalFeatureAssociationNoteDao" />
+        	<constructor-arg name="physicalFeatureAssociationInstanceFactory" ref="physicalFeatureAssociationInstanceFactory" />
+        	<constructor-arg name="photoInstanceFactory" ref="photoInstanceFactory" />
+        	<constructor-arg name="physicalFeaturePhotoAssociationInstanceFactory" ref="physicalFeaturePhotoAssociationInstanceFactory" />
+        	<constructor-arg name="physicalFeatureAssociationNoteInstanceFactory" ref="physicalFeatureAssociationNoteInstanceFactory" />
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+        </bean>
+        
+        <bean id="physicalFeaturePhotoAssociationService"
+        	class="omis.physicalfeature.service.impl.PhysicalFeaturePhotoAssociationServiceImpl">
+        	<constructor-arg name="physicalFeaturePhotoAssociationDao" ref="physicalFeaturePhotoAssociationDao"/>
+        	<constructor-arg name="photoDao" ref="photoDao"/>
+        	<constructor-arg name="physicalFeaturePhotoAssociationInstanceFactory" ref="physicalFeaturePhotoAssociationInstanceFactory" />
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+        </bean>
+        
+        <!-- Report services -->
+        <bean id="physicalFeatureProfileItemReportService"
+        	class="omis.physicalfeature.report.impl.hibernate.PhysicalFeatureProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="featureClassificationDao"
+        	class="omis.physicalfeature.dao.impl.hibernate.FeatureClassificationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.physicalfeature.domain.FeatureClassification"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="physicalFeatureDao"
+        	class="omis.physicalfeature.dao.impl.hibernate.PhysicalFeatureDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeature"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="physicalFeatureAssociationDao"
+        	class="omis.physicalfeature.dao.impl.hibernate.PhysicalFeatureAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="physicalFeaturePhotoAssociationDao"
+        	class="omis.physicalfeature.dao.impl.hibernate.PhysicalFeaturePhotoAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+        
+        <bean id="physicalFeatureAssociationNoteDao"
+        	class="omis.physicalfeature.dao.impl.hibernate.PhysicalFeatureAssociationNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociationNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+        <!-- Instance factories -->
+        
+        <bean id="featureClassificationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.physicalfeature.domain.FeatureClassification"/>
+		</bean>
+		
+		<bean id="physicalFeatureInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeature"/>
+		</bean>
+		
+		<bean id="physicalFeatureAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociation"/>
+		</bean>
+		
+		<bean id="physicalFeaturePhotoAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation"/>
+		</bean>
+		
+		<bean id="physicalFeatureAssociationNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociationNote"/>
+		</bean>
+        
+        <!--Property editor factories -->
+        
+         <bean id="featureClassificationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.physicalfeature.domain.FeatureClassification"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="featureClassificationDao"/>
+		</bean>
+		
+		<bean id="physicalFeaturePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeature"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="physicalFeatureDao"/>
+		</bean>
+		
+		<bean id="physicalFeatureAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="physicalFeatureAssociationDao"/>
+		</bean>
+		
+		<bean id="physicalFeaturePhotoAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="physicalFeaturePhotoAssociationDao"/>
+		</bean>
+		
+		<bean id="physicalFeatureAssociationNotePropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="physicalFeatureAssociationNoteDao"/>
+				<constructor-arg name="entityName" value="omis.physicalfeature.domain.PhysicalFeatureAssociationNote"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<!-- Photo Retrievers -->
+		
+		 <bean id="physicalFeatureAssociationPhotoRetriever"
+            class="omis.media.io.impl.SimplePhotoRetrieverImpl">
+    		<constructor-arg name="fileLocator" ref="physicalFeatureAssociationPhotoLocator"/>
+    		<constructor-arg name="defaultFilename" value="NotFound.jpg"/>
+		</bean>
+        
+        <!-- Photo Persisters -->
+        
+        <bean id="physicalFeatureAssociationPhotoPersister"
+	        class="omis.media.io.impl.SimplePhotoPersisterImpl">
+    		<constructor-arg name="fileLocator" ref="physicalFeatureAssociationPhotoLocator"/>
+  		</bean>
+  		
+  		<!-- Photo File Locators -->
+
+	  	<bean id="physicalFeatureAssociationPhotoLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+	    	<constructor-arg name="path" value="${application.resource.path}\Photos\DPFPhotos"/>
+	  	</bean>
+        
+        <!-- Photo File Remover -->
+        
+        <bean id="physicalFeatureAssociationPhotoRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+        	<constructor-arg name="fileLocator" ref="physicalFeatureAssociationPhotoLocator"/>
+        </bean>
+</beans>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.domain">
+	<class entity-name="omis.financial.domain.FinancialAsset"
+			proxy="omis.financial.domain.FinancialAsset"
+			name="omis.financial.domain.impl.FinancialAssetImpl"
+			table="`FINANCIAL_ASSET`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FINANCIAL_ASSET_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+			<many-to-one name="category" column="`CATEGORY_ID`" entity-name="omis.financial.domain.FinancialAssetCategory" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String"  not-null="true"/>
+			<property name="amount" column="`AMOUNT`" type="big_decimal" />
+			<property name="reportedDate" column="`REPORTED_DATE`" type="java.util.Date"  not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findFinancialAsset"><![CDATA[
+		select financialAsset
+		from
+			omis.financial.domain.FinancialAsset financialAsset
+		where
+			financialAsset.offender = :offender
+		and
+			financialAsset.category = :category
+		and
+			financialAsset.description = :description
+		and
+			financialAsset.amount = :amount
+		and
+			financialAsset.reportedDate = :reportedDate
+	]]></query>	
+	<query name="findFinancialAssetExcluding"><![CDATA[
+		select financialAsset
+		from
+			omis.financial.domain.FinancialAsset financialAsset
+		where
+			financialAsset.offender = :offender
+		and
+			financialAsset.category = :category
+		and
+			financialAsset.description = :description
+		and
+			financialAsset.amount = :amount
+		and
+			financialAsset.reportedDate = :reportedDate
+		and
+			financialAsset != :excludedFinancialAsset
+	]]></query>	
+	<query name="findAllFinancialAssetsByOffender"><![CDATA[
+		select financialAsset
+		from
+			omis.financial.domain.FinancialAsset financialAsset
+		where
+			financialAsset.offender = :offender
+	]]></query>
+	<query name="findAssetTotalByOffender"><![CDATA[
+		select sum(financialAsset.amount)
+		from
+			omis.financial.domain.FinancialAsset financialAsset
+		where
+			financialAsset.offender = :offender
+		group by financialAsset.offender
+	]]></query>	
+</hibernate-mapping>

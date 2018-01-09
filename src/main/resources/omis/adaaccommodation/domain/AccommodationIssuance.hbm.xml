@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.domain">
+	<class entity-name="omis.adaaccommodation.domain.AccommodationIssuance"
+		proxy="omis.adaaccommodation.domain.AccommodationIssuance"
+		name="omis.adaaccommodation.domain.impl.AccommodationIssuanceImpl"
+		table="`ADA_ACCOMMODATION_ISSUANCE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADA_ACCOMMODATION_ISSUANCE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="timestamp" type="timestamp" column="`TIMESTAMP`" not-null="true"/>
+		<many-to-one name="issuer" column="`ISSUER_ID`" entity-name="omis.person.domain.Person" not-null="true"/>
+		<property name="description" column="`DESCRIPTION`" not-null="true" type="string"/>
+		<many-to-one name="accommodation" column="`ACCOMMODATION_ID`" entity-name="omis.adaaccommodation.domain.Accommodation" not-null="true"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findAccommodationIssuance"><![CDATA[
+	select adai
+	from
+		omis.adaaccommodation.domain.AccommodationIssuance adai
+	where
+		adai.accommodation = :accommodation
+		and
+		adai.timestamp = :timestamp
+	]]></query>
+	<query name="findAccommodationIssuanceExcluding"><![CDATA[
+		select adai
+		from	
+			omis.adaaccommodation.domain.AccommodationIssuance adai
+		where
+			adai.accommodation = :accommodation
+			and
+			adai.timestamp = :timestamp
+		and adai != :accommodationIssuance
+	]]></query>
+	<query name="findAccommodationIssuancesByAccommodation"><![CDATA[
+		select issuance
+		from
+			omis.adaaccommodation.domain.AccommodationIssuance issuance
+		where
+			issuance.accommodation = :accommodation
+	]]></query>
+	<query name="findAssociatedAuthorization"><![CDATA[
+		select authorization
+		from
+			omis.adaaccommodation.domain.Authorization authorization			
+			right outer join authorization.accommodation accommodation
+		where
+			accommodation = :accommodation
+	]]></query>
+</hibernate-mapping>

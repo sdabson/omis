@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placement.domain">
+	<query name="findAllowedChangeSummariesForCorrectionalStatus"><![CDATA[
+		select new omis.placement.report.AllowedCorrectionalStatusChangeSummary(
+			allowedCorrectionalStatusChange.id,
+			case when fromCorrectionalStatus is not null then true else false end,
+			fromCorrectionalStatus.id, fromCorrectionalStatus.name,
+			case when toCorrectionalStatus is not null then true else false end,
+			toCorrectionalStatus.id, toCorrectionalStatus.name,
+			action.id, action.name
+		) from omis.supervision.domain.AllowedCorrectionalStatusChange allowedCorrectionalStatusChange
+		inner join allowedCorrectionalStatusChange.action action
+		left outer join allowedCorrectionalStatusChange.fromCorrectionalStatus fromCorrectionalStatus
+		left outer join allowedCorrectionalStatusChange.toCorrectionalStatus toCorrectionalStatus
+		where (fromCorrectionalStatus = :correctionalStatus
+			or (fromCorrectionalStatus is null and :correctionalStatus is null))
+	]]></query>
+</hibernate-mapping>

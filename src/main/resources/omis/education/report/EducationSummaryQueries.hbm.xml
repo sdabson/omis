@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.education.report">
+	<query name="findEducationSummariesByOffender"><![CDATA[
+		select new omis.education.report.EducationSummary(
+			educationTerm.id,
+			educationTerm.attendedDateRange.startDate,
+			educationTerm.attendedDateRange.endDate,
+			educationTerm.description,
+			educationTerm.institute.name,
+			cat.name,
+			case when achievement is null then FALSE else TRUE end)
+		from
+			omis.education.domain.EducationTerm educationTerm
+			left join educationTerm.institute.category cat
+			left join educationTerm.achievement achievement
+		where 
+			educationTerm.offender = :offender 
+		order by
+			educationTerm.attendedDateRange.startDate asc
+	]]></query>
+	<query name="findHighSchoolEducationByOffender"><![CDATA[
+		  select new omis.education.report.EducationProfileSummary(
+		  category.level, count(category.level)) 
+		    from omis.education.domain.EducationalAchievement achievement
+right outer join achievement.educationTerm educationTerm
+ left outer join achievement.category category
+           where educationTerm.offender = :offender
+             and category.level in (:levels)
+        group by category.level  
+	]]></query>
+	<query name="findEducationDocumentSummariesByOffender"><![CDATA[
+		select new omis.education.report.EducationDocumentSummary(
+			educationAssociableDocument.id,
+			document.title,
+			category.name,
+			document.date)
+		from
+			omis.education.domain.EducationAssociableDocument educationAssociableDocument
+			left join educationAssociableDocument.document document
+			left join educationAssociableDocument.category category
+		where 
+			educationAssociableDocument.offender = :offender 
+		order by
+			document.date asc
+		
+	]]></query>
+</hibernate-mapping>

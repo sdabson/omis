@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators -->
+  <bean id="commitStatusFormValidator" class="omis.commitstatus.web.validator.CommitStatusFormValidator">
+  </bean>
+
+  <!-- Web controller packages -->
+  <context:component-scan base-package="omis.commitstatus.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  <aop:config>
+      <aop:pointcut id="commitStatusControllerOperation" expression="execution(* omis.commitstatus.web.controller.CommitStatusController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="commitStatusControllerOperation"/>
+  </aop:config>
+  
+  <!-- Profile Items -->
+  
+  <bean id="commitStatusTermProfileItem" class="omis.commitstatus.web.profile.CommitStatusTermProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>COMMIT_STATUS_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/commitStatus/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	<constructor-arg name="name" value="commitStatusTerm"/>
+  	<constructor-arg name="commitStatusTermProfileItemReportService" ref="commitStatusTermProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${commitStatusTermProfileItemEnabled}"/>
+  </bean>
+</beans>

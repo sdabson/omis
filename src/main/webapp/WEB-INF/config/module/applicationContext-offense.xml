@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Services -->
+    
+    <bean id="offenseService" class="omis.offense.service.impl.OffenseServiceImpl">
+       	<constructor-arg name="offenseDao" ref="offenseDao" />	
+    </bean>
+    
+    <!-- Service delegates -->
+    
+    <bean id="offenseDelegate" class="omis.offense.service.delegate.OffenseDelegate">
+    	<constructor-arg name="offenseDao" ref="offenseDao" />
+    	<constructor-arg name="offenseInstanceFactory" ref="offenseInstanceFactory"/>
+    </bean>
+        
+	<!-- Data access objects -->
+    
+    <bean id="offenseDao" class="omis.offense.dao.impl.hibernate.OffenseDaoHibernateImpl">
+    	<constructor-arg name="entityName" value="omis.offense.domain.Offense"/>
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	</bean>
+ 	
+ 	<!-- Instance factories -->
+  		 
+	<bean id="offenseInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.offense.domain.Offense"/>
+	</bean>
+		
+	<!--Property editor factories -->
+ 	
+ 	<bean id="offensePropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    	<constructor-arg name="dao" ref="offenseDao"/>
+ 		<constructor-arg name="entityName" value="omis.offense.domain.Offense"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+</beans>

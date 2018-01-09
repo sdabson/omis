@@ -41,3 +41,14 @@ derby.log
 # TODO - Replace proprietary content, remove this
 src/main/webapp/resources/common/images/
 src/main/webapp/resources/3rdparty/
+src/main/webapp/resources/alert/images/
+src/main/webapp/resources/visitation/images/
+src/main/webapp/resources/health/images/
+src/main/webapp/resources/investigation/images/
+src/main/webapp/resources/incident/images/
+src/main/webapp/resources/location/images/
+src/main/webapp/resources/otherPhoto/images/
+src/main/webapp/resources/locationTerm/images/
+src/main/webapp/resources/sentence/images/
+src/main/webapp/resources/common/style/jquery
+src/main/webapp/resources/supervision/images/

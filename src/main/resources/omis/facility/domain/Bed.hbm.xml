@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.facility.domain">
+		<class entity-name="omis.facility.domain.Bed"
+			proxy="omis.facility.domain.Bed"
+			name="omis.facility.domain.impl.BedImpl"
+			table="`FACILITY_BED`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FACILITY_BED_SEQ`</param>
+				</generator>
+			</id>	
+			<property name="number" column="`BED_NUMBER`" not-null="true" type="java.lang.Integer"/>
+			<many-to-one name="room" column="`ROOM_ID`" 
+			entity-name="omis.facility.domain.Room" not-null="true" />
+		</class>
+		<query name="findBedsByRoom"><![CDATA[
+			from 
+				omis.facility.domain.Bed bed
+			where 
+				bed.room = :room
+			order by 
+				bed.number
+		]]></query>
+		<query name="findBed"><![CDATA[
+			from 
+				omis.facility.domain.Bed bed
+			where 
+				bed.room = :room
+			and 
+				bed.number = :number
+		]]></query>
+		<query name="findBedExcluding"><![CDATA[
+			from 
+				omis.facility.domain.Bed bed
+			where 
+				bed.room = :room
+			and 
+				bed.number = :number
+			and
+				bed <> :excludedBed
+		]]></query>
+	</hibernate-mapping>

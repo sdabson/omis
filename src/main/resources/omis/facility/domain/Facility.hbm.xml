@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.facility.domain">
+		<class entity-name="omis.facility.domain.Facility"
+			proxy="omis.facility.domain.Facility"
+			name="omis.facility.domain.impl.FacilityImpl"
+			table="`FACILITY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FACILITY_SEQ`</param>
+				</generator>
+			</id>	
+			<property name="name" column="`NAME`" not-null="true" type="string"/>
+			<many-to-one name="location" column="`LOCATION_ID`"
+			entity-name="omis.location.domain.Location" not-null="true" unique="true"/>
+			<property name="abbreviation" column="`ABBREVIATION`" not-null="true" type="string"/>
+			<property name="active" column="`VALID`" not-null="true" type="yes_no"/>
+		</class>
+		<query name="countBedsByFacility">
+			select count(*)
+			from omis.facility.domain.Bed bed
+			where bed.room.facility = :facility
+		</query>
+		<query name="findFacilityByLocation"><![CDATA[
+			from
+				omis.facility.domain.Facility facility
+			where
+				facility.location = :location
+		]]></query>
+		<query name="findFacilitiesByOrganizationBetweenDates"><![CDATA[
+			select facility
+			from omis.facility.domain.Facility facility
+			  inner join facility.location location
+			  inner join location.organization organization
+			where location.organization = :organization
+			  and ((location.dateRange.startDate <= :endDate or :endDate is null)
+			    or (location.dateRange.startDate is null and :startDate is null)) 
+			  and ((location.dateRange.endDate > :startDate or :startDate is null)
+			    or (location.dateRange.endDate is null and :endDate is null))
+			order by
+			  facility.name
+		]]></query>
+		<query name="findAllFacilities"><![CDATA[
+			select facility
+			from omis.facility.domain.Facility facility
+				inner join fetch facility.location location
+				inner join fetch location.organization organization
+			order by
+				facility.name
+		]]></query>
+		<query name="findFacilitiesByOrganization"><![CDATA[
+			select facility
+			from omis.facility.domain.Facility facility
+				inner join fetch facility.location location
+				inner join fetch location.organization organization
+			where organization = :organization
+			order by
+				facility.name
+		]]></query>
+		<query name="findFacility"><![CDATA[
+			from
+				omis.facility.domain.Facility facility
+			where
+				facility.location = :location
+			and
+				facility.name = :name
+		]]></query>
+		<query name="findFacilityExcluding"><![CDATA[
+			from
+				omis.facility.domain.Facility facility
+			where
+				facility.location = :location
+			and
+				facility.name = :name
+			and
+				facility <> :excludedFacility
+		]]></query>
+	</hibernate-mapping>

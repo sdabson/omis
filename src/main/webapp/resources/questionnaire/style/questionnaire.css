@@ -1,0 +1,69 @@
+.whiteSpace{
+	height:50px; 
+	display:block;
+}
+
+span.shortInput{
+	width:20%;
+	float:left;
+}
+
+span.shortInput input, span.shortInput select{
+	float:right;
+}
+
+span.addComments label{
+	cursor: pointer;
+}
+
+
+fieldset{
+	padding: 23px;
+	margin: 2px;
+	margin-bottom: 12px;
+	clear: left;
+}
+
+
+span.details{
+	text-align:right;
+	width: 100%;
+	float: left;
+	clear: both;
+	max-width: 60%;
+	margin-bottom: 2px;
+}
+
+span.details label{
+	font-weight: bold;
+	width: 20%;
+	white-space: nowrap;
+	margin-right: 2%;
+	float:left;
+}
+
+span.details span.detail{
+	float: left;
+	max-width: 60%;
+	margin-bottom: 2px;
+}
+
+.answerSet{
+	padding-bottom: 20px;
+}
+
+.answerCreate{
+	float:left;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 2%;
+	padding-right: 2%;
+	width: 85%;
+	border-style: solid;
+	border-width: 1px;
+	margin: 10px;
+}
+
+.removeSet{
+	background-color: hsla(355, 100%, 50%, 0.3);
+}

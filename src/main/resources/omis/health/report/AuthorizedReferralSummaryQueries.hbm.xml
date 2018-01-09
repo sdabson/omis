@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.report">
+	<query name="findUnscheduledAuthorizedExternalReferralSummariesByFacility"><![CDATA[
+	  select new omis.health.report.AuthorizedReferralSummary(
+	        authorization.id,
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offenderName.middleName,
+	        offender.offenderNumber,
+	        case when provider is not null then true else false end,
+	        providerName.lastName,
+	        providerName.firstName,
+	        providerTitle.name,
+	        providerTitle.abbreviation,
+	        referralReason.name,
+	        authorizationRequest.reasonNotes,
+	        medicalFacility.name,
+	        'EXTERNAL_MEDICAL'
+	      )
+	    from
+	      omis.health.domain.ExternalReferralAuthorization as authorization
+	      inner join authorization.request as authorizationRequest
+	      inner join authorizationRequest.offender as offender
+	      inner join offender.name as offenderName
+	      inner join authorizationRequest.medicalFacility as medicalFacility
+	      inner join authorizationRequest.reason as referralReason
+	      left outer join authorizationRequest.providerAssignment as providerAssignment
+	      left outer join providerAssignment.provider as provider
+	      left outer join provider.name as providerName
+	      left outer join providerAssignment.title as providerTitle
+	    where
+	      authorizationRequest.facility = :facility
+	      and not exists (
+	        select innerExternalReferral
+	        from omis.health.domain.ExternalReferral innerExternalReferral
+	        where innerExternalReferral.authorization = authorization
+	      )
+	      and (authorization.status = 'APPROVED'
+	        or (authorization.status = 'PANEL_REVIEW_REQUIRED'
+            and authorization.panelReviewDecision.status = 'APPROVED'))
+	]]></query>
+	<query name="findUnscheduledAuthorizedExternalReferralSummariesByOffender"><![CDATA[
+	  select new omis.health.report.AuthorizedReferralSummary(
+	        authorization.id,
+	        offenderName.lastName,
+	        offenderName.firstName,
+	        offenderName.middleName,
+	        offender.offenderNumber,
+	        case when provider is not null then true else false end,
+	        providerName.lastName,
+	        providerName.firstName,
+	        providerTitle.name,
+	        providerTitle.abbreviation,
+	        referralReason.name,
+	        authorizationRequest.reasonNotes,
+	        medicalFacility.name,
+	        'EXTERNAL_MEDICAL'
+	      )
+	    from
+	      omis.health.domain.ExternalReferralAuthorization as authorization
+	      inner join authorization.request as authorizationRequest
+	      inner join authorizationRequest.offender as offender
+	      inner join offender.name as offenderName
+	      inner join authorizationRequest.medicalFacility as medicalFacility
+	      inner join authorizationRequest.reason as referralReason
+	      left outer join authorizationRequest.providerAssignment as providerAssignment
+	      left outer join providerAssignment.provider as provider
+	      left outer join provider.name as providerName
+	      left outer join providerAssignment.title as providerTitle
+	    where
+	      authorizationRequest.offender = :offender
+	      and not exists (
+	        select innerExternalReferral
+	        from omis.health.domain.ExternalReferral innerExternalReferral
+	        where innerExternalReferral.authorization = authorization
+	      )
+		and (authorization.status = 'APPROVED'
+	        or (authorization.status = 'PANEL_REVIEW_REQUIRED'
+            and authorization.panelReviewDecision.status = 'APPROVED'))
+	]]></query>
+</hibernate-mapping>

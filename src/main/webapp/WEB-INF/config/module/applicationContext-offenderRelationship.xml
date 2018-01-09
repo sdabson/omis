@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	  
+	  <!--  Services -->
+  
+        <bean id="createRelationshipsService"
+			class="omis.offenderrelationship.service.impl.CreateRelationshipsServiceImpl">
+				<constructor-arg name="familyAssociationCategoryDelegate" ref="familyAssociationCategoryDelegate"/>
+				<constructor-arg name="visitationAssociationCategoryDelegate" ref="visitationAssociationCategoryDelegate"/>
+				<constructor-arg name="personDelegate" ref="personDelegate"/>
+				<constructor-arg name="addressDelegate" ref="addressDelegate"/>	
+				<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+				<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+				<constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+				<constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+				<constructor-arg name="contactDelegate" ref="contactDelegate"/>
+				<constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+				<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>	
+				<constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+				<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+				<constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+				<constructor-arg name="familyAssociationDelegate" ref="familyAssociationDelegate"/>
+				<constructor-arg name="victimAssociationDelegate" ref="victimAssociationDelegate"/>
+				<constructor-arg name="visitationAssociationDelegate" ref="visitationAssociationDelegate"/>
+				<constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+				<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+				<constructor-arg name="relationshipNoteDelegate" ref="relationshipNoteDelegate"/>
+				<constructor-arg name="relationshipNoteCategoryDesignatorDelegate" ref="relationshipNoteCategoryDesignatorDelegate"/>
+		</bean>
+		
+		<bean id="updateOffenderRelationService"
+			class="omis.offenderrelationship.service.impl.UpdateOffenderRelationServiceImpl">
+				<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+				<constructor-arg name="personDelegate" ref="personDelegate"/>
+				<constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
+				<constructor-arg name="countryDelegate" ref="countryDelegate"/>
+				<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+				<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+				<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+				<constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
+				<constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+				<constructor-arg name="contactDelegate" ref="contactDelegate"/>
+				<constructor-arg name="telephoneNumberDelegate" ref="telephoneNumberDelegate"/>
+				<constructor-arg name="onlineAccountDelegate" ref="onlineAccountDelegate"/>
+				<constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+				<constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+				<constructor-arg name="relationshipDelegate" ref="relationshipDelegate"/>
+				<constructor-arg name="relationshipNoteDelegate" ref="relationshipNoteDelegate"/>
+				<constructor-arg name="relationshipNoteCategoryDesignatorDelegate" ref="relationshipNoteCategoryDesignatorDelegate"/>
+		</bean>
+		
+	<!--  Report Services -->	
+		
+		<bean id="offenderRelationshipsReportService"
+			class="omis.offenderrelationship.report.impl.hibernate.OffenderRelationshipsReportServiceHibernateImpl">
+				<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+			
+		<bean id="offenderRelationshipReportService"
+		      class="omis.offenderrelationship.report.impl.hibernate.OffenderRelationshipReportServiceHibernateImpl">
+		  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		  <constructor-arg name="maximumResults" value="30"/>
+		</bean>
+		
+		<bean id="offenderRelationReportService"
+		      class="omis.offenderrelationship.report.impl.hibernate.OffenderRelationReportServiceHibernateImpl">
+		  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+		<bean id="offenderRelationshipSummaryReportService"
+		      class="omis.offenderrelationship.report.impl.hibernate.OffenderRelationshipSummaryReportServiceHibernateImpl">
+		  <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
+	<!-- Factories for property editors -->	
+	  <bean id="offenderRelationshipAddressOperationPropertyEditorFactory" class="omis.beans.factory.impl.EnumPropertyEditorFactoryImpl">
+	    <constructor-arg name="enumName" value="omis.offenderrelationship.web.controller.OffenderRelationshipAddressOperation"/>
+	    <constructor-arg name="enumPropertyName" value="name"/>
+	  </bean>
+	  
+	  <bean id="telephoneNumberItemOperationPropertyEditorFactory" class="omis.beans.factory.impl.EnumPropertyEditorFactoryImpl">
+	    <constructor-arg name="enumName" value="omis.contact.web.form.TelephoneNumberItemOperation"/>
+	    <constructor-arg name="enumPropertyName" value="name"/>
+	  </bean>
+	  
+	  <bean id="onlineAccountContactItemOperationPropertyEditorFactory" class="omis.beans.factory.impl.EnumPropertyEditorFactoryImpl">
+	    <constructor-arg name="enumName" value="omis.contact.web.form.OnlineAccountContactItemOperation"/>
+	    <constructor-arg name="enumPropertyName" value="name"/>
+	  </bean>
+</beans>        

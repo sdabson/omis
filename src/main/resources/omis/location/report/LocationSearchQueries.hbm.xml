@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.location.search.report">
+	<query name="findLocationSearchResultsByAddressNumberStreetAndSuffix">	
+	<![CDATA[
+	     select new omis.location.search.report.LocationSearchResult(location.id, organization.id, 
+	            address.id, organization.name, address.value, city.name, state.name, 
+	            zipCode.value )
+	       from omis.location.domain.Location location
+     inner join location.address address
+     inner join address.zipCode zipCode
+     inner join zipCode.city city
+     inner join city.state state
+     inner join location.organization organization
+       where utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) >= 70
+       order by utl_match.JARO_WINKLER_SIMILARITY(upper(address.value)) desc
+	]]>
+	</query>
+	<query name="findLocationSearchResultsByAddressFields">
+	<![CDATA[
+	 select new omis.location.search.report.LocationSearchResult(location.id, organization.id, 
+	            address.id, organization.name, address.value, city.name, state.name, 
+	            zipCode.value )
+	       from omis.location.domain.Location location
+     inner join location.address address
+     inner join address.zipCode zipCode
+     inner join zipCode.city city
+     inner join city.state state
+     inner join location.organization organization
+          where utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) >= 60
+            and utl_match.JARO_WINKLER_SIMILARITY(upper(city.name), upper(:cityName)) >= 40
+            and utl_match.JARO_WINKLER_SIMILARITY(upper(state.name), upper(:stateName)) >= 60
+            and utl_match.JARO_WINKLER_SIMILARITY(upper(zipCode.value), upper(:zipCode)) >= 60
+       order by utl_match.JARO_WINKLER_SIMILARITY(upper(address.value)) desc
+	]]>
+	</query>
+	<query name="findLocationSearchResultsByOrganizationName">
+	<![CDATA[
+	 select new omis.location.search.report.LocationSearchResult(location.id, organization.id, 
+	            address.id, organization.name, address.value, city.name, state.name, 
+	            zipCode.value )
+	       from omis.location.domain.Location location
+     inner join location.address address
+     inner join address.zipCode zipCode
+     inner join zipCode.city city
+     inner join city.state state
+     inner join location.organization organization
+          where utl_match.JARO_WINKLER_SIMILARITY(upper(organization.name), upper(:organizationName)) >= 80
+       order by utl_match.JARO_WINKLER_SIMILARITY(upper(organization.name), upper(:organizationName)) desc
+	]]>
+	</query>
+</hibernate-mapping>

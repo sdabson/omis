@@ -1,0 +1,94 @@
+package omis.workrestriction.service.testng;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.testng.annotations.Test;
+
+import omis.audit.domain.AuthorizationSignature;
+import omis.exception.DuplicateEntityFoundException;
+import omis.offender.domain.Offender;
+import omis.offender.service.delegate.OffenderDelegate;
+import omis.person.domain.Person;
+import omis.person.service.delegate.PersonDelegate;
+import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
+import omis.user.domain.UserAccount;
+import omis.user.service.delegate.UserAccountDelegate;
+import omis.workrestriction.domain.WorkRestriction;
+import omis.workrestriction.domain.WorkRestrictionCategory;
+import omis.workrestriction.service.WorkRestrictionService;
+import omis.workrestriction.service.delegate.WorkRestrictionCategoryDelegate;
+
+/**
+ * WorkRestrictionRemoveTests.java
+ * 
+ *@author Annie Jacques 
+ *@version 0.1.0 (Aug 18, 2016)
+ *@since OMIS 3.0
+ *
+ */
+@Test(groups={"workRestriction"})
+public class WorkRestrictionRemoveTests 
+	extends AbstractHibernateTransactionalTestNGSpringContextTests {
+	
+	@Autowired
+	@Qualifier("workRestrictionService")
+	private WorkRestrictionService workRestrictionService;
+	
+	@Autowired
+	@Qualifier("userAccountDelegate")
+	private UserAccountDelegate userAccountDelegate;
+	
+	@Autowired
+	@Qualifier("personDelegate")
+	private PersonDelegate personDelegate;
+	
+	@Autowired
+	@Qualifier("workRestrictionCategoryDelegate")
+	private WorkRestrictionCategoryDelegate categoryDelegate;
+	
+	@Autowired
+	@Qualifier("offenderDelegate")
+	private OffenderDelegate offenderDelegate;
+	
+	@Test
+	public void testRemove() throws DuplicateEntityFoundException{
+		
+		final Person person = this.personDelegate.create("Last", "First", 
+				"Middle", null);
+		final UserAccount authorizedByUser = this.userAccountDelegate
+				.create(person, "USERNAME", "password1", new Date(), 
+						(Integer) 0, true);
+		final Date authorizationDate = this.parseDateText("08/01/2016");
+		final AuthorizationSignature authorizationSignature 
+			= new AuthorizationSignature(authorizedByUser, authorizationDate);
+		final WorkRestrictionCategory category 
+			= this.categoryDelegate.create("categoryTest", true);
+		final Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"lastNameOffender", "firstNameOffender", "middleNameOffender", 
+				null);
+		final String notes = "testNotes";
+		
+		final WorkRestriction workRestriction 
+			= this.workRestrictionService.create(offender, category, 
+					authorizationSignature, notes);
+		
+		this.workRestrictionService.remove(workRestriction);
+		
+		assert !this.workRestrictionService.findByOffender(offender)
+			.contains(workRestriction)
+		: "Work Restriction Was Not Removed.";
+	}
+	
+	private Date parseDateText(final String dateText) {
+		try {
+			return new SimpleDateFormat("MM/dd/yyyy").parse(dateText);
+		} catch (ParseException e) {
+			throw new RuntimeException("Error parsing date", e);
+		}
+	}
+	
+}

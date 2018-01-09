@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substance.report">
+	<query name="summarizeSubstanceByOffender"><![CDATA[
+		select new
+			omis.substance.report.SubstanceTestSummary(
+		 		substanceTestSample.id,
+		 		sampleCollectionMethod.name, 
+				substanceTestSample.collectionDate,
+				case
+					when
+						substanceTestSample.random = true
+					then
+						'Random'
+					else
+						reason.name
+					end,
+				substanceTest.resultDate, 
+				substanceTest.id,
+				(select 
+					value.name
+				from
+					omis.substancetest.domain.SubstanceTestResultValue as value
+				where
+					value.importance =
+					(select 
+						max(resultValue.importance)
+					from
+						omis.substancetest.domain.SubstanceTestResultValue resultValue,
+						omis.substancetest.domain.SubstanceTestResult testResult
+					where
+						resultValue = testResult.value
+					and
+						testResult.substanceTest = substanceTest)),
+				(select 
+					value.name
+				from
+					omis.substancetest.domain.SubstanceTestResultValue as value
+				where
+					value.importance =
+					(select 
+						max(resultValue.importance)
+					from
+						omis.substancetest.domain.SubstanceTestResultValue resultValue,
+						omis.substancetest.domain.LabResult labResult
+					where
+						resultValue = labResult.value
+					and
+						labResult.substanceTest = substanceTest)),
+				substanceTest.labRequestDate, substanceTest.labResultDate)
+		from
+			omis.substancetest.domain.SubstanceTest as substanceTest
+			right outer join substanceTest.substanceTestSample as substanceTestSample
+			left outer join substanceTestSample.sampleCollectionMethod as sampleCollectionMethod
+			left outer join substanceTestSample.substanceTestReason reason
+		where
+			substanceTestSample.offender = :offender
+		order by
+			substanceTestSample.collectionDate desc	
+	]]></query>
+	<query name="summarizeSubstanceSampleRequestsByOffender"><![CDATA[
+		select new omis.substance.report.SubstanceTestSummary(request.id,
+			request.date, 'Random')
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+				(request.resolution.sample is null
+			and
+				request.resolution.statusReason is null)
+		order by
+			request.date
+	]]></query>
+	<query name="summarizeFulfilledRequestsWithoutSample"><![CDATA[
+		select new omis.substance.report.SubstanceTestSummary(request.resolution.statusReason.name,
+		request.id, request.date)
+		from
+			omis.substancetest.domain.SampleRequest request
+		where
+			request.offender = :offender
+		and
+				(request.resolution.sample is null
+			and
+				request.resolution.statusReason is not null)
+		order by
+			request.date
+	]]></query>
+</hibernate-mapping>

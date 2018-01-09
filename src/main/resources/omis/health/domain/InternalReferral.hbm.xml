@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<typedef name="referralLocationDesignator" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.health.domain.ReferralLocationDesignator</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.health.domain.InternalReferral"
+		proxy="omis.health.domain.InternalReferral"
+		name="omis.health.domain.impl.InternalReferralImpl"
+		table="`INTERNAL_REFERRAL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INTERNAL_REFERRAL_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offenderAppointmentAssociation" column="`OFFENDER_APPT_ASSOC_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.OffenderAppointmentAssociation" unique="false"/>
+		<many-to-one name="providerLevel" column="`PROVIDER_LEVEL_ID`" cascade="none" not-null="false"
+		    entity-name="omis.health.domain.ProviderLevel" unique="false"/>
+		<many-to-one name="reason" column="`REASON_ID`" entity-name="omis.health.domain.InternalReferralReason" not-null="true"/>
+		<many-to-one name="statusReason" column="`STATUS_REASON_ID`" not-null="false" entity-name="omis.health.domain.InternalReferralStatusReason"/>
+		<property name="rescheduleRequired" column="`RESCHEDULE_REQ`" not-null="false" type="yes_no"/>
+		<property name="schedulingNotes" column="`SCHEDULING_NOTES`" not-null="false" type="string"/>
+		<property name="assessmentNotes" column="`ASSESSMENT_NOTES`" not-null="false" type="string"/>
+		<property name="locationDesignator" column="`LOCATION_DESIGNATOR`" not-null="false" type="referralLocationDesignator"/>
+		<many-to-one name="actionRequest" column="`ACTION_REQUEST_ID`" cascade="none" not-null="false"
+			entity-name="omis.health.domain.HealthRequest" unique="false"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findInternalReferralByOffenderAppointmentAssociation"><![CDATA[
+		from omis.health.domain.InternalReferral ir
+	   where ir.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findInternalReferralByOffenderDateTimeProvider"><![CDATA[
+	  select ir
+		from omis.health.domain.ProviderInternalReferralAssociation pira
+		right outer join pira.internalReferral ir
+	   where ir.offenderAppointmentAssociation.offender = :offender
+	     and ir.offenderAppointmentAssociation.appointment.date = :date
+	     and ir.offenderAppointmentAssociation.appointment.startTime = :startTime
+	     and pira.providerAssignment = :providerAssignment
+	     and ir.statusReason is null
+		 and (pira.cancelled is null
+		  or pira.cancelled = false)
+	]]></query>
+	<query name="findInternalReferralByOffenderAppointmentAssociationExcluding"><![CDATA[
+		from omis.health.domain.InternalReferral ir
+	   where ir.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	     and ir not in (:exclude)
+	]]></query>
+	<query name="findInternalReferralByOffenderDateTimeProviderExcluding"><![CDATA[
+	  select ir
+		from omis.health.domain.ProviderInternalReferralAssociation pira
+		right outer join pira.internalReferral ir
+	   where ir.offenderAppointmentAssociation.offender = :offender
+	     and ir.offenderAppointmentAssociation.appointment.date = :date
+	     and ir.offenderAppointmentAssociation.appointment.startTime = :startTime
+	     and pira.providerAssignment = :providerAssignment
+	     and ir not in (:exclude)
+	]]></query>
+</hibernate-mapping>

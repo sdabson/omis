@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.contact.domain">
+	<class entity-name="omis.contact.domain.OnlineAccountHost"
+		proxy="omis.contact.domain.OnlineAccountHost"
+		name="omis.contact.domain.impl.OnlineAccountHostImpl"
+		table="`ONLINE_ACCOUNT_HOST`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ONLINE_ACCOUNT_HOST_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true" unique="true"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="category" column="`CATEGORY`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.contact.domain.OnlineAccountCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findOnlineAccountHosts"><![CDATA[
+		select onlineAccountHost 
+		from omis.contact.domain.OnlineAccountHost onlineAccountHost
+		where
+			onlineAccountHost.valid = true
+		order by
+			onlineAccountHost.name
+	]]></query>
+</hibernate-mapping>

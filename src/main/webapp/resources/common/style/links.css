@@ -1,0 +1,290 @@
+/*
+ * Common link styling.
+ *
+ * Do not add module specific link styling to this file.
+ *
+ * Author: Stephen Abson
+ * Author: Ryan Johns
+ * Author: Joel Norris
+ * Version: 0.1.3 (May 11, 2017)
+ * Since: OMIS 3.0
+ */
+
+a.createLink:before {
+	content: url('../images/add.png');
+	cursor: pointer;
+}
+
+a.downloadLink:before {
+	content: url('../images/download.png');
+	cursor: pointer;
+}
+
+a.printLink:before {
+	content: url('../images/print.png');
+	cursor: pointer;
+}
+
+a.helpLink:before {
+	content: url('../images/help.png');
+	cursor: pointer;
+}
+
+a.applicationHelpLink:before {
+	content: url('../images/applicationHelp.png');
+	cursor: pointer;
+}
+
+a.viewEditLink:before {
+	content: url('../images/edit.png');
+	cursor: pointer;
+}
+
+a.viewLink:before {
+	content: url('../images/view.png');
+	cursor: pointer;
+}
+
+a.listLink:before {
+	content: url('../images/list.png');
+	cursor: pointer;
+}
+
+a.homeLink:before {
+	content: url('../images/home.png');
+	cursor: pointer;
+}
+
+a.authorizeLink:before {
+	content: url('../images/authorize.png');
+	cursor: pointer;
+}
+
+a.removeLink:before {
+	content: url('../images/remove.png');
+	cursor: pointer;
+}
+
+a.deleteLink:before {
+	content: url('../images/delete.png');
+	cursor: pointer;
+}
+
+a.clearLink:before {
+	content: url('../images/clear.png');
+	cursor: pointer;
+}
+
+a.assessLink:before {
+	content: url('../images/assess.png');
+	cursor: pointer;
+}
+
+a.moduleLink:before {
+	content: url('../images/module.png');
+	cursor: pointer;
+}
+
+a.personalDetailsLink:before {
+	content: url('../images/personalDetails.png');
+	cursor: pointer;
+}
+
+a.refreshLink:before {
+	content: url('../images/refresh.png');
+	cursor: pointer;
+}
+
+a.offenderProfileLink:before {
+	content: url('../images/offenderProfile.png');
+	cursor: pointer;
+}
+
+a.configLink:before {
+	content: url('../images/admin.png');
+	cursor: pointer;
+}
+
+a.infoLink:before {
+	content: url('../images/info.png');
+	cursor: pointer;
+}
+
+a.backLink:before {
+	content: url('../images/back.png');
+	cursor: pointer;
+}
+
+a.changePasswordLink:before {
+	content: url('../images/changePassword.png');
+	cursor: pointer;
+}
+
+a.adminIndexLink:before {
+	content: url('../images/admin.png');
+	cursor: pointer;
+}
+
+a.cancelLink:before {
+	content: url('../images/cancel.png');
+	cursor: pointer;
+}
+
+a.calendarLink:before {
+	content: url('../images/calendar.png');
+	cursor: pointer;
+}
+
+a.currentUserAccountLink:before {
+	content: url('../images/user.png');
+	cursor: pointer;
+}
+
+a.currentUserLink:before {
+	content: url('../images/user.png');
+	cursor: pointer;
+}
+
+a.commentLink:before {
+	content: url('../images/speechBubble.png');
+	cursor: pointer;
+}
+
+a.actionMenuItem:before {
+	content: url('../images/actionMenu.png');
+	cursor: pointer;
+}
+
+a.searchLink:before {
+	content: url('../images/search.png');
+	cursor: pointer;
+}
+
+a.linkLink:before {
+	content: url('../images/link.png');
+	cursor: pointer;
+}
+
+a.unlinkLink:before {
+	content: url('../images/unlink.png');
+	cursor: pointer;
+}
+
+a.expandLink:before {
+	content: url('../images/expand.png');
+	cursor: pointer;
+}
+
+a.collapseLink:before {
+	content: url('../images/collapse.png');
+	cursor: pointer;
+}
+
+a.reportLink:before {
+	content: url('../images/report.png');
+	cursor: pointer;
+}
+
+a.reportHomeLink:before {
+	content: url('../images/reportHome.png');
+	cursor:pointer;
+}
+
+a.formLink:before {
+	content: url('../images/form.png');
+	cursor: pointer;
+}
+
+a.tableViewLink:before {
+	content: url('../images/filterLink.png');
+	cursor: pointer
+}
+
+a.quickReferenceGuideLink:before {
+	content: url('../images/quickReferenceGuide.png');
+	cursor: pointer
+}
+
+a.printLink:before, a.helpLink:before,  
+a.viewLink:before, a.homeLink:before, a.reportHomeLink, a.offenderProfileLink:before, 
+a.refreshLink:before, a.configLink:before, a.addLink:before, 
+a.deleteLink:before, a.completeLink:before, a.backLink:before, 
+a.iconLink:before, a.personalDetailsLink:before, a.moduleLink:before, 
+a.infoLink:before, a.changePasswordLink:before, a.adminIndexLink:before, 
+a.cancelLink:before, a.calendarLink:before, a.authorizeLink:before, 
+a.currentUserAccountLink:before, a.currentUserLink:before,
+a.linkLink:before, a.unlinkLink:before, a.reportLink:before,
+a.formLink:before, a.tableViewLink:before, a.applicationHelpLink:before {
+	vertical-align: -50%;
+}
+
+a.clearLink:before, a.createLink:before, a.listLink:before, 
+a.removeLink:before, a.searchLink:before, a.downloadLink:before, 
+a.viewEditLink:before, a.actionMenuItem:before,a.expandLink:before,
+a.collapseLink:before, a.deleteLink:before {
+	vertical-align: -20%;
+}
+
+h1 a.actionMenuItem:before {
+	vertical-align: 0%;
+}
+
+a.createLink, a.printLink, a.helpLink, a.viewEditLink, a.downloadLink,
+a.viewLink, a.listLink, a.removeLink, a.offenderProfileLink, a.refreshLink, 
+a.configLink, a.addLink, a.homeLink, a.reportHomeLink, a.deleteLink, a.completeLink, a.backLink, 
+a.iconLink, a.personalDetailsLink, a.moduleLinkre, a.infoLink, 
+a.changePasswordLink, a.adminIndexLink, a.cancelLink, a.calendarLink,
+a.authorizeLink, a.clearLink, a.currentUserAccountLink, a.currentUserLink,
+a.searchLink, a.linkLink, a.unlinkLink, a.actionMenuItem, a.formLink,
+a.reportLink, a.quickReferenceGuideLink, a.expandLink, a.collapseLink, 
+a.deleteLink, a.applicationHelpLink {
+	vertical-align: middle;
+}
+
+a span.linkLabel {
+	display: none;
+}
+
+ul.taskLinks {
+	list-style: none;
+	padding: 0px;
+	margin: 4px 0px 0px 0px;
+}
+
+ul.taskLinks li {
+	padding: 2px;
+}
+
+ul li.taskLinkItem {
+	list-style: none;
+}
+
+ul.taskLinks {
+	border-style: solid;
+	border-width: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+ul.taskLinks li.header {
+  border-bottom-width: 0px;
+  border-bottom-style: solid;
+}
+
+/* linkHeader - Header like components with links. */
+
+ul.linkHeader {
+	padding: 2px;
+	list-style: none;
+}
+
+ul.linkHeader li {
+	display: inline;
+}
+
+/* For links to features in test stage. */
+
+a.testStage:before {
+	content: url(../images/testStage.png);
+	vertical-align: -20%;
+}

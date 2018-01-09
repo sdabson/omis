@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.DetainerAgency"
+			proxy="omis.detainernotification.domain.DetainerAgency"
+			name="omis.detainernotification.domain.impl.DetainerAgencyImpl"
+			table="`DETAINER_AGENCY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`DETAINER_AGENCY_SEQ`</param>
+				</generator>
+			</id>
+			
+			<property name="agencyName" column="`AGENCY_NAME`" type="java.lang.String" not-null="true" unique="true"/>
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+			<property name="telephoneNumber" column="`TELEPHONE_NUMBER`" type="java.lang.String" not-null="false" />
+			<many-to-one name="address" column="`ADDRESS_ID`" entity-name="omis.address.domain.Address"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findDetainerAgency"><![CDATA[
+		select detainerAgency
+		from
+			omis.detainernotification.domain.DetainerAgency detainerAgency
+		where
+			detainerAgency.agencyName = :agencyName
+	]]></query>
+	<query name="findDetainerAgencyExcluding"><![CDATA[
+		select detainerAgency
+		from
+			omis.detainernotification.domain.DetainerAgency detainerAgency
+		where
+			detainerAgency.agencyName = :agencyName
+		and
+			detainerAgency != :detainerAgency
+	]]></query>
+	<query name="findAllDetainerAgencies"><![CDATA[
+		select detainerAgency
+		from
+			omis.detainernotification.domain.DetainerAgency detainerAgency
+		where
+			detainerAgency.valid = true
+		order by
+			detainerAgency.agencyName asc
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Court case web configuration.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators. -->
+  
+  <bean id="courtCaseFormValidator"
+        class="omis.courtcase.web.validator.CourtCaseFormValidator"/>
+        
+  <bean id="chargeFormValidator"
+        class="omis.courtcase.web.validator.ChargeFormValidator"/>
+  
+  <!-- Validator delegates -->
+  
+  <bean id="courtCaseFieldsValidatorDelegate" class="omis.courtcase.web.validator.delegate.CourtCaseFieldsValidatorDelegate"/>
+  
+  <!-- Profile Items -->
+  
+  <bean id="courtCaseProfileItem" class="omis.courtcase.web.profile.CourtCaseProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>COURT_CASE_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/courtCase/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="courtCaseAndCharges"/>
+  	<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	<constructor-arg name="courtCaseProfileItemService" ref="courtCaseProfileItemService"/>
+  	<constructor-arg name="enabled" value="${courtCaseProfileItemEnabled}"/>
+  </bean>
+  
+  <bean id="chargeProfileItem" class="omis.courtcase.web.profile.ChargeProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>CHARGE_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/courtCase/profile/includes/profileItemCharge.jsp"/>
+  	<constructor-arg name="name" value="charges"/>
+  	<constructor-arg name="profileItemRegistry" ref="legalProfileItemRegistry"/>
+  	<constructor-arg name="chargeProfileItemService" ref="chargeProfileItemService"/>
+  	<constructor-arg name="enabled" value="${chargeProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.courtcase.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="courtCaseControllerOperation" expression="execution(* omis.courtcase.web.controller.CourtCaseController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="courtCaseControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="manageChargeControllerOperation" expression="execution(* omis.courtcase.web.controller.ManageChargeController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageChargeControllerOperation"/>
+  </aop:config>
+      
+</beans>

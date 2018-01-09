@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substanceuse.domain.UseTerm">
+	<typedef name="useTermSource" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.substanceuse.domain.UseTermSource</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.substanceuse.domain.UseTerm"
+		proxy="omis.substanceuse.domain.UseTerm"
+		name="omis.substanceuse.domain.impl.UseTermImpl"
+		table="`USE_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`USE_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="true"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<many-to-one name="use" column="`SUBSTANCE_USE_ID`" cascade="none" not-null="true"
+			entity-name="omis.substanceuse.domain.SubstanceUse" unique="false"/>
+		<component name="allotment">
+			<property name="quantity" column="`ALLOTMENT_QUANTITY`" type="java.lang.Long" not-null="true"/>
+			<many-to-one name="measurement" column="`ALLOTMENT_MEASUREMENT`" cascade="none" not-null="true"
+				entity-name="omis.substanceuse.domain.UseMeasurement" unique="false"/>
+		</component>
+		<many-to-one name="frequency" column="`FREQUENCY_ID`" cascade="none" not-null="false"
+			entity-name="omis.substanceuse.domain.UseFrequency" unique="false"/>
+		<property name="source" column="`SOURCE`" not-null="true" type="useTermSource"/>
+	</class>
+	<query name="findUseTermsBySubstanceUse"><![CDATA[
+		select term
+		from omis.substanceuse.domain.UseTerm term
+		where term.use = :substanceUse
+	]]></query>
+	<query name="findUseTerm"><![CDATA[
+		select term
+		from omis.substanceuse.domain.UseTerm term
+		where term.dateRange.startDate = :startDate
+		and term.use = :substanceUse
+		and term.source = :source
+	]]></query>
+	<query name="findUseTermExcluding"><![CDATA[
+		select term
+		from omis.substanceuse.domain.UseTerm term
+		where term.dateRange.startDate = :startDate
+		and term.use = :substanceUse
+		and term.source = :source
+		and term <> :useTerm
+	]]></query>
+</hibernate-mapping>

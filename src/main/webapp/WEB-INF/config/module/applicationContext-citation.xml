@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="misdemeanorCitationService"
+        class="omis.citation.service.impl.MisdemeanorCitationServiceImpl">
+    <constructor-arg name="misdemeanorCitationDelegate" ref="misdemeanorCitationDelegate"/>
+    <constructor-arg name="misdemeanorOffenseDelegate" ref="misdemeanorOffenseDelegate"/>
+    <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="misdemeanorCitationDelegate" class="omis.citation.service.delegate.MisdemeanorCitationDelegate">
+    <constructor-arg name="misdemeanorCitationInstanceFactory" ref="misdemeanorCitationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    <constructor-arg name="misdemeanorOffenseDao" ref="misdemeanorOffenseDao"/>
+    <constructor-arg name="stateDao" ref="stateDao"/>
+    <constructor-arg name="cityDao" ref="cityDao"/>
+    <constructor-arg name="misdemeanorCitationDao" ref="misdemeanorCitationDao"/>
+  </bean>
+  
+  <bean id="misdemeanorOffenseDelegate" class="omis.citation.service.delegate.MisdemeanorOffenseDelegate">
+    <constructor-arg name="misdemeanorOffenseInstanceFactory" ref="misdemeanorOffenseInstanceFactory"/>
+    <constructor-arg name="misdemeanorOffenseDao" ref="misdemeanorOffenseDao"/>
+  </bean>
+  
+  <!-- Report Services -->
+  
+  <bean id="misdemeanorCitationReportService"
+  	class="omis.citation.report.impl.hibernate.MisdemeanorCitationReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <bean id="misdemeanorCitationProfileItemReportService"
+  	class="omis.citation.report.impl.hibernate.MisdemeanorCitationProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <!-- Data access objects -->
+   
+  <bean id="misdemeanorCitationDao"
+        class="omis.citation.dao.impl.hibernate.MisdemeanorCitationDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorCitation"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="misdemeanorOffenseDao"
+        class="omis.citation.dao.impl.hibernate.MisdemeanorOffenseDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorOffense"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="stateDao"
+        class="omis.region.dao.impl.hibernate.StateDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.region.domain.State"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="cityDao"
+        class="omis.region.dao.impl.hibernate.CityDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.region.domain.City"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Instance factories -->
+  
+  <bean id="misdemeanorCitationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorCitation"/>
+  </bean>
+
+  <bean id="misdemeanorOffenseInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorOffense"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+ 
+  <bean id="misdemeanorCitationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="misdemeanorCitationDao"/>
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorCitation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="misdemeanorOffensePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="misdemeanorOffenseDao"/>
+    <constructor-arg name="entityName" value="omis.citation.domain.MisdemeanorOffense"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+</beans>

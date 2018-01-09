@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.incident.domain">
+	<class entity-name="omis.incident.domain.IncidentStatementNote"
+		proxy="omis.incident.domain.IncidentStatementNote"
+		name="omis.incident.domain.impl.IncidentStatementNoteImpl"
+		table="`INCIDENT_STATEMENT_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INCIDENT_STATEMENT_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="statement" column="`STATEMENT_ID`" cascade="none" not-null="true" entity-name="omis.incident.domain.IncidentStatement"/>
+		<property name="note" type="java.lang.String" not-null="true" column="`NOTE`"/>
+		<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findIncidentStatementNoteExcluding"><![CDATA[
+		select note
+		from
+			omis.incident.domain.IncidentStatementNote note
+		where
+			note.statement = :statement
+		and
+			note.note = :note
+		and
+			note.date = :date
+		and
+			note <> :statementNote
+		order by
+			note.date
+	]]></query>
+	<query name="findIncidentStatementNote"><![CDATA[
+		select note
+		from
+			omis.incident.domain.IncidentStatementNote note
+		where
+			note.statement = :statement
+		and
+			note.note = :note
+		and
+			note.date = :date
+		order by
+			note.date
+	]]></query>
+	<query name="findIncidentStatementNotes"><![CDATA[
+		select note
+		from
+			omis.incident.domain.IncidentStatementNote note
+		where
+			note.statement = :statement
+		order by note.date
+	]]></query>
+</hibernate-mapping>

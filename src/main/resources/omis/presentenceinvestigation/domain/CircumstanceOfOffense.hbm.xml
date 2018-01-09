@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.CircumstanceOfOffense"
+			proxy="omis.presentenceinvestigation.domain.CircumstanceOfOffense"
+			name="omis.presentenceinvestigation.domain.impl.CircumstanceOfOffenseImpl"
+			table="`CIRCUMSTANCE_OF_OFFENSE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`CIRCUMSTANCE_OF_OFFENSE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offenseSectionSummary" column="`OFFENSE_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.OffenseSectionSummary" not-null="true" />
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="false" />
+			<component name="statement">
+				<property name="chargeReason" column="`CHARGE_REASON`" type="java.lang.String" not-null="true" />
+				<property name="involvementReason" column="`INVOLVEMENT_REASON`" type="java.lang.String" not-null="true" />
+				<property name="courtRecommendation" column="`COURT_RECOMMENDATION`" type="java.lang.String" not-null="true" />
+			</component>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findCircumstanceOfOffense"><![CDATA[
+		select circumstanceOfOffense
+		from
+			omis.presentenceinvestigation.domain.CircumstanceOfOffense circumstanceOfOffense
+		where
+			circumstanceOfOffense.offenseSectionSummary = :offenseSectionSummary
+	]]></query>
+	<query name="findCircumstanceOfOffenseExcluding"><![CDATA[
+		select circumstanceOfOffense
+		from
+			omis.presentenceinvestigation.domain.CircumstanceOfOffense circumstanceOfOffense
+		where
+			circumstanceOfOffense.offenseSectionSummary = :offenseSectionSummary
+		and
+			circumstanceOfOffense != :circumstanceOfOffense
+	]]></query>
+</hibernate-mapping>

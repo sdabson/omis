@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+     
+  <!-- Instance factories. -->
+	
+  <bean id="relationshipInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.relationship.domain.Relationship"/>
+  </bean>
+  
+  <bean id="relationshipNoteCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNoteCategory"/>
+  </bean>
+
+  <bean id="relationshipNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNote"/>
+  </bean>
+  
+  <bean id="relationshipNoteCategoryDesignatorInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNoteCategoryDesignator"/>
+  </bean>
+  
+  <!-- Report services -->
+  
+  <bean id="relationshipProfileItemReportService"
+  	class="omis.relationship.report.impl.hibernate.RelationshipProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Helpers -->
+  
+  <bean id="relationshipDelegate"
+        class="omis.relationship.service.delegate.RelationshipDelegate">
+    <constructor-arg name="relationshipDao" ref="relationshipDao"/>
+    <constructor-arg name="relationshipInstanceFactory" ref="relationshipInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="relationshipNoteCategoryDelegate"
+        class="omis.relationship.service.delegate.RelationshipNoteCategoryDelegate">
+    <constructor-arg name="relationshipNoteCategoryInstanceFactory" ref="relationshipNoteCategoryInstanceFactory"/>
+    <constructor-arg name="relationshipNoteCategoryDao" ref="relationshipNoteCategoryDao"/>
+  </bean>
+
+  <bean id="relationshipNoteDelegate"
+        class="omis.relationship.service.delegate.RelationshipNoteDelegate">
+    <constructor-arg name="relationshipNoteInstanceFactory" ref="relationshipNoteInstanceFactory"/>
+    <constructor-arg name="relationshipNoteDao" ref="relationshipNoteDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="relationshipNoteCategoryDesignatorDelegate"
+        class="omis.relationship.service.delegate.RelationshipNoteCategoryDesignatorDelegate">
+    <constructor-arg name="relationshipNoteCategoryDesignatorDao" ref="relationshipNoteCategoryDesignatorDao"/>
+  </bean>
+  
+  <!-- Data access objects -->
+
+  <bean id="relationshipDao"
+        class="omis.relationship.dao.impl.hibernate.RelationshipDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.relationship.domain.Relationship"/>
+  </bean>
+  
+  <bean id="relationshipNoteCategoryDesignatorDao"
+        class="omis.relationship.dao.impl.hibernate.RelationshipNoteCategoryDesignatorDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNoteCategoryDesignator"/>
+  </bean>
+
+  <bean id="relationshipNoteCategoryDao"
+        class="omis.relationship.dao.impl.hibernate.RelationshipNoteCategoryDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNoteCategory"/>
+  </bean>
+  
+  <bean id="relationshipNoteDao"
+        class="omis.relationship.dao.impl.hibernate.RelationshipNoteDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.relationship.domain.RelationshipNote"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="relationshipPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="relationshipDao"/>
+  	<constructor-arg name="entityName" value="omis.relationship.domain.Relationship"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+</beans>

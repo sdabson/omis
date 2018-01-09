@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.facility.domain">
+	<class entity-name="omis.facility.domain.Level"
+		proxy="omis.facility.domain.Level"
+		name="omis.facility.domain.impl.LevelImpl"
+		table="`FACILITY_LEVEL`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FACILITY_LEVEL_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<many-to-one name="facility" column="`FACILITY_ID`" 
+			entity-name="omis.facility.domain.Facility" not-null="true" />
+		<many-to-one name="complex" column="`COMPLEX_ID`" cascade="none" not-null="false"
+			entity-name="omis.facility.domain.Complex" unique="false"/>
+		<many-to-one name="unit" column="`UNIT_ID`" cascade="none" not-null="false"
+			entity-name="omis.facility.domain.Unit" unique="false"/>
+		<many-to-one name="section" column="`SECTION_ID`" cascade="none" not-null="false"
+			entity-name="omis.facility.domain.Section" unique="false"/>
+	</class>
+	<query name="findLevelsByFacility">
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.facility facility
+		where 
+			facility = :facility
+		order by
+			level.name
+	</query>
+	<query name="findLevelsByComplex"><![CDATA[
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.complex complex
+		where
+			(complex is null and :complex is null)
+			or
+			complex = :complex
+		order by
+			level.name
+	]]></query>
+	<query name="findLevelsByUnit"><![CDATA[
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.unit unit
+		where 
+			(unit is null and :unit is null)
+			or
+			unit = :unit
+		order by
+			level.name
+	]]></query>
+	<query name="findLevelsBySection"><![CDATA[
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.section section
+		where
+			(section is null and :section is null)
+			or
+			section = :section
+		order by
+			level.name
+	]]></query>
+	<query name="findLevels"><![CDATA[
+		from
+			omis.facility.domain.Level level
+			left outer join fetch level.complex complex
+			left outer join fetch level.facility facility
+			left outer join fetch level.unit unit
+			left outer join fetch level.section section
+		where
+			facility = :facility
+		and
+			(:complex is null or complex = :complex)
+		and
+			(:unit is null or unit = :unit)
+		and
+			(:section is null or section = :section)
+	]]></query>
+	<query name="findLevel"><![CDATA[
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.facility facility
+		where 
+			level.name = :name
+		and
+			facility = :facility
+	]]></query>
+	<query name="findLevelExcluding"><![CDATA[
+		from 
+			omis.facility.domain.Level level
+			inner join fetch level.facility facility
+		where 
+			level.name = :name
+		and
+			facility = :facility
+		and
+			level <> :excludedLevel
+	]]></query>
+</hibernate-mapping>

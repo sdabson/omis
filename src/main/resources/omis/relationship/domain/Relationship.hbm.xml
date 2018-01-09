@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.relationship.domain.Relationship"
+	       proxy="omis.relationship.domain.Relationship"
+	       name="omis.relationship.domain.impl.RelationshipImpl"
+	       table="`RELATIONSHIP`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`RELATIONSHIP_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="relationship">
+			<many-to-one name="firstPerson" entity-name="omis.person.domain.Person"
+			          column="`PERSON1_ID`" not-null="true"/>
+			<many-to-one name="secondPerson" entity-name="omis.person.domain.Person"
+			          column="`PERSON2_ID`" not-null="true"/>
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findRelationshipByPeople"><![CDATA[
+		select relationship
+		from omis.relationship.domain.Relationship relationship
+		where relationship.firstPerson = :firstPerson
+			and relationship.secondPerson = :secondPerson
+	]]></query>
+	<query name="findRelationshipCountByOffender"><![CDATA[
+		select count(relationship.id)
+		  from omis.relationship.domain.Relationship relationship
+		 where relationship.firstPerson = :offender
+	]]></query>
+</hibernate-mapping>

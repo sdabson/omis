@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+  <!-- Validator -->
+  
+  <bean id="securityThreatGroupActivityFormValidator"
+        class="omis.stg.web.validator.SecurityThreatGroupActivityFormValidator"/>
+  
+  <bean id="securityThreatGroupAffiliationFormValidator"
+        class="omis.stg.web.validator.SecurityThreatGroupAffiliationFormValidator"/>
+  
+  <!-- Web controller packages -->
+  
+  <context:component-scan base-package="omis.stg.web.controller"/>
+  
+  <!-- Profile Items -->
+  
+  <bean id="stgProfileItem"
+  	class="omis.stg.web.profile.StgProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>STG_AFFILIATION_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/stg/affiliation/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="securityThreatGroup"/>
+  	<constructor-arg name="profileItemRegistry" ref="safetyProfileItemRegistry"/>
+  	<constructor-arg name="stgProfileItemReportService" ref="stgProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${stgProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Use controller transactions -->
+  
+   <aop:config>
+      <aop:pointcut id="manageSecurityThreatGroupActivityControllerOperation" expression="execution(* omis.stg.web.controller.ManageSecurityThreatGroupActivityController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageSecurityThreatGroupActivityControllerOperation"/>
+  </aop:config> 
+  
+  <aop:config>
+      <aop:pointcut id="manageSecurityThreatGroupAffiliationControllerOperation" expression="execution(* omis.stg.web.controller.ManageSecurityThreatGroupAffiliationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageSecurityThreatGroupAffiliationControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="reportSecurityThreatGroupAffiliationsControllerOperation" expression="execution(* omis.stg.web.controller.ReportSecurityThreatGroupAffiliationsController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportSecurityThreatGroupAffiliationsControllerOperation"/>
+  </aop:config>
+  
+</beans>

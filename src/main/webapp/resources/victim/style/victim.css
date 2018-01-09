@@ -1,0 +1,80 @@
+/*
+ * Victim module styling
+ *
+ * Author: Stephen Abson, Joel Norris
+ */
+
+a.victimSearchLink:before {
+	content: url('../images/victimSearch.png');
+}
+
+a.victimProfileLink:before {
+	content: url('../images/victimProfile.png');
+}
+
+a.victimSearchLink:before, a.victimProfileLink:before {
+	vertical-align: -20%;
+}
+
+a.victimSearchLink, a.victimProfileLink {
+	vertical-align: middle;
+}
+
+.removeContent{
+	background-color: hsla(355, 100%, 50%, 0.3) !important;
+/* 	box-shadow: 0 0 6px #FF0000; */
+}
+
+.victimDocumentItem {
+	display: inline-block;
+	width: 100%;
+	margin: 0 0 5px 0; 
+}
+
+.victimDocumentItem:nth-child(odd) {
+	background-color: #FFFFFF;
+}
+
+.victimDocumentItem:nth-child(even) {
+	background-color: #F5F5F5;
+}
+
+.victimDocumentItem span.removeLinkContainer {
+	margin: 0 0 0 22%;
+}
+
+.victimDocumentItem span.documentTagFieldGroup a.removeTagLink {
+	float: left;
+}
+
+.victimDocumentItem span.fieldGroup a.createLink {
+	margin: 0 0 0 22%;
+}
+
+/* Document Tag Styling */
+
+span.documentTagItemsFieldGroup {
+	display: block;
+	margin: 0 0 0 22%;
+}
+
+.documentTag {
+	display: inline-block;
+	box-shadow: 0 0 3px #000000;
+	padding: 1px;
+	margin: 1px 1px 1px 1px;
+}
+
+span.documentTagWrapper {
+	display: inline-block;
+	box-shadow: 0 0 3px #000000;
+	padding: 1px;
+}
+
+.removeTagLink {
+	display: inline;
+}
+
+.victimDocumentItem span.documentTagFieldGroup {
+	
+}

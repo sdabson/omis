@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+  
+  <import resource="applicationContext-accessAttempt.xml"/>
+  
+  <import resource="applicationContext-adaAccommodation.xml"/>
+  
+  <import resource="applicationContext-address.xml"/>
+  
+  <import resource="applicationContext-alert.xml"/>
+  
+  <import resource="applicationContext-asrc.xml"/>
+  
+  <import resource="applicationContext-audit.xml"/>
+  
+  <import resource="applicationContext-bedPlacement.xml"/>
+  
+  <import resource="applicationContext-biographicAndContactSection.xml"/>
+  
+  <import resource="applicationContext-caution.xml"/>
+  
+  <import resource="applicationContext-caseload.xml"/>
+  
+  <import resource="applicationContext-cache.xml"/>
+  
+  <import resource="applicationContext-citation.xml"/>
+  
+  <import resource="applicationContext-citizenship.xml"/>
+
+  <import resource="applicationContext-commitStatus.xml"/>
+  
+  <import resource="applicationContext-communitySupervision.xml"/>
+
+  <import resource="applicationContext-condition.xml"/>
+  
+  <import resource="applicationContext-config.xml"/>
+  
+  <import resource="applicationContext-contact.xml"/>
+
+  <import resource="applicationContext-conviction.xml"/>
+
+  <import resource="applicationContext-country.xml"/>
+  
+  <import resource="applicationContext-court.xml"/>
+  
+  <import resource="applicationContext-courtCase.xml"/>
+
+  <import resource="applicationContext-courtCaseCondition.xml"/>
+  
+  <import resource="applicationContext-courtCaseDocument.xml"/>
+  
+  <import resource="applicationContext-criminalAssociation.xml"/>
+  
+  <import resource="applicationContext-custody.xml"/>
+  
+  <import resource="applicationContext-demographics.xml"/>
+  
+  <import resource="applicationContext-detainerNotification.xml"/>
+  
+  <import resource="applicationContext-disciplinaryCode.xml"/>
+  
+  <import resource="applicationContext-dna.xml"/>
+  
+  <import resource="applicationContext-docket.xml"/>
+  
+  <import resource="applicationContext-document.xml"/>
+  
+  <import resource="applicationContext-employment.xml"/>
+  
+  <import resource="applicationContext-education.xml"/>
+  
+  <import resource="applicationContext-facility.xml"/>
+  
+  <import resource="applicationContext-family.xml"/>
+  
+  <import resource="applicationContext-financial.xml"/>
+  
+  <import resource="applicationContext-grievance.xml"/>
+  
+  <import resource="applicationContext-health.xml"/>
+  
+  <import resource="applicationContext-hearing.xml"/>
+  
+  <import resource="applicationContext-hearingAnalysis.xml"/>
+  
+  <import resource="applicationContext-identificationNumber.xml"/>
+  
+  <import resource="applicationContext-immigration.xml"/>
+  
+  <import resource="applicationContext-incident.xml"/>
+  
+  <import resource="applicationContext-jail.xml"/>
+  
+  <import resource="applicationContext-judge.xml"/>
+  
+  <import resource="applicationContext-location.xml"/>
+  
+  <import resource="applicationContext-locationTerm.xml"/>
+  
+  <import resource="applicationContext-mail.xml"/>
+  
+  <import resource="applicationContext-media.xml"/>
+  
+  <import resource="applicationContext-military.xml"/>
+  
+  <import resource="applicationContext-need.xml"/>
+  
+  <import resource="applicationContext-offender.xml"/>
+  
+  <import resource="applicationContext-offenderContact.xml"/>
+  
+  <import resource="applicationContext-offenderFlag.xml"/>
+  
+  <import resource="applicationContext-offenderPhoto.xml"/>
+  
+  <import resource="applicationContext-offenderRelationship.xml"/>
+  
+  <import resource="applicationContext-offense.xml"/>
+  
+  <import resource="applicationContext-offenseTerm.xml"/>
+  
+  <import resource="applicationContext-organization.xml"/>
+  
+  <import resource="applicationContext-paroleBoardCondition.xml"/>
+  
+  <import resource="applicationContext-paroleBoardItinerary.xml"/>
+  
+  <import resource="applicationContext-paroleBoardMember.xml"/>
+  
+  <import resource="applicationContext-paroleEligibility.xml"/>
+  
+  <import resource="applicationContext-person.xml"/>
+  
+  <import resource="applicationContext-personDelegate.xml"/>
+  
+  <import resource="applicationContext-personPhoto.xml"/>
+  
+  <import resource="applicationContext-physicalFeature.xml"/>
+  
+  <import resource="applicationContext-placement.xml"/>
+  
+  <import resource="applicationContext-placementScreening.xml"/>
+  
+  <import resource="applicationContext-prerelease.xml"/>
+  
+  <import resource="applicationContext-presentenceInvestigation.xml"/>
+  
+  <import resource="applicationContext-prisonTerm.xml"/>
+
+  <import resource="applicationContext-probationTerm.xml"/>
+  
+  <import resource="applicationContext-program.xml"/>
+  
+  <import resource="applicationContext-questionnaire.xml"/>
+  
+  <import resource="applicationContext-region.xml"/>
+  
+  <import resource="applicationContext-religion.xml"/>
+  
+  <import resource="applicationContext-relationship.xml"/>
+  
+  <import resource="applicationContext-residence.xml"/>
+  
+  <import resource="applicationContext-schedule.xml"/>
+  
+  <import resource="applicationContext-search.xml"/>
+  
+  <import resource="applicationContext-specialNeed.xml"/>
+  
+  <import resource="applicationContext-sentence.xml"/>
+  
+  <import resource="applicationContext-separationNeed.xml"/>
+  
+  <import resource="applicationContext-staff.xml"/>
+  
+  <import resource="applicationContext-stg.xml"/>
+  
+  <import resource="applicationContext-substance.xml"/>
+  
+  <import resource="applicationContext-substanceTest.xml"/>
+  
+  <import resource="applicationContext-supervision.xml"/>
+  
+  <import resource="applicationContext-supervisionFee.xml"/>
+  
+  <import resource="applicationContext-task.xml"/>
+
+  <import resource="applicationContext-term.xml"/>
+  
+  <import resource="applicationContext-tierDesignation.xml"/>
+  
+  <import resource="applicationContext-treatment.xml"/>
+  
+  <import resource="applicationContext-trackeddocument.xml"/>
+  
+  <import resource="applicationContext-user.xml"/>
+  
+  <import resource="applicationContext-userService.xml"/>
+  
+  <import resource="applicationContext-userPreference.xml"/>
+  
+  <import resource="applicationContext-vehicle.xml"/>
+  
+  <import resource="applicationContext-victim.xml"/>
+  
+  <import resource="applicationContext-violationEvent.xml"/>
+  
+  <import resource="applicationContext-visitation.xml"/>
+  
+  <import resource="applicationContext-warrant.xml"/>
+  
+  <import resource="applicationContext-web.xml"/>
+  
+  <import resource="applicationContext-workAssignment.xml"/>
+  
+  <import resource="applicationContext-workRestriction.xml"/>
+  
+</beans>

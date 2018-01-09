@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Mapping and queries for offense.
+  -
+  - Author: Stephen Abson
+  - Author: Josh Divine
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offense.domain">
+	<class	entity-name="omis.offense.domain.Offense"
+			proxy="omis.offense.domain.Offense"
+			name="omis.offense.domain.impl.OffenseImpl"
+			table="`OFFENSE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`OFFENSE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCourtCase" unique="true">
+			<property name="violationCode" column="`VIOLATION_CODE`" not-null="true"/>
+			<property name="name" column="`NAME`" not-null="true"/>
+		</properties>
+		<property name="classification" column="`CLASSIFICATION`" not-null="false">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.offense.domain.OffenseClassification</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<property name="shortName" column="`SHORT_NAME`" not-null="true"/>
+		<property name="url" column="`URL`" not-null="false"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findOffenses"><![CDATA[
+		select offense
+		from omis.offense.domain.Offense offense
+		order by offense.name
+	]]></query>
+	<query name="findOffense"><![CDATA[
+		from 
+			omis.offense.domain.Offense as offense
+		where
+			offense.name = :name
+		and
+			offense.shortName = :shortName
+		and
+			offense.violationCode = :violationCode
+		and
+			offense.classification = :classification
+	]]></query>
+	<query name="findOffenseExcluding"><![CDATA[
+		from 
+			omis.offense.domain.Offense as offense
+		where
+			offense.name = :name
+		and
+			offense.shortName = :shortName
+		and
+			offense.violationCode = :violationCode
+		and
+			offense.classification = :classification
+		and
+			offense <> :excludedOffense
+	]]></query>
+	<query name="findOffensesByQuery"><![CDATA[
+		from 
+			omis.offense.domain.Offense as offense
+		where
+			upper(offense.name) like concat('%', :query, '%')
+		or
+			upper(offense.violationCode) like concat('%', :query, '%')
+		order by offense.name 
+	]]></query>
+</hibernate-mapping>

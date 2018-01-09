@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Helpers. -->
+  
+  <bean id="countryDelegate"
+        class="omis.country.service.delegate.CountryDelegate">
+    <constructor-arg name="countryInstanceFactory" ref="countryInstanceFactory"/>
+    <constructor-arg name="countryDao" ref="countryDao"/>
+  </bean>
+
+  <!-- Instance factories. -->
+
+  <bean id="countryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.country.domain.Country"/>
+  </bean>
+
+  <!-- Services. -->
+  
+  <bean id="countryService" class="omis.country.service.impl.CountryServiceImpl">
+    <constructor-arg name="countryDao" ref="countryDao"/>
+  </bean>
+
+  <!-- Data access objects. -->
+  
+  <bean id="countryDao" class="omis.country.dao.impl.hibernate.CountryDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.country.domain.Country"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Property editor factories -->
+  
+  <bean id="countryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="countryDao"/>
+    <constructor-arg name="entityName" value="omis.country.domain.Country"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

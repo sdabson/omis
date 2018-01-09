@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  <hibernate-mapping package="omis.residence.report"> 	
+  	<query name="findResidentTermsByOffenderAndEffectiveDate"><![CDATA[
+ 		select new omis.residence.report.ResidenceSummary(
+ 			rt.id, 'RESIDENCE', name.firstName, name.lastName, name.middleName,
+ 			offender.offenderNumber, rt.status, '', rt.category, rt.dateRange.startDate, 
+ 			rt.dateRange.endDate, rt.address, cast(:effectiveDate as timestamp))
+ 			from
+	 			omis.residence.domain.ResidenceTerm rt
+	 			left outer join rt.person offender
+	 			left outer join offender.name name	 			
+ 			where
+  				offender = :offender 
+  			order by rt.dateRange.startDate asc, rt.dateRange.endDate asc, rt.category asc
+  	]]></query>
+  	<query name="findNonResidentTermsByOffenderAndEffectiveDate"><![CDATA[
+  		select new omis.residence.report.ResidenceSummary(
+  		nrt.id, 'NONRESIDENCE', name.firstName, name.lastName, name.middleName,
+ 		offender.offenderNumber, nrt.status, organization.name, nrt.dateRange.startDate, 
+ 			nrt.dateRange.endDate, address, cast(:effectiveDate as timestamp))
+  			from  
+ 				omis.residence.domain.NonResidenceTerm nrt
+ 				left outer join nrt.person offender
+ 				left outer join offender.name name
+ 				left outer join nrt.location location
+ 				left outer join location.address address
+ 				left outer join location.organization organization
+  			where 
+  				offender = :offender
+ 			order by nrt.dateRange.startDate asc, nrt.dateRange.endDate	asc	
+  	]]></query>
+  	<query name="summarizeByResienceTerm"><![CDATA[
+  		select new omis.residence.report.ResidenceSummary(
+ 			rt.id, 'RESIDENCE', name.firstName, name.lastName, name.middleName,
+ 			offender.offenderNumber, rt.status, rt.category, rt.dateRange.startDate, 
+ 			rt.dateRange.endDate, rt.address)
+ 			from
+	 			omis.residence.domain.ResidenceTerm rt
+	 			left outer join rt.person offender
+	 			left outer join offender.name name	 			
+ 			where
+ 				rt = :residenceTerm 				
+  	]]></query>
+  	<query name="findCurrentPrimaryResidentTermByOffender"><![CDATA[
+ 		select new omis.residence.report.ResidenceSummary(
+ 			rt.id,
+ 			rt.status,
+ 			'',
+ 			rt.dateRange.startDate, 
+ 			rt.dateRange.endDate,
+ 			rt.address)
+ 			from
+	 			omis.residence.domain.ResidenceTerm rt
+	 		inner join
+	 			rt.person offender
+ 			where
+  				offender = :offender
+  			and
+  				rt.category = 'PRIMARY'
+  			and
+  				((rt.dateRange.startDate is null or rt.dateRange.startDate <= :effectiveDate)
+				and (rt.dateRange.endDate is null or rt.dateRange.endDate > :effectiveDate))
+  	]]></query>
+  </hibernate-mapping>

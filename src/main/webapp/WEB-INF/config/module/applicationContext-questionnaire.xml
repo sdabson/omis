@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+		
+		
+		<!--  Services -->
+		<bean id="administeredQuestionnaireService" class="omis.questionnaire.service.impl.AdministeredQuestionnaireServiceImpl">
+			<constructor-arg name="questionnaireTypeDelegate" ref="questionnaireTypeDelegate" />
+			<constructor-arg name="administeredQuestionnaireDelegate" ref="administeredQuestionnaireDelegate" />
+			<constructor-arg name="administeredQuestionValueDelegate" ref="administeredQuestionValueDelegate" />
+			<constructor-arg name="administeredQuestionnaireSectionNoteDelegate" ref="administeredQuestionnaireSectionNoteDelegate" />
+			<constructor-arg name="administeredQuestionnaireSectionStatusDelegate" ref="administeredQuestionnaireSectionStatusDelegate" />
+			<constructor-arg name="allowedQuestionDelegate" ref="allowedQuestionDelegate" />
+			<constructor-arg name="questionnaireSectionDelegate" ref="questionnaireSectionDelegate" />
+			<constructor-arg name="userAccountDelegate" ref="userAccountDelegate" />
+		</bean>
+		
+		<bean id="questionnaireSectionService" class="omis.questionnaire.service.impl.QuestionnaireSectionServiceImpl">
+			<constructor-arg name="questionnaireSectionDelegate" ref="questionnaireSectionDelegate" />
+			<constructor-arg name="sectionTypeDelegate" ref="sectionTypeDelegate" />
+		</bean>
+		
+		<bean id="questionnaireTypeService" class="omis.questionnaire.service.impl.QuestionnaireTypeServiceImpl">
+			<constructor-arg name="questionnaireTypeDelegate" ref="questionnaireTypeDelegate" />
+			<constructor-arg name="questionnaireCategoryDelegate" ref="questionnaireCategoryDelegate" />
+		</bean>
+		
+		<bean id="questionService" class="omis.questionnaire.service.impl.QuestionServiceImpl">
+			<constructor-arg name="questionDelegate" ref="questionDelegate" />
+			<constructor-arg name="allowedQuestionDelegate" ref="allowedQuestionDelegate" />
+			<constructor-arg name="allowedAnswerDelegate" ref="allowedAnswerDelegate" />
+			<constructor-arg name="answerValueDelegate" ref="answerValueDelegate" />
+		</bean>
+		
+		<!-- Daos -->
+		<bean id="questionnaireCategoryDao" class="omis.questionnaire.dao.impl.hibernate.QuestionnaireCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireCategory" />
+		</bean>
+		
+		<bean id="questionnaireTypeDao" class="omis.questionnaire.dao.impl.hibernate.QuestionnaireTypeDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireType" />
+		</bean>
+		
+		<bean id="sectionTypeDao" class="omis.questionnaire.dao.impl.hibernate.SectionTypeDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.SectionType" />
+		</bean>
+		
+		<bean id="questionnaireSectionDao" class="omis.questionnaire.dao.impl.hibernate.QuestionnaireSectionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireSection" />
+		</bean>
+		
+		<bean id="questionDao" class="omis.questionnaire.dao.impl.hibernate.QuestionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.Question" />
+		</bean>
+		
+		<bean id="allowedQuestionDao" class="omis.questionnaire.dao.impl.hibernate.AllowedQuestionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AllowedQuestion" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireDao" class="omis.questionnaire.dao.impl.hibernate.AdministeredQuestionnaireDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaire" />
+		</bean>
+		
+		<bean id="administeredQuestionValueDao" class="omis.questionnaire.dao.impl.hibernate.AdministeredQuestionValueDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionValue" />
+		</bean>
+		
+		<bean id="answerValueDao" class="omis.questionnaire.dao.impl.hibernate.AnswerValueDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AnswerValue" />
+		</bean>
+		
+		<bean id="allowedAnswerDao" class="omis.questionnaire.dao.impl.hibernate.AllowedAnswerDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AllowedAnswer" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionNoteDao" class="omis.questionnaire.dao.impl.hibernate.AdministeredQuestionnaireSectionNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaireSectionNote" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionStatusDao" class="omis.questionnaire.dao.impl.hibernate.AdministeredQuestionnaireSectionStatusDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus" />
+		</bean>
+		
+		<!-- Delegates -->
+		
+		<bean id="questionnaireTypeDelegate" class="omis.questionnaire.service.delegate.QuestionnaireTypeDelegate">
+			<constructor-arg name="questionnaireTypeDao" ref="questionnaireTypeDao" />
+			<constructor-arg name="questionnaireSectionDelegate" ref="questionnaireSectionDelegate" />
+			<constructor-arg name="allowedQuestionDelegate" ref="allowedQuestionDelegate" />
+			<constructor-arg name="allowedAnswerDelegate" ref="allowedAnswerDelegate" />
+			<constructor-arg name="questionnaireTypeInstanceFactory" ref="questionnaireTypeInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+
+		<bean id="administeredQuestionnaireDelegate" class="omis.questionnaire.service.delegate.AdministeredQuestionnaireDelegate">
+			<constructor-arg name="administeredQuestionnaireDao" ref="administeredQuestionnaireDao" />
+			<constructor-arg name="administeredQuestionnaireInstanceFactory" ref="administeredQuestionnaireInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="administeredQuestionValueDelegate" class="omis.questionnaire.service.delegate.AdministeredQuestionValueDelegate">
+			<constructor-arg name="administeredQuestionValueDao" ref="administeredQuestionValueDao" />
+			<constructor-arg name="administeredQuestionValueInstanceFactory" ref="administeredQuestionValueInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionNoteDelegate" class="omis.questionnaire.service.delegate.AdministeredQuestionnaireSectionNoteDelegate">
+			<constructor-arg name="administeredQuestionnaireSectionNoteDao" ref="administeredQuestionnaireSectionNoteDao" />
+			<constructor-arg name="administeredQuestionnaireSectionNoteInstanceFactory" ref="administeredQuestionnaireSectionNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionStatusDelegate" class="omis.questionnaire.service.delegate.AdministeredQuestionnaireSectionStatusDelegate">
+			<constructor-arg name="administeredQuestionnaireSectionStatusDao" ref="administeredQuestionnaireSectionStatusDao" />
+			<constructor-arg name="administeredQuestionnaireSectionStatusInstanceFactory" ref="administeredQuestionnaireSectionStatusInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="allowedQuestionDelegate" class="omis.questionnaire.service.delegate.AllowedQuestionDelegate">
+			<constructor-arg name="allowedQuestionDao" ref="allowedQuestionDao" />
+			<constructor-arg name="allowedQuestionInstanceFactory" ref="allowedQuestionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="questionnaireSectionDelegate" class="omis.questionnaire.service.delegate.QuestionnaireSectionDelegate">
+			<constructor-arg name="questionnaireSectionDao" ref="questionnaireSectionDao" />
+			<constructor-arg name="questionnaireSectionInstanceFactory" ref="questionnaireSectionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="allowedAnswerDelegate" class="omis.questionnaire.service.delegate.AllowedAnswerDelegate">
+			<constructor-arg name="allowedAnswerDao" ref="allowedAnswerDao" />
+			<constructor-arg name="allowedAnswerInstanceFactory" ref="allowedAnswerInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="answerValueDelegate" class="omis.questionnaire.service.delegate.AnswerValueDelegate">
+			<constructor-arg name="answerValueDao" ref="answerValueDao" />
+			<constructor-arg name="answerValueInstanceFactory" ref="answerValueInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="questionDelegate" class="omis.questionnaire.service.delegate.QuestionDelegate">
+			<constructor-arg name="questionDao" ref="questionDao" />
+			<constructor-arg name="questionInstanceFactory" ref="questionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="questionnaireCategoryDelegate" class="omis.questionnaire.service.delegate.QuestionnaireCategoryDelegate">
+			<constructor-arg name="questionnaireCategoryDao" ref="questionnaireCategoryDao" />
+			<constructor-arg name="questionnaireCategoryInstanceFactory" ref="questionnaireCategoryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="sectionTypeDelegate" class="omis.questionnaire.service.delegate.SectionTypeDelegate">
+			<constructor-arg name="sectionTypeDao" ref="sectionTypeDao" />
+			<constructor-arg name="sectionTypeInstanceFactory" ref="sectionTypeInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<!-- Instance Factories -->
+		
+		<bean id="questionnaireTypeInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireType" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaire" />
+		</bean>
+		
+		<bean id="administeredQuestionValueInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionValue" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaireSectionNote" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionStatusInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus" />
+		</bean>
+		
+		<bean id="allowedQuestionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AllowedQuestion" />
+		</bean>
+		
+		<bean id="questionnaireSectionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireSection" />
+		</bean>
+		
+		<bean id="allowedAnswerInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AllowedAnswer" />
+		</bean>
+		
+		<bean id="answerValueInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.AnswerValue" />
+		</bean>
+		
+		<bean id="questionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.Question" />
+		</bean>
+		
+		<bean id="questionnaireCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.QuestionnaireCategory" />
+		</bean>
+		
+		<bean id="sectionTypeInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.questionnaire.domain.SectionType" />
+		</bean>
+		
+		<!-- Property Editor Factories -->
+		
+		<bean id="administeredQuestionnairePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="administeredQuestionnaireDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.AdministeredQuestionnaire" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="administeredQuestionnaireSectionStatusPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="administeredQuestionnaireSectionStatusDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="questionnaireTypePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="questionnaireTypeDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.QuestionnaireType" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="answerValuePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="answerValueDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.AnswerValue" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="questionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="questionDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.Question" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="allowedQuestionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="allowedQuestionDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.AllowedQuestion" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="questionnaireSectionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="questionnaireSectionDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.QuestionnaireSection" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="allowedAnswerPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="allowedAnswerDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.AllowedAnswer" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="questionnaireCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="questionnaireCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.QuestionnaireCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="sectionTypePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="sectionTypeDao" />
+			<constructor-arg name="entityName"
+				value="omis.questionnaire.domain.SectionType" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

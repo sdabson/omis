@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Mapping and queries for location.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.location.domain">
+	<class entity-name="omis.location.domain.Location"
+	       proxy="omis.location.domain.Location"
+	       name="omis.location.domain.impl.LocationImpl"
+		   table="`LOCATION`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LOCATION_SEQ`</param>
+			</generator>
+	  </id>
+	  <many-to-one name="address" column="`ADDRESS_ID`" not-null="true"
+	   			entity-name="omis.address.domain.Address"/>
+	  <many-to-one name="organization" column="`ORGANIZATION_ID`" not-null="true"
+	   			       entity-name="omis.organization.domain.Organization" lazy="false"/>
+	  <component name="dateRange">
+	  	<property name="startDate" not-null="false" type="java.util.Date"
+	  	          column="`START_DATE`"/>
+	  	<property name="endDate" not-null="false" type="java.util.Date"
+	  	          column="`END_DATE`"/>
+	  </component>
+	</class>
+	<query name="findLocationByOrganizationOnDateOrderedByName"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where organization = :organization
+		  and (location.dateRange.startDate <= :date
+		    or location.dateRange.startDate is null)
+		  and (location.dateRange.endDate >= :date
+		    or location.dateRange.endDate is null)
+		order by
+		  organization.name,
+		  location.dateRange.startDate, location.dateRange.endDate
+	]]></query>
+	<query name="findLocationByOrganizationOrderedByName"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where organization = :organization
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate
+	]]></query>
+	<query name="findAllLocationsOrderedByName"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate
+	]]></query>
+	<query name="findLocationOnDateOrderedByName"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where (location.dateRange.startDate <= :date
+		    or location.dateRange.startDate is null)
+		  and (location.dateRange.endDate >= :date
+		    or location.dateRange.endDate is null)
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate
+	]]></query>
+	<query name="findLocationsByOrganizations"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where organization in (:organizations)
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate
+	]]></query>
+	<query name="findLocationsByOrganizationInState"><![CDATA[
+		select location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where organization in (:organizations) and state = :state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findJailLocations"><![CDATA[
+		select location
+		from omis.jail.domain.Jail jail
+		inner join jail.location location
+		inner join fetch location.organization organization
+		inner join fetch location.address address
+		inner join fetch address.zipCode zipCode
+		inner join fetch zipCode.city city
+		inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findPrereleaseLocations"><![CDATA[
+		select location
+		from omis.prerelease.domain.PreReleaseCenter prereleaseCenter
+		inner join prereleaseCenter.location location
+		inner join fetch location.organization organization
+		inner join fetch location.address address
+		inner join fetch address.zipCode zipCode
+		inner join fetch zipCode.city city
+		inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findFacilityLocations"><![CDATA[
+		select location
+		from omis.facility.domain.Facility facility
+		inner join facility.location location
+		inner join fetch location.organization organization
+		inner join fetch location.address address
+		inner join fetch address.zipCode zipCode
+		inner join fetch zipCode.city city
+		inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findCommunitySupervisionOfficeLocations"><![CDATA[
+		select location
+		from omis.communitysupervision.domain.CommunitySupervisionOffice commSupOffice
+		inner join commSupOffice.location location
+		inner join fetch location.organization organization
+		inner join fetch location.address address
+		inner join fetch address.zipCode zipCode
+		inner join fetch zipCode.city city
+		inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findTreatmentAndSactionCenterLocations"><![CDATA[
+		select location
+		from omis.treatment.domain.TreatmentCenter treatmentCenter
+		inner join treatmentCenter.location location
+		inner join fetch location.organization organization
+		inner join fetch location.address address
+		inner join fetch address.zipCode zipCode
+		inner join fetch zipCode.city city
+		inner join fetch city.state state
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+	<query name="findAllBoardItineraryLocations"><![CDATA[
+		select distinct location
+		from omis.location.domain.Location location
+		  inner join fetch location.organization organization
+		  inner join fetch location.address address
+		  inner join fetch address.zipCode zipCode
+		  inner join fetch zipCode.city city
+		  inner join fetch city.state state
+		where 
+			location in (select jail.location
+						 from omis.jail.domain.Jail jail)
+		or
+			location in (select prereleaseCenter.location
+						 from omis.prerelease.domain.PreReleaseCenter prereleaseCenter)
+		or
+			location in (select facility.location
+						 from omis.facility.domain.Facility facility)
+		or
+			location in (select commSupOffice.location
+						 from omis.communitysupervision.domain.CommunitySupervisionOffice commSupOffice)
+		or
+			location in (select treatmentCenter.location 
+						 from omis.treatment.domain.TreatmentCenter treatmentCenter) 
+		order by organization.name,
+			location.dateRange.startDate, location.dateRange.endDate	
+	]]></query>
+</hibernate-mapping>

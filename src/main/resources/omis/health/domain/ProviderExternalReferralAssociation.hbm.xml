@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderExternalReferralAssociation"
+		proxy="omis.health.domain.ProviderExternalReferralAssociation"
+		name="omis.health.domain.impl.ProviderExternalReferralAssociationImpl"
+		table="`PROVIDER_EXT_REF_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROVIDER_EXT_REF_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ProviderAssignment" unique="false"/>
+		<property name="cancelled" column="`CANCELLED`" not-null="false" type="yes_no"/>
+		<property name="primary" column="`PRIMARY`" not-null="true" type="yes_no"/>
+		<many-to-one name="externalReferral" column="`EXTERNAL_REFERRAL_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.ExternalReferral" unique="false"/>
+	</class>
+	<query name="findPrimaryProviderExternalReferralAssociation"><![CDATA[
+	  select association
+	  from omis.health.domain.ProviderExternalReferralAssociation association
+	  where association.primary = true
+	    and association.externalReferral = :externalReferral 
+	]]></query>
+</hibernate-mapping>

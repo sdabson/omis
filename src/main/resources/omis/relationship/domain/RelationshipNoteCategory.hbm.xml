@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Mapping and queries for relationship note categories.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.relationship.domain">
+
+	<!-- Maps class. -->
+	<class entity-name="omis.relationship.domain.RelationshipNoteCategory"
+		proxy="omis.relationship.domain.RelationshipNoteCategory"
+		name="omis.relationship.domain.impl.RelationshipNoteCategoryImpl"
+		table="`RELATIONSHIP_NOTE_CAT`">
+		<cache usage="transactional" region="relationship"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`RELATIONSHIP_NOTE_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" column="`NAME`" not-null="true" unique="true"/>
+		<property name="sortOrder" type="java.lang.Short" column="`SORT_ORDER`" not-null="true"/>
+	</class>
+	
+	<!-- Returns relationship note category by business key. -->
+	<query name="findRelationshipNoteCategory" cacheable="true" cache-region="relationship"><![CDATA[
+      select category
+      from omis.relationship.domain.RelationshipNoteCategory category
+      where category.name = :name
+	]]></query>
+</hibernate-mapping>

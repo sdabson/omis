@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Street suffix mapping and queries.
+  -
+  - Author: Stephen Abson 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.address.domain">
+	<class entity-name="omis.address.domain.StreetSuffix"
+	       proxy="omis.address.domain.StreetSuffix"
+	       name="omis.address.domain.impl.StreetSuffixImpl"
+		   table="`STREET_SUFFIX`">
+		<cache usage="transactional" region="address"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`STREET_SUFFIX_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" unique="true"
+		          column="`NAME`"/>
+		<property name="abbreviation" type="java.lang.String" not-null="true" unique="true"
+		          column="`ABBREVIATION`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+	</class>
+	<query name="findAllStreetSuffixes" cacheable="true" cache-region="address"><![CDATA[
+		select suffix from omis.address.domain.StreetSuffix suffix
+		order by suffix.sortOrder, suffix.name
+	]]></query>
+	<query name="findStreetSuffix" cacheable="true" cache-region="address"><![CDATA[
+		select suffix from omis.address.domain.StreetSuffix suffix
+		where suffix.name = :name
+	]]></query>
+</hibernate-mapping>

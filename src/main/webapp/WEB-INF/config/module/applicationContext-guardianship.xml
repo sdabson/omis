@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+         <!-- Services -->
+        
+        <bean id="guardianshipService"
+        	class="omis.guardianship.service.impl.GuardianshipServiceImpl">
+        	<constructor-arg name="guardianshipDao" ref="guardianshipDao"/>
+        	<constructor-arg name="relationshipDao" ref="relationshipDao"/>
+        	<constructor-arg name="guardianServiceDelegate" ref="guardianServiceDelegate"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="relationshipInstanceFactory" ref="relationshipInstanceFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="guardianshipDao"
+        	class="omis.guardianship.dao.impl.hibernate.GuardianshipDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.guardianship.domain.Guardianship"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="guardianshipInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.guardianship.domain.Guardianship"/>
+		</bean>
+		
+		<!--Property editor factories -->
+        
+        <bean id="guardianshipPropertyEditorFactory"
+       		class="omis.web.support.propertyeditor.factory.impl.hibernate.PropertyEditorFactoryHibernateEntityImpl">
+ 			<property name="entityName" value="omis.guardianship.domain.Guardianship"/>
+ 			<property name="configuration" ref="hibernateConfiguration"/>
+  			<property name="service" ref="guardianshipService"/>
+		</bean>
+		
+		<!-- Validators -->
+		
+		<bean id="guardianshipFormValidator" 
+			class="omis.guardianship.validator.GuardianshipFormValidator"/> 
+			
+		<!--  Helpers -->
+	  	<bean id="guardianServiceDelegate" class="omis.contact.service.delegate.GuardianServiceDelegate">
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+			<constructor-arg name="guardianshipDao" ref="guardianshipDao"/>
+			<constructor-arg name="guardianshipInstanceFactory" ref="guardianshipInstanceFactory"/>
+	  	</bean>
+		
+		 <!-- Web configuration -->
+ 		 
+ 		 <context:component-scan base-package="omis.guardianship.web.controller"/>
+</beans>
+

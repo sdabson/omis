@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.address.domain">
+	<typedef name="buildingCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.address.domain.BuildingCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.address.domain.Address"
+	       proxy="omis.address.domain.Address"
+	       name="omis.address.domain.impl.AddressImpl"
+		   table="`ADDRESS`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ADDRESS_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<properties name="unqiueAddress">
+			<property name="value" type="java.lang.String" not-null="false" column="`VALUE`"/>
+			<many-to-one name="zipCode" entity-name="omis.address.domain.ZipCode" not-null="true" column="`ZIPCODE_ID`"/>
+		</properties>
+		<property name="designator" type="java.lang.String" not-null="false" column="`DESIGNATOR`"/>
+		<property name="coordinates" column="`COORDINATES`" not-null="false" type="java.lang.String"/>
+		<property name="buildingCategory" not-null="false" type="buildingCategory" column="`BUILDING_CATEGORY`"/>
+	</class>
+<!-- 	find an address -->
+	<query name="findAddress"><![CDATA[
+	select address
+	from 
+		omis.address.domain.Address address	
+	where 
+		address.value = :value
+	and 
+		address.zipCode = :zipCode
+	]]></query>
+<!-- 	find an address -->
+	<query name="findAddressExcluding"><![CDATA[
+	select address
+	from 
+		omis.address.domain.Address address	
+	where 
+		address.value = :value
+	and 
+		address.zipCode = :zipCode
+	and 
+		address != :address
+	]]></query>
+	<query name="searchAddressByAddressNumberStreetAndSuffix"><![CDATA[
+	  select address
+		from omis.address.domain.Address address
+  inner join fetch address.zipCode zipCode
+  inner join fetch zipCode.city city
+  inner join fetch city.country country
+  left join fetch city.state state
+	   where utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) >= 70
+    order by utl_match.JARO_WINKLER_SIMILARITY(upper(address.value)) desc
+	]]></query>
+		
+	<query name="searchAddressesByAddressFields"><![CDATA[
+		select address
+		  from omis.address.domain.Address address
+    inner join fetch address.zipCode zipCode
+    inner join fetch zipCode.city city
+    inner join fetch city.country country
+    left join fetch city.state state
+         where utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) >= 70
+           and utl_match.JARO_WINKLER_SIMILARITY(upper(city.name), upper(:cityName)) >=70
+           and utl_match.JARO_WINKLER_SIMILARITY(upper(state.name), upper(:stateName)) >= 70
+           and utl_match.JARO_WINKLER_SIMILARITY(upper(zipCode.value), upper(:zipCode)) >= 70
+      order by utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) desc
+	]]></query>
+	<query name="searchAddressesByValueAndFields"><![CDATA[
+		select address
+		  from omis.address.domain.Address address
+	    inner join fetch address.zipCode zipCode
+	    inner join fetch zipCode.city city
+	    inner join fetch city.country country
+	    left outer join fetch city.state state
+	    where utl_match.JARO_WINKLER_SIMILARITY(upper(address.value), upper(:value)) >= 70
+	      and (:zipCode is null or zipCode = :zipCode)
+	      and (:city is null or city = :city)
+	      and (:state is null or state = :state)
+	]]></query>
+	<query name="findAddressesByValue"><![CDATA[
+		select address
+		from omis.address.domain.Address address
+		inner join fetch address.zipCode zipCode
+	    inner join fetch zipCode.city city
+	    inner join fetch city.country country
+	    left join fetch city.state state
+	    where upper(address.value) like concat('%', upper(:value), '%') 
+	    order by address.value asc
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.disciplinaryCode.report">
+	<query name="findDisciplinaryCodeSummariesBySupervisoryOrganization"><![CDATA[
+		select new omis.disciplinaryCode.report.SupervisoryOrganizationDisciplinaryCodeSummary(
+			disciplinaryCode.id,
+			supervisoryOrganizationCode.id,
+			disciplinaryCode.value,
+			disciplinaryCode.description,
+			disciplinaryCode.extendedDescription,
+			supervisoryOrganizationCode.dateRange,
+			cast(:effectiveDate as timestamp)) 
+		from
+			omis.disciplinaryCode.domain.SupervisoryOrganizationCode supervisoryOrganizationCode,
+			omis.disciplinaryCode.domain.DisciplinaryCode disciplinaryCode
+			
+		where 
+			supervisoryOrganizationCode.supervisoryOrganization = :supervisoryOrganization 
+		and
+			supervisoryOrganizationCode.code.id = disciplinaryCode.id
+		and
+			(:effectiveDate >= supervisoryOrganizationCode.dateRange.startDate 
+			and (:effectiveDate < supervisoryOrganizationCode.dateRange.endDate
+			or supervisoryOrganizationCode.dateRange.endDate is null))
+		order by
+			supervisoryOrganizationCode.dateRange.startDate asc,
+			supervisoryOrganizationCode.dateRange.endDate asc
+	]]></query>
+	<query name="findDisciplinaryCodeSummariesWithDateRangeBySupervisoryOrganization"><![CDATA[
+		select new omis.disciplinaryCode.report.SupervisoryOrganizationDisciplinaryCodeSummary(
+			disciplinaryCode.id,
+			supervisoryOrganizationCode.id,
+			disciplinaryCode.value,
+			disciplinaryCode.description,
+			disciplinaryCode.extendedDescription,
+			supervisoryOrganizationCode.dateRange,
+			cast(:effectiveDate as timestamp)) 
+		from
+			omis.disciplinaryCode.domain.SupervisoryOrganizationCode supervisoryOrganizationCode,
+			omis.disciplinaryCode.domain.DisciplinaryCode disciplinaryCode
+			
+		where 
+			supervisoryOrganizationCode.supervisoryOrganization = :supervisoryOrganization 
+		and
+			supervisoryOrganizationCode.code.id = disciplinaryCode.id
+		and
+			(supervisoryOrganizationCode.dateRange.startDate <= :endDate or :endDate is null)
+			and (supervisoryOrganizationCode.dateRange.endDate > :startDate or :startDate is null
+				or supervisoryOrganizationCode.dateRange.endDate is null) 
+		order by
+			supervisoryOrganizationCode.dateRange.startDate asc,
+			supervisoryOrganizationCode.dateRange.endDate asc
+	]]></query>
+	<query name="findAllSupervisoryOrganizationSummaries"><![CDATA[
+		select new omis.disciplinaryCode.report.SupervisoryOrganizationDisciplinarySummary(
+			supervisoryOrganization.id,
+			supervisoryOrganization.name)
+		from 
+			omis.supervision.domain.SupervisoryOrganization supervisoryOrganization
+	]]></query>
+</hibernate-mapping> 

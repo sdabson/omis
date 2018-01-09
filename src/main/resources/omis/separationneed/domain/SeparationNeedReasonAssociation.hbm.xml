@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.separationneed.domain">
+	<class entity-name="omis.separationneed.domain.SeparationNeedReasonAssociation"
+		proxy="omis.separationneed.domain.SeparationNeedReasonAssociation"
+		name="omis.separationneed.domain.impl.SeparationNeedReasonAssociationImpl"
+		table="`SEP_NEED_REASON_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SEP_NEED_REASON_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="separationNeed" column="`SEPARATION_NEED_ID`" cascade="none" not-null="true"
+			entity-name="omis.separationneed.domain.SeparationNeed" unique="false"/>
+		<many-to-one name="reason" column="`REASON_ID`" cascade="none" not-null="true"
+			entity-name="omis.separationneed.domain.SeparationNeedReason" unique="false"/>
+	</class>
+	<query name="findSeparationNeedReasonAssociationsBySeparationNeed"><![CDATA[
+		from
+			omis.separationneed.domain.SeparationNeedReasonAssociation association
+		where
+			association.separationNeed = :separationNeed
+	]]></query>
+	<query name="findSeparationNeedReasonAssociation"><![CDATA[
+		from
+			omis.separationneed.domain.SeparationNeedReasonAssociation association
+		where
+			association.separationNeed = :separationNeed
+		and
+			association.reason = :separationNeedReason
+	]]></query>
+	<query name="findSeparationNeedReasonAssociationExcluding"><![CDATA[
+		from
+			omis.separationneed.domain.SeparationNeedReasonAssociation association
+		where
+			association.separationNeed = :separationNeed
+		and
+			association.reason = :separationNeedReason
+		and
+			association <> :separationNeedReasonAssociation
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,202 @@
+/*
+ * Tabs.
+ * Author: Ryan Johns, Stephen Abson
+ * Version: 0.1.2 (Sep 9, 2015)
+ */
+ 
+#tabContainer {
+ 	height:100%;
+ 	margin:0px;
+ 	padding:0px;
+}
+
+.left_arrow, .right_arrow {
+	width:16px;
+}
+
+.left_arrow, .right_arrow, .removeAll {
+	
+	padding-top:10px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+ 
+.tabbed_area {
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+	margin:0px;
+	float:left;
+	width: 100%;
+	position:relative;
+	height: 100%;
+}
+
+.tabIcons .actionMenuItem:before {
+	 vertical-align: -50%;
+}
+
+.tabbed_area:nth-child(n+2) .tab_content {
+	border-left-width:2px;
+}
+
+
+.tabbed_area:first-child .tabIcons {
+	width: 8%;
+}
+
+.tabbed_area .tabIcons {
+	display: inline;
+    height: 26px;
+    margin-right: 0;
+    margin-top: 3px;
+    overflow: hidden;
+    width: 40px;
+}
+  
+ ul.tabs {
+	margin: 0;
+    padding: 0;
+    padding-left: 20px;
+	display:inline-block;
+	white-space:nowrap;
+	vertical-align:bottom;
+	overflow:hidden;
+	max-width:62%;
+	max-width:calc(90% - 350px);
+}
+
+
+div.tabbed_area.split ul.tabs {
+	max-width:60%;
+	max-width:calc(90% - 280px);
+}
+
+div.tabbed_area.split:nth-child(1) ul.tabs {
+	max-width:62%;
+	max-width:calc(90% - 400px);
+}
+
+div.tabbed_area.split:nth-child(2) ul.tabs {
+	max-width:62%;
+	max-width:calc(90% - 130px);
+}
+
+ul.tabs li.tab_li {
+	list-style: none;
+	display:inline;
+	margin: 0;
+    padding: 0;
+    opacity: .5;
+}
+
+ul.tabs li.tab_li {
+	display: inline-block;
+	min-width: 120px;
+	vertical-align:bottom;
+	position:relative;
+	height:40px;
+	top:-1px;
+    z-index:1;
+}
+
+ul.tabs li.tab_li.active{
+	border-width: 1px 1px 0;
+	border-style: solid;
+	top: -1px;
+	z-index:100;
+	background-color:#fff;
+	opacity: 1;
+}
+
+ul.tabs li.tab_li:nth-child(n+2) {
+	border-left-style: solid;
+	border-left-width: 1px;
+}
+
+li.tab_li.active + li.tab_li {
+	border-style: none;
+}
+
+ul.tabs li.tab_li span a.remove {
+	display:table-cell;
+	width:20px;
+}
+
+ul.tabs li.tab_li span a.remove:after {
+	content: url('../images/close.png');
+}
+
+ul.tabs li span {
+	display:table;
+	height:100%;
+	width:100%;
+	padding-left:5px;
+}
+
+
+ul.tabs li.tab_li a.swap {
+    margin: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    padding: 0;
+    min-width: 70px;
+    z-index: 49;
+    display:table-cell;
+    vertical-align:middle;
+}
+
+.tabSet {
+	width: 100%;
+    top:41px;
+    position: absolute;
+    bottom:0px;
+}
+
+.tab_content {
+	padding-left: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	border-top-width: 1px;
+	border-left-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 0px;
+	padding-right: 0px;
+	border-style: solid;
+	width: calc(100% - 0px);
+	height: calc(100% - 1px);
+    margin-bottom: -5px;
+	position:relative;
+	top:-2px;
+	z-index:1;
+	background-color:#fff;
+}
+
+#offenderTabs.split ul.tabs {
+	background-color#f00;
+	max-width:60%;
+	max-width:calc(90% - 280px);
+}
+.split:last-child {
+	width: 50%;
+}
+
+.split {
+	width: calc(50% - 2px);
+}
+
+.split:first-child .tabIcons {
+	width: 12%;
+}
+
+
+
+.split #content ul li {
+	width:100%;
+}

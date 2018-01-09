@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.custody.domain">
+	<class entity-name="omis.custody.domain.CustodyOverride"
+		proxy="omis.custody.domain.CustodyOverride"
+		name="omis.custody.domain.impl.CustodyOverrideImpl"
+		table="`CUSTODY_OVERRIDE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`CUSTODY_OVERRIDE_SEQ`</param>
+					</generator>
+		</id>
+		<many-to-one name="custodyReview" column="`REVIEW_ID`" not-null="false"
+		entity-name="omis.custody.domain.CustodyReview" unique="true"/>
+		<many-to-one name="custodyLevel" column="`LEVEL_ID`"
+		entity-name="omis.custody.domain.CustodyLevel" not-null="true"/>
+		<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="authorizationSignature">
+					<many-to-one name="userAccount" column="`AUTHORIZE_ACCOUNT_ID`"
+							 not-null="false"/>
+					<property name="date" column="`AUTHORIZE_DATE`" not-null="false"/>
+		</component>
+		</class>
+		<query name="findCustodyOverrideByCustodyReview"><![CDATA[
+			from 
+				omis.custody.domain.CustodyOverride custodyOverride
+			where 
+				custodyOverride.custodyReview = :custodyReview
+		]]></query>
+		<query name="findCustodyOverride"><![CDATA[
+			from
+				omis.custody.domain.CustodyOverride custodyOverride
+			where
+				custodyOverride.custodyLevel = :custodyLevel
+			and
+				custodyOverride.custodyReview = :custodyReview
+		]]></query>
+		<query name="findCustodyOverrideExcluding"><![CDATA[
+			from
+				omis.custody.domain.CustodyOverride custodyOverride
+			where
+				custodyOverride.custodyLevel = :custodyLevel
+			and
+				custodyOverride.custodyReview = :custodyReview
+			and
+				custodyOverride <> :excludedCustodyOverride
+		]]></query>
+	</hibernate-mapping>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Ryan Johns
+ - Version: 0.1.0 (Apr 21, 2014)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping package="omis.health.report">
+	<query name="findProviderDailyScheduleOnDate"><![CDATA[
+		select ps.sundayTimeRange, 
+			ps.mondayTimeRange, 
+			ps.tuesdayTimeRange, 
+			ps.wednesdayTimeRange, 
+			ps.thursdayTimeRange, 
+			ps.fridayTimeRange, 
+			ps.saturdayTimeRange,
+			pa.provider.name.firstName, 
+			pa.provider.name.lastName,
+			pa.title.category, 
+			pa.facility.name,
+			pa
+		from omis.health.domain.ProviderSchedule ps
+		right join ps.providerAssignment pa
+		where pa = :providerAssignment
+	]]></query>
+	<query name="findProviderDailySchedulesByFacilityOnDate"><![CDATA[
+		select ps.sundayTimeRange, 
+			ps.mondayTimeRange, 
+			ps.tuesdayTimeRange, 
+			ps.wednesdayTimeRange, 
+			ps.thursdayTimeRange, 
+			ps.fridayTimeRange, 
+			ps.saturdayTimeRange,
+			pa.provider.name.firstName, 
+			pa.provider.name.lastName,
+			pa.title.category, 
+			pa.facility.name,
+			pa
+		 from omis.health.domain.ProviderSchedule ps
+		   right join ps.providerAssignment pa
+		 where pa.facility = :facility
+		   and (pa.dateRange.startDate <= :date
+		    or pa.dateRange.startDate is null)
+		   and (pa.dateRange.endDate > :date
+		    or pa.dateRange.endDate is null)
+	]]></query>
+	<query name="findProviderDailySchedulesByProviderDuringDateRange"><![CDATA[
+		select ps.sundayTimeRange, 
+			ps.mondayTimeRange, 
+			ps.tuesdayTimeRange, 
+			ps.wednesdayTimeRange, 
+			ps.thursdayTimeRange, 
+			ps.fridayTimeRange, 
+			ps.saturdayTimeRange, 
+			pa.provider.name.firstName, 
+			pa.provider.name.lastName,
+			pa.title.category, 
+			pa.facility.name,
+			pa
+		 from omis.health.domain.ProviderSchedule ps
+		right join ps.providerAssignment pa
+		 where pa = :providerAssignment
+	]]></query>
+	<query name="findProviderDailySchedulesByFacilityDuringDateRange"><![CDATA[
+		select ps.sundayTimeRange, 
+			ps.mondayTimeRange, 
+			ps.tuesdayTimeRange, 
+			ps.wednesdayTimeRange, 
+			ps.thursdayTimeRange, 
+			ps.fridayTimeRange, 
+			ps.saturdayTimeRange, 
+			ps.providerAssignment.provider.name.firstName, 
+			ps.providerAssignment.provider.name.lastName,
+			ps.providerAssignment.title.category, 
+			ps.providerAssignment.facility.name,
+			ps.providerAssignment
+		 from omis.health.domain.ProviderSchedule ps
+		 right join ps.providerAssignment pa
+		 where pa.facility = :facility
+		   and (pa.dateRange.startDate <= :date
+		    or pa.dateRange.startDate is null)
+		   and (pa.dateRange.endDate > :date
+		    or pa.dateRange.endDate is null)
+	]]></query>
+	<query name="findProviderAppointmentCountByDate"><![CDATA[
+		select ha
+		from omis.health.domain.HealthAppointment ha,
+			 omis.health.domain.ProviderInternalReferralAssociation pira
+	   where pira.internalReferral.offenderAppointmentAssociation.appointment = ha
+	     and pira.providerAssignment = :providerAssignment
+	     and trunc(ha.date) = trunc(:date)
+	     and pira.internalReferral.statusReason is null
+		 and (pira.cancelled is null
+		    or pira.cancelled = false)
+           and ha.status is null
+	]]></query>
+	<query name="findIrregularScheduleDayByDate"><![CDATA[
+		from omis.health.domain.IrregularScheduleDay isd
+	   where isd.day = :date
+	     and isd.providerAssignment = :providerAssignment
+	]]></query>
+</hibernate-mapping>

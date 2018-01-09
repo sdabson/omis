@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="offenderPhotoService"
+        class="omis.offenderphoto.service.impl.OffenderPhotoServiceImpl">
+    <constructor-arg name="offenderPhotoAssociationDao" ref="offenderPhotoAssociationDao"/>
+    <constructor-arg name="offenderPhotoAssociationInstanceFactory" ref="offenderPhotoAssociationInstanceFactory"/>
+    <constructor-arg name="photoDao" ref="photoDao"/>
+    <constructor-arg name="offenderPhotoAssociationNoteDao" ref="offenderPhotoAssociationNoteDao"/>
+    <constructor-arg name="offenderPhotoAssociationNoteDelegate" ref="offenderPhotoAssociationNoteDelegate"/>
+    <constructor-arg name="photoInstanceFactory" ref="photoInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Service Delegates -->
+  
+  <bean id="offenderPhotoAssociationNoteDelegate"
+  		class="omis.offenderphoto.service.delegate.OffenderPhotoAssociationNoteDelegate">
+  	<constructor-arg name="offenderPhotoAssociationNoteInstanceFactory" ref="offenderPhotoAssociationNoteInstanceFactory"/>
+  	<constructor-arg name="offenderPhotoAssociationNoteDao" ref="offenderPhotoAssociationNoteDao"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Report Services -->
+  <bean id="offenderPhotoAssociationProfileItemReportService"
+  	class="omis.offenderphoto.report.impl.hibernate.OffenderPhotoAssociationProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  
+  <bean id="offenderPhotoAssociationSummaryReportService"
+ 	class="omis.offenderphoto.report.impl.hibernate.OffenderPhotoAssociationSummaryReportServiceHibernateImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean> 
+ 
+  <!-- Data access objects -->
+
+  <bean id="offenderPhotoAssociationDao"
+        class="omis.offenderphoto.dao.impl.hibernate.OffenderPhotoAssociationDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociation"/>
+  </bean>
+
+  <bean id="offenderPhotoAssociationNoteDao"
+  		class="omis.offenderphoto.dao.impl.hibernate.OffenderPhotoAssociationNoteDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociationNote"/>	
+	</bean>
+  	
+  <!-- Instance factories. -->
+
+  <bean id="offenderPhotoAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociation"/>
+  </bean>
+
+	<bean id="offenderPhotoAssociationNoteInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociationNote"/>
+  </bean>
+  
+  <!-- Locator for offender photos -->
+
+  <bean id="offenderPhotoLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+    <constructor-arg name="path" value="${application.resource.path}\Photos\OffenderPhotos"/>
+  </bean>
+
+  <!-- Helper classes -->
+	
+  <bean id="offenderPhotoRetriever"
+	    class="omis.media.io.impl.SimplePhotoRetrieverImpl">
+    <constructor-arg name="fileLocator" ref="offenderPhotoLocator"/>
+    <constructor-arg name="defaultFilename" value="NotFound.jpg"/>
+  </bean>
+
+  <bean id="offenderPhotoPersister"
+        class="omis.media.io.impl.SimplePhotoPersisterImpl">
+    <constructor-arg name="fileLocator" ref="offenderPhotoLocator"/>
+  </bean>
+  
+  <bean id="offenderPhotoRemover"
+        class="omis.io.impl.SimpleFileRemoverImpl">
+    <constructor-arg name="fileLocator" ref="offenderPhotoLocator"/>
+  </bean>
+  
+  <!-- Delegates -->
+	
+	<bean id="offenderPhotoAssociationDelegate" class="omis.offenderphoto.service.delegate.OffenderPhotoAssociationDelegate">
+		<constructor-arg name="offenderPhotoAssociationDao" ref="offenderPhotoAssociationDao" />
+		<constructor-arg name="photoDao" ref="photoDao"/>
+		<constructor-arg name="offenderPhotoAssociationInstanceFactory" ref="offenderPhotoAssociationInstanceFactory" />
+		<constructor-arg name="photoInstanceFactory" ref="photoInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	
+	
+  <!-- Property editor factories -->
+  
+  <bean id="offenderPhotoAssociationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="offenderPhotoAssociationDao"/>
+    <constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="offenderPhotoAssociationNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="offenderPhotoAssociationNoteDao"/>
+			<constructor-arg name="entityName" value="omis.offenderphoto.domain.OffenderPhotoAssociationNote"/>
+			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+</beans>

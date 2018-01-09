@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.alert.domain">
+	<class entity-name="omis.alert.domain.OffenderAlert" 
+		   proxy="omis.alert.domain.OffenderAlert"
+		   name="omis.alert.domain.impl.OffenderAlertImpl"
+		   table="`ALERT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ALERT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueAlert">
+			<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true"
+		                 column="`OFFENDER_ID`"/>
+			<property name="expireDate" column="`EXPIRE_DATE`" not-null="true"/>
+			<property name="description" column="`DESCRIPTION`"  not-null="true"/>
+		</properties>
+		<component name="resolution" class="omis.alert.domain.component.AlertResolution">
+			<many-to-one name="resolvedBy" entity-name="omis.person.domain.Person" not-null="false"
+		    	         column="`RESOLVED_BY_PERSON_ID`"/>
+			<property name="date" column="`ACTION_DATE`" not-null="false"/>	
+			<property name="description" column="`ACTION_DESCRIPTION`"  not-null="false"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findOffenderAlertsByOffender"><![CDATA[
+	    select offenderAlert
+		from omis.alert.domain.OffenderAlert offenderAlert
+		where offenderAlert.offender = :offender
+		order by offenderAlert.expireDate desc, offenderAlert.description
+	]]></query>
+	<query name="findOffenderAlert"><![CDATA[
+	  select offenderAlert
+	    from omis.alert.domain.OffenderAlert offenderAlert
+	   where offenderAlert.offender = :offender
+	     and offenderAlert.expireDate = :expireDate
+	     and offenderAlert.description = :description
+	]]></query>
+	<query name="findOffenderAlertExcluding"><![CDATA[
+	  select offenderAlert
+	    from omis.alert.domain.OffenderAlert offenderAlert
+	   where offenderAlert.offender = :offender
+	     and offenderAlert.expireDate = :expireDate
+	     and offenderAlert.description = :description
+	     and offenderAlert <> :excludedOffenderAlert
+	]]></query>
+	<query name="findOffenderAlertProfileItemSummaryByOffenderAndDate"><![CDATA[
+		select new omis.alert.report.OffenderAlertProfileItemSummary(
+		  	(count(case when (offenderAlert.expireDate > :effectiveDate
+		      and (offenderAlert.resolution.date is null
+		       or offenderAlert.resolution.date > :effectiveDate)) then 1 else null end)),
+		    count(case when offenderAlert.offender = :offender
+		      and (offenderAlert.expireDate <= :effectiveDate
+		       or offenderAlert.resolution.date is not null
+		      and offenderAlert.resolution.date <= :effectiveDate) then 1 else null end))
+		     from omis.alert.domain.OffenderAlert offenderAlert
+		    where offenderAlert.offender = :offender
+	]]></query>
+</hibernate-mapping>

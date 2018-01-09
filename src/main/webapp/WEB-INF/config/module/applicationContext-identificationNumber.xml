@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Configuration for identification numbers.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Services -->
+	
+	<bean id="identificationNumberService" class="omis.identificationnumber.service.impl.IdentificationNumberServiceImpl">
+		<constructor-arg name="identificationNumberDelegate" ref="identificationNumberDelegate"/>
+		<constructor-arg name="identificationNumberIssuerDelegate" ref="identificationNumberIssuerDelegate"/>
+		<constructor-arg name="identificationNumberCategoryDelegate" ref="identificationNumberCategoryDelegate"/>
+	</bean>
+	
+	<bean id="identificationNumberCategoryService" class="omis.identificationnumber.service.impl.IdentificationNumberCategoryServiceImpl">
+		<constructor-arg name="identificationNumberCategoryDelegate" ref="identificationNumberCategoryDelegate"/>
+	</bean>
+	
+	<!-- Report services -->
+	
+	<bean id="identificationNumberReportService" class="omis.identificationnumber.report.impl.hibernate.IdentificationNumberReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="identificationNumberProfileItemReportService" class="omis.identificationnumber.report.impl.hibernate.IdentificationNumberProfileItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="identificationNumberSummaryItemReportService" class="omis.identificationnumber.report.impl.hibernate.IdentificationNumberSummaryItemReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- Service delegates -->
+	
+	<bean id="identificationNumberDelegate" class="omis.identificationnumber.service.delegate.IdentificationNumberDelegate">
+		<constructor-arg name="identificationNumberInstanceFactory" ref="identificationNumberInstanceFactory"/>
+		<constructor-arg name="identificationNumberDao" ref="identificationNumberDao"/>
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	</bean>
+	
+	<bean id="identificationNumberIssuerDelegate" class="omis.identificationnumber.service.delegate.IdentificationNumberIssuerDelegate">
+		<constructor-arg name="identificationNumberIssuerInstanceFactory" ref="identificationNumberIssuerInstanceFactory"/>
+		<constructor-arg name="identificationNumberIssuerDao" ref="identificationNumberIssuerDao"/>
+	</bean>
+		
+	<bean id="identificationNumberCategoryDelegate" class="omis.identificationnumber.service.delegate.IdentificationNumberCategoryDelegate">
+		<constructor-arg name="identificationNumberCategoryInstanceFactory" ref="identificationNumberCategoryInstanceFactory"/>
+		<constructor-arg name="identificationNumberCategoryDao" ref="identificationNumberCategoryDao"/>
+	</bean>
+	
+	<!-- Instance factories -->
+	
+	<bean id="identificationNumberInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumber"/>
+	</bean>
+	
+	<bean id="identificationNumberIssuerInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberIssuer"/>
+	</bean>
+	
+	<bean id="identificationNumberCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberCategory"/>
+	</bean>
+	
+	<!-- Property editor factories -->
+	
+	<bean id="identificationNumberPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="identificationNumberDao"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumber"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<bean id="identificationNumberIssuerPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="identificationNumberIssuerDao"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberIssuer"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<bean id="identificationNumberCategoryPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="identificationNumberCategoryDao"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberCategory"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<!-- Data access objects -->
+	
+	<bean id="identificationNumberDao" class="omis.identificationnumber.dao.impl.hibernate.IdentificationNumberDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumber"/>
+	</bean>
+	
+	<bean id="identificationNumberIssuerDao" class="omis.identificationnumber.dao.impl.hibernate.IdentificationNumberIssuerDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberIssuer"/>
+	</bean>
+	
+	<bean id="identificationNumberCategoryDao" class="omis.identificationnumber.dao.impl.hibernate.IdentificationNumberCategoryDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		<constructor-arg name="entityName" value="omis.identificationnumber.domain.IdentificationNumberCategory"/>
+	</bean>
+	
+</beans>

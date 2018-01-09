@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+       <bean id="casePlanObjectiveService"
+       		class="omis.need.service.impl.CasePlanObjectiveServiceImpl">
+       		<constructor-arg name="casePlanReferralDao" ref="casePlanReferralDao"/>
+       		<constructor-arg name="casePlanObjectiveDao" ref="casePlanObjectiveDao"/>
+       		<constructor-arg name="needDomainDao" ref="needDomainDao"/>
+       		<constructor-arg name="objectivePriorityDao" ref="objectivePriorityDao"/>
+       		<constructor-arg name="casePlanObjectiveInstanceFactory" ref="casePlanObjectiveInstanceFactory"/>
+       		<constructor-arg name="casePlanReferralInstanceFactory" ref="casePlanReferralInstanceFactory"/>
+       		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+       </bean>
+       
+       <!-- Report Services -->    
+        
+        <bean id="casePlanObjectiveReportService"
+        	class="omis.need.report.impl.hibernate.CasePlanObjectiveReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="needDomainSummaryReportService"
+        	class="omis.need.report.impl.hibernate.NeedDomainSummaryReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <bean id="needProfileItemReportService"
+        	class="omis.need.report.impl.hibernate.NeedProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+	    <bean id="objectivePriorityDao"
+	  		class="omis.need.dao.impl.hibernate.ObjectivePriorityDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.need.domain.ObjectivePriority"/>	
+	  	</bean>
+	  	
+	  	<bean id="needDomainDao"
+	  		class="omis.need.dao.impl.hibernate.NeedDomainDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.need.domain.NeedDomain"/>	
+	  	</bean>
+	  	
+	  	<bean id="casePlanObjectiveDao"
+	  		class="omis.need.dao.impl.hibernate.CasePlanObjectiveDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.need.domain.CasePlanObjective"/>	
+	  	</bean>
+	  	
+	  	<bean id="casePlanReferralDao"
+	  		class="omis.need.dao.impl.hibernate.CasePlanReferralDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.need.domain.CasePlanReferral"/>	
+	  	</bean>
+  		
+  		<!-- Instance factories -->
+		
+		<bean id="casePlanObjectiveInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		    <constructor-arg name="entityName" value="omis.need.domain.CasePlanObjective"/>
+	 	</bean>
+	 	
+	 	<bean id="casePlanReferralInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+		    <constructor-arg name="entityName" value="omis.need.domain.CasePlanReferral"/>
+	 	</bean>
+  		
+ 		 <!--Property editor factories -->
+ 		 
+		 <bean id="objectivePriorityPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="objectivePriorityDao"/>
+				<constructor-arg name="entityName" value="omis.need.domain.ObjectivePriority"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="needDomainPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="needDomainDao"/>
+				<constructor-arg name="entityName" value="omis.need.domain.NeedDomain"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="casePlanObjectivePropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="casePlanObjectiveDao"/>
+				<constructor-arg name="entityName" value="omis.need.domain.CasePlanObjective"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+</beans>

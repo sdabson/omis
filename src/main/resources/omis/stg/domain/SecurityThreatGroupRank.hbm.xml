@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<class	entity-name="omis.stg.domain.SecurityThreatGroupRank"
+			proxy="omis.stg.domain.SecurityThreatGroupRank"
+			name="omis.stg.domain.impl.SecurityThreatGroupRankImpl"
+			table="`STG_RANK`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`STG_RANK_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="string" not-null="true" unique="true" column="`NAME`"/>
+		<many-to-one name="group" entity-name="omis.stg.domain.SecurityThreatGroup" not-null="true"
+			             column="`GROUP_ID`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>		   
+	</class>
+	<query name="findSecurityThreatGroupRanks"><![CDATA[
+		select securityThreatGroupRank
+		from omis.stg.domain.SecurityThreatGroupRank securityThreatGroupRank
+		order by securityThreatGroupRank.name
+	]]></query>
+	<query name="findSecurityThreatGroupRank"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupRank securityThreatGroupRank
+		where
+			securityThreatGroupRank.name = :name
+		and
+			securityThreatGroupRank.group = :securityThreatGroup
+	]]></query>
+	<query name="findSecurityThreatGroupRankExcluding"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupRank securityThreatGroupRank
+		where
+			securityThreatGroupRank.name = :name
+		and
+			securityThreatGroupRank.group = :securityThreatGroup
+		and
+			securityThreatGroupRank <> :excludedRank
+	]]></query>
+	<query name="findSecurityThreatGroupRanksByGroup"><![CDATA[
+		from
+			omis.stg.domain.SecurityThreatGroupRank securityThreatGroupRank
+		where
+			securityThreatGroupRank.group = :securityThreatGroup
+		order by securityThreatGroupRank.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,59 @@
+
+
+
+div#offenderSearchResults table {
+	padding:0px;
+	margin:0px;
+}
+
+#offenderSearchResultsBody, #offenderSearchResultsHeader {
+    border-collapse: collapse;
+    margin: 20px;
+    text-align: left;
+    max-width: 600px;
+    min-width: 50px;
+}
+
+.searchLink {
+	 background:url('/resources/common/images/offenderProfile.png');
+}
+
+#offenderSearchResultsHeader thead {
+	background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    font-size: 100%;
+    margin: 0;
+    outline: 0 none;
+    padding: 0;
+    vertical-align: baseline;
+}
+
+#offenderSearchResultsHeader th {
+	border-bottom: 1px dashed #6699CC;
+    color: #003399;
+    font-weight: normal;
+    padding: 12px 0px;
+}
+
+#offenderSearchResultsTBody {
+	padding:0px;
+	margin:0px;
+	min-width:100px;
+	max-height: 300px;
+    overflow-y: auto;
+    overflow-x: visible;
+}
+
+#offenderSearchResultsBody tbody tr {
+	border-bottom: 1px solid #EEEEEE;
+}
+
+#offenderSearchResultsBody tbody tr td {
+    margin-top: 5px;
+    padding-top: 9px;
+}
+
+#offenderSearchResultsBody tbody tr:last-child {
+	border-bottom: none
+}
+

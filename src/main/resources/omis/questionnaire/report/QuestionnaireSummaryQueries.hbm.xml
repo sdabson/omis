@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.report">
+	 <query name="findAdministeredQuestionnaireSummariesByAnswerer"><![CDATA[
+		select new omis.questionnaire.report.AdministeredQuestionnaireSummary(
+			administeredQuestionnaire.id,
+			name.firstName,
+			name.lastName,
+			type.questionnaireHelp,
+			type.title,
+			administeredQuestionnaire.comments,
+			administeredQuestionnaire.draft,
+			administeredQuestionnaire.date)
+		from 
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+			left join administeredQuestionnaire.questionnaireType type
+			left join administeredQuestionnaire.assessor assessor
+			left join assessor.name name
+		where
+			administeredQuestionnaire.answerer = :answerer
+	]]></query> 
+	<query name="findAdministeredQuestionnaireSummariesByAnswererAndQuestionnaireType"><![CDATA[
+		select new omis.questionnaire.report.AdministeredQuestionnaireSummary(
+			administeredQuestionnaire.id,
+			name.firstName,
+			name.lastName,
+			type.questionnaireHelp,
+			type.title,
+			administeredQuestionnaire.comments,
+			administeredQuestionnaire.draft,
+			administeredQuestionnaire.date)
+		from 
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+			left join administeredQuestionnaire.questionnaireType type
+			left join administeredQuestionnaire.assessor assessor
+			left join assessor.name name
+		where
+			administeredQuestionnaire.answerer = :answerer
+		and
+			type = :questionnaireType
+	]]></query> 
+	 <query name="findAdministeredQuestionnaireSectionSummariesByQuestionnaire"><![CDATA[
+		select new omis.questionnaire.report.AdministeredQuestionnaireSectionSummary(
+			questionnaireSection.id,
+			status.id,
+			questionnaireSection.title,
+			questionnaireSection.sectionNumber,
+			questionnaireSection.sectionHelp,
+			type.description,
+			status.draft
+		)
+		from
+			omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus status
+			left join
+				status.questionnaireSection questionnaireSection
+			left join 
+				questionnaireSection.sectionType type
+			left join
+				status.administeredQuestionnaire administeredQuestionnaire
+			where
+				administeredQuestionnaire = :administeredQuestionnaire
+			order by
+				questionnaireSection.sortOrder
+	]]></query>
+	<query name="findQuestionSummariesByQuestionnaireSection"><![CDATA[
+		select new omis.questionnaire.report.QuestionSummary(
+			question.id,
+			allowedQuestion.id,
+			allowedQuestion.questionNumber,
+			question.text,
+			allowedQuestion.questionHelp,
+			question.questionCategory,
+			allowedQuestion.questionConditionality,
+			allowedQuestion.answerCardinality,
+			allowedQuestion.valid)
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+			left join 
+			allowedQuestion.question question
+		where
+			allowedQuestion.questionnaireSection = :questionnaireSection
+		and
+			allowedQuestion.valid =  true
+		order by
+			allowedQuestion.sortOrder
+	]]></query>
+	<query name="findAnswerValueSummariesByAllowedQuestion"><![CDATA[
+		select new omis.questionnaire.report.AnswerValueSummary(
+			answerValue.id,
+			allowedAnswer.id,
+			answerValue.description,
+			allowedAnswer.sortOrder,
+			answerValue.value)
+		from
+			omis.questionnaire.domain.AllowedAnswer allowedAnswer
+			left join allowedAnswer.answerValue answerValue
+		where
+			allowedAnswer.allowedQuestion = :allowedQuestion
+		order by
+			allowedAnswer.sortOrder
+	]]></query>
+	<query name="administeredQuestionnaireSummarize"><![CDATA[
+		select new omis.questionnaire.report.AdministeredQuestionnaireSummary(
+			administeredQuestionnaire.id,
+			name.firstName,
+			name.lastName,
+			type.questionnaireHelp,
+			type.title,
+			administeredQuestionnaire.comments,
+			administeredQuestionnaire.draft,
+			administeredQuestionnaire.date)
+		from 
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+			left join administeredQuestionnaire.questionnaireType type
+			left join administeredQuestionnaire.assessor assessor
+			left join assessor.name name
+		where
+			administeredQuestionnaire.questionnaireType = type
+		and
+			administeredQuestionnaire = :administeredQuestionnaire
+	]]></query> 
+	<query name="questionSummarize"><![CDATA[
+		select new omis.questionnaire.report.QuestionSummary(
+			question.id,
+			allowedQuestion.id,
+			allowedQuestion.questionNumber,
+			question.text,
+			allowedQuestion.questionHelp,
+			question.questionCategory,
+			allowedQuestion.questionConditionality,
+			allowedQuestion.answerCardinality,
+			allowedQuestion.valid)
+		from
+			omis.questionnaire.domain.AllowedQuestion allowedQuestion
+			left join 
+			allowedQuestion.question question
+		where
+			allowedQuestion = :allowedQuestion
+	]]></query>
+	<query name="findQuestionnaireTypeSummariesByQuestionnaireCategory"><![CDATA[
+		select new omis.questionnaire.report.QuestionnaireTypeSummary(
+			questionnaireType.id,
+			questionnaireCategory.description,
+			questionnaireType.title,
+			questionnaireType.dateRange.startDate,
+			questionnaireType.dateRange.endDate,
+			questionnaireType.valid,
+			questionnaireType.cycle)
+		from
+			omis.questionnaire.domain.QuestionnaireType questionnaireType
+			left join 
+			questionnaireType.questionnaireCategory questionnaireCategory
+		where
+			questionnaireCategory = :questionnaireCategory
+	]]></query>
+	<query name="findAllQuestionnaireTypeSummaries"><![CDATA[
+		select new omis.questionnaire.report.QuestionnaireTypeSummary(
+			questionnaireType.id,
+			questionnaireCategory.description,
+			questionnaireType.title,
+			questionnaireType.dateRange.startDate,
+			questionnaireType.dateRange.endDate,
+			questionnaireType.valid,
+			questionnaireType.cycle)
+		from
+			omis.questionnaire.domain.QuestionnaireType questionnaireType
+			left join 
+			questionnaireType.questionnaireCategory questionnaireCategory
+		order by
+			questionnaireCategory asc, questionnaireType.dateRange.startDate asc,
+			questionnaireType.dateRange.endDate asc, 
+			upper(questionnaireType.title) asc,
+			questionnaireType.cycle
+	]]></query>
+	<query name="questionnaireTypeSummarize"><![CDATA[
+		select new omis.questionnaire.report.QuestionnaireTypeSummary(
+			questionnaireType.id,
+			questionnaireCategory.description,
+			questionnaireType.title,
+			questionnaireType.dateRange.startDate,
+			questionnaireType.dateRange.endDate,
+			questionnaireType.valid,
+			questionnaireType.cycle)
+		from
+			omis.questionnaire.domain.QuestionnaireType questionnaireType
+			left join 
+			questionnaireType.questionnaireCategory questionnaireCategory
+		where
+			questionnaireType = :questionnaireType
+	]]></query>
+	<query name="findQuestionnaireSectionSummariesByQuestionnaireType"><![CDATA[
+		select new omis.questionnaire.report.QuestionnaireSectionSummary(
+			questionnaireSection.id,
+			questionnaireSection.title,
+			questionnaireSection.sectionNumber,
+			questionnaireSection.sectionHelp,
+			type.description)
+		from
+			omis.questionnaire.domain.QuestionnaireSection questionnaireSection
+			left join 
+				questionnaireSection.sectionType type
+		where
+			questionnaireSection.questionnaireType = :questionnaireType
+		order by
+				questionnaireSection.sortOrder
+		
+	]]></query>
+	<query name="findAdministeredQuestionnaireCountByQuestionnaireType"><![CDATA[
+		select 
+			count(administeredQuestionnaire.id)
+		from 
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+			left join administeredQuestionnaire.questionnaireType type
+		where
+			type = :questionnaireType
+	]]></query>
+	<query name="findAdministeredQuestionnaireCountByAnswerer"><![CDATA[
+		select 
+			count(administeredQuestionnaire.id)
+		from 
+			omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+		where
+			administeredQuestionnaire.answerer = :answerer
+	]]></query>
+</hibernate-mapping>

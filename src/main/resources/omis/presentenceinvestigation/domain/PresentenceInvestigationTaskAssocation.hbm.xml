@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation"
+			proxy="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation"
+			name="omis.presentenceinvestigation.domain.impl.PresentenceInvestigationTaskAssociationImpl"
+			table="`PRSNTNC_INVSTGTN_TSK_ASSOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PRSNTNC_INVSTGTN_TSK_ASSOC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="task" column="`TASK_ID`" entity-name="omis.task.domain.Task" not-null="true" />
+			<many-to-one name="presentenceInvestigationRequest" column="`PRSTNC_INVSTGTN_REQUEST_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationRequest" not-null="true" />
+			<many-to-one name="taskSource" column="`PRSTNC_INVSTGTN_TASK_SOURCE_ID`" entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findPresentenceInvestigationTaskAssociation"><![CDATA[
+		select presentenceInvestigationTaskAssociation
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation presentenceInvestigationTaskAssociation
+		where
+			presentenceInvestigationTaskAssociation.task = :task
+		and
+			presentenceInvestigationTaskAssociation.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			presentenceInvestigationTaskAssociation.taskSource = :taskSource
+	]]></query>
+	<query name="findPresentenceInvestigationTaskAssociationExcluding"><![CDATA[
+		select presentenceInvestigationTaskAssociation
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation presentenceInvestigationTaskAssociation
+		where
+			presentenceInvestigationTaskAssociation.task = :task
+		and
+			presentenceInvestigationTaskAssociation.presentenceInvestigationRequest = :presentenceInvestigationRequest
+		and
+			presentenceInvestigationTaskAssociation.taskSource = :taskSource
+		and
+			presentenceInvestigationTaskAssociation != :presentenceInvestigationTaskAssociation
+	]]></query>
+	<query name="findTaskByTaskTemplateAndPresentenceInvestigationRequest"><![CDATA[
+		select task
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation presentenceInvestigationTaskAssociation
+		inner join
+			presentenceInvestigationTaskAssociation.task task
+		inner join
+			presentenceInvestigationTaskAssociation.taskSource taskSource
+		where
+			taskSource.taskTemplate = :taskTemplate
+		and
+			presentenceInvestigationTaskAssociation.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findTasksByPresentenceInvestigationRequest"><![CDATA[
+		select presentenceInvestigationTaskAssociation
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation presentenceInvestigationTaskAssociation
+		where
+			presentenceInvestigationTaskAssociation.presentenceInvestigationRequest = :presentenceInvestigationRequest
+	]]></query>
+</hibernate-mapping>

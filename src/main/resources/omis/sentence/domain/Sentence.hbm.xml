@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Mapping and queries for sentences.
+  -
+  - Author: Stephen Abson
+  - Author: Josh Divine
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.sentence.domain">
+	<class	entity-name="omis.sentence.domain.Sentence"
+			proxy="omis.sentence.domain.Sentence"
+			name="omis.sentence.domain.impl.SentenceImpl"
+			table="`SENTENCE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`SENTENCE_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<properties name="uniqueSentence">
+			<many-to-one name="conviction" column="`CONVICTION_ID`" not-null="true"
+				entity-name="omis.conviction.domain.Conviction"/>
+			<property name="effectiveDate" column="`EFFECTIVE_DATE`" not-null="false"/>
+		</properties>
+		<component name="prisonTerm">
+			<property name="years" column="`PRISON_TERM_YEARS`"/>
+			<property name="months" column="`PRISON_TERM_MONTHS`"/>
+			<property name="days" column="`PRISON_TERM_DAYS`"/>
+		</component>
+		<component name="probationTerm">
+			<property name="years" column="`PROBATION_TERM_YEARS`"/>
+			<property name="months" column="`PROBATION_TERM_MONTHS`"/>
+			<property name="days" column="`PROBATION_TERM_DAYS`"/>
+		</component>
+		<component name="deferredTerm">
+			<property name="years" column="`DEFERRED_TERM_YEARS`"/>
+			<property name="months" column="`DEFERRED_TERM_MONTHS`"/>
+			<property name="days" column="`DEFERRED_TERM_DAYS`"/>
+		</component>
+     	<many-to-one name="category" column="`CATEGORY_ID`" not-null="true"
+				entity-name="omis.sentence.domain.SentenceCategory"/>
+		<property name="pronouncementDate" column="`PRONOUNCEMENT_DATE`" not-null="false"/>
+		<component name="credit" class="omis.conviction.domain.component.ConvictionCredit">
+			<property name="jailTime" column="`JAIL_TIME_CREDIT`"/>
+			<property name="streetTime" column="`STREET_TIME_CREDIT`"/>
+		</component>
+		<property name="turnSelfInDate" column="`TURN_SELF_IN_DATE`" not-null="false"/>
+		<property name="lengthClassification" column="`LENGTH_CLASSIFICATION`" not-null="false">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.sentence.domain.SentenceLengthClassification</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<many-to-one name="legalDispositionCategory" column="`LEGAL_DISP_CATEGORY_ID`" not-null="true"
+				entity-name="omis.sentence.domain.LegalDispositionCategory"/>
+		<component name="connection" class="omis.sentence.domain.component.SentenceConnection">
+			<many-to-one name="sentence" column="`CONNECTION_SENTENCE_ID`" not-null="false"
+				entity-name="omis.sentence.domain.Sentence"/>
+			<property name="classification" column="`CONNECTION_CLASSIFICATION`" not-null="false">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.sentence.domain.SentenceConnectionClassification</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+		</component>
+		<property name="active" column="`ACTIVE`" not-null="true" type="yes_no"/>
+		<property name="changeOrder" column="`CHANGE_ORDER`" not-null="true"/>
+	</class>
+	<query name="findSentenceByConviction"><![CDATA[
+		select sentence from omis.sentence.domain.Sentence as sentence
+		where sentence.conviction = :conviction
+	]]></query>
+	<query name="findActiveSentenceByConviction"><![CDATA[
+		select sentence from omis.sentence.domain.Sentence as sentence
+		where sentence.conviction = :conviction
+		and sentence.active = 'Y'
+	]]></query>
+	<query name="findSentencesByOffender"><![CDATA[
+		select sentence from omis.sentence.domain.Sentence as sentence
+		where sentence.conviction.courtCase.docket.person = :offender
+	]]></query>
+	<query name="findActiveSentencesExcludingCourtCase"><![CDATA[
+		select sentence 
+		from omis.sentence.domain.Sentence as sentence
+		where 
+			sentence.conviction.courtCase.docket.person = :person
+		and 
+			sentence.active = 'Y'
+		and 
+			sentence.conviction.courtCase <> :courtCase
+	]]></query>
+	<query name="findSentence"><![CDATA[
+		select sentence 
+		from omis.sentence.domain.Sentence as sentence
+		where
+			sentence.conviction = :conviction
+		and
+			sentence.effectiveDate = :effectiveDate
+		and
+			sentence.active = 'Y'
+	]]></query>
+	<query name="findSentenceExcluding"><![CDATA[
+		select sentence 
+		from omis.sentence.domain.Sentence as sentence
+		where
+			sentence.conviction = :conviction
+		and
+			sentence.effectiveDate = :effectiveDate
+		and
+			sentence.active = 'Y'
+		and
+			sentence <> :sentence
+	]]></query>
+	<query name="findActiveSentences"><![CDATA[
+		select sentence 
+		from omis.sentence.domain.Sentence as sentence
+		where 
+			sentence.conviction.courtCase.docket.person = :person
+		and 
+			sentence.active = 'Y'
+	]]></query>
+	<query name="removeSentencesByConviction"><![CDATA[
+		delete 
+		from omis.sentence.domain.Sentence as sentence
+		where 
+			sentence.conviction = :conviction
+	]]></query>
+	<query name="countSentencesByConviction"><![CDATA[
+		select count(sentence) 
+		from omis.sentence.domain.Sentence as sentence
+		where 
+			sentence.conviction = :conviction
+	]]></query>
+	<query name="findActiveSentenceCountByPerson"><![CDATA[
+		select count(sentence.id)
+		from omis.sentence.domain.Sentence as sentence
+		where 
+			sentence.conviction.courtCase.docket.person = :person
+		and
+			sentence.active = 'Y'
+		and
+			(sentence.conviction.courtCase.flags.dismissed is null
+			  or sentence.conviction.courtCase.flags.dismissed = 'N')
+	]]></query>
+	<query name="updateSentenceConnectionsWithConsecutiveSentence"><![CDATA[
+		update omis.sentence.domain.Sentence
+		  set connection.sentence = :newSentence
+		  where connection.sentence = :oldSentence
+	]]></query>
+	<query name="countSentenceConnected"><![CDATA[
+		select count (sentence)
+		from omis.sentence.domain.Sentence sentence
+		where sentence.connection.sentence = :sentence
+	]]></query>
+</hibernate-mapping>

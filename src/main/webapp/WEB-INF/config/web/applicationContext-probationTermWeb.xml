@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+    <!-- Validators -->
+    
+    <bean id="probationTermFormValidator" class="omis.probationterm.web.validator.ProbationTermFormValidator">
+    </bean>
+    
+    <!-- Web configuration -->
+    
+    <context:component-scan base-package="omis.probationterm.web.controller"/>
+    
+    <!-- Summary Item -->
+    
+    <bean id="probationTermSummaryItem"
+    	class="omis.probationterm.web.summary.ProbationTermSummaryItem">
+    	<constructor-arg name="probationTermSummaryItemReportService" ref="probationTermSummaryItemReportService"/>
+    	<constructor-arg name="summaryItemRegistry" ref="dischargeDataSummaryItemRegistry"/>
+    	<constructor-arg name="includedPageName" value="/WEB-INF/views/probationTerm/summary/includes/summaryItem.jsp"/>
+    	<constructor-arg name="order" value="3"/>
+    	<constructor-arg name="enabled" value="${probationTermSummaryItemEnabled}"/>
+    </bean>
+    
+    <!-- Use controller transactions -->
+    
+    <aop:config>
+      <aop:pointcut id="reportProbationTermControllerOperation" expression="execution(* omis.probationterm.web.controller.ReportProbationTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportProbationTermControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="manageProbationTermControllerOperation" expression="execution(* omis.probationterm.web.controller.ManageProbationTermController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageProbationTermControllerOperation"/>
+    </aop:config>
+  
+</beans>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Instance factories. -->
+  
+  <bean id="securityThreatGroupAffiliationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliation"/>
+  </bean>
+
+	 <bean name="securityThreatGroupAffiliationNoteInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliationNote"/>
+	 </bean>
+	 
+	<bean name="securityThreatGroupInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroup"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupActivityLevelInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityLevel"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupChapterInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupChapter"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupRankInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupRank"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupActivityInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivity"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupActivityInvolvementInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityInvolvement"/>
+	 </bean>
+	 
+	 <bean name="securityThreatGroupActivityNoteInstanceFactory"
+	   	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	   	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	   	<constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityNote"/>
+	 </bean>
+	 
+  <!-- Services -->
+  
+  <bean id="securityThreatGroupAffiliationService"
+        class="omis.stg.service.impl.SecurityThreatGroupAffiliationServiceImpl">
+    <constructor-arg name="securityThreatGroupAffiliationDelegate" ref="securityThreatGroupAffiliationDelegate"/>
+    <constructor-arg name="securityThreatGroupDelegate" ref="securityThreatGroupDelegate"/>
+    <constructor-arg name="securityThreatGroupActivityLevelDelegate" ref="securityThreatGroupActivityLevelDelegate"/>
+    <constructor-arg name="securityThreatGroupChapterDelegate" ref="securityThreatGroupChapterDelegate"/>
+    <constructor-arg name="securityThreatGroupRankDelegate" ref="securityThreatGroupRankDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+    <constructor-arg name="verificationMethodDelegate" ref="verificationMethodDelegate"/>
+    <constructor-arg name="securityThreatGroupAffiliationNoteDelegate" ref="securityThreatGroupAffiliationNoteDelegate"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityService"
+        class="omis.stg.service.impl.SecurityThreatGroupActivityServiceImpl">
+    <constructor-arg name="activityDelegate" ref="securityThreatGroupActivityDelegate"/>
+    <constructor-arg name="involvementDelegate" ref="securityThreatGroupActivityInvolvementDelegate"/>
+    <constructor-arg name="noteDelegate" ref="securityThreatGroupActivityNoteDelegate"/>
+  </bean>
+
+  <!-- Report services -->
+  
+  <bean id="securityThreatGroupAffiliationReportService"
+     class="omis.stg.report.impl.hibernate.SecurityThreatGroupAffiliationReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="stgProfileItemReportService"
+  	class="omis.stg.report.impl.hibernate.StgProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityReportService"
+     class="omis.stg.report.impl.hibernate.SecurityThreatGroupActivityReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="securityThreatGroupAffiliationDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupAffiliationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliation"/>
+  </bean>
+  
+    <bean id="securityThreatGroupAffiliationNoteDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupAffiliationNoteDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliationNote"/>
+  </bean>
+
+  <bean id="securityThreatGroupDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroup"/>
+  </bean>
+
+  <bean id="securityThreatGroupRankDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupRankDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupRank"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityLevelDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupActivityLevelDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityLevel"/>
+  </bean>
+  
+  <bean id="securityThreatGroupChapterDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupChapterDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupChapter"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupActivityDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivity"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityInvolvementDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupActivityInvolvementDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityInvolvement"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityNoteDao"
+        class="omis.stg.dao.impl.hibernate.SecurityThreatGroupActivityNoteDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityNote"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="securityThreatGroupPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroup"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="securityThreatGroupAffiliationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupAffiliationDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+    <bean id="securityThreatGroupAffiliationNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupAffiliationNoteDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupAffiliationNote"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="securityThreatGroupRankPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupRankDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupRank"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="securityThreatGroupChapterPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupChapterDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupChapter"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+
+  <bean id="securityThreatGroupActivityLevelPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupActivityLevelDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityLevel"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="securityThreatGroupActivityPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupActivityDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivity"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="securityThreatGroupActivityInvolvementPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupActivityInvolvementDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityInvolvement"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <bean id="securityThreatGroupActivityNotePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="securityThreatGroupActivityNoteDao"/>
+    <constructor-arg name="entityName" value="omis.stg.domain.SecurityThreatGroupActivityNote"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>    
+  </bean>
+  
+  <!-- Delegates -->
+  <bean id="securityThreatGroupAffiliationNoteDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupAffiliationNoteDelegate">
+	<constructor-arg name="affiliationNoteInstanceFactory" ref="securityThreatGroupAffiliationNoteInstanceFactory"/>
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	<constructor-arg name="affiliationNoteDao" ref="securityThreatGroupAffiliationNoteDao"/>
+  </bean>
+  
+  <bean id="securityThreatGroupDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupDelegate">
+	<constructor-arg name="securityThreatGroupInstanceFactory" ref="securityThreatGroupInstanceFactory"/>
+	<constructor-arg name="securityThreatGroupDao" ref="securityThreatGroupDao"/>
+  </bean>
+  
+  <bean id="securityThreatGroupAffiliationDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupAffiliationDelegate">
+	<constructor-arg name="securityThreatGroupAffiliationInstanceFactory" ref="securityThreatGroupAffiliationInstanceFactory"/>
+	<constructor-arg name="securityThreatGroupAffiliationDao" ref="securityThreatGroupAffiliationDao"/>
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="securityThreatGroupActivityLevelDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupActivityLevelDelegate">
+	<constructor-arg name="securityThreatGroupActivityLevelInstanceFactory" ref="securityThreatGroupActivityLevelInstanceFactory"/>
+	<constructor-arg name="securityThreatGroupActivityLevelDao" ref="securityThreatGroupActivityLevelDao"/>
+  </bean>
+  
+  <bean id="securityThreatGroupChapterDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupChapterDelegate">
+	<constructor-arg name="securityThreatGroupChapterInstanceFactory" ref="securityThreatGroupChapterInstanceFactory"/>
+	<constructor-arg name="securityThreatGroupChapterDao" ref="securityThreatGroupChapterDao"/>
+  </bean>
+  
+  <bean id="securityThreatGroupRankDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupRankDelegate">
+	<constructor-arg name="securityThreatGroupRankInstanceFactory" ref="securityThreatGroupRankInstanceFactory"/>
+	<constructor-arg name="securityThreatGroupRankDao" ref="securityThreatGroupRankDao"/>
+  </bean>
+  
+    <bean id="securityThreatGroupActivityDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupActivityDelegate">
+	<constructor-arg name="activityInstanceFactory" ref="securityThreatGroupActivityInstanceFactory"/>
+	<constructor-arg name="activityDao" ref="securityThreatGroupActivityDao"/>
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+      <bean id="securityThreatGroupActivityInvolvementDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupActivityInvolvementDelegate">
+	<constructor-arg name="involvementInstanceFactory" ref="securityThreatGroupActivityInvolvementInstanceFactory"/>
+	<constructor-arg name="involvementDao" ref="securityThreatGroupActivityInvolvementDao"/>
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+      <bean id="securityThreatGroupActivityNoteDelegate"
+	   	class="omis.stg.service.delegate.SecurityThreatGroupActivityNoteDelegate">
+	<constructor-arg name="activityNoteInstanceFactory" ref="securityThreatGroupActivityNoteInstanceFactory"/>
+	<constructor-arg name="activityNoteDao" ref="securityThreatGroupActivityNoteDao"/>
+	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+</beans>

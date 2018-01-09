@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.violationevent.domain">
+	<class entity-name="omis.violationevent.domain.ViolationEvent"
+			proxy="omis.violationevent.domain.ViolationEvent"
+			name="omis.violationevent.domain.impl.ViolationEventImpl"
+			table="`VIOLATION_EVENT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`VIOLATION_EVENT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="jurisdiction" column="`SUPERVISORY_ORGANIZATION_ID`" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="false" />
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true" />
+			<component name="event">
+				<property name="date" column="`EVENT_DATE`" type="java.util.Date" not-null="true" />
+				<property name="details" column="`EVENT_DETAILS`" type="java.lang.String" not-null="true" />
+			</component>
+			<property name="category" column="`CATEGORY`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.violationevent.domain.ViolationEventCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findViolationEvent"><![CDATA[
+		select violationEvent
+		from
+			omis.violationevent.domain.ViolationEvent violationEvent
+		where
+			violationEvent.jurisdiction = :jurisdiction
+		and
+			violationEvent.offender = :offender
+		and
+			violationEvent.event.date = :date
+		and
+			violationEvent.event.details = :details
+		and
+			violationEvent.category = :category
+	]]></query>
+	<query name="findViolationEventExcluding"><![CDATA[
+		select violationEvent
+		from
+			omis.violationevent.domain.ViolationEvent violationEvent
+		where
+			violationEvent.jurisdiction = :jurisdiction
+		and
+			violationEvent.offender = :offender
+		and
+			violationEvent.event.date = :date
+		and
+			violationEvent.event.details = :details
+		and
+			violationEvent.category = :category
+		and
+			violationEvent != :violationEvent
+	]]></query>
+	<query name="findViolationEventsByOffender"><![CDATA[
+		select violationEvent
+		from
+			omis.violationevent.domain.ViolationEvent violationEvent
+		where
+			violationEvent.offender = :offender
+	]]></query>
+	<query name="findUnresolvedViolationEventsByOffender"><![CDATA[
+		select violationEvent
+		from
+			omis.violationevent.domain.ViolationEvent violationEvent
+		where
+			violationEvent.offender = :offender
+		and
+			(
+				violationEvent in
+				(
+					select violationEventSub 
+					from
+						omis.violationevent.domain.ConditionViolation conditionViolation
+					inner join
+						conditionViolation.violationEvent violationEventSub
+					where
+						violationEventSub = violationEvent
+					and
+						conditionViolation not in
+						(
+							select conditionViolationSub
+							from
+								omis.hearing.domain.Infraction infraction
+							inner join
+								infraction.conditionViolation conditionViolationSub
+							where
+								conditionViolationSub = conditionViolation
+						)
+				)
+				or
+				violationEvent in
+				(
+					select violationEventSub 
+					from
+						omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+					inner join
+						disciplinaryCodeViolation.violationEvent violationEventSub
+					where
+						violationEventSub = violationEvent
+					and
+						disciplinaryCodeViolation not in
+						(
+							select disciplinaryCodeViolationSub
+							from
+								omis.hearing.domain.Infraction infraction
+							inner join
+								infraction.disciplinaryCodeViolation disciplinaryCodeViolationSub
+							where
+								disciplinaryCodeViolationSub = disciplinaryCodeViolation
+						)
+				)
+			)
+	]]></query>
+	<query name="findViolationEventCountByOffender"><![CDATA[
+		select count(violationEvent.id)
+			from omis.violationevent.domain.ViolationEvent violationEvent
+			where 
+				violationEvent.offender = :offender
+	]]></query>
+</hibernate-mapping>

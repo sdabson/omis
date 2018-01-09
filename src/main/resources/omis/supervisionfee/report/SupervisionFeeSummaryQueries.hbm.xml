@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+  <hibernate-mapping package="omis.supervisionfee.report">
+  <query name="findSupervisionFeesByOffenderAndDate"><![CDATA[
+  	select new omis.supervisionfee.report.SupervisionFeeSummary(
+  	msf.id, 
+  	msf.fee, 
+  	msf.dateRange.startDate, 
+  	msf.dateRange.endDate,
+  	msf.authorityCategory,
+  	msf.comment
+	)   	
+  	from omis.supervisionfee.domain.MonthlySupervisionFee msf
+   		where 
+			msf.offender = :offender 
+	order by msf.dateRange.endDate desc, 
+		msf.dateRange.startDate desc		
+	]]></query>	
+	<query name="findSupervisionFeesBy"><![CDATA[
+	from omis.supervisionfee.domain.MonthlySupervisionFee msf
+   		where 
+			msf.offender = :offender
+	order by msf.dateRange.endDate desc, 
+		msf.dateRange.startDate desc	
+	 ]]></query>
+	 <query name="findSupervisionFeeRequirementsBySupervisionFee"><![CDATA[
+	 select new omis.supervisionfee.report.SupervisionFeeRequirementSummary(
+	 case when :effectiveDate between supervisionFeeRequirements.dateRange.startDate and
+	 supervisionFeeRequirements.dateRange.endDate
+	 then
+	 true
+	 else 
+	 false
+	 end as active,
+	 supervisionFeeRequirements.dateRange.startDate,
+	 supervisionFeeRequirements.dateRange.endDate,
+	 case when
+	 officer is not null and name is not null
+	 then
+	 concat(name.lastName, ', ', name.firstName)
+	 when
+	 court is not null
+	 then
+	 court.name
+	 end as authority,
+	 reason.name,
+	 supervisionFeeRequirements.fee
+	 )	 
+	 from omis.supervisionfee.domain.SupervisionFeeRequirement supervisionFeeRequirements
+	 left join supervisionFeeRequirements.officer officer
+	 left join officer.name name
+	 left join supervisionFeeRequirements.court court
+	 left join supervisionFeeRequirements.reason reason
+	 where supervisionFeeRequirements.monthlySupervisionFee = :monthlySupervisionFee
+	 order by supervisionFeeRequirements.dateRange.endDate desc
+	 ]]></query>	 
+  </hibernate-mapping>

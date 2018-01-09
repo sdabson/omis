@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.stg.domain">
+	<class entity-name="omis.stg.domain.SecurityThreatGroupActivity"
+		proxy="omis.stg.domain.SecurityThreatGroupActivity"
+		name="omis.stg.domain.impl.SecurityThreatGroupActivityImpl"
+		table="`STG_ACTIVITY`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`STG_ACTIVITY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="summary" column="`SUMMARY`" not-null="true" type="string"/>
+		<property name="reportDate" column="`REPORT_DATE`" not-null="true" type="java.util.Date"/>
+		<many-to-one name="reportedBy" entity-name="omis.person.domain.Person" not-null="true"
+			column="REPORTED_BY_ID"/>
+		<component name="creationSignature">			
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+ 	<query name="findSecurityThreatGroupActivity"><![CDATA[ 
+ 		from 
+ 			omis.stg.domain.SecurityThreatGroupActivity activity 
+ 		where 
+ 			activity.reportDate = :date 
+ 		and 
+ 			activity.reportedBy = :reportedBy 
+ 		and 
+ 			activity.summary = :summary 
+ 	]]></query> 
+ 	<query name="findExcludingActivity"><![CDATA[ 
+ 		from 
+ 			omis.stg.domain.SecurityThreatGroupActivity activity 
+ 		where 
+ 			activity.reportDate = :date 
+ 		and 
+ 			activity.reportedBy = :reportedBy 
+ 		and 
+ 			activity.summary = :summary 
+ 		and 
+ 			activity <> :excludedActivity 
+ 	]]></query> 
+	</hibernate-mapping>

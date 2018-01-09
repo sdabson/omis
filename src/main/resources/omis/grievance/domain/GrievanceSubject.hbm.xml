@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.grievance.domain">
+	<class entity-name="omis.grievance.domain.GrievanceSubject"
+		proxy="omis.grievance.domain.GrievanceSubject"
+		name="omis.grievance.domain.impl.GrievanceSubjectImpl"
+		table="`GRIEVANCE_SUBJECT`">
+		<cache usage="transactional" region="grievance"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`GRIEVANCE_SUBJECT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" column="`NAME`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="medical" type="yes_no" not-null="true" column="`MEDICAL`"/>
+		<property name="startLevel" column="`START_LEVEL`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.grievance.domain.GrievanceDispositionLevel</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findGrievanceSubjects" cacheable="true" cache-region="grievance"><![CDATA[
+		from
+			omis.grievance.domain.GrievanceSubject subject
+		where
+			subject.valid = true
+		order by subject.name
+	]]></query>
+	<query name="findGrievanceSubject" cacheable="true" cache-region="grievance"><![CDATA[
+		select subject
+		from omis.grievance.domain.GrievanceSubject subject
+		where subject.name = :name
+	]]></query>
+</hibernate-mapping>

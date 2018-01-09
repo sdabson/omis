@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="substanceTestSampleService"
+        	class="omis.substancetest.service.impl.SubstanceTestSampleServiceImpl">
+        	<constructor-arg name="substanceTestSampleDao" ref="substanceTestSampleDao"/>
+        	<constructor-arg name="sampleCollectionMethodDao" ref="sampleCollectionMethodDao"/>
+        	<constructor-arg name="substanceTestReasonDao" ref="substanceTestReasonDao"/>
+        	<constructor-arg name="substanceTestDao" ref="substanceTestDao"/>
+        	<constructor-arg name="substanceTestResultDao" ref="substanceTestResultDao"/>
+        	<constructor-arg name="labResultDao" ref="labResultDao"/>
+        	<constructor-arg name="sampleRequestDao" ref="sampleRequestDao"/>
+        	<constructor-arg name="sampleRequestStatusReasonDao" ref="sampleRequestStatusReasonDao"/>
+        	<constructor-arg name="substanceTestSampleInstanceFactory" ref="substanceTestSampleInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+        
+        <bean id="substanceTestService"
+        	class="omis.substancetest.service.impl.SubstanceTestServiceImpl">
+        	<constructor-arg name="substanceTestDao" ref="substanceTestDao"/>
+        	<constructor-arg name="substanceTestResultDao" ref="substanceTestResultDao"/>
+        	<constructor-arg name="substanceTestResultValueDao" ref="substanceTestResultValueDao"/>
+        	<constructor-arg name="labResultDao" ref="labResultDao"/>
+        	<constructor-arg name="testKitDao" ref="testKitDao"/>
+        	<constructor-arg name="testKitParameterDao" ref="testKitParameterDao"/>
+        	<constructor-arg name="substanceDao" ref="substanceDao"/>
+        	<constructor-arg name="substanceLabDao" ref="substanceLabDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="substanceTestInstanceFactory" ref="substanceTestInstanceFactory"/>
+        	<constructor-arg name="substanceTestResultInstanceFactory" ref="substanceTestResultInstanceFactory"/>
+        	<constructor-arg name="labResultInstanceFactory" ref="labResultInstanceFactory"/>
+        </bean>
+        
+        <!-- Report Services -->
+        <bean id="substanceTestProfileItemReportService"
+        	class="omis.substancetest.report.impl.hibernate.SubstanceTestProfileItemReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+       
+        
+        <!-- Data access objects -->
+  		
+  		<bean id="sampleCollectionMethodDao"
+        	class="omis.substancetest.dao.impl.hibernate.SampleCollectionMethodDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SampleCollectionMethod"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="sampleRequestDao"
+        	class="omis.substancetest.dao.impl.hibernate.SampleRequestDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SampleRequest"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="substanceTestReasonDao"
+        	class="omis.substancetest.dao.impl.hibernate.SubstanceTestReasonDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestReason"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="substanceTestResultDao"
+        	class="omis.substancetest.dao.impl.hibernate.SubstanceTestResultDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestResult"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="labResultDao"
+        	class="omis.substancetest.dao.impl.hibernate.LabResultDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.LabResult"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="substanceTestResultValueDao"
+        	class="omis.substancetest.dao.impl.hibernate.SubstanceTestResultValueDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestResultValue"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="substanceTestSampleDao"
+        	class="omis.substancetest.dao.impl.hibernate.SubstanceTestSampleDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestSample"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="substanceTestDao"
+        	class="omis.substancetest.dao.impl.hibernate.SubstanceTestDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTest"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="testKitParameterDao"
+        	class="omis.substancetest.dao.impl.hibernate.TestKitParameterDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.TestKitParameter"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="testKitDao"
+        	class="omis.substancetest.dao.impl.hibernate.TestKitDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.substancetest.domain.TestKit"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		  		
+  		<bean id="sampleRequestStatusReasonDao"
+	  		class="omis.substancetest.dao.impl.hibernate.SampleRequestStatusReasonDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.substancetest.domain.domain.SampleRequestStatusReason"/>	
+	  	</bean>
+ 		 
+ 		<!-- Instance factories -->
+  		 
+		<bean id="substanceTestSampleInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestSample"/>
+		</bean> 
+		
+		<bean id="substanceTestInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTest"/>
+		</bean> 
+		
+		<bean id="substanceTestResultInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestResult"/>
+		</bean> 
+		
+		<bean id="labResultInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.LabResult"/>
+		</bean>
+		
+		<bean id="sampleCollectionMethodInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.SampleCollectionMethod"/>
+		</bean> 
+		
+		<bean id="testKitInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.substancetest.domain.TestKit"/>
+		</bean> 
+ 		 
+ 		 <!--Property editor factories -->
+ 		
+		<bean id="sampleCollectionMethodPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SampleCollectionMethod"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="sampleCollectionMethodDao"/>
+		</bean>
+		
+		<bean id="substanceTestReasonPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestReason"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="substanceTestReasonDao"/>
+		</bean>
+		
+		<bean id="substanceTestResultPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestResult"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="substanceTestResultDao"/>
+		</bean>
+		
+		<bean id="labResultPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.LabResult"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="labResultDao"/>
+		</bean>
+		
+		<bean id="substanceTestResultValuePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestResultValue"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="substanceTestResultValueDao"/>
+		</bean>
+		
+		<bean id="substanceTestSamplePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTestSample"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="substanceTestSampleDao"/>
+		</bean>
+		
+		<bean id="substanceTestPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.SubstanceTest"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="substanceTestDao"/>
+		</bean>
+		
+		<bean id="testKitParameterPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.TestKitParameter"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="testKitParameterDao"/>
+		</bean>
+		
+		<bean id="testKitPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.substancetest.domain.TestKit"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="testKitDao"/>
+		</bean>
+		
+		<bean id="sampleRequestStatusReasonPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="sampleRequestStatusReasonDao"/>
+				<constructor-arg name="entityName" value="omis.substancetest.domain.SampleRequestStatusReason"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="sampleRequestPropertyEditorFactory"
+			class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+				<constructor-arg name="dao" ref="sampleRequestDao"/>
+				<constructor-arg name="entityName" value="omis.substancetest.domain.SampleRequest"/>
+				<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+</beans>        

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.substance.domain">
+		<class entity-name="omis.substance.domain.SubstanceUseAdmission"
+				proxy="omis.substance.domain.SubstanceUseAdmission"
+				name="omis.substance.domain.impl.SubstanceUseAdmissionImpl"
+				table="`SUBSTANCE_USE_ADMIT`">
+				<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`SUBSTANCE_USE_ADMIT_SEQ`</param>
+					</generator>
+				</id>	
+				<many-to-one name="offender" not-null="true" column="`OFFENDER_ID`"
+					entity-name="omis.offender.domain.Offender" unique="true"/>
+				<many-to-one name="substance" not-null="true" column="`SUBSTANCE_ID`"
+					entity-name="omis.substance.domain.Substance" unique="true"/>
+				<property name="admissionDate" column="`ADMISSION_DATE`" not-null="true"/>
+				<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+				</component>
+		</class>
+		<query name="findAdmissionByOffender"><![CDATA[
+			from
+				omis.substance.domain.SubstanceUseAdmission admission
+			where
+				admission.offender = :offender
+		]]></query>
+	</hibernate-mapping>

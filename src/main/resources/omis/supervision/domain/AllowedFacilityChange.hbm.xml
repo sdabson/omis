@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+ - Mapping and queries for allowed facility change.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+	
+	<!-- Mapping for allowed facility change. -->
+	<class entity-name="omis.supervision.domain.AllowedFacilityChange"
+	       proxy="omis.supervision.domain.AllowedFacilityChange"
+	       name="omis.supervision.domain.impl.AllowedFacilityChangeImpl"
+	       table="`ALLOWED_FACILITY_CHANGE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ALLOWED_FACILITY_CHANGE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueAllowedFacilityChange">
+			<many-to-one name="action" entity-name="omis.supervision.domain.PlacementTermChangeAction"
+				not-null="true" column="`ACTION_ID`"/>
+			<many-to-one name="fromFacility" entity-name="omis.facility.domain.Facility"
+				not-null="false" column="`FROM_FACILITY_ID`"/>
+			<many-to-one name="toFacility" entity-name="omis.facility.domain.Facility"
+				not-null="false" column="`TO_FACILITY_ID`"/>
+		</properties>
+	</class>
+</hibernate-mapping>

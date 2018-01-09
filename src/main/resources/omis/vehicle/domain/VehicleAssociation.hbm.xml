@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.vehicle.domain">
+	<class entity-name="omis.vehicle.domain.VehicleAssociation"
+		proxy="omis.vehicle.domain.VehicleAssociation"
+		name="omis.vehicle.domain.impl.VehicleAssociationImpl"
+		table="`VEHICLE_ASSOCIATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VEHICLE_ASSOCIATION_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="true"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<property name="year" column="`YEAR`" type="java.lang.Integer" not-null="false"/>
+		<property name="comments" column="COMMENTS" type="java.lang.String" not-null="false"/>
+		<many-to-one name="vehicleModel" column="`VEHICLE_MODEL_ID`" cascade="none" not-null="false"
+			entity-name="omis.vehicle.domain.VehicleModel" unique="false"/>
+		<many-to-one name="vehicleMake" column="`VEHICLE_MAKE_ID`" cascade="none" not-null="false"
+			entity-name="omis.vehicle.domain.VehicleMake" unique="false"/>
+		<many-to-one name="vehicleColor" column="`VEHICLE_COLOR_ID`" cascade="none" not-null="false"
+			entity-name="omis.vehicle.domain.VehicleColor" unique="false"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component> 
+	</class>
+
+	<query name="findVehicleAssociation"><![CDATA[
+		select vehicleAssociation 
+		from omis.vehicle.domain.VehicleAssociation vehicleAssociation
+		where
+			vehicleAssociation.offender = :offender
+		and
+			vehicleAssociation.vehicleModel = :vehicleModel
+		and
+			vehicleAssociation.vehicleColor = :vehicleColor
+		and
+			vehicleAssociation.vehicleMake = :vehicleMake
+		and
+			vehicleAssociation.year = :year
+		and
+			vehicleAssociation.dateRange.startDate = :startDate
+		and
+			((vehicleAssociation.dateRange.endDate = :endDate) or (vehicleAssociation.dateRange.endDate is null and :endDate is null))
+		order by
+			vehicleAssociation.offender.name
+	]]></query>
+	<query name="findVehicleAssociationByOffender"><![CDATA[
+		select vehicleAssociation 
+		from omis.vehicle.domain.VehicleAssociation vehicleAssociation
+	    where vehicleAssociation.offender = :offender
+	    order by vehicleAssociation.offender.name
+	]]></query>
+ 
+	<query name="findVehicleAssociationExluding"><![CDATA[
+		select vehicleAssociation
+		from
+			omis.vehicle.domain.VehicleAssociation vehicleAssociation
+		where
+			((vehicleAssociation.vehicleColor = :vehicleColor) or (vehicleAssociation.vehicleColor is null and :vehicleColor is null))
+		and
+			((vehicleAssociation.vehicleModel = :vehicleModel) or (vehicleAssociation.vehicleModel is null and :vehicleModel is null))
+		and
+			((vehicleAssociation.year = :year) or (vehicleAssociation.year is null and :year is null))
+		and
+			vehicleAssociation.dateRange.startDate = :startDate
+		and
+			((vehicleAssociation.dateRange.endDate = :endDate) or (vehicleAssociation.dateRange.endDate is null and :endDate is null))
+		and
+		    vehicleAssociation != :excludedVehicleAssociation
+		and
+			vehicleAssociation.offender = :offender
+		order by vehicleAssociation.offender.name
+	]]></query>   
+
+	<query name="findVehicleAssociationSaveExluding"><![CDATA[
+		select vehicleAssociation
+		from
+			omis.vehicle.domain.VehicleAssociation vehicleAssociation
+		where
+			((vehicleAssociation.vehicleColor = :vehicleColor) or (vehicleAssociation.vehicleColor is null and :vehicleColor is null))
+		and
+			((vehicleAssociation.vehicleModel = :vehicleModel) or (vehicleAssociation.vehicleModel is null and :vehicleModel is null))
+		and
+			((vehicleAssociation.year = :year) or (vehicleAssociation.year is null and :year is null))
+		and
+			vehicleAssociation.dateRange.startDate = :startDate
+		and
+			((vehicleAssociation.dateRange.endDate = :endDate) or (vehicleAssociation.dateRange.endDate is null and :endDate is null))
+		and
+			vehicleAssociation.offender = :offender
+		order by vehicleAssociation.offender.name
+	]]></query>
+	<query name="findVehicleAssociationCountByOffenderAndDate"><![CDATA[
+		select count(vehicleAssociation)
+		  from omis.vehicle.domain.VehicleAssociation vehicleAssociation
+		 where vehicleAssociation.offender = :offender
+		   and ((vehicleAssociation.dateRange.startDate <= :effectiveDate
+		    or vehicleAssociation.dateRange.startDate is null)
+		   and (vehicleAssociation.dateRange.endDate > :effectiveDate
+		    or vehicleAssociation.dateRange.endDate is null))
+	]]></query>
+
+</hibernate-mapping>

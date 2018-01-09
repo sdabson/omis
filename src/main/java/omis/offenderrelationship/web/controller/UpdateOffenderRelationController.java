@@ -1,0 +1,2273 @@
+package omis.offenderrelationship.web.controller;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import omis.address.domain.Address;
+import omis.address.domain.AddressUnitDesignator;
+import omis.address.domain.BuildingCategory;
+import omis.address.domain.StreetSuffix;
+import omis.address.domain.ZipCode;
+import omis.address.web.controller.delegate.AddressFieldsControllerDelegate;
+import omis.address.web.form.AddressFields;
+import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.contact.domain.OnlineAccount;
+import omis.contact.domain.OnlineAccountHost;
+import omis.contact.domain.TelephoneNumber;
+import omis.contact.domain.TelephoneNumberCategory;
+import omis.contact.domain.component.PoBox;
+import omis.contact.web.controller.delegate.OnlineAccountFieldsControllerDelegate;
+import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
+import omis.contact.web.controller.delegate.TelephoneNumberFieldsControllerDelegate;
+import omis.contact.web.form.OnlineAccountContactItemOperation;
+import omis.contact.web.form.OnlineAccountFields;
+import omis.contact.web.form.PoBoxFields;
+import omis.contact.web.form.TelephoneNumberFields;
+import omis.contact.web.form.TelephoneNumberItemOperation;
+import omis.country.domain.Country;
+import omis.exception.DuplicateEntityFoundException;
+import omis.family.domain.FamilyAssociation;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
+import omis.offender.report.OffenderReportService;
+import omis.offender.report.OffenderSummary;
+import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.offenderrelationship.service.UpdateOffenderRelationService;
+import omis.offenderrelationship.web.form.EditRelationshipsForm;
+import omis.offenderrelationship.web.form.OnlineAccountContactItem;
+import omis.offenderrelationship.web.form.TelephoneNumberItem;
+import omis.offenderrelationship.web.validator.EditRelationshipsFormValidator;
+import omis.person.domain.Person;
+import omis.person.domain.Suffix;
+import omis.person.web.delegate.PersonFieldsControllerDelegate;
+import omis.person.web.form.PersonFields;
+import omis.region.domain.City;
+import omis.region.domain.State;
+import omis.relationship.domain.Relationship;
+import omis.report.ReportFormat;
+import omis.report.ReportRunner;
+import omis.report.web.controller.delegate.ReportControllerDelegate;
+import omis.util.StringUtility;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+/**
+ * Edit offender relationship controller.
+ * 
+ * @author Joel Norris
+ * @author Yidong Li
+ * @author Josh Divine
+ * @version 0.1.1 (Nov 21, 2017)
+ * @since OMIS 3.0
+ */
+@Controller
+@RequestMapping("/offenderRelationship/update")
+@PreAuthorize("hasRole('USER')")
+public class UpdateOffenderRelationController {
+	/* View names. */
+	private static final String EDIT_VIEW_NAME = "offenderRelationship/edit";
+	private static final String OFFENDER_RELATION_LIST_ACTION_MENU_VIEW_NAME
+		= "offenderRelationship/includes/offenderRelationListActionMenu";
+	private static final String OFFENDER_RELATION_EDIT_ACTION_MENU_VIEW_NAME
+		= "offenderRelationship/includes/update/offenderRelationEditActionMenu";
+	private static final String ADDRESSES_VIEW_NAME
+		= "address/json/addresses";
+	private static final String TELEPHONE_NUMBERS_ACTION_MENU_VIEW_NAME
+		= "offenderRelationship/includes/update/"
+				+ "offenderRelationshipTelephoneNumbersActionMenu";
+	private static final String EMAILS_ACTION_MENU_VIEW_NAME
+		= "offenderRelationship/includes/update/"
+				+ "offenderRelationshipEmailActionMenu";
+	private static final String EDIT_TELEPHONE_NUMBER_TABLE_ROW_VIEW_NAME 
+		= "offenderRelationship/includes/update/editTelephoneNumberTableRow";
+	private static final String EDIT_ONLINE_ACCOUNT_TABLE_ROW_VIEW_NAME 
+		= "offenderRelationship/includes/update/editOnlineAccountTableRow";
+	
+	/* Model keys. */
+	private static final String EDIT_RELATIONSHIPS_FORM_MODEL_KEY
+		= "editRelationshipsForm";
+	private static final String OFFENDER_MODEL_KEY = "offender";
+	private static final String OFFENDER_SUMMARY_MODEL_KEY = "offenderSummary";
+	private static final String NAME_SUFFIXES_MODEL_KEY = "nameSuffixes";
+	private static final String COUNTRIES_MODEL_KEY = "countries";
+	private static final String HOME_TYPES_MODEL_KEY = "homeTypes";
+	private static final String STREET_SUFFIXES_MODEL_KEY = "streetSuffixes";
+	private static final String UNIT_DESIGNATORS_MODEL_KEY = "unitDesignators";
+	private static final String RELATION_MODEL_KEY = "relation";
+	private static final String 
+		OFFENDER_RELATIONSHIP_TELEPHONE_NUMBER_INDEX_MODEL_KEY 
+		= "offenderRelationshipTelephoneNumberIndex";
+	private static final String 
+		OFFENDER_RELATIONSHIP_ONLINE_ACCOUNT_INDEX_MODEL_KEY 
+		= "offenderRelationshipOnlineAccountIndex";
+	private static final String TELEPHONE_NUMBER_ITEM_INDEX_MODEL_KEY 
+		= "telephoneNumberIndex";
+	private static final String TELEPHONE_NUMBER_CATEGORY_MODEL_KEY
+		= "telephoneNumberCategories";
+	private static final String TELEPHONE_NUMBER_ITEM_MODEL_KEY
+		= "telephoneNumberItem";
+	private static final String ONLINE_ACCOUNT_ITEM_INDEX_MODEL_KEY 
+		= "onlineAccountIndex";
+	private static final String ONLINE_ACCOUNT_HOSTS_MODEL_KEY 
+		= "onlineAccountHosts";
+	private static final String ONLINE_ACCOUNT_CONTACT_ITEM_MODEL_KEY
+		= "onlineAccountContactItem";
+	private static final String ADDRESSES_MODEL_KEY
+		= "addresses";
+	private static final String BIRTH_COUNTRIES_MODEL_KEY = "birthCountries";
+	private static final String PO_BOX_COUNTRIES_MODEL_KEY = "poBoxCountries";
+	private static final String RELATIONSHIP_MODEL_KEY = "relationship";
+	private static final String EXISTING_ADDRESS_MODEL_KEY
+		= "existingAddress";
+	
+	/* Property names. */
+	private static final String ADDRESS_FIELDS_PROPERTY_NAME = "addressFields";
+	private static final String PO_BOX_FIELDS_PROPERTY_NAME = "poBoxFields";
+	private static final String PERSON_FIELDS_PROPERTY_NAME = "personFields";
+	
+	/* Report names. */
+	private static final String FAMILY_ASSOCIATION_DETAILS_REPORT_NAME 
+		= "/Relationships/Family/Family_Details_Redacted";
+	
+	/* Report runners. */
+	@Autowired
+	@Qualifier("reportRunner")
+	private ReportRunner reportRunner;
+	
+	/* PropertyEditors. */
+	@Autowired
+	@Qualifier("relationshipPropertyEditorFactory")
+	private PropertyEditorFactory relationshipPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("offenderPropertyEditorFactory")
+	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("personPropertyEditorFactory")
+	private PropertyEditorFactory personPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("countryPropertyEditorFactory")
+	private PropertyEditorFactory countryPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("statePropertyEditorFactory")
+	private PropertyEditorFactory statePropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("cityPropertyEditorFactory")
+	private PropertyEditorFactory cityPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("zipCodePropertyEditorFactory")
+	private PropertyEditorFactory zipCodePropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("addressUnitDesignatorPropertyEditorFactory")
+	private PropertyEditorFactory addressUnitDesignatorPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("streetSuffixPropertyEditorFactory")
+	private PropertyEditorFactory streetSuffixPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("onlineAccountHostPropertyEditorFactory")
+	private PropertyEditorFactory onlineAccountHostPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("datePropertyEditorFactory")
+	private CustomDateEditorFactory customDateEditorFactory;
+	
+	@Autowired
+	@Qualifier("addressPropertyEditorFactory")
+	private PropertyEditorFactory addressPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("offenderRelationshipAddressOperationPropertyEditorFactory")
+	private PropertyEditorFactory 
+		offenderRelationshipAddressOperationPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("telephoneNumberItemOperationPropertyEditorFactory")
+	private PropertyEditorFactory 
+		telephoneNumberItemOperationPropertyEditorFactory;
+
+	@Autowired
+	@Qualifier("onlineAccountContactItemOperationPropertyEditorFactory")
+	private PropertyEditorFactory 
+		onlineAccountContactItemOperationPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("telephoneNumberPropertyEditorFactory")
+	private PropertyEditorFactory telephoneNumberPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("onlineAccountPropertyEditorFactory")
+	private PropertyEditorFactory onlineAccountPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("familyAssociationPropertyEditorFactory")
+	private PropertyEditorFactory familyAssociationPropertyEditorFactory;
+		
+	/* Controller Delegates. */
+	@Autowired
+	@Qualifier("personFieldsControllerDelegate")
+	private PersonFieldsControllerDelegate personFieldsControllerDelegate;
+	
+	@Autowired
+	@Qualifier("addressFieldsControllerDelegate")
+	private AddressFieldsControllerDelegate addressFieldsControllerDelegate;
+	
+	@Autowired
+	@Qualifier("poBoxFieldsControllerDelegate")
+	private PoBoxFieldsControllerDelegate poBoxFieldsControllerDelegate;
+	
+	@Autowired
+	@Qualifier("telephoneNumberFieldsControllerDelegate")
+	private TelephoneNumberFieldsControllerDelegate 
+		telephoneNumberFieldsControllerDelegate;
+	
+	@Autowired
+	@Qualifier("onlineAccountFieldsControllerDelegate")
+	private OnlineAccountFieldsControllerDelegate 
+		onlineAccountFieldsControllerDelegate;
+	
+	/* Services. */
+	@Autowired
+	@Qualifier("updateOffenderRelationService")
+	private UpdateOffenderRelationService updateOffenderRelationService;
+	
+	@Autowired
+	@Qualifier("offenderReportService")
+	private OffenderReportService offenderReportService;
+	
+	@Autowired
+	@Qualifier("offenderSummaryModelDelegate")
+	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
+	
+	/* Validator */
+	@Autowired
+	@Qualifier("editRelationshipsFormValidator")
+	private EditRelationshipsFormValidator editRelationshipsFormValidator;
+	
+	/* Helper */
+	@Autowired
+	@Qualifier("reportControllerDelegate")
+	private ReportControllerDelegate reportControllerDelegate;
+	
+	/* Redirects. */
+	private static final String LIST_REDIRECT
+		= "redirect:/offenderRelationship/list.html?offender=%d";
+	
+	/* Report parameter names. */
+	private static final String FAMILY_MEMBER_DETAILS_ID_REPORT_PARAM_NAME 
+		= "FAMILY_ASSOC_ID";
+	
+	/**
+	 * Instantiates a default instance of offender relationship controller.
+	 */
+	public UpdateOffenderRelationController() {
+		//Default constructor
+	}
+	
+	/**
+	 * Save the edit screen for offender relationship.
+	 * 
+	 * @param result result
+	 * @param relationship relationship
+	 * @param editRelationshipsForm edit relationship form
+	 * @return model and view to redirect to list screen
+	 * @throws DuplicateEntityFoundException DuplicateEntityFoundException
+	 */
+	@RequestMapping(value = "edit.html", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_EDIT')")
+	public ModelAndView edit(
+		@RequestParam(value = "relationship", required = true)
+		final Relationship relationship,
+		final EditRelationshipsForm editRelationshipsForm,
+		final BindingResult result) 
+		throws DuplicateEntityFoundException {
+		if (editRelationshipsForm.getPoBoxFields().getCountry() != null) {
+			// Has state
+			if (this.updateOffenderRelationService.hasStates(
+				editRelationshipsForm.getPoBoxFields().getCountry())) {
+				editRelationshipsForm.getPoBoxFields().setHasState(true);
+			} else {
+				editRelationshipsForm.getPoBoxFields().setHasState(false);
+			}
+		} else {
+			editRelationshipsForm.getPoBoxFields().setHasState(true);
+		}
+		
+		this.editRelationshipsFormValidator.validate(editRelationshipsForm, 
+			result); 
+		if (result.hasErrors()) {
+			return this.prepareRedisplayEditMav(editRelationshipsForm, result, 
+				relationship);
+		}
+		
+		Boolean personFieldsNewCity = false;
+		Boolean addressFieldsNewCity = false;
+		Boolean poBoxFieldsNewCity = false;
+		if (editRelationshipsForm.getPersonFields().getNewCity()) {
+			personFieldsNewCity = true;
+		}
+		// If checkbox checked
+		if (editRelationshipsForm.getEnterAddress() != null
+			&& editRelationshipsForm.getEnterAddress()) {
+			if (editRelationshipsForm.getAddressOperation().equals(
+				OffenderRelationshipAddressOperation.NEW)
+				&& editRelationshipsForm.getAddressFields().getNewCity()) {
+				addressFieldsNewCity = true;
+			}
+		}
+		// If checkbox checked
+		if (editRelationshipsForm.getEnterPoBox() != null
+			&& editRelationshipsForm.getEnterPoBox()) {
+			if (editRelationshipsForm.getPoBoxFields().getNewCity()) {
+				poBoxFieldsNewCity = true;
+			}
+		}
+		String personFieldsNewCityName;
+		String addressFieldsNewCityName;
+		String poBoxFieldsNewCityName;
+		String personFieldsCountryName;
+		String addressFieldsCountryName;
+		String poBoxFieldsCountryName;
+		String personFieldsStateName;
+		String addressFieldsStateName;
+		String poBoxFieldsStateName;
+		// person fields create new city
+		if (personFieldsNewCity) {
+			personFieldsNewCityName = editRelationshipsForm
+				.getPersonFields().getCityName();
+			personFieldsCountryName = editRelationshipsForm
+				.getPersonFields().getBirthCountry().getName();
+			if (editRelationshipsForm.getPersonFields().getBirthState()
+				!= null) {
+				personFieldsStateName = editRelationshipsForm.getPersonFields()
+				.getBirthState().getName();
+			} else {
+				personFieldsStateName = null;
+			}
+		} else {
+			// person fields not create new city
+			personFieldsNewCityName = null;
+			if (editRelationshipsForm.getPersonFields().getBirthCountry()
+				!= null) {
+				personFieldsCountryName = editRelationshipsForm
+					.getPersonFields().getBirthCountry().getName();
+				if (editRelationshipsForm.getPersonFields().getBirthState()
+					!= null) {
+					personFieldsStateName = editRelationshipsForm
+						.getPersonFields().getBirthState().getName();
+				} else {
+					personFieldsStateName = null;
+				}
+			} else {
+				personFieldsCountryName = null;
+				personFieldsStateName = null;
+			}
+		}
+		if (addressFieldsNewCity) {
+			// Address fields creates new city
+			addressFieldsNewCityName = editRelationshipsForm
+				.getAddressFields().getCityName();
+			addressFieldsCountryName = editRelationshipsForm
+				.getAddressFields().getCountry().getName();
+			if (editRelationshipsForm.getAddressFields().getState() != null) {
+				addressFieldsStateName
+					= editRelationshipsForm.getAddressFields().getState()
+					.getName();
+			} else {
+				addressFieldsStateName = null;
+			}
+		} else {
+			// Address fields not creates new city
+			addressFieldsNewCityName = null;
+			// checked, existing
+			if (editRelationshipsForm.getEnterAddress() != null
+				&& editRelationshipsForm.getEnterAddress()
+				&& (!editRelationshipsForm.getAddressOperation().equals(
+					OffenderRelationshipAddressOperation.NEW))) {
+				if (editRelationshipsForm.getAddressFields().getCountry()
+					!= null) {
+					addressFieldsCountryName = editRelationshipsForm
+						.getAddressFields().getCountry().getName();
+					if (editRelationshipsForm.getAddressFields().getState()
+						!= null) {
+						addressFieldsStateName = editRelationshipsForm
+							.getAddressFields().getState().getName();
+					} else {
+						addressFieldsStateName = null;
+					}
+				} else {
+					addressFieldsCountryName = null;
+					addressFieldsStateName = null;
+				}
+			} else {
+				// not checked
+				addressFieldsCountryName = null;
+				addressFieldsStateName = null;
+			}
+		}
+		if (poBoxFieldsNewCity) {
+			// Po box creates new city
+			poBoxFieldsNewCityName = editRelationshipsForm.getPoBoxFields()
+				.getCityName();
+			poBoxFieldsCountryName = editRelationshipsForm.getPoBoxFields()
+				.getCountry().getName();
+			if (editRelationshipsForm.getPoBoxFields().getState() != null) {
+				poBoxFieldsStateName = editRelationshipsForm.getPoBoxFields()
+				.getState().getName();
+			} else {
+				poBoxFieldsStateName = null;
+			}
+		} else {
+			// Po box not creates new city. check box unchecked or check box 
+			// checked + "existing"
+			poBoxFieldsNewCityName = null;
+			if (editRelationshipsForm.getEnterPoBox() != null
+				&& editRelationshipsForm.getEnterPoBox()) {
+				// checked + "existing"
+				if (editRelationshipsForm.getPoBoxFields().getCountry()
+					!= null) {
+					poBoxFieldsCountryName = editRelationshipsForm
+						.getPoBoxFields().getCountry().getName();
+					if (editRelationshipsForm.getPoBoxFields().getState()
+						!= null) {
+						poBoxFieldsStateName = editRelationshipsForm
+							.getPoBoxFields().getState().getName();
+					} else {
+						poBoxFieldsStateName = null;
+					}
+				} else {
+					poBoxFieldsCountryName = null;
+					poBoxFieldsStateName = null;
+				}
+			} else {
+				// unchecked
+				poBoxFieldsCountryName = null;
+				poBoxFieldsStateName = null;
+			}
+		}
+			
+		Boolean addressFieldsNewZipCode = false;
+		Boolean poBoxFieldsNewZipCode = false;
+		String addressFieldsZipCodeValue;
+		String addressFieldsZipCodeExtension;
+		String poBoxFieldsZipCodeValue;
+		String poBoxFieldsZipCodeExtension;
+		if (editRelationshipsForm.getEnterAddress() != null
+			&& editRelationshipsForm.getEnterAddress()) {
+			// Checked
+			if (editRelationshipsForm.getAddressOperation().equals(
+				OffenderRelationshipAddressOperation.NEW)
+				&& editRelationshipsForm
+				.getAddressFields().getNewZipCode()) {
+				addressFieldsNewZipCode = true;
+				addressFieldsZipCodeValue = editRelationshipsForm
+					.getAddressFields().getZipCodeValue();
+				addressFieldsZipCodeExtension = editRelationshipsForm
+					.getAddressFields().getZipCodeExtension();
+			} else {
+				addressFieldsZipCodeValue = null;
+				addressFieldsZipCodeExtension = null;
+			}
+		} else {
+			// unchecked
+			addressFieldsZipCodeValue = null;
+			addressFieldsZipCodeExtension = null;
+		}
+		if (editRelationshipsForm.getEnterPoBox() != null
+			&& editRelationshipsForm.getEnterPoBox()) {
+			// checked
+			if (editRelationshipsForm.getPoBoxFields().getNewZipCode()) {
+				poBoxFieldsNewZipCode = true;
+				poBoxFieldsZipCodeValue = editRelationshipsForm.getPoBoxFields()
+					.getZipCodeValue();
+				poBoxFieldsZipCodeExtension = editRelationshipsForm
+					.getPoBoxFields().getZipCodeExtension();
+			} else {
+				poBoxFieldsZipCodeValue = null;
+				poBoxFieldsZipCodeExtension = null;
+			}
+		} else {
+			// unchecked
+			poBoxFieldsZipCodeValue = null;
+			poBoxFieldsZipCodeExtension = null;
+		}
+	
+		PoBox poBox = new PoBox();
+		
+		City newCreatedAddressFieldsCity;
+		City newCreatedPoBoxFieldsCity;
+		City newCreatedPersonFieldsCity;
+		
+		ZipCode newCreatedAddressFieldsZipCode;
+		ZipCode newCreatedPoBoxFieldsZipCode;
+		
+		Boolean addressPoBoxFieldsNewCity = false;
+			
+		// All three fields are going to create new cities
+		if (personFieldsNewCity && addressFieldsNewCity
+			&& poBoxFieldsNewCity) { 
+			if ((addressFieldsNewCityName.equals(poBoxFieldsNewCityName))
+				&& (addressFieldsNewCityName.equals(personFieldsNewCityName))
+				&& (addressFieldsCountryName.equals(poBoxFieldsCountryName))
+				&& (addressFieldsCountryName.equals(personFieldsCountryName))
+				&& ((addressFieldsStateName != null
+				&& personFieldsStateName != null
+				&& addressFieldsStateName.equals(personFieldsStateName))
+				|| (addressFieldsStateName == null
+				&& personFieldsStateName == null))
+				&& ((addressFieldsStateName != null
+				&& poBoxFieldsStateName != null
+				&& addressFieldsStateName.equals(poBoxFieldsStateName))
+				|| (addressFieldsStateName == null
+				&& poBoxFieldsStateName == null))) {
+		// If all new cities in address, po box and person fields are the same
+		// Create new city for all fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedAddressFieldsCity = newCreatedCity;
+				newCreatedPoBoxFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity = newCreatedCity;
+				addressPoBoxFieldsNewCity = true;
+			} else if ((addressFieldsNewCityName.equals(poBoxFieldsNewCityName))
+				&& (addressFieldsCountryName.equals(poBoxFieldsCountryName))
+				&& ((addressFieldsStateName != null
+				&& poBoxFieldsStateName != null
+				&& addressFieldsStateName.equals(poBoxFieldsStateName))
+				|| (addressFieldsStateName == null
+				&& poBoxFieldsStateName == null))
+				&& ((!addressFieldsNewCityName.equals(personFieldsNewCityName))
+				|| (!addressFieldsCountryName.equals(personFieldsCountryName))
+				|| ((addressFieldsStateName != null
+				&& personFieldsStateName != null
+				&& !addressFieldsStateName.equals(personFieldsStateName))
+				|| (addressFieldsStateName != null
+				&& personFieldsStateName == null)
+				|| (addressFieldsStateName == null
+				&& personFieldsStateName != null)))) {
+				// If poBox and address fields new cities are the same, 
+				// but different from person fields
+				City newCreatedCity = this.updateOffenderRelationService
+				// Create new city for address and poBox fields
+					.createCity(
+						addressFieldsNewCityName, 
+						editRelationshipsForm.getAddressFields().getState(),
+						editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedAddressFieldsCity = newCreatedCity;
+				newCreatedPoBoxFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity 
+					= this.updateOffenderRelationService.createCity(
+						personFieldsNewCityName, 
+						editRelationshipsForm.getPersonFields().getBirthState(),
+						editRelationshipsForm.getPersonFields()
+						.getBirthCountry()); 
+				addressPoBoxFieldsNewCity = true;
+			} else if ((addressFieldsNewCityName.equals(
+					personFieldsNewCityName))
+				&& (addressFieldsCountryName.equals(personFieldsCountryName))
+				&& (addressFieldsStateName != null
+				&& personFieldsStateName != null
+				&& addressFieldsStateName.equals(personFieldsStateName)
+				|| (addressFieldsStateName == null
+				&& personFieldsStateName == null))
+				&& ((!addressFieldsNewCityName.equals(poBoxFieldsNewCityName))
+				|| (!addressFieldsCountryName.equals(poBoxFieldsCountryName))
+				|| (addressFieldsStateName != null
+				&& poBoxFieldsStateName != null
+				&& (!addressFieldsStateName.equals(poBoxFieldsStateName))
+				|| (addressFieldsStateName != null
+				&& poBoxFieldsStateName == null)
+				|| (addressFieldsStateName == null
+				&& poBoxFieldsStateName != null)))) {
+			// If person and address fields new cities are the same, 
+			// but different from po box fields
+			// Create new city for address and person fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+						addressFieldsNewCityName, 
+						editRelationshipsForm.getAddressFields().getState(),
+						editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedPoBoxFieldsCity = this.updateOffenderRelationService
+				// Create new city for po box fields
+					.createCity(
+					poBoxFieldsNewCityName, 
+					editRelationshipsForm.getPoBoxFields().getState(),
+					editRelationshipsForm.getPoBoxFields().getCountry());
+				newCreatedAddressFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity = newCreatedCity;
+				addressPoBoxFieldsNewCity = false;
+			} else if ((personFieldsNewCityName.equals(poBoxFieldsNewCityName))
+				&& (personFieldsCountryName.equals(poBoxFieldsCountryName))
+				&& (poBoxFieldsStateName != null
+				&& personFieldsStateName != null
+				&& personFieldsStateName.equals(poBoxFieldsStateName)
+				|| (poBoxFieldsStateName == null
+				&& personFieldsStateName == null))
+				&& ((!addressFieldsNewCityName.equals(personFieldsNewCityName))
+				|| (!addressFieldsCountryName.equals(personFieldsCountryName))
+				|| (addressFieldsStateName != null
+				&& personFieldsStateName != null
+				&& (!addressFieldsStateName.equals(personFieldsStateName))
+				|| (addressFieldsStateName != null
+				&& personFieldsStateName == null)
+				|| (addressFieldsStateName == null
+				&& personFieldsStateName != null)))) {
+// If person and po box fields new cities are the same, 
+// but different from address fields
+// Create new city for person and poBox fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+					poBoxFieldsNewCityName, 
+					editRelationshipsForm.getPersonFields().getBirthState(),
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+				// Create new city for address fields
+				newCreatedAddressFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedPoBoxFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity = newCreatedCity;
+				addressPoBoxFieldsNewCity = false;
+			} else {
+				// All new cities in three fields are different
+				// Create new city for po box fields
+				newCreatedPoBoxFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					poBoxFieldsNewCityName, 
+					editRelationshipsForm.getPoBoxFields().getState(),
+					editRelationshipsForm.getPoBoxFields().getCountry());
+				// Create new city for address fields
+				newCreatedAddressFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedPersonFieldsCity 
+					= this.updateOffenderRelationService.createCity(
+					personFieldsNewCityName, 
+					editRelationshipsForm.getPersonFields().getBirthState(),
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+				addressPoBoxFieldsNewCity = false;
+			}
+		} else if (poBoxFieldsNewCity && addressFieldsNewCity
+			&& (!personFieldsNewCity)) {
+			// po box and address fields create new cities, person fields not
+			if (poBoxFieldsNewCityName.equals(addressFieldsNewCityName)
+				&& poBoxFieldsCountryName.equals(addressFieldsCountryName)
+				&& ((poBoxFieldsStateName != null
+				&& addressFieldsStateName != null
+				&& poBoxFieldsStateName.equals(addressFieldsStateName)
+				|| (poBoxFieldsStateName == null
+				&& addressFieldsStateName == null)))) {
+				// po box and address fields' new city names are same
+				// Create same new city for address and person fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+						addressFieldsNewCityName, 
+						editRelationshipsForm.getAddressFields().getState(),
+						editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedAddressFieldsCity = newCreatedCity;
+				newCreatedPoBoxFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity = null;
+				addressPoBoxFieldsNewCity = true;
+			} else {
+				// Different new cities for po box and address fields
+				newCreatedAddressFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedPoBoxFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					poBoxFieldsNewCityName, 
+					editRelationshipsForm.getPoBoxFields().getState(),
+					editRelationshipsForm.getPoBoxFields().getCountry());
+				newCreatedPersonFieldsCity = null;
+				addressPoBoxFieldsNewCity = false;
+			}
+		} else if ((!poBoxFieldsNewCity) && addressFieldsNewCity
+				&& personFieldsNewCity) {
+			// person and address fields create new cities, po box fields not
+			if (personFieldsNewCityName.equals(addressFieldsNewCityName)
+				&& personFieldsCountryName.equals(addressFieldsCountryName)
+				&& (personFieldsStateName != null
+				&& addressFieldsStateName != null
+				&& personFieldsStateName.equals(addressFieldsStateName)
+				|| (personFieldsStateName == null
+				&& addressFieldsStateName == null))) {
+				// person and address fields' new city names are same
+				// Create same new city for address and person fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedAddressFieldsCity = newCreatedCity;
+				newCreatedPoBoxFieldsCity = null;
+				newCreatedPersonFieldsCity = newCreatedCity;
+				addressPoBoxFieldsNewCity = false;
+			} else {
+				// Different new cities for person and address fields
+				newCreatedAddressFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					addressFieldsNewCityName, 
+					editRelationshipsForm.getAddressFields().getState(),
+					editRelationshipsForm.getAddressFields().getCountry());
+				newCreatedPoBoxFieldsCity = null;
+				newCreatedPersonFieldsCity 
+					= this.updateOffenderRelationService.createCity(
+					personFieldsNewCityName, 
+					editRelationshipsForm.getPersonFields().getBirthState(),
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+				addressPoBoxFieldsNewCity = false;
+			}
+		} else if (poBoxFieldsNewCity && (!addressFieldsNewCity)
+			&& personFieldsNewCity) {
+			// person and po box fields create new cities, address fields not
+			if (personFieldsNewCityName.equals(poBoxFieldsNewCityName)
+				&& personFieldsCountryName.equals(poBoxFieldsCountryName)
+				&& ((personFieldsStateName != null
+				&& poBoxFieldsStateName != null
+				&& personFieldsStateName.equals(poBoxFieldsStateName))
+				|| (personFieldsStateName == null
+				&& poBoxFieldsStateName == null))) {
+				// person and po box fields' new city names are same
+				// Create same new city for address and person fields
+				City newCreatedCity = this.updateOffenderRelationService
+					.createCity(
+					personFieldsNewCityName, 
+					editRelationshipsForm.getPersonFields().getBirthState(),
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+				newCreatedPoBoxFieldsCity = newCreatedCity;
+				newCreatedPersonFieldsCity = newCreatedCity;
+				newCreatedAddressFieldsCity = null;
+				addressPoBoxFieldsNewCity = false;
+			} else {
+				// Different new cities for person and po box fields
+				newCreatedPoBoxFieldsCity = this.updateOffenderRelationService
+					.createCity(
+					poBoxFieldsNewCityName, 
+					editRelationshipsForm.getPoBoxFields().getState(),
+					editRelationshipsForm.getPoBoxFields().getCountry());
+				newCreatedPersonFieldsCity 
+					= this.updateOffenderRelationService.createCity(
+					personFieldsNewCityName, 
+					editRelationshipsForm.getPersonFields().getBirthState(),
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+				newCreatedAddressFieldsCity = null;
+				addressPoBoxFieldsNewCity = false;
+			}
+		} else if (poBoxFieldsNewCity && (!addressFieldsNewCity)
+				&& (!personFieldsNewCity)) {
+			// po box fields create new cities, person and address fields not
+			// Create same new city for address and person fields
+			newCreatedPoBoxFieldsCity = this.updateOffenderRelationService
+				.createCity(
+				poBoxFieldsNewCityName, 
+				editRelationshipsForm.getPoBoxFields().getState(),
+				editRelationshipsForm.getPoBoxFields().getCountry());
+			newCreatedAddressFieldsCity = null;
+			newCreatedPersonFieldsCity = null;
+			addressPoBoxFieldsNewCity = false;
+		} else if ((!poBoxFieldsNewCity) && addressFieldsNewCity
+				&& (!personFieldsNewCity)) {
+			// address fields create new cities, person and po box fields not
+			// Create same new city for address and person fields
+			newCreatedAddressFieldsCity = this.updateOffenderRelationService
+				.createCity(
+				addressFieldsNewCityName, 
+				editRelationshipsForm.getAddressFields().getState(),
+				editRelationshipsForm.getAddressFields().getCountry());
+			newCreatedPoBoxFieldsCity = null;
+			newCreatedPersonFieldsCity = null;
+			addressPoBoxFieldsNewCity = false;
+		} else if (personFieldsNewCity && (!addressFieldsNewCity)
+			&& (!poBoxFieldsNewCity)) {
+			// person fields create new cities, po box and address fields not
+			newCreatedPoBoxFieldsCity = null;
+			newCreatedAddressFieldsCity = null;
+			if (editRelationshipsForm.getPersonFields().getBirthState()
+				!= null) {
+				newCreatedPersonFieldsCity = this.updateOffenderRelationService
+				.createCity(personFieldsNewCityName, 
+				editRelationshipsForm.getPersonFields().getBirthState(),
+				editRelationshipsForm.getPersonFields().getBirthCountry());
+			} else {
+				newCreatedPersonFieldsCity = this.updateOffenderRelationService
+				.createCity(personFieldsNewCityName, null,
+					editRelationshipsForm.getPersonFields().getBirthCountry());
+			}
+			addressPoBoxFieldsNewCity = false;
+		} else {
+			// None creates new city
+			newCreatedPoBoxFieldsCity = null;
+			newCreatedAddressFieldsCity = null;
+			newCreatedPersonFieldsCity = null;
+			addressPoBoxFieldsNewCity = false;
+		}
+		
+		if (addressFieldsNewZipCode && poBoxFieldsNewZipCode) {
+			// Both address and po box fields will create new zip codes
+			if (addressFieldsZipCodeValue.equals(poBoxFieldsZipCodeValue)
+				&& addressFieldsZipCodeExtension.equals(
+					poBoxFieldsZipCodeExtension)) {
+				// New zip codes in address and po box fields are same
+				if (addressPoBoxFieldsNewCity) {
+		// Both address and po box fields create new cities and they are same
+		// Create new zip code for address and po box fields 
+					ZipCode newCreatedZipCode 
+							= this.updateOffenderRelationService
+							.createZipCode(
+								editRelationshipsForm.getAddressFields()
+								.getZipCodeValue(), 
+								editRelationshipsForm.getAddressFields()
+								.getZipCodeExtension(), 
+							newCreatedPoBoxFieldsCity);
+					newCreatedAddressFieldsZipCode = newCreatedZipCode;
+					newCreatedPoBoxFieldsZipCode = newCreatedZipCode;
+					poBox.setValue(editRelationshipsForm.getPoBoxFields()
+							.getPoBoxValue());
+					poBox.setZipCode(newCreatedZipCode);
+				} else {
+			// new cities created for po box and address fields are different
+					if (newCreatedPoBoxFieldsCity != null
+							&& newCreatedAddressFieldsCity != null) {
+			// Both po box and address fields create new cities,but different
+						newCreatedAddressFieldsZipCode = 
+								this.updateOffenderRelationService
+								.createZipCode(
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeValue(), 
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeExtension(), 
+									newCreatedAddressFieldsCity);
+						newCreatedPoBoxFieldsZipCode = 
+								this.updateOffenderRelationService
+								.createZipCode(
+									editRelationshipsForm.getPoBoxFields()
+									.getZipCodeValue(), 
+									editRelationshipsForm.getPoBoxFields()
+									.getZipCodeExtension(), 
+									newCreatedPoBoxFieldsCity);
+					} else if (newCreatedPoBoxFieldsCity == null
+						&& newCreatedAddressFieldsCity != null) {
+		// Po box field does not creates new city and address fields does
+						newCreatedAddressFieldsZipCode = 
+							this.updateOffenderRelationService.createZipCode(
+								editRelationshipsForm.getAddressFields()
+									.getZipCodeValue(), 
+								editRelationshipsForm.getAddressFields()
+									.getZipCodeExtension(),
+								newCreatedAddressFieldsCity);
+						newCreatedPoBoxFieldsZipCode =
+									this.updateOffenderRelationService
+									.createZipCode(
+										editRelationshipsForm.getPoBoxFields()
+										.getZipCodeValue(),
+										editRelationshipsForm.getPoBoxFields()
+										.getZipCodeExtension(),
+										editRelationshipsForm.getPoBoxFields()
+										.getCity());
+					} else if (newCreatedPoBoxFieldsCity != null
+						&& newCreatedAddressFieldsCity == null) {
+					// Po box field creates new city and address fields does not
+						newCreatedAddressFieldsZipCode = 
+							this.updateOffenderRelationService.createZipCode(
+								editRelationshipsForm.getAddressFields()
+								.getZipCodeValue(), 
+								editRelationshipsForm.getAddressFields()
+								.getZipCodeExtension(),
+								editRelationshipsForm.getAddressFields()
+								.getCity());
+						newCreatedPoBoxFieldsZipCode = 
+							this.updateOffenderRelationService.createZipCode(
+								editRelationshipsForm.getPoBoxFields()
+								.getZipCodeValue(),
+								editRelationshipsForm.getPoBoxFields()
+								.getZipCodeExtension(),
+								newCreatedPoBoxFieldsCity);
+					} else {
+						// none create new zip code
+						if (!editRelationshipsForm.getAddressFields().getCity()
+							.equals(editRelationshipsForm.getPoBoxFields()
+							.getCity())) {
+							newCreatedAddressFieldsZipCode = 
+								this.updateOffenderRelationService
+								.createZipCode(
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeValue(), 
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeExtension(), 
+									editRelationshipsForm.getAddressFields()
+									.getCity());
+							newCreatedPoBoxFieldsZipCode = 
+								this.updateOffenderRelationService
+								.createZipCode(
+									editRelationshipsForm.getPoBoxFields()
+									.getZipCodeValue(), 
+									editRelationshipsForm.getPoBoxFields()
+									.getZipCodeExtension(), 
+									editRelationshipsForm.getPoBoxFields()
+									.getCity());
+						} else {
+							newCreatedAddressFieldsZipCode = 
+								this.updateOffenderRelationService
+								.createZipCode(
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeValue(), 
+									editRelationshipsForm.getAddressFields()
+									.getZipCodeExtension(), 
+									editRelationshipsForm.getAddressFields()
+									.getCity());
+							newCreatedPoBoxFieldsZipCode 
+								= newCreatedAddressFieldsZipCode; 
+						}
+					}
+				}
+				poBox.setValue(editRelationshipsForm.getPoBoxFields()
+					.getPoBoxValue());
+				poBox.setZipCode(newCreatedPoBoxFieldsZipCode);
+			} else {
+				// new zip codes in address and po box fields are different
+				if (newCreatedAddressFieldsCity != null) {
+					newCreatedAddressFieldsZipCode 
+						= this.updateOffenderRelationService.createZipCode(
+							editRelationshipsForm.getAddressFields()
+								.getZipCodeValue(), 
+							editRelationshipsForm.getAddressFields()
+								.getZipCodeExtension(), 
+							newCreatedAddressFieldsCity);
+				} else {
+					newCreatedAddressFieldsZipCode 
+						= this.updateOffenderRelationService.createZipCode(
+						editRelationshipsForm.getAddressFields()
+							.getZipCodeValue(), 
+						editRelationshipsForm.getAddressFields()
+							.getZipCodeExtension(), 
+						editRelationshipsForm.getAddressFields().getCity());
+				}
+				if (newCreatedPoBoxFieldsCity != null) {
+					newCreatedPoBoxFieldsZipCode 
+						= this.updateOffenderRelationService.createZipCode(
+							editRelationshipsForm.getPoBoxFields()
+								.getZipCodeValue(), 
+							editRelationshipsForm.getPoBoxFields()
+								.getZipCodeExtension(), 
+							newCreatedPoBoxFieldsCity);
+				} else {
+					newCreatedPoBoxFieldsZipCode 
+						= this.updateOffenderRelationService.createZipCode(
+						editRelationshipsForm.getPoBoxFields()
+							.getZipCodeValue(), 
+						editRelationshipsForm.getPoBoxFields()
+							.getZipCodeExtension(), 
+						editRelationshipsForm.getPoBoxFields().getCity());
+				}
+				poBox.setValue(editRelationshipsForm.getPoBoxFields()
+					.getPoBoxValue());
+				poBox.setZipCode(newCreatedPoBoxFieldsZipCode);
+			}
+		} else if (addressFieldsNewZipCode && (!poBoxFieldsNewZipCode)) {
+			// Address fields create new zip code, po box fields not
+			if (newCreatedAddressFieldsCity == null) {
+				newCreatedAddressFieldsZipCode 
+					= this.updateOffenderRelationService.createZipCode(
+					editRelationshipsForm.getAddressFields()
+						.getZipCodeValue(), 
+					editRelationshipsForm.getAddressFields()
+						.getZipCodeExtension(), 
+					editRelationshipsForm.getAddressFields().getCity());
+			} else {
+				newCreatedAddressFieldsZipCode 
+					= this.updateOffenderRelationService.createZipCode(
+					editRelationshipsForm.getAddressFields()
+						.getZipCodeValue(), 
+					editRelationshipsForm.getAddressFields()
+						.getZipCodeExtension(), 
+					newCreatedAddressFieldsCity);
+			}
+			newCreatedPoBoxFieldsZipCode = null;
+			poBox.setValue(editRelationshipsForm.getPoBoxFields()
+				.getPoBoxValue());
+			poBox.setZipCode(editRelationshipsForm.getPoBoxFields()
+				.getZipCode());
+		} else if ((!addressFieldsNewZipCode) && poBoxFieldsNewZipCode) {
+			// Po Box fields create new zip code, address fields not
+			if (newCreatedPoBoxFieldsCity == null) {
+				newCreatedPoBoxFieldsZipCode 
+					= this.updateOffenderRelationService.createZipCode(
+					editRelationshipsForm.getPoBoxFields().getZipCodeValue(), 
+					editRelationshipsForm.getPoBoxFields()
+					.getZipCodeExtension(), 
+					editRelationshipsForm.getPoBoxFields().getCity());
+			} else {
+				newCreatedPoBoxFieldsZipCode 
+					= this.updateOffenderRelationService.createZipCode(
+					editRelationshipsForm.getPoBoxFields().getZipCodeValue(), 
+					editRelationshipsForm.getPoBoxFields()
+					.getZipCodeExtension(), 
+					newCreatedPoBoxFieldsCity);
+			}
+			newCreatedAddressFieldsZipCode = null;
+			poBox.setValue(editRelationshipsForm.getPoBoxFields()
+				.getPoBoxValue());
+			poBox.setZipCode(newCreatedPoBoxFieldsZipCode);
+		} else {
+			// None create new zip codes
+			newCreatedPoBoxFieldsZipCode = null;
+			newCreatedAddressFieldsZipCode = null;
+			poBox.setValue(editRelationshipsForm.getPoBoxFields()
+				.getPoBoxValue());
+			poBox.setZipCode(editRelationshipsForm.getPoBoxFields()
+				.getZipCode());
+		}
+		
+		if (!editRelationshipsForm.getPersonFields().getNewCity()) {
+			// Exiting city
+			this.updateOffenderRelationService.updateRelation(
+				relationship.getSecondPerson(), 
+				editRelationshipsForm.getPersonFields().getLastName(), 
+				editRelationshipsForm.getPersonFields().getFirstName(), 
+				editRelationshipsForm.getPersonFields().getMiddleName(), 
+				editRelationshipsForm.getPersonFields().getSuffix(), 
+				editRelationshipsForm.getPersonFields().getSex(), 
+				editRelationshipsForm.getPersonFields().getBirthDate(), 
+				editRelationshipsForm.getPersonFields().getBirthCountry(), 
+				editRelationshipsForm.getPersonFields().getBirthState(), 
+				editRelationshipsForm.getPersonFields().getBirthCity(), 
+				editRelationshipsForm.getPersonFields()
+				.getSocialSecurityNumber(), 
+				editRelationshipsForm.getPersonFields().getStateIdNumber(), 
+				editRelationshipsForm.getPersonFields().getDeceased(), 
+				editRelationshipsForm.getPersonFields().getDeathDate());
+		} else {
+			this.updateOffenderRelationService.updateRelation(relationship
+				.getSecondPerson(), 
+				editRelationshipsForm.getPersonFields().getLastName(), 
+				editRelationshipsForm.getPersonFields().getFirstName(), 
+				editRelationshipsForm.getPersonFields().getMiddleName(), 
+				editRelationshipsForm.getPersonFields().getSuffix(), 
+				editRelationshipsForm.getPersonFields().getSex(), 
+				editRelationshipsForm.getPersonFields().getBirthDate(), 
+				editRelationshipsForm.getPersonFields().getBirthCountry(), 
+				editRelationshipsForm.getPersonFields().getBirthState(), 
+				newCreatedPersonFieldsCity,
+				editRelationshipsForm.getPersonFields()
+				.getSocialSecurityNumber(), 
+				editRelationshipsForm.getPersonFields().getStateIdNumber(), 
+				editRelationshipsForm.getPersonFields().getDeceased(), 
+				editRelationshipsForm.getPersonFields().getDeathDate());
+		}
+		
+		/* Create address. No exception */
+		Address address;
+		if (editRelationshipsForm.getEnterAddress() != null
+			&& editRelationshipsForm.getEnterAddress()) {
+			// EnterAddress check box checked
+			if (editRelationshipsForm.getAddressOperation()
+				.equals(OffenderRelationshipAddressOperation.NEW)) {
+				// New address
+				if (editRelationshipsForm.getAddressFields().getNewCity()) {
+					// New city in address fields
+				    address = this.updateOffenderRelationService.createAddress(
+				    editRelationshipsForm.getAddressFields().getValue(), 
+				    newCreatedAddressFieldsZipCode);   
+				} else {
+					// Existing city, existing zip code in address fields
+					if (newCreatedAddressFieldsZipCode == null) {
+						// Existing zip code
+					    address = this.updateOffenderRelationService
+					    	.createAddress(
+					    editRelationshipsForm.getAddressFields().getValue(), 
+					    editRelationshipsForm.getAddressFields()
+					    .getZipCode());   
+					} else {
+						// New created zip code
+					    address = this.updateOffenderRelationService
+					    	.createAddress(
+					    editRelationshipsForm.getAddressFields().getValue(), 
+					    newCreatedAddressFieldsZipCode);   
+					}
+				}
+			} else if (editRelationshipsForm.getAddressOperation()
+				.equals(OffenderRelationshipAddressOperation.CURRENT)) {
+				// New address
+				address = this.updateOffenderRelationService
+					.findMailingAddress(relationship.getSecondPerson());
+			} else {
+				// Existing address in address fields
+				address = editRelationshipsForm.getAddress();
+			}
+		} else {
+			address = null;
+		}
+		
+		/* Create contact. DuplicateEntityFoundException */
+		if ((editRelationshipsForm.getEnterAddress() != null
+			&& editRelationshipsForm.getEnterAddress())
+			&& (editRelationshipsForm.getEnterPoBox() != null
+			&& editRelationshipsForm.getEnterPoBox())) {
+			// Address, po box  both checked
+			this.updateOffenderRelationService.changeContact(relationship
+				.getSecondPerson(), poBox, address);
+		}
+		if ((editRelationshipsForm.getEnterAddress() != null
+			&& editRelationshipsForm.getEnterAddress())
+			&& ((editRelationshipsForm.getEnterPoBox() != null
+			&& !editRelationshipsForm.getEnterPoBox())
+			|| (editRelationshipsForm.getEnterPoBox() == null))) {
+			// Address checked, po box unchecked
+			this.updateOffenderRelationService.changeContact(
+				relationship.getSecondPerson(), null, address);
+		}
+		if (((editRelationshipsForm.getEnterAddress() != null
+			&& !editRelationshipsForm.getEnterAddress())
+			|| (editRelationshipsForm.getEnterAddress() == null))
+			&& (editRelationshipsForm.getEnterPoBox() != null
+			&& editRelationshipsForm.getEnterPoBox())) {
+			// Address unchecked, po box checked
+			this.updateOffenderRelationService.changeContact(
+				relationship.getSecondPerson(), poBox, null);
+		}
+		if (((editRelationshipsForm.getEnterAddress() != null
+			&& !editRelationshipsForm.getEnterAddress())
+			|| (editRelationshipsForm.getEnterAddress() == null))
+			&& ((editRelationshipsForm.getEnterPoBox() != null
+			&& !editRelationshipsForm.getEnterPoBox())
+			|| (editRelationshipsForm.getEnterPoBox() == null))) {
+			// Address, po box both unchecked
+			this.updateOffenderRelationService.changeContact(
+				relationship.getSecondPerson(), null, null);
+		}
+		
+		/* Create telephone number. DuplicateEntityFoundException */
+		List<TelephoneNumberItem> telephoneNumberItems 
+			= editRelationshipsForm.getTelephoneNumberItems();
+		int originalTotalTelepphoneNumber = this.updateOffenderRelationService
+			.findTelephoneNumbers(relationship.getSecondPerson()).size();
+		int telephoneNumberCounter = 0;
+		for (TelephoneNumberItem item : telephoneNumberItems) {
+			if ((item.getOperation() == null)
+				|| (item.getOperation().equals(
+				TelephoneNumberItemOperation.REMOVE))) {
+				if (telephoneNumberCounter < originalTotalTelepphoneNumber) {
+					this.updateOffenderRelationService.removeTelephoneNumber(
+						item.getTelephoneNumber());
+				}
+			}
+			if (item.getOperation().equals(
+					TelephoneNumberItemOperation.UPDATE)) {
+				this.updateOffenderRelationService.updateTelephoneNumber(
+					item.getTelephoneNumber(), 
+					item.getTelephoneNumberFields().getValue(), 
+					item.getTelephoneNumberFields().getExtension(), 
+					resolveCheckBoxValue(item.getTelephoneNumberFields()
+							.getPrimary()), 
+					resolveCheckBoxValue(item.getTelephoneNumberFields()
+							.getActive()),
+					item.getTelephoneNumberFields().getCategory());
+			}
+			if (item.getOperation().equals(
+					TelephoneNumberItemOperation.CREATE)) {
+				this.updateOffenderRelationService.createTelephoneNumber(
+					relationship.getSecondPerson(), 
+					item.getTelephoneNumberFields().getValue(), 
+					item.getTelephoneNumberFields().getExtension(), 
+					resolveCheckBoxValue(item.getTelephoneNumberFields()
+							.getPrimary()), 
+					resolveCheckBoxValue(item.getTelephoneNumberFields()
+							.getActive()),
+					item.getTelephoneNumberFields().getCategory());
+			}
+			telephoneNumberCounter = telephoneNumberCounter + 1;
+		}
+			
+		/* Add online account. DuplicateEntityFoundException */
+		List<OnlineAccountContactItem> onlineAccountItems 
+			= editRelationshipsForm.getOnlineAccountContactItems();
+		int originalTotalOnlineAccount = this.updateOffenderRelationService
+			.findOnlineAccounts(relationship.getSecondPerson()).size();
+		int onlineAccountCounter = 0;
+		for (OnlineAccountContactItem onlineAccountContactItem 
+			: onlineAccountItems) {
+			if (onlineAccountContactItem.getOperation().equals(
+				OnlineAccountContactItemOperation.CREATE)) {
+				this.updateOffenderRelationService.createOnlineAccount(
+						relationship.getSecondPerson(), 
+						onlineAccountContactItem.getOnlineAccountFields()
+							.getName(), 
+						onlineAccountContactItem.getOnlineAccountFields()
+							.getHost(), 
+						resolveCheckBoxValue(onlineAccountContactItem
+							.getOnlineAccountFields().getPrimary()),
+						resolveCheckBoxValue(onlineAccountContactItem
+							.getOnlineAccountFields().getActive()));
+			}
+			if (onlineAccountContactItem.getOperation()
+				.equals(OnlineAccountContactItemOperation.UPDATE)) {
+				this.updateOffenderRelationService.updateOnlineAccount(
+						onlineAccountContactItem.getOnlineAccount(), 
+						onlineAccountContactItem.getOnlineAccountFields()
+						.getName(),
+						onlineAccountContactItem.getOnlineAccountFields()
+						.getHost(), 
+						resolveCheckBoxValue(onlineAccountContactItem
+						.getOnlineAccountFields().getPrimary()),
+						resolveCheckBoxValue(onlineAccountContactItem
+						.getOnlineAccountFields().getActive()));
+			}
+			if (onlineAccountContactItem.getOperation()
+				.equals(OnlineAccountContactItemOperation.REMOVE)) {
+				if (onlineAccountCounter < originalTotalOnlineAccount) {
+					this.updateOffenderRelationService.removeOnlineAccount(
+						onlineAccountContactItem.getOnlineAccount());
+				}
+			}
+			onlineAccountCounter = onlineAccountCounter + 1;
+		}
+		Person person = relationship.getFirstPerson();
+		return new ModelAndView(String.format(LIST_REDIRECT, 
+			((Offender) (person)).getId()));
+//			((Offender) (relationship.getFirstPerson())).getId()));
+	}
+	
+	/**
+	 * Displays the specified person with information from the edit 
+	 * relationships form.
+	 * 
+	 * @param relationship relationship
+	 * @return model and view to redirect to appropriate update screen
+	 */
+	@RequestMapping(value = "edit.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_VIEW')")
+	public ModelAndView update(
+		@RequestParam(value = "relationship", required = true)
+		final Relationship relationship) {
+		EditRelationshipsForm editRelationshipsForm 
+			= new EditRelationshipsForm();
+		// Set person fields
+		PersonFields personFields = new PersonFields();
+		final List<State> personFieldsBirthStates;
+		final List<City> personFieldsBirthCities;
+		
+		if (relationship.getSecondPerson().getName() != null) {
+			personFields.setFirstName(relationship.getSecondPerson().getName()
+					.getFirstName());
+			personFields.setLastName(relationship.getSecondPerson().getName()
+					.getLastName());
+			personFields.setMiddleName(relationship.getSecondPerson().getName()
+					.getMiddleName());
+			personFields.setSuffix(relationship.getSecondPerson().getName()
+					.getSuffix());
+		}
+		if (relationship.getSecondPerson().getIdentity() != null) {
+			personFields.setBirthCity(relationship.getSecondPerson()
+					.getIdentity().getBirthPlace());
+			personFields.setBirthCountry(relationship.getSecondPerson()
+					.getIdentity().getBirthCountry());  
+			personFields.setBirthState(relationship.getSecondPerson()
+					.getIdentity().getBirthState());  
+			personFields.setBirthDate(relationship.getSecondPerson()
+					.getIdentity().getBirthDate());
+			personFields.setDeathDate(relationship.getSecondPerson()
+					.getIdentity().getDeathDate());
+			personFields.setDeceased(relationship.getSecondPerson()
+					.getIdentity().getDeceased());
+			personFields.setSex(relationship.getSecondPerson().getIdentity()
+					.getSex());
+			personFields.setSocialSecurityNumber(relationship.getSecondPerson()
+					.getIdentity().getSocialSecurityNumber());
+			personFields.setStateIdNumber(relationship.getSecondPerson()
+					.getIdentity().getStateIdNumber());
+			personFieldsBirthStates = this.updateOffenderRelationService
+				.findStates(relationship.getSecondPerson().getIdentity()
+						.getBirthCountry());
+			if (relationship.getSecondPerson().getIdentity().getBirthState()
+					!= null) {
+				personFieldsBirthCities = this.updateOffenderRelationService
+				.findCitiesByState(relationship.getSecondPerson().getIdentity()
+						.getBirthState());
+			} else {
+				personFieldsBirthCities 
+					= this.updateOffenderRelationService
+				.findCitiesByCountryWithoutState(relationship.getSecondPerson()
+				.getIdentity().getBirthCountry());
+			}
+		} else {
+			personFieldsBirthStates = Collections.emptyList();
+			personFieldsBirthCities = Collections.emptyList();
+		}
+		editRelationshipsForm.setPersonFields(personFields);
+
+		/* Set po box field */
+		PoBox poBox = this.updateOffenderRelationService.findPoBox(
+			relationship.getSecondPerson());
+		PoBoxFields poBoxFields = new PoBoxFields();
+		if (poBox != null) {
+			if (poBox.getZipCode() != null) {
+				poBoxFields.setCity(poBox.getZipCode().getCity());
+				poBoxFields.setCityName(poBox.getZipCode().getCity().getName());
+				poBoxFields.setCountry(poBox.getZipCode().getCity()
+						.getCountry());
+				poBoxFields.setState(poBox.getZipCode().getCity().getState());
+				poBoxFields.setZipCodeExtension(poBox.getZipCode()
+						.getExtension());
+				poBoxFields.setZipCodeValue(poBox.getZipCode().getValue());
+			}
+			poBoxFields.setPoBoxValue(poBox.getValue());
+			poBoxFields.setZipCode(poBox.getZipCode());
+			poBoxFields.setNewZipCode(false);
+			editRelationshipsForm.setEnterPoBox(true);
+			editRelationshipsForm.setPoBoxFields(poBoxFields);
+		} else {
+			editRelationshipsForm.setPoBoxFields(null);
+		}
+		/* Set telephone number fields */
+		List<TelephoneNumber> telephoneNumbers 
+			= this.updateOffenderRelationService.findTelephoneNumbers(
+					relationship.getSecondPerson());
+		List<TelephoneNumberItem> telephoneNumberItems 
+			= new ArrayList<TelephoneNumberItem>();
+		if (telephoneNumbers != null) {
+			for (TelephoneNumber item : telephoneNumbers) {
+				TelephoneNumberItem telephoneNumberItem 
+					= new TelephoneNumberItem();
+				telephoneNumberItem.setId(item.getId()); 
+				telephoneNumberItem.setOperation(
+					TelephoneNumberItemOperation.UPDATE);
+				TelephoneNumberFields telephoneNumberField 
+					= new TelephoneNumberFields();
+				telephoneNumberField.setCategory(item.getCategory());
+				telephoneNumberField.setExtension(item.getExtension());
+				telephoneNumberField.setPrimary(resolveCheckBoxValue(
+						item.getPrimary()));
+				telephoneNumberField.setValue(item.getValue());
+				telephoneNumberField.setCategory(item.getCategory());
+				telephoneNumberField.setActive(resolveCheckBoxValue(
+						item.getActive()));
+				telephoneNumberItem.setTelephoneNumberFields(
+						telephoneNumberField);
+				telephoneNumberItem.setTelephoneNumber(item);
+				telephoneNumberItem.setOperation(
+					TelephoneNumberItemOperation.UPDATE);
+				telephoneNumberItems.add(telephoneNumberItem);
+			}
+		}
+		editRelationshipsForm.setTelephoneNumberItems(telephoneNumberItems);
+				
+		/* Set online account fields */
+		List<OnlineAccount> onlineAccounts 
+			= this.updateOffenderRelationService.findOnlineAccounts(
+					relationship.getSecondPerson());
+		List<OnlineAccountContactItem> onlineAccountContactItems 
+			= new ArrayList<OnlineAccountContactItem>();
+		if (onlineAccounts != null) {
+			for (OnlineAccount item : onlineAccounts) {
+				OnlineAccountFields onlineAccountFields
+					= new OnlineAccountFields();
+				onlineAccountFields.setActive(item.getActive());
+				onlineAccountFields.setHost(item.getHost());
+				onlineAccountFields.setName(item.getName());
+				onlineAccountFields.setPrimary(item.getPrimary());
+				OnlineAccountContactItem onlineAccountContactItem 
+					= new OnlineAccountContactItem();
+				onlineAccountContactItem.setId(item.getId());
+				onlineAccountContactItem.setOnlineAccountFields(
+					onlineAccountFields);
+				onlineAccountContactItem.setOperation(
+					OnlineAccountContactItemOperation.UPDATE);
+				onlineAccountContactItem.setOnlineAccount(item);
+				onlineAccountContactItems.add(onlineAccountContactItem);
+			}
+		}
+		editRelationshipsForm.setOnlineAccountContactItems(
+			onlineAccountContactItems);
+		
+		/* Set address fields */
+		AddressFields addressFields = new AddressFields();
+		Address address = this.updateOffenderRelationService
+			.findMailingAddress(relationship.getSecondPerson());
+		
+		if (address != null) {
+			editRelationshipsForm.setAddressFields(addressFields);
+			editRelationshipsForm.setEnterAddress(true);
+			/* Set current address as default at edit screen */
+			editRelationshipsForm.setAddressOperation(
+				OffenderRelationshipAddressOperation.CURRENT);
+//			editRelationshipsForm.setCurrentAddress(address);
+		} else {
+			/* Set existing address as default at edit screen 
+			 * when current address does not exist*/
+			editRelationshipsForm.setAddressOperation(
+				OffenderRelationshipAddressOperation.EXISTING);
+		}
+		
+		/* Set current address as default at edit screen */
+		/*editRelationshipsForm.setAddressOperation(
+			OffenderRelationshipAddressOperation.CURRENT);*/
+		return this.prepareEditMav(editRelationshipsForm, 
+			personFieldsBirthStates, personFieldsBirthCities, relationship);
+	}
+	
+	/** returns addresses given name search criteria.
+	 * @param searchCriteria searchCriteria
+	 * @return view of...address, ..
+	 * @throws IOException  */
+	@RequestMapping(value = "/findOffenderRelationshipAddress.json", 
+		method = RequestMethod.GET)
+	@ResponseBody
+	public ModelAndView searchAddressByCriteria(
+		  @RequestParam(value = "term", required = false) 
+		 	final String searchCriteria) {
+		List<Address> addresses;
+		if (StringUtility.hasContent(searchCriteria)) {
+			addresses = this.updateOffenderRelationService
+				.findAddresses(searchCriteria);  
+		} else {
+			addresses = Collections.emptyList();
+		}
+		ModelAndView mav = new ModelAndView(ADDRESSES_VIEW_NAME);
+		mav.addObject(ADDRESSES_MODEL_KEY, addresses);
+		return mav;
+	}
+	
+	/* Helper Methods. */
+	
+	/*
+	 * Prepares a model and view for editing.
+	 * 
+	 * @param form edit relationships form
+	 * @param personFieldsBirthStates a list of states for person fields
+	 * @param personFieldsBirthCities a list of cities for person fields
+	 * @param address address
+	 * @return model and view for editing offender relationship
+	 */
+	private ModelAndView prepareEditMav(
+		final EditRelationshipsForm form,
+		final List<State> personFieldsBirthStates, 
+		final List<City> personFieldsBirthCities,
+		final Relationship relationship) {
+		ModelAndView mav = new ModelAndView(EDIT_VIEW_NAME);
+		Address address = this.updateOffenderRelationService
+			.findMailingAddress(relationship.getSecondPerson());
+		mav.addObject(EXISTING_ADDRESS_MODEL_KEY, address);
+		mav.addObject(EDIT_RELATIONSHIPS_FORM_MODEL_KEY, form);
+		mav.addObject(RELATIONSHIP_MODEL_KEY, relationship);
+
+		List<Suffix> nameSuffixes 
+			= this.updateOffenderRelationService.findNameSuffixes();
+		List<String> nameSuffixStrings 
+			= this.updateOffenderRelationService.findSuffixNames();
+		mav.addObject(NAME_SUFFIXES_MODEL_KEY, nameSuffixes);
+		mav.addObject(HOME_TYPES_MODEL_KEY, BuildingCategory.values());
+		List<StreetSuffix> streetSuffixes 
+			= this.updateOffenderRelationService.findStreetSuffixes();
+		mav.addObject(STREET_SUFFIXES_MODEL_KEY, streetSuffixes);
+		List<AddressUnitDesignator> addressUnitDesignators 
+			= this.updateOffenderRelationService.findAddressUnitDesignators();
+		mav.addObject(UNIT_DESIGNATORS_MODEL_KEY, addressUnitDesignators);
+				
+		List<Country> countries = this.updateOffenderRelationService
+			.findCountries();
+		mav.addObject(COUNTRIES_MODEL_KEY, countries);
+		mav.addObject(BIRTH_COUNTRIES_MODEL_KEY, countries);
+		mav.addObject(PO_BOX_COUNTRIES_MODEL_KEY, countries);
+		
+		List<OnlineAccountHost> onlineAccountHosts 
+			= this.updateOffenderRelationService.findOnlineAccountHosts();
+		OffenderSummary offenderSummary = this.offenderReportService
+			.summarizeOffender((Offender) (relationship.getFirstPerson()));
+		mav.addObject(OFFENDER_SUMMARY_MODEL_KEY, offenderSummary);
+		mav.addObject(OFFENDER_MODEL_KEY,
+				(Offender) (relationship.getFirstPerson()));
+		mav.addObject(RELATION_MODEL_KEY, relationship.getSecondPerson());
+		
+		mav.addObject(OFFENDER_RELATIONSHIP_TELEPHONE_NUMBER_INDEX_MODEL_KEY,
+			form.getTelephoneNumberItems().size());
+		
+		mav.addObject(OFFENDER_RELATIONSHIP_ONLINE_ACCOUNT_INDEX_MODEL_KEY, 
+			form.getOnlineAccountContactItems().size());
+		
+		ModelMap map = mav.getModelMap();
+		AddressFields addressFields = form.getAddressFields();
+		if (addressFields != null) {
+			if (addressFields.getCity() != null) {
+				if (this.updateOffenderRelationService.hasStates(
+					addressFields.getCountry())) {
+					if (addressFields.getState() != null) {
+						this.addressFieldsControllerDelegate
+							.prepareEditAddressFields(
+							map, countries, 
+							this.updateOffenderRelationService.findStates(
+							addressFields.getCountry()), 
+							this.updateOffenderRelationService
+							.findCitiesByState(
+							addressFields.getState()), 
+							this.updateOffenderRelationService.findZipCodes(
+							addressFields.getCity()), 
+							ADDRESS_FIELDS_PROPERTY_NAME);
+					} else {
+						this.addressFieldsControllerDelegate
+							.prepareEditAddressFields(
+							map, countries, 
+							this.updateOffenderRelationService.findStates(
+							addressFields.getCountry()), 
+							this.updateOffenderRelationService
+							.findCitiesByCountryWithoutState(
+							addressFields.getCountry()), 
+							this.updateOffenderRelationService.findZipCodes(
+							addressFields.getCity()), 
+							ADDRESS_FIELDS_PROPERTY_NAME);	
+					}
+				} else {
+					// No state
+					this.addressFieldsControllerDelegate
+						.prepareEditAddressFields(
+						map, countries, null, 
+						this.updateOffenderRelationService.findCitiesByCountry(
+							addressFields.getCity().getCountry()), 
+						this.updateOffenderRelationService.findZipCodes(
+							addressFields.getCity()), 
+						ADDRESS_FIELDS_PROPERTY_NAME); 
+				}
+			} else {
+				 // no city
+				if (addressFields.getCountry() != null) {
+					if (this.updateOffenderRelationService.hasStates(
+						addressFields.getCountry())) {
+						if (addressFields.getState() != null) {
+							this.addressFieldsControllerDelegate
+								.prepareEditAddressFields(
+								map, countries, 
+								this.updateOffenderRelationService
+								.findStates(addressFields.getCountry()), 
+								this.updateOffenderRelationService
+								.findCitiesByState(
+								addressFields.getState()), null, 
+								ADDRESS_FIELDS_PROPERTY_NAME);
+						} else {
+							this.addressFieldsControllerDelegate
+								.prepareEditAddressFields(
+								map, countries, 
+								this.updateOffenderRelationService
+								.findStates(addressFields.getCountry()), 
+								this.updateOffenderRelationService
+								.findCitiesByCountryWithoutState(
+								addressFields.getCountry()), null, 
+								ADDRESS_FIELDS_PROPERTY_NAME);	
+						}
+					} else {
+						// No state
+						this.addressFieldsControllerDelegate
+							.prepareEditAddressFields(
+							map, countries, null,
+							this.updateOffenderRelationService
+							.findCitiesByCountry(form.getAddressFields()
+									.getCountry()),
+							null, ADDRESS_FIELDS_PROPERTY_NAME);
+					}
+				} else {
+					// No country. Should never hit here
+					this.addressFieldsControllerDelegate
+						.prepareEditAddressFields(
+						map, countries, null, null, null, 
+						ADDRESS_FIELDS_PROPERTY_NAME);
+				}
+			}
+		} else {
+			this.addressFieldsControllerDelegate.prepareEditAddressFields(
+				map, countries, null, null, null, ADDRESS_FIELDS_PROPERTY_NAME);
+		}
+		
+		PoBoxFields poBoxFields = form.getPoBoxFields();
+		if (poBoxFields != null) {
+			if (poBoxFields.getCity() != null) {
+				if (this.updateOffenderRelationService.hasStates(
+					form.getPoBoxFields().getCountry())) {
+					if (poBoxFields.getState() != null) {
+						this.poBoxFieldsControllerDelegate
+							.prepareEditPoBoxFields(
+							map, countries, 
+							this.updateOffenderRelationService.findStates(
+								poBoxFields.getCountry()), 
+							this.updateOffenderRelationService
+							.findCitiesByState(
+								poBoxFields.getCity().getState()), 
+							this.updateOffenderRelationService.findZipCodes(
+								poBoxFields.getCity()), 
+							PO_BOX_FIELDS_PROPERTY_NAME);
+					} else {
+				    	this.poBoxFieldsControllerDelegate
+					    	.prepareEditPoBoxFields(
+							map, countries, 
+							this.updateOffenderRelationService.findStates(
+								poBoxFields.getCountry()), 
+							this.updateOffenderRelationService
+							.findCitiesByCountryWithoutState(
+								poBoxFields.getCountry()), 
+							this.updateOffenderRelationService.findZipCodes(
+								form.getPoBoxFields().getCity()), 
+							PO_BOX_FIELDS_PROPERTY_NAME);
+				    }
+				} else {
+					// No state
+					this.poBoxFieldsControllerDelegate
+						.prepareEditPoBoxFields(map, 
+						countries, null, 
+						this.updateOffenderRelationService.findCitiesByCountry(
+							poBoxFields.getCity().getCountry()), 
+						this.updateOffenderRelationService.findZipCodes(
+							poBoxFields.getCity()), 
+						PO_BOX_FIELDS_PROPERTY_NAME); 
+				}
+			} else {
+				// no city
+				if (poBoxFields.getCountry() != null) {
+					if (poBoxFields.getHasStates()) {
+						if (poBoxFields.getState() != null) {
+							this.poBoxFieldsControllerDelegate
+								.prepareEditPoBoxFields(
+									map, countries, 
+								this.updateOffenderRelationService.findStates(
+								poBoxFields.getCountry()), 
+								this.updateOffenderRelationService
+								.findCitiesByState(
+								poBoxFields.getState()), null, 
+								PO_BOX_FIELDS_PROPERTY_NAME);
+						} else {
+							this.poBoxFieldsControllerDelegate
+									.prepareEditPoBoxFields(
+										map, countries, 
+									this.updateOffenderRelationService
+									.findStates(
+									poBoxFields.getCountry()), 
+									this.updateOffenderRelationService
+								.findCitiesByCountryWithoutState(
+								poBoxFields.getCountry()), null, 
+								PO_BOX_FIELDS_PROPERTY_NAME);	
+						}
+					} else {
+						// No state
+						this.poBoxFieldsControllerDelegate
+							.prepareEditPoBoxFields(
+							map, countries, null,
+							this.updateOffenderRelationService
+							.findCitiesByCountry(poBoxFields.getCountry()),
+							null, PO_BOX_FIELDS_PROPERTY_NAME);
+					}
+				} else {
+					// No country
+					this.poBoxFieldsControllerDelegate
+						.prepareEditPoBoxFields(map, 
+						countries, null, null, null,
+						PO_BOX_FIELDS_PROPERTY_NAME);
+				}
+			}
+		} else {
+			List<State> states 
+				= this.updateOffenderRelationService.findStates(null);
+			List<City> cities 
+				= this.updateOffenderRelationService.findCitiesByState(null);
+			List<ZipCode> zipCodes 
+				= this.updateOffenderRelationService.findZipCodes(null);
+			this.poBoxFieldsControllerDelegate.prepareEditPoBoxFields(map, 
+				countries, states, cities, zipCodes, 
+				PO_BOX_FIELDS_PROPERTY_NAME);
+		}
+		
+		if (form.getPersonFields() != null) {
+			PersonFields personFields = form.getPersonFields();
+			if (personFields != null) {
+				if (personFields.getBirthCity() != null) {
+					if (this.updateOffenderRelationService.hasStates(
+						personFields.getBirthCountry())) {
+						if (personFields.getBirthState() != null) {
+							this.personFieldsControllerDelegate
+								.prepareEditPersonFields(map, nameSuffixStrings,
+									countries, 
+								this.updateOffenderRelationService.findStates(
+									personFields.getBirthCountry()),
+								this.updateOffenderRelationService
+								.findCitiesByState(
+								personFields.getBirthState()),
+								PERSON_FIELDS_PROPERTY_NAME);
+						} else {
+							this.personFieldsControllerDelegate
+								.prepareEditPersonFields(map, nameSuffixStrings,
+								countries, 
+								this.updateOffenderRelationService.findStates(
+									personFields.getBirthCountry()),
+								this.updateOffenderRelationService
+								.findCitiesByCountryWithoutState(
+								personFields.getBirthCountry()),
+								PERSON_FIELDS_PROPERTY_NAME);
+						}
+					} else {
+						// No state
+						this.personFieldsControllerDelegate
+							.prepareEditPersonFields(map, nameSuffixStrings,
+							countries,
+							null, 
+							this.updateOffenderRelationService
+							.findCitiesByCountry(personFields
+							.getBirthCountry()), 
+							PERSON_FIELDS_PROPERTY_NAME);   
+					}
+				} else {
+					// no city
+					if (personFields.getBirthCountry() != null) {
+						if (this.updateOffenderRelationService.hasStates(
+							personFields.getBirthCountry())) {
+							if (personFields.getBirthState() != null) {
+								this.personFieldsControllerDelegate.
+									prepareEditPersonFields(map,
+									nameSuffixStrings, 
+									countries, 
+									this.updateOffenderRelationService
+									.findStates(personFields.getBirthCountry()),
+									this.updateOffenderRelationService
+									.findCitiesByState(
+										personFields.getBirthState()),
+										PERSON_FIELDS_PROPERTY_NAME);
+							} else {
+								this.personFieldsControllerDelegate.
+									prepareEditPersonFields(map, 
+										nameSuffixStrings,
+									countries, 
+									this.updateOffenderRelationService
+									.findStates(personFields
+										.getBirthCountry()), 
+									this.updateOffenderRelationService
+									.findCitiesByCountryWithoutState(
+									personFields.getBirthCountry()),
+									PERSON_FIELDS_PROPERTY_NAME);
+							}
+						} else {
+							this.personFieldsControllerDelegate
+								.prepareEditPersonFields(map, nameSuffixStrings,
+									countries, 
+									null, this.updateOffenderRelationService
+									.findCitiesByCountry(personFields
+									.getBirthCountry()), 
+									PERSON_FIELDS_PROPERTY_NAME);
+						}
+					} else {
+						this.personFieldsControllerDelegate
+							.prepareEditPersonFields(map, nameSuffixStrings,
+							countries, 
+							null, null, PERSON_FIELDS_PROPERTY_NAME);
+					}
+				}
+			}
+		} else {
+			List<State> states 
+				= this.updateOffenderRelationService.findStates(null);
+			List<City> cities 
+				= this.updateOffenderRelationService.findCitiesByState(null);
+			this.personFieldsControllerDelegate.prepareEditPersonFields(map, 
+				nameSuffixStrings, countries, states, cities, 
+				PERSON_FIELDS_PROPERTY_NAME);
+		}
+
+		this.onlineAccountFieldsControllerDelegate
+			.prepareEditOnlineAccountFields(map, onlineAccountHosts);
+		this.telephoneNumberFieldsControllerDelegate
+			.prepareEditTelephoneNumberFields(map);
+		this.offenderSummaryModelDelegate.add(map,
+			(Offender) relationship.getFirstPerson());
+		return new ModelAndView(EDIT_VIEW_NAME, map);
+	}
+	
+	// Prepares redisplay edit model and view
+	private ModelAndView prepareRedisplayEditMav(
+		final EditRelationshipsForm editRelationshipsForm,
+		final BindingResult result,
+		final Relationship relationship) {
+		final List<State> personFieldsBirthStates;
+		final List<City> personFieldsBirthCities;
+		if (relationship.getSecondPerson().getIdentity() != null) {
+			personFieldsBirthStates = this.updateOffenderRelationService
+				.findStates(relationship.getSecondPerson().getIdentity()
+				.getBirthCountry());
+			if (relationship.getSecondPerson().getIdentity().getBirthState()
+				!= null) {
+				personFieldsBirthCities = this.updateOffenderRelationService
+				.findCitiesByState(relationship.getSecondPerson().getIdentity()
+				.getBirthState());
+			} else {
+				personFieldsBirthCities = this.updateOffenderRelationService
+				.findCitiesByCountry(relationship.getSecondPerson()
+				.getIdentity().getBirthCountry());
+			}
+			
+		} else {
+			personFieldsBirthStates = Collections.emptyList();
+			personFieldsBirthCities = Collections.emptyList();
+		}
+		ModelAndView mav = this.prepareEditMav(editRelationshipsForm, 
+			personFieldsBirthStates, personFieldsBirthCities, relationship); 
+		mav.addObject(BindingResult.MODEL_KEY_PREFIX
+			+ EDIT_RELATIONSHIPS_FORM_MODEL_KEY, result);
+		return mav;
+	}
+	
+	/**
+	 * Displays the action menu for the specified offender's relationships 
+	 * list screen.
+	 * 
+	 * @param offender offender
+	 * @return model and view for offender relationships action menu
+	 */
+	@RequestMapping(value = "offenderRelationListActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayOffenderRelationshipsListActionMenu(
+		@RequestParam(value = "offender", required = true)
+		final Offender offender) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		return new ModelAndView(OFFENDER_RELATION_LIST_ACTION_MENU_VIEW_NAME,
+			map);
+	}
+	
+	/**
+	 * Displays the action menu for the specified offender's relationships 
+	 * edit screen.
+	 * 
+	 * @param offender offender
+	 * @return model and view for offender relationships action menu
+	 */
+	@RequestMapping(value = "offenderRelationEditActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayOffenderRelationshipsEditActionMenu(
+		@RequestParam(value = "offender", required = true)
+		final Offender offender) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		return new ModelAndView(OFFENDER_RELATION_EDIT_ACTION_MENU_VIEW_NAME,
+			map);
+	}
+	
+	/**
+	 * Returns the state options view with a collections of state for the
+	 * specified country for person fields snippet.
+	 * 
+	 * @param country country
+	 * @param personFieldsPropertyName perdson fields property name
+	 * @return model and view to show state options
+	 */
+	@RequestMapping(value = "personFieldsEditStateOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showPersonFieldsStateOptions(
+			@RequestParam(value = "country", required = true)
+				final Country country,
+			@RequestParam(value = "personFieldsPropertyName", required = true)
+				final String personFieldsPropertyName) {
+		List<State> states 
+			= this.updateOffenderRelationService.findStates(country);
+		return this.personFieldsControllerDelegate.showStateOptions(states, 
+			personFieldsPropertyName);
+	}
+
+	/**
+	 * Returns the city options view with a collection of cities for the
+	 * specified state for person fields snippet.
+	 * 
+	 * @param state state
+	 * @param country country
+	 * @param personFieldsPropertyName person fields property name
+	 * @return model and view to show city options
+	 */
+	@RequestMapping(value = "personFieldsEditCityOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showPersonFieldsCityOptions(
+		@RequestParam(value = "state", required = false)
+			final State state,
+		@RequestParam(value = "personFieldsPropertyName", required = true)
+			final String personFieldsPropertyName,
+			@RequestParam(value = "country", required = false)
+			final Country country) {
+		if (state != null) {
+			return this.personFieldsControllerDelegate.showCityOptions(
+				this.updateOffenderRelationService.findCitiesByState(state), 
+				personFieldsPropertyName);
+		} else {
+			if (this.updateOffenderRelationService.hasStates(country)) {
+				return this.personFieldsControllerDelegate.showCityOptions(
+					this.updateOffenderRelationService
+					.findCitiesByCountryWithoutState(country), 
+					personFieldsPropertyName);
+			} else {
+				return this.personFieldsControllerDelegate.showCityOptions(
+					this.updateOffenderRelationService.findCitiesByCountry(
+					country), personFieldsPropertyName);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the state options view with a collections of state for the
+	 * specified country for address fields snippet.
+	 * 
+	 * @param country country
+	 * @param addressFieldsPropertyName address fields property name
+	 * @return model and view to show state options
+	 */
+	@RequestMapping(value = "addressFieldsEditStateOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showAddressFieldsStateOptions(
+		@RequestParam(value = "country", required = true)
+			final Country country,
+		@RequestParam(value = "addressFieldsPropertyName", required = true)
+			final String addressFieldsPropertyName) {
+		List<State> states 
+			= this.updateOffenderRelationService.findStates(country);
+		return this.addressFieldsControllerDelegate.showStateOptions(states, 
+			addressFieldsPropertyName);
+	}
+	
+	/**
+	 * Returns the city options view with a collection of cities for the
+	 * specified state for address fields snippet.
+	 * 
+	 * @param state state
+	 * @param country country
+	 * @param addressFieldsPropertyName address fields property name
+	 * @return model and view to show city options
+	 */
+	@RequestMapping(value = "addressFieldsEditCityOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showAddressFieldsCityOptions(
+		@RequestParam(value = "state", required = false)
+			final State state,
+		@RequestParam(value = "addressFieldsPropertyName", required = true)
+			final String addressFieldsPropertyName,
+				@RequestParam(value = "country", required = false)
+		final Country country) {
+		if (state != null) {
+			return this.addressFieldsControllerDelegate.showCityOptions(
+				this.updateOffenderRelationService.findCitiesByState(state),
+				addressFieldsPropertyName);
+		} else {
+			if (this.updateOffenderRelationService.hasStates(country)) {
+				return this.addressFieldsControllerDelegate.showCityOptions(
+				this.updateOffenderRelationService
+				.findCitiesByCountryWithoutState(country), 
+				addressFieldsPropertyName);
+			} else {
+				return this.addressFieldsControllerDelegate.showCityOptions(
+				this.updateOffenderRelationService.findCitiesByCountry(country),
+				addressFieldsPropertyName);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the zip code options view with a collection of zip codes for the
+	 * specified city for address field snippet.
+	 * 
+	 * @param city city
+	 * @param addressFieldsPropertyName address fields property name
+	 * @return model and view to show zip code options
+	 */
+	@RequestMapping(value = "addressFieldsEditZipCodeOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showAddressFieldsZipCodeOptions(
+		@RequestParam(value = "city", required = true)
+			final City city,
+		@RequestParam(value = "addressFieldsPropertyName", required = true)
+			final String addressFieldsPropertyName) {
+		return this.addressFieldsControllerDelegate.showZipCodeOptions(
+			this.updateOffenderRelationService.findZipCodes(city), 
+			addressFieldsPropertyName);
+	}
+	
+	/**
+	 * Returns the state options view with a collections of state for the
+	 * specified country for po box fields snippet.
+	 * 
+	 * @param country country
+	 * @param poBoxFieldsPropertyName po box fields property name
+	 * @return model and view to show state options
+	 */
+	@RequestMapping(value = "poBoxFieldsEditStateOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showPoBoxFieldsStateOptions(
+		@RequestParam(value = "country", required = true)
+			final Country country,
+		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
+			final String poBoxFieldsPropertyName) {
+		List<State> states 
+			= this.updateOffenderRelationService.findStates(country);
+		return this.poBoxFieldsControllerDelegate.showStateOptions(states, 
+			poBoxFieldsPropertyName);
+	}
+	
+	/**
+	 * Returns the city options view with a collection of cities for the
+	 * specified state for po box fields snippet.
+	 * 
+	 * @param state state
+	 * @param poBoxFieldsPropertyName po box fields property name
+	 * @param country country
+	 * @return model and view to show city options
+	 */
+	@RequestMapping(value = "poBoxFieldsEditCityOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showPoBoxFieldsCityOptions(
+		@RequestParam(value = "state", required = false)
+			final State state,
+		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
+			final String poBoxFieldsPropertyName,
+			@RequestParam(value = "country", required = false)
+		final Country country) {
+		if (state != null) {
+			return this.poBoxFieldsControllerDelegate.showCityOptions(
+				this.updateOffenderRelationService.findCitiesByState(state), 
+				poBoxFieldsPropertyName);
+		} else {
+			if (this.updateOffenderRelationService.hasStates(country)) {
+				return this.poBoxFieldsControllerDelegate.showCityOptions(
+					this.updateOffenderRelationService
+					.findCitiesByCountryWithoutState(country), 
+					poBoxFieldsPropertyName);
+			} else {
+				return this.poBoxFieldsControllerDelegate.showCityOptions(
+					this.updateOffenderRelationService.findCitiesByCountry(
+					country), poBoxFieldsPropertyName);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the zip code options view with a collection of zip codes for the
+	 * specified city for po box field snippet.
+	 * 
+	 * @param city city
+	 * @param poBoxFieldsPropertyName po box fields property name
+	 * @return model and view to show zip code options
+	 */
+	@RequestMapping(value = "poBoxFieldsEditZipCodeOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showPoBoxFieldsZipCodeOptions(
+		@RequestParam(value = "city", required = true)
+			final City city,
+		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
+			final String poBoxFieldsPropertyName) {
+		return this.addressFieldsControllerDelegate.showZipCodeOptions(
+			this.updateOffenderRelationService.findZipCodes(city), 
+			poBoxFieldsPropertyName);
+	}
+	
+	/**
+	 * Returns a view for telephone number action menu pertaining to the 
+	 * specified offender.
+	 * 
+	 * @param offender offender
+	 * @return model and view for telephone number action menu
+	 */
+	@RequestMapping(value = "/telephoneNumberEditActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView telephoneNumberActionMenu(@RequestParam(
+		value = "offender",	required = true) final Offender offender) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		return new ModelAndView(TELEPHONE_NUMBERS_ACTION_MENU_VIEW_NAME, map);
+	}	
+	
+	/**
+	 * Adds a telephone number item.
+	 * 
+	 * @param telephoneNumberItemIndex telephone number item index
+	 * @return model and view for a telephone number item view
+	 */
+	@RequestMapping(
+		value = "/addEditOffenderRelationshipTelephoneNumberItem.html", 
+		method = RequestMethod.GET)
+	public ModelAndView addTelephoneNumberItem(@RequestParam(
+		value = "telephoneNumberItemIndex", required = true)
+		final int telephoneNumberItemIndex) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(TELEPHONE_NUMBER_ITEM_INDEX_MODEL_KEY, 
+			telephoneNumberItemIndex);
+		map.addAttribute(TELEPHONE_NUMBER_CATEGORY_MODEL_KEY, 
+			TelephoneNumberCategory.values());
+		TelephoneNumberItem telephoneNumberItem = new TelephoneNumberItem();
+		telephoneNumberItem.setOperation(TelephoneNumberItemOperation.CREATE);
+		map.addAttribute(TELEPHONE_NUMBER_ITEM_MODEL_KEY, telephoneNumberItem);
+		return new ModelAndView(EDIT_TELEPHONE_NUMBER_TABLE_ROW_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Adds an online account item.
+	 * 
+	 * @param onlineAccountItemIndex online account item index
+	 * @return model and view for an email item view
+	 */
+	@RequestMapping(value = "addEditOffenderRelationshipOnlineAccountItem.html",
+		method = RequestMethod.GET)
+	public ModelAndView addEmailItem(@RequestParam(
+		value = "onlineAccountItemIndex", required = true)
+		final int onlineAccountItemIndex) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(ONLINE_ACCOUNT_ITEM_INDEX_MODEL_KEY, 
+			onlineAccountItemIndex); 
+		List<OnlineAccountHost> onlineAccountHosts 
+			= this.updateOffenderRelationService.findOnlineAccountHosts();
+		map.addAttribute(ONLINE_ACCOUNT_HOSTS_MODEL_KEY, onlineAccountHosts);
+		OnlineAccountContactItem onlineAccountContactItem 
+			= new OnlineAccountContactItem(); 
+		onlineAccountContactItem.setOperation(
+			OnlineAccountContactItemOperation.CREATE);
+		map.addAttribute(ONLINE_ACCOUNT_CONTACT_ITEM_MODEL_KEY, 
+			onlineAccountContactItem);
+		return new ModelAndView(EDIT_ONLINE_ACCOUNT_TABLE_ROW_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Returns a view for online account action menu pertaining to the specified
+	 * offender.
+	 * 
+	 * @param offender offender
+	 * @return model and view for online account action menu
+	 */
+	@RequestMapping(value = "/onlineAccountContactEditActionMenu.html",
+		method = RequestMethod.GET)
+	public ModelAndView onlineAccountContactActionMenu(@RequestParam(
+		value = "offender",	required = true) final Offender offender) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		return new ModelAndView(EMAILS_ACTION_MENU_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Remove this relationships.
+	 * 
+	 * @param relationship relationship
+	 * @return model and view to redirect to appropriate update screen
+	 */
+	@RequestMapping(value = "remove.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_REMOVE')")
+	public ModelAndView remove(
+		@RequestParam(value = "relationship", required = true)
+		final Relationship relationship) {
+		this.updateOffenderRelationService.removeRelationship(
+			(Offender) (relationship.getFirstPerson()), 
+			relationship.getSecondPerson());
+		return new ModelAndView(String.format(LIST_REDIRECT, 
+				((Offender) (relationship.getFirstPerson())).getId()));
+	}
+	
+	/**
+	 * Returns the report for family member details.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @param familyAssociation family association
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/familyAssociationDetailsReport.html",
+			method = RequestMethod.GET)
+	public ResponseEntity<byte []> reportFamilyMemberDetails(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat,
+			@RequestParam(value = "familyAssociation", required = true)
+			final FamilyAssociation familyAssociation) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(FAMILY_MEMBER_DETAILS_ID_REPORT_PARAM_NAME,
+			Long.toString(familyAssociation.getId()));
+		byte[] doc = this.reportRunner.runReport(
+			FAMILY_ASSOCIATION_DETAILS_REPORT_NAME,
+			reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+			doc, reportFormat);
+	}
+	
+	/**
+	 * Sets up and registers property editors.
+	 * 
+	 * @param binder web binder
+	 */
+	@InitBinder
+	protected void initBinder(final WebDataBinder binder) {
+		binder.registerCustomEditor(Offender.class,
+			this.offenderPropertyEditorFactory.createOffenderPropertyEditor());
+		binder.registerCustomEditor(Person.class,
+			this.personPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(StreetSuffix.class,
+			this.streetSuffixPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(AddressUnitDesignator.class,
+			this.addressUnitDesignatorPropertyEditorFactory
+			.createPropertyEditor());
+		binder.registerCustomEditor(Country.class,
+			this.countryPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(State.class,
+			this.statePropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(City.class,
+			this.cityPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(ZipCode.class,
+			this.zipCodePropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(OnlineAccountHost.class,
+			this.onlineAccountHostPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(Date.class,
+			this.customDateEditorFactory.createCustomDateOnlyEditor(true));
+		binder.registerCustomEditor(Address.class,
+			this.addressPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(OffenderRelationshipAddressOperation.class,
+			this.offenderRelationshipAddressOperationPropertyEditorFactory
+			.createPropertyEditor());
+		binder.registerCustomEditor(OnlineAccountContactItemOperation.class,
+			this.onlineAccountContactItemOperationPropertyEditorFactory
+			.createPropertyEditor());
+		binder.registerCustomEditor(TelephoneNumberItemOperation.class,
+			this.telephoneNumberItemOperationPropertyEditorFactory
+			.createPropertyEditor());
+		binder.registerCustomEditor(TelephoneNumber.class,
+			this.telephoneNumberPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(OnlineAccount.class,
+			this.onlineAccountPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(Relationship.class,
+			this.relationshipPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(FamilyAssociation.class,
+			this.familyAssociationPropertyEditorFactory.createPropertyEditor());
+	}
+	
+	// Returns true if value is true; false otherwise
+	private Boolean resolveCheckBoxValue(final Boolean value) {
+		if (value != null) {
+			return value;
+		} else {
+			return false;
+		}
+	}
+}

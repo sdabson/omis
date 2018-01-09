@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offenderflag.domain">
+	<class	entity-name="omis.offenderflag.domain.OffenderFlag"
+			proxy="omis.offenderflag.domain.OffenderFlag"
+			name="omis.offenderflag.domain.impl.OffenderFlagImpl"
+			table="`OFFENDER_FLAG`">
+	  <id name="id" column="`ID`">
+		<generator class="sequence">
+		  <param name="sequence">`OFFENDER_FLAG_SEQ`</param>
+		</generator>
+	  </id>
+	  <properties name="unqiueOffenderFlag">
+		<many-to-one name="category" entity-name="omis.offenderflag.domain.OffenderFlagCategory" not-null="true" column="`CATEGORY_ID`"/>
+		<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+      </properties>
+      <property name="value" type="yes_no" not-null="false" column="`VALUE`"/>
+      <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+	</class>
+	<query name="findOffenderFlagsByOffender"><![CDATA[
+	     select flag
+	       from omis.offenderflag.domain.OffenderFlag flag
+	      where flag.offender = :offender
+	   order by flag.category.sortOrder, flag.category.name
+	]]></query>
+	<query name="countMissingOffenderFlags"><![CDATA[
+	  select count(category)
+	    from omis.offenderflag.domain.OffenderFlagCategory category
+	   where category in (:categories)
+	     and not exists (select flag
+	                       from omis.offenderflag.domain.OffenderFlag flag
+	                      where flag.offender = :offender
+	                        and flag.category = category)
+	]]></query>
+	<query name="findOffenderFlag"><![CDATA[
+	  select flag
+	    from omis.offenderflag.domain.OffenderFlag flag
+	   where flag.offender = :offender
+	     and flag.category = :category
+	]]></query>
+	<query name="findOffenderFlagCountByOffender"><![CDATA[
+		select count(flag.id)
+		  from omis.offenderflag.domain.OffenderFlag flag
+		 where flag.offender = :offender
+		   and flag.value = true
+	]]></query>
+</hibernate-mapping>

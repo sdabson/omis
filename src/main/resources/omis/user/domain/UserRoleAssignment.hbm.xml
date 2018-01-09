@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ - Mapping and queries for user role assignments.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<class entity-name="omis.user.domain.UserRoleAssignment"
+	       proxy="omis.user.domain.UserRoleAssignment"
+	       name="omis.user.domain.impl.UserRoleAssignmentImpl"
+	       table="`USER_ROLE_ASSIGNMENT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`USER_ROLE_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueUserGroupMembership">
+			<many-to-one name="userRole" entity-name="omis.user.domain.UserRole" column="`ROLE_ID`" not-null="true"/>
+			<many-to-one name="userGroup" entity-name="omis.user.domain.UserGroup" column="`GROUP_ID`" not-null="true"/>
+		</properties>
+	</class>
+	<query name="deleteUserRoleAssignmentsByUserRole"><![CDATA[
+	  delete from omis.user.domain.UserRoleAssignment assignment
+	  where assignment.userRole = :userRole
+	]]></query>
+	<query name="deleteUserRoleAssignmentsByUserGroup"><![CDATA[
+	  delete from omis.user.domain.UserRoleAssignment assignment
+	  where assignment.userGroup = :userGroup
+	]]></query>
+	<query name="findUserRoleAssignment"><![CDATA[
+	  select assignment
+	  from omis.user.domain.UserRoleAssignment assignment
+	  where assignment.userRole = :userRole
+	    and assignment.userGroup = :userGroup
+	]]></query>
+</hibernate-mapping>

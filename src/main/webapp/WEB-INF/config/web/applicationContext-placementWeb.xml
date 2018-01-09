@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+    <!-- Validators -->
+		
+	<bean id="correctionalStatusChangeFormValidator"
+        class="omis.placement.web.validator.CorrectionalStatusChangeFormValidator"/>
+	
+	<bean id="locationChangeFormValidator"
+	    class="omis.placement.web.validator.LocationChangeFormValidator"/>
+	    
+	<bean id="programPlacementChangeFormValidator"
+	    class="omis.placement.web.validator.ProgramPlacementChangeFormValidator"/>
+	
+	<bean id="supervisoryOrganizationChangeFormValidator"
+	    class="omis.placement.web.validator.SupervisoryOrganizationChangeFormValidator"/>
+	
+	<!-- Web configuration -->
+ 		 
+ 	<context:component-scan base-package="omis.placement.web.controller"/>
+ 	
+ 	<!-- Use controller transactions -->
+	
+	<aop:config>
+	    <aop:pointcut id="placementControllerOperation" expression="execution(* omis.placement.web.controller.PlacementController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="placementControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+	    <aop:pointcut id="correctionalStatusChangeControllerOperation" expression="execution(* omis.placement.web.controller.CorrectionalStatusChangeController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="correctionalStatusChangeControllerOperation"/>
+	</aop:config>
+
+	<aop:config>
+	    <aop:pointcut id="supervisoryOrganizationChangeControllerOperation" expression="execution(* omis.placement.web.controller.SupervisoryOrganizationChangeController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="supervisoryOrganizationChangeControllerOperation"/>
+	</aop:config>
+
+	<aop:config>
+	    <aop:pointcut id="locationChangeControllerOperation" expression="execution(* omis.placement.web.controller.LocationChangeController.*(..))"/>
+	    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="locationChangeControllerOperation"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut id="programPlacementChangeControllerOperation" expression="execution(* omis.placement.web.controller.ProgramPlacementChangeController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="programPlacementChangeControllerOperation"/>
+	</aop:config>
+ 	
+ 	<!-- Summary Item -->
+ 	
+ 	<bean id="placementSummaryItem"
+  		class="omis.placement.web.summary.PlacementSummaryItem">
+  		<constructor-arg name="placementReportService" ref="placementReportService"/>
+  		<constructor-arg name="summaryItemRegistry" ref="placementSummaryItemRegistry"/>
+  		<constructor-arg name="includedPageName" value="/WEB-INF/views/placement/summary/includes/summaryItem.jsp"/>
+  		<constructor-arg name="order" value="1"/>
+  		<constructor-arg name="enabled" value="${placementSummaryItemEnabled}"/>
+    </bean>
+
+	<bean id="legacyPlacementSummaryItem"
+  		class="omis.placement.web.summary.LegacyPlacementSummaryItem">
+  		<constructor-arg name="placementReportService" ref="placementReportService"/>
+  		<constructor-arg name="summaryItemRegistry" ref="legacyPlacementSummaryItemRegistry"/>
+  		<constructor-arg name="includedPageName" value="/WEB-INF/views/placement/legacySummary/includes/summaryItem.jsp"/>
+  		<constructor-arg name="order" value="3"/>
+  		<constructor-arg name="enabled" value="${legacyPlacementSummaryItemEnabled}"/>
+    </bean>
+
+  
+   	<!-- Profile Item -->
+ 	
+ 	<bean id="placementProfileItem" class="omis.placement.web.profile.PlacementProfileItem">
+  		 <constructor-arg name="requiredAuthorizations">
+ 			<set>
+ 				<value>PLACEMENT_PROFILE_VIEW</value>
+ 				<value>ADMIN</value>
+ 			</set>
+ 		</constructor-arg>
+  		<constructor-arg name="includePage" value="/WEB-INF/views/placement/profile/includes/profileItem.jsp"/>
+  		<constructor-arg name="name" value="placement"/>
+  		<constructor-arg name="profileItemRegistry" ref="placementProfileItemRegistry"/>
+  		<constructor-arg name="placementProfileItemReportService" ref="placementProfileItemReportService"/>
+  		<constructor-arg name="enabled" value="${placementProfileItemEnabled}"/>
+  </bean>
+  
+</beans>        

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.warrant.domain">
+	<class entity-name="omis.warrant.domain.WarrantCauseViolation"
+			proxy="omis.warrant.domain.WarrantCauseViolation"
+			name="omis.warrant.domain.impl.WarrantCauseViolationImpl"
+			table="`WARRANT_CAUSE_VIOLATION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`WARRANT_CAUSE_VIOLATION_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="warrant" column="`WARRANT_ID`" entity-name="omis.warrant.domain.Warrant" not-null="true" />
+			<many-to-one name="cause" column="`WARRANT_COURT_CASE_ID`" entity-name="omis.courtcase.domain.CourtCase" not-null="true" />
+			<many-to-one name="condition" column="`CONDITION_ID`" entity-name="omis.condition.domain.Condition" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="false" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findWarrantCauseViolation"><![CDATA[
+		select warrantCauseViolation
+		from
+			omis.warrant.domain.WarrantCauseViolation warrantCauseViolation
+		where
+			warrantCauseViolation.warrant = :warrant
+		and
+			warrantCauseViolation.cause = :cause
+		and
+			warrantCauseViolation.condition = :condition
+	]]></query>
+	<query name="findWarrantCauseViolationExcluding"><![CDATA[
+		select warrantCauseViolation
+		from
+			omis.warrant.domain.WarrantCauseViolation warrantCauseViolation
+		where
+			warrantCauseViolation.warrant = :warrant
+		and
+			warrantCauseViolation.cause = :cause
+		and
+			warrantCauseViolation.condition = :condition
+		and
+			warrantCauseViolation != :warrantCauseViolation
+	]]></query>
+	
+	<query name="findWarrantCauseViolationsByWarrant"><![CDATA[
+		select warrantCauseViolation
+		from
+			omis.warrant.domain.WarrantCauseViolation warrantCauseViolation
+		where
+			warrantCauseViolation.warrant = :warrant
+	]]></query>
+</hibernate-mapping>

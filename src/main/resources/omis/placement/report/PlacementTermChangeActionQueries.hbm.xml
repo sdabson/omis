@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Queries to summarize placement term change actions.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placement.domain">
+	<query name="findPlacementTermChangeActionForSupervisoryOrganizationChange"><![CDATA[
+      select new omis.placement.report.PlacementTermChangeActionSummary(changeAction.id, changeAction.name)
+      from omis.supervision.domain.PlacementTermChangeAction changeAction
+      where changeAction in
+        (select innerChangeAction
+         from omis.supervision.domain.AllowedSupervisoryOrganizationChange allowedChange
+           inner join allowedChange.action innerChangeAction,
+           omis.supervision.domain.AllowedSupervisoryOrganizationRule rule
+         where rule.supervisoryOrganization = allowedChange.toSupervisoryOrganization
+           and rule.correctionalStatus = :correctionalStatus
+           and allowedChange.fromSupervisoryOrganization = :supervisoryOrganization
+        )
+      order by changeAction.name
+	]]></query>
+</hibernate-mapping>

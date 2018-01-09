@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.warrant.report">
+	<query name="findUnclearedWarrantSummariesByOffender"><![CDATA[
+		select new omis.warrant.report.WarrantSummary(
+			warrant.id,
+			warrant.date,
+			warrant.warrantReason,
+			(select warrantArrest.id from 
+				omis.warrant.domain.WarrantArrest warrantArrest
+				where warrantArrest.warrant = warrant)
+			)
+		from
+			omis.warrant.domain.Warrant warrant
+		where
+			warrant.offender = :offender
+		and
+			warrant not in (select warrant from 
+				omis.warrant.domain.WarrantRelease warrantRelease
+				inner join
+					warrantRelease.warrant warrant2
+				where
+					warrant2 = warrant)
+		and
+			warrant not in (select warrant from 
+				omis.warrant.domain.WarrantCancellation warrantCancellation
+				inner join
+					warrantCancellation.warrant warrant2
+				where
+					warrant2 = warrant)
+	]]></query>
+	<query name="findReleasedWarrantSummariesByOffender"><![CDATA[
+		select new omis.warrant.report.WarrantSummary(
+			warrant.id,
+			warrant.date,
+			warrant.warrantReason,
+			clearedByPersonName.lastName,
+			clearedByPersonName.firstName,
+			warrantRelease.clearSignature.date,
+			warrantRelease.id,
+			cast(null as long),
+			(select warrantArrest.id from 
+				omis.warrant.domain.WarrantArrest warrantArrest
+				where warrantArrest.warrant = warrant)
+			)
+		from
+			omis.warrant.domain.WarrantRelease warrantRelease
+		inner join
+			warrantRelease.warrant warrant
+		inner join
+			warrantRelease.clearSignature.person person
+		inner join
+			person.name clearedByPersonName
+		where
+			warrant.offender = :offender
+	]]></query>
+	<query name="findCancelledWarrantSummariesByOffender"><![CDATA[
+		select new omis.warrant.report.WarrantSummary(
+			warrant.id,
+			warrant.date,
+			warrant.warrantReason,
+			clearedByPersonName.lastName,
+			clearedByPersonName.firstName,
+			warrantCancellation.clearSignature.date,
+			cast(null as long),
+			warrantCancellation.id,
+			(select warrantArrest.id from 
+				omis.warrant.domain.WarrantArrest warrantArrest
+				where warrantArrest.warrant = warrant)
+			)
+		from
+			omis.warrant.domain.WarrantCancellation warrantCancellation
+		inner join
+			warrantCancellation.warrant warrant
+		inner join
+			warrantCancellation.clearSignature.person person
+		inner join
+			person.name clearedByPersonName
+		where
+			warrant.offender = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWork"
+		proxy="omis.health.domain.LabWork"
+		name="omis.health.domain.impl.LabWorkImpl"
+		table="`LAB_WORK`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offenderAppointmentAssociation" column="`OFFENDER_APPT_ASSOC_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.OffenderAppointmentAssociation" unique="false"/>
+		<property name="rescheduleRequired" column="`RESCHEDULE_REQUIRED`" not-null="false" type="yes_no"/>
+		<property name="schedulingNotes" column="`SCHEDULING_NOTES`" not-null="false" type="string"/>
+		<property name="sampleNotes" column="`SAMPLE_NOTES`" not-null="false" type="string"/>
+		<component name="order">
+			<many-to-one name="byAssignment" column="`BY_ASSIGNMENT_ID`" cascade="none" not-null="false"
+				entity-name="omis.health.domain.ProviderAssignment" unique="false"/>
+			<property name="date" column="`ORDER_DATE`" not-null="true"/>
+		</component>
+		<component name="results">
+			<many-to-one name="lab" column="`RESULTS_LAB_ID`" cascade="none" not-null="false"
+				entity-name="omis.health.domain.Lab" unique="false"/>
+			<property name="date" column="`RESULTS_DATE`" not-null="false" type="java.util.Date"/>
+			<property name="notes" column="`RESULTS_NOTES`" type="java.lang.String" not-null="false"/>
+		</component>
+		<component name="sampleRestrictions">
+			<property name="nothingPerOral" column="`NOTHING_PER_ORAL`" type="yes_no" not-null="false"/>
+			<property name="noLeaky" column="`NO_LEAKY`" type="yes_no" not-null="false"/>
+			<property name="noMeds" column="`NO_MEDS`" type="yes_no" not-null="false"/>
+		</component>
+		<many-to-one name="sampleLab" column="`SAMPLE_LAB_ID`" cascade="none" not-null="false"
+			entity-name="omis.health.domain.Lab" unique="false"/>
+		<many-to-one name="labWorkCategory" column="`CATEGORY_ID`" cascade="none" not-null="true"
+			entity-name="omis.health.domain.LabWorkCategory" unique="false"/>
+		<property name="sampleTaken" column="`SAMPLE_TAKEN`" not-null="false" type="yes_no"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findOffenderAppointmentAssociation"><![CDATA[
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findByLabWorkReferral"><![CDATA[
+		select
+			labWork
+		from
+			omis.health.domain.LabWorkReferralAssociation association
+		right outer join
+			association.labWork labWork
+		where
+			association.referral = :labWorkReferral
+	]]></query>
+	<query name="findRequiredLabWork"><![CDATA[
+		select
+			labWork
+		from
+			omis.health.domain.LabWorkRequirement labWorkRequirement
+		right outer join
+			labWorkRequirement.labWork labWork
+		where
+			labWorkRequirement.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findRequiredLabWorkExcluding"><![CDATA[
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation = :offenderAppointmentAssociation
+		and
+			labWork.labWorkCategory = :labWorkCategory
+		and
+			labWork.sampleLab = :sampleLab
+		and
+			labWork.results.lab = :resultsLab
+		and
+			labWork != :labWork
+	]]></query>
+	<query name="findByOffenderAppointmentAssociation"><![CDATA[
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
+	<query name="findMatchingLabWork"><![CDATA[
+		select 
+			labWork
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation = :offenderAppointmentAssociation
+		and
+			labWork.labWorkCategory = :labWorkCategory
+		and
+			labWork.sampleLab = :sampleLab
+		and
+			labWork.results.lab = :resultsLab
+	]]></query>
+	<query name="findLabWorksBYOffenderAndDate"><![CDATA[
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation.offender = :offender
+		and
+			labWork.offenderAppointmentAssociation.appointment.date = :date
+	]]></query>
+	
+	
+	
+	
+	
+	
+	<query name="findIncompleteLabWorkByOffender"><![CDATA[
+		select labWork
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation.offender = :offender
+		and
+			labWork.offenderAppointmentAssociation.appointment.facility = :facility
+		and
+			(((labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null) and (labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null))
+			or((:endDate = null) and (:startDate = null))
+			or(labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null and :endDate=null)
+			or(labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null and :startDate=null))
+		and
+			((labWork.sampleTaken = true and :sampleMustBeTaken = true) or (:sampleMustBeTaken = false or :sampleMustBeTaken = null))
+		and labWork.results.date = null
+	]]></query>
+
+	<query name="findIncompleteLabWorkByOffenderBySearch"><![CDATA[
+		select labWork
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation.offender = :offender
+		and
+			labWork.offenderAppointmentAssociation.appointment.facility = :facility
+		and
+			(((labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null) and (labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null))
+			or((:endDate = null) and (:startDate = null))
+			or(labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null and :endDate=null)
+			or(labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null and :startDate=null))
+		and
+			((labWork.sampleTaken = true and :sampleMustBeTaken = true) or ((:sampleMustBeTaken = false or :sampleMustBeTaken = null) and (labWork.sampleTaken = false or labWork.sampleTaken = null)))
+		and labWork.results.date = null	
+	]]></query>
+	<query name="findIncompleteLabWorkByFacility"><![CDATA[
+		select labWork
+		from
+			omis.health.domain.LabWork labWork
+		where
+			labWork.offenderAppointmentAssociation.appointment.facility = :facility
+		and
+			(((labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null) and (labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null))
+			or((:endDate = null) and (:startDate = null))
+			or(labWork.offenderAppointmentAssociation.appointment.date >= :startDate and :startDate !=null and :endDate=null)
+			or(labWork.offenderAppointmentAssociation.appointment.date <= :endDate and :endDate !=null and :startDate=null))
+		and
+			((labWork.sampleTaken = true and :sampleMustBeTaken = true) or (:sampleMustBeTaken = false or :sampleMustBeTaken = null))
+		and labWork.results.date = null
+	]]></query>
+	<query name="findResultLabs"><![CDATA[
+		select lab
+		from
+			omis.health.domain.Lab lab
+	]]></query>
+</hibernate-mapping>

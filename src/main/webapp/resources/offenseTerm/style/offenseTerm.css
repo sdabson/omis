@@ -1,0 +1,31 @@
+/*
+ * Styling for offense term screen.
+ *
+ * @author: Stephen Abson
+ */
+ 
+/* Allows header to be inline with section links. */ 
+form.editForm div.fieldsetSection h4 {
+	display: inline;
+}
+
+h4.hidden {
+	display: none;
+}
+
+div.fieldsetSection div.headerContent {
+	padding: 2px;
+	margin: 4px;
+}
+
+span.message {
+	margin-left: 32px;
+}
+
+span.fieldValue {
+	max-width: 15%;
+}
+
+form.editForm table.listTable {
+	width: 100%;
+}

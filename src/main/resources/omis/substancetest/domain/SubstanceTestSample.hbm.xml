@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substancetest.domain">
+	<class entity-name="omis.substancetest.domain.SubstanceTestSample"
+			proxy="omis.substancetest.domain.SubstanceTestSample"
+			name="omis.substancetest.domain.impl.SubstanceTestSampleImpl"
+			table="`SUBSTANCE_TEST_SAMPLE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SUBSTANCE_TEST_SAMPLE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`"
+				not-null="true" />
+			<property name="collectionDate" column="`COLLECTION_DATE`" not-null="true" />
+			<many-to-one name="collectionEmployee" column="`COLLECT_EMP_ID`"
+				not-null="true" />
+			<many-to-one name="sampleCollectionMethod" column="`SAMPLE_COLLECTION_ID`"
+				not-null="true" />
+			<property name="random" column="`RANDOM`" not-null="false" type="yes_no"/>
+			<many-to-one name="substanceTestReason" column="`REASON_ID`"
+				not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+					 not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findSamplesByOffender">
+	from
+		omis.substancetest.domain.SubstanceTestSample sample
+	where
+		sample.offender = :offender
+	</query>
+	<query name="findSubstanceTestSample"><![CDATA[
+	from
+		omis.substancetest.domain.SubstanceTestSample sample
+	where
+		sample.offender = :offender
+	and
+		sample.collectionDate = :collectionDate
+	and
+		sample.sampleCollectionMethod = :collectionMethod
+	]]></query>
+	<query name="findSubstanceTestSampleExcluding"><![CDATA[
+	from
+		omis.substancetest.domain.SubstanceTestSample sample
+	where
+		sample.offender = :offender
+	and
+		sample.collectionDate = :collectionDate
+	and
+		sample.sampleCollectionMethod = :collectionMethod
+	and
+		sample <> :sample
+	]]></query>
+	<query name="findLastSubstanceTestDateByOffender"><![CDATA[
+		 select max(substanceTestSample.collectionDate)
+		   from omis.substancetest.domain.SubstanceTestSample substanceTestSample
+		  where substanceTestSample.offender = :offender  
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.ConditionGroup"
+	       proxy="omis.condition.domain.ConditionGroup"
+	       name="omis.condition.domain.impl.ConditionGroupImpl"
+	       table="`CONDITION_GROUP`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CONDITION_GROUP_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<property name="name" type="java.lang.String" column="`NAME`" not-null="true"></property>
+		</properties>
+	</class>
+	<query name="findUnusedConditionGroupsByAgreement"><![CDATA[
+		select conditionGroup
+		from
+			omis.condition.domain.ConditionGroup conditionGroup
+		where
+			conditionGroup not in
+				(select conditionGroup2
+					from
+						omis.condition.domain.Condition condition
+					inner join
+						condition.agreement agreement
+					inner join
+						condition.conditionClause conditionClause,
+						omis.condition.domain.ConditionGroupClause conditionGroupClause
+					inner join
+						conditionGroupClause.conditionClause conditionClause2
+					inner join
+						conditionGroupClause.conditionGroup conditionGroup2
+					where
+						agreement = :agreement
+					and
+						conditionClause = conditionClause2)
+	]]></query>
+	<query name="findUsedConditionGroupsByAgreement"><![CDATA[
+		select conditionGroup
+		from
+			omis.condition.domain.Condition condition
+		inner join
+			condition.agreement agreement
+		inner join
+			condition.conditionClause conditionClause,
+			omis.condition.domain.ConditionGroupClause conditionGroupClause
+		inner join
+			conditionGroupClause.conditionClause conditionClause2
+		inner join
+			conditionGroupClause.conditionGroup conditionGroup
+		where
+			agreement = :agreement
+		and
+			conditionClause = conditionClause2
+	]]></query>
+</hibernate-mapping>

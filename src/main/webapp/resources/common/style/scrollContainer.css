@@ -1,0 +1,81 @@
+/* Scroll container styling.
+ * Author: Ryan Johns
+ * Version: 0.1.0 (Nov 22, 2014) */
+ 
+ .left_arrow:before {
+ 	content: url('../images/arrowLeft.png');
+}
+
+.left_arrow {
+	cursor:pointer;
+	
+	margin:0px;
+	overflow:hidden;
+	float:left;
+} 
+ 
+ .right_arrow:before {
+ 	content: url('../images/arrowRight.png');
+ 	;
+}
+
+.right_arrow {
+	cursor:pointer;
+	margin:0px;
+	overflow:hidden;
+	float:right;
+	right:24px;
+}
+
+.removeAll:before {
+	content: "[Close all tabs]";
+	
+}
+
+.removeAll {
+	cursor: pointer;
+	float:right;
+	right:0px;
+}
+
+.up_arrow:before {
+	content: url('../images/arrowUp.png');
+}
+
+.up_arrow {
+	cursor:pointer;
+	float:top;
+	top:0px;
+	left:50%;
+	margin:0px;
+	overflow:hidden;
+}
+
+.down_arrow:before {
+	content: url('../images/arrowDown.png');
+}
+
+.down_arrow {
+	cursor:pointer;
+	position:relative;
+	bottom:0px;
+	left:50%;
+	margin:0px;
+	overflow:hidden;
+}
+
+.scrollContainer {
+  z-index: 48;
+  padding: 0;
+  margin:0;
+  height:29px;
+  overflow-y:visible;
+  width:89%;
+  display:inline;
+ }
+ 
+ .split .scrollContainer {
+	width: 87%
+}
+
+

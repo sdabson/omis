@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+  <!-- Data access object -->
+  
+  <bean id="jailDao" class="omis.jail.dao.impl.hibernate.JailDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.jail.domain.Jail"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="jailDelegate" class="omis.jail.service.delegate.JailDelegate">
+    <constructor-arg name="jailDao" ref="jailDao"/>
+    <constructor-arg name="jailInstanceFactory" ref="jailInstanceFactory"/>
+  </bean>
+  
+  
+  <!-- Property Editors -->
+  <bean id="jailPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="jailDao"/>
+    <constructor-arg name="entityName" value="omis.jail.domain.Jail"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+	<bean id="jailInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.jail.domain.Jail" />
+	</bean>
+</beans>

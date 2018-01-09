@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+  <!-- Validators -->
+  
+  <bean id="staffTitleFormValidator" class="omis.staff.web.validator.StaffTitleFormValidator"/>
+  
+  <bean id="staffAssignmentFormValidator" class="omis.staff.web.validator.StaffAssignmentFormValidator"/>
+  
+  <bean id="staffSearchFormValidator" class="omis.staff.web.validator.StaffSearchFormValidator"/>
+  
+  <!-- Web configuration -->
+	
+  <context:component-scan base-package="omis.staff.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="staffTitleControllerOperation" expression="execution(* omis.staff.web.controller.StaffTitleController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="staffTitleControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="staffModuleControllerOperation" expression="execution(* omis.staff.web.controller.StaffModuleController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="staffModuleControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="staffSearchControllerOperation" expression="execution(* omis.staff.web.controller.StaffSearchController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="staffSearchControllerOperation"/>
+  </aop:config>
+  
+</beans>

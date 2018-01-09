@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  <bean id="documentTrackingService" class="omis.trackeddocument.service.impl.DocumentTrackingServiceImpl">
+    <constructor-arg name="trackedDocumentCategoryDelegate" ref="trackedDocumentCategoryDelegate"/>
+    <constructor-arg name="trackedDocumentReceivalDelegate" ref="trackedDocumentReceivalDelegate"/>
+    <constructor-arg name="docketDelegate" ref="docketDelegate"/>
+    <constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+  </bean>
+  
+  <bean id="docketDocumentTrackingReportService" class="omis.trackeddocument.report.impl.hibernate.DocketDocumentTrackingReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Service delegates -->
+  <bean id="trackedDocumentCategoryDelegate"
+        class="omis.trackeddocument.service.delegate.TrackedDocumentCategoryDelegate">
+        <constructor-arg name="trackedDocumentCategoryDao" ref="trackedDocumentCategoryDao"/>
+        <constructor-arg name="trackedDocumentCategoryInstanceFactory" ref="trackedDocumentCategoryInstanceFactory"/>
+  </bean>
+  
+   <bean id="trackedDocumentReceivalDelegate"
+        class="omis.trackeddocument.service.delegate.TrackedDocumentReceivalDelegate">
+        <constructor-arg name="trackedDocumentReceivalDao" ref="trackedDocumentReceivalDao"/>
+        <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        <constructor-arg name="trackedDocumentReceivalInstanceFactory" ref="trackedDocumentReceivalInstanceFactory"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="trackedDocumentCategoryDao" class="omis.trackeddocument.dao.impl.hibernate.TrackedDocumentCategoryDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentCategory"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="trackedDocumentReceivalDao" class="omis.trackeddocument.dao.impl.hibernate.TrackedDocumentReceivalDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentReceival"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  <bean id="trackedDocumentCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentCategory"/>
+  </bean>
+  
+  <bean id="trackedDocumentReceivalInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentReceival"/>
+  </bean>
+  
+  <!--Property editor factories -->
+   <bean id="trackedDocumentReceivalPropertyEditorFactory"
+    	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentReceival"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="trackedDocumentReceivalDao"/>
+	</bean>
+	<bean id="trackedDocumentCategoryPropertyEditorFactory"
+    	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="entityName" value="omis.trackeddocument.domain.TrackedDocumentCategory"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		<constructor-arg name="dao" ref="trackedDocumentCategoryDao"/>
+	</bean>
+</beans>

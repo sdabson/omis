@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.AgreementNote"
+	       proxy="omis.condition.domain.AgreementNote"
+	       name="omis.condition.domain.impl.AgreementNoteImpl"
+	       table="`AGREEMENT_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`AGREEMENT_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<many-to-one name="agreement" class="omis.condition.domain.Agreement" column="`AGREEMENT_ID`" not-null="true"/>
+			<property name="date" column="`DATE`" not-null="true"/>
+			<property name="description" type="java.lang.String" not-null="true" column="`DESCRIPTION`"/>
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class> 
+	<query name="findAgreementNote"><![CDATA[
+	  	select agreementNote 
+	  		from omis.condition.domain.AgreementNote agreementNote
+	  	where 
+	  		agreementNote.agreement = :agreement
+    	and 
+    		agreementNote.date = :date
+	    and 
+	    	agreementNote.description = :description
+	]]></query>
+	<query name="findAgreementNoteExcluding"><![CDATA[
+		select agreementNote 
+			from omis.condition.domain.AgreementNote agreementNote
+		where 
+			agreementNote.agreement = :agreement
+	    and 
+	    	agreementNote.date = :date
+	    and 
+	    	agreementNote.description = :description
+	    and 
+	    	agreementNote != :agreementNote
+	]]></query>
+	<query name="findAgreementNotesByAgreement"><![CDATA[
+	  	select agreementNote 
+	  		from omis.condition.domain.AgreementNote agreementNote
+	  	where 
+	  		agreementNote.agreement = :agreement
+	]]></query>
+</hibernate-mapping>

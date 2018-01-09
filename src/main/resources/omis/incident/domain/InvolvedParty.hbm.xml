@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.incident.domain">
+	<typedef name="involvedPartyCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.incident.domain.InvolvedPartyCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.incident.domain.InvolvedParty"
+		proxy="omis.incident.domain.InvolvedParty"
+		name="omis.incident.domain.impl.InvolvedPartyImpl"
+		table="`INVOLVED_PARTY`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INVOLVED_PARTY_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" column="`PERSON_ID`" cascade="none" not-null="true" entity-name="omis.person.domain.Person"/>
+		<property name="category" column="`CATEGORY`" not-null="true" type="involvedPartyCategory"/>
+		<many-to-one name="statement" column="`STATEMENT_ID`" cascade="none" not-null="true" entity-name="omis.incident.domain.IncidentStatement"/>
+		<property name="narrative" column="`NARRATIVE`" not-null="false" type="string"/>
+		<component name="verificationSignature" class="omis.audit.domain.VerificationSignature">
+		    <property name="result" column="`VERIFICATION_RESULT`" type="yes_no" not-null="true"/>
+			<many-to-one name="method" entity-name="omis.audit.domain.VerificationMethod" not-null="true" column="`VERIFICATION_METHOD_ID`"/>
+	  	</component>
+	  	<property name="name" column="`NAME`" not-null="false" type="string"/>
+	</class>
+	<query name="findInvolvedParty"><![CDATA[
+		select
+			involvedParty
+		from
+			omis.incident.domain.InvolvedParty involvedParty 
+		where
+			involvedParty.statement = :statement
+		and
+			involvedParty.person = :person
+		order by
+			involvedParty.person
+	]]></query>
+	<query name="findInvolvedPartyExcluding"><![CDATA[
+		select
+			involvedParty
+		from
+			omis.incident.domain.InvolvedParty involvedParty 
+		where
+			involvedParty.statement = :statement
+		and
+			involvedParty.person = :person
+		and
+			involvedParty <> :involvedParty
+		order by
+			involvedParty.person
+	]]></query>
+	<query name="findInvolvedParties"><![CDATA[
+		select involvedParty
+		from
+			omis.incident.domain.InvolvedParty involvedParty 
+		where
+			involvedParty.statement = :incidentStatement
+	]]></query>
+</hibernate-mapping>

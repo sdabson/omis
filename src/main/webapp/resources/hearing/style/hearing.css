@@ -1,0 +1,90 @@
+.violations{
+	min-height: 100px;
+	padding-bottom: 20px;
+}
+
+.scheduledViolations{
+	padding-bottom: 10px;
+}
+
+.detailsLabel, .summarizeMessage{
+	font-weight: bold;
+}
+
+.detail{
+	margin-right: 1%;
+}
+
+.hearingDetails .detailsLabel::after{
+	content: " : ";
+}
+
+.summarizeMessage{
+	float: left;
+	margin-bottom: 10px;
+}
+
+span.oneline{
+	text-align:right;
+	width: 100%;
+	float: left;
+	clear: both;
+}
+
+span.onelineHalf{
+	width: 45%;
+	
+}
+span.oneline label {
+	width: 20%;
+	white-space: nowrap;
+	margin-right: 2%;
+	float:left;
+}
+
+span.oneline span.detail{
+	float: left;
+	max-width: 60%;
+	margin-bottom: 2px;
+}
+
+.selectionError{
+	display: inherit;
+	float: left;
+	font-size: 76%;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #D8000C;
+}
+
+.violationDescription{
+	padding-top: 20px;
+}
+
+.violationDescriptionNoOverflow{
+	display: inline-block;
+	overflow:hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 500px;
+}
+
+.violationDescriptionShow{
+	display: inline-block;
+	width: 500px;
+}
+.showOverflow, .hideOverflow {
+	display: none;
+}
+.showOverflow:after{
+	content: url('../../common/images/arrowRight.png');
+}
+.showOverflow:hover{
+	cursor: pointer;
+}
+.hideOverflow:after{
+	content: url('../../common/images/arrowLeft.png');
+}
+.hideOverflow:hover{
+	cursor: pointer;
+}

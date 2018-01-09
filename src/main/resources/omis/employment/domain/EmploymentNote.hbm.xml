@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.domain">
+	<class entity-name="omis.employment.domain.EmploymentNote"
+		proxy="omis.employment.domain.EmploymentNote"
+		name="omis.employment.domain.impl.EmploymentNoteImpl"
+		table="`EMPLOYMENT_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EMPLOYMENT_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="employmentTerm" column="`EMPLOYMENT_TERM_ID`" cascade="none" not-null="true"
+			entity-name="omis.employment.domain.EmploymentTerm" unique="false"/>
+		<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+		<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`NTE_CREATE_ACCOUNT_ID`"
+				 not-null="true"/>
+			<property name="date" column="`NTE_CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`NTE_UPDATE_ACCOUNT_ID`"
+				 not-null="true"/>
+			<property name="date" column="`NTE_UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+
+	<query name="findEmploymentNote"><![CDATA[
+		select employmentNote
+		from
+			omis.employment.domain.EmploymentNote employmentNote
+		where
+			employmentNote.employmentTerm = :term
+		and
+			employmentNote.date = :date
+		and
+			employmentNote.value = :value
+	]]></query>   
+	
+	<query name="findEmploymentNoteExluding"><![CDATA[
+		select employmentNote
+		from
+			omis.employment.domain.EmploymentNote employmentNote
+		where
+			employmentNote.employmentTerm = :term
+		and
+			employmentNote.date = :date
+		and
+			employmentNote.value = :value
+		and
+			employmentNote <> :excludedNote
+	]]></query>
+	
+	<query name="findEmploymentNotes"><![CDATA[
+		select employmentNote
+		from
+			omis.employment.domain.EmploymentNote employmentNote
+		where
+			employmentNote.employmentTerm = :term
+		order by employmentNote.date
+	]]></query>
+</hibernate-mapping>

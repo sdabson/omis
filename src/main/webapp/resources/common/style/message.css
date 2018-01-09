@@ -1,0 +1,40 @@
+/*
+ * Message styling.
+ *
+ * Author: Stephen Abson
+ */
+
+#modalArea {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+#modalLayer {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+#modalMessage {
+	width: 200px;
+	height: 75px;
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 200px;
+	border: 1px solid;
+}
+
+#modalMessageText, #modalMessageButtons {
+	padding: 4px;
+	margin: 0px;
+}

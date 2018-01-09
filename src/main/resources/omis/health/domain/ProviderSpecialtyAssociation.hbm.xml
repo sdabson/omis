@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ProviderSpecialtyAssociation"
+		proxy="omis.health.domain.ProviderSpecialtyAssociation"
+		name="omis.health.domain.impl.ProviderSpecialtyAssociationImpl"
+		table="`PROVIDER_SPECIALTY_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PROVIDER_SPECIALTY_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="providerAssignment" column="`PROVIDER_ASSIGNMENT_ID`" 
+			cascade="none" not-null="true" entity-name="omis.health.domain.ProviderAssignment"
+			unique="false"/>
+		<many-to-one name="specialty" column="`PROVIDER_SPECIALTY_ID`" cascade="none" 
+			not-null="true" entity-name="omis.health.domain.ProviderSpecialty" unique="false"/>
+	</class>
+</hibernate-mapping>

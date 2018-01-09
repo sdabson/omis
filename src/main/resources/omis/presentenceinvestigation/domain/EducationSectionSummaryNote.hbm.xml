@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.EducationSectionSummaryNote"
+			proxy="omis.presentenceinvestigation.domain.EducationSectionSummaryNote"
+			name="omis.presentenceinvestigation.domain.impl.EducationSectionSummaryNoteImpl"
+			table="`EDUCATION_SCTN_SMMRY_NTE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`EDUCATION_SCTN_SMMRY_NTE_SEQ`</param>
+				</generator>
+			</id>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<many-to-one name="educationSectionSummary" column="`EDUCATION_SCTN_SMMRY_ID`" entity-name="omis.presentenceinvestigation.domain.EducationSectionSummary" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findEducationSectionSummaryNote"><![CDATA[
+		select educationSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.EducationSectionSummaryNote educationSectionSummaryNote
+		where
+			educationSectionSummaryNote.description = :description
+		and
+			educationSectionSummaryNote.date = :date
+		and
+			educationSectionSummaryNote.educationSectionSummary = :educationSectionSummary
+	]]></query>
+	<query name="findEducationSectionSummaryNoteExcluding"><![CDATA[
+		select educationSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.EducationSectionSummaryNote educationSectionSummaryNote
+		where
+			educationSectionSummaryNote.description = :description
+		and
+			educationSectionSummaryNote.date = :date
+		and
+			educationSectionSummaryNote.educationSectionSummary = :educationSectionSummary
+		and
+			educationSectionSummaryNote != :educationSectionSummaryNote
+	]]></query>
+	<query name="findByEducationSectionSummary"><![CDATA[
+		select educationSectionSummaryNote
+		from
+			omis.presentenceinvestigation.domain.EducationSectionSummaryNote educationSectionSummaryNote
+		where
+			educationSectionSummaryNote.educationSectionSummary = :educationSectionSummary
+	]]></query>
+</hibernate-mapping>

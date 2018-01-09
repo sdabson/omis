@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Security configuration.
+  -
+  - Author: Stephen Abson
+  -->
+<beans:beans
+    xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+  <!-- Security properties -->
+  
+  <beans:bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  	<beans:property name="locations">
+  		<beans:list>
+  			<beans:value>classpath:security.properties</beans:value>
+  		</beans:list>
+  	</beans:property>
+  </beans:bean>
+
+  <!--
+    - Hibernate mapping locations
+    -
+    - Security configuration requires access attempt, user and their
+    - dependencies.
+    -->
+
+  <util:list id="hibernateMappingLocations">
+    <beans:value>classpath:/omis/person/domain/*.hbm.xml</beans:value>
+    <beans:value>classpath:/omis/user/domain/*.hbm.xml</beans:value>
+    <beans:value>classpath:/omis/security/domain/*.hbm.xml</beans:value>
+    <beans:value>classpath:/omis/country/domain/*.hbm.xml</beans:value>
+    <beans:value>classpath:/omis/region/domain/*.hbm.xml</beans:value>
+  </util:list>
+
+  <!-- Imports -->
+  
+  <beans:import resource="applicationContext-sessionFactory.xml"/>
+  
+  <beans:import resource="module/applicationContext-accessAttempt.xml"/>
+  
+  <beans:import resource="module/applicationContext-person.xml"/>
+  
+  <beans:import resource="module/applicationContext-user.xml"/>
+   
+  <!-- Services -->
+
+  <beans:bean id="accessAttemptLogger"
+        class="omis.security.service.impl.AccessAttemptLoggerImpl">
+    <beans:constructor-arg name="accessAttemptDao" ref="accessAttemptDao"/>
+    <beans:constructor-arg name="accessAttemptInstanceFactory" ref="accessAttemptInstanceFactory"/>
+    <beans:constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+  </beans:bean>
+
+  <!-- Web security configuration -->
+
+  <beans:bean id="omisUrlAuthenticationSuccessHandler"
+        class="omis.security.handler.OmisUrlAuthenticationSuccessHandler">
+     <beans:property name="defaultTargetUrl" value="/index.html"/>
+     <beans:property name="accessAttemptLogger" ref="accessAttemptLogger"/>
+  </beans:bean>
+  
+    <beans:bean id="omisUrlAuthenticationFailureHandler"
+        class="omis.security.handler.OmisUrlAuthenticationFailureHandler">
+     <beans:property name="defaultFailureUrl" value="/login.html?badCredentials=true"/>
+     <beans:property name="accessAttemptLogger" ref="accessAttemptLogger"/>
+  </beans:bean>
+
+  <http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
+  	<form-login
+			authentication-failure-handler-ref="omisUrlAuthenticationFailureHandler"
+			authentication-success-handler-ref="omisUrlAuthenticationSuccessHandler"
+			login-page="/login.html"
+  			login-processing-url="/j_spring_security_check"/>
+  	<logout
+  			logout-success-url="/login.html"
+  			logout-url="/j_spring_security_logout"/>
+  	<access-denied-handler error-page="/accessDenied.html"/>
+    <custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
+    <session-management session-authentication-strategy-ref="sas"/>
+  </http>
+  
+  <authentication-manager>
+       <ldap-authentication-provider user-search-filter="(${ldap.username.attribute}={0})"
+                                     group-search-base="${ldap.group.search.base}"
+                                     group-search-filter="(${ldap.group.search.filter}={0})"
+                                     group-role-attribute="${ldap.group.role.attribute}"
+                                     role-prefix="none"/>
+  </authentication-manager>
+
+  <beans:bean id="accessDecisionManager"
+      class="org.springframework.security.access.vote.AffirmativeBased">
+    <beans:property name="decisionVoters">
+      <beans:list>
+        <beans:bean
+          class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
+        <beans:bean class="org.springframework.security.access.vote.RoleVoter">
+                <beans:property name="rolePrefix" value=""/>
+        </beans:bean>
+        <beans:bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+
+  <!--  Security configuration -->
+  
+  <global-method-security pre-post-annotations="enabled"/>
+
+  <beans:bean id="concurrencyFilter"
+              class="org.springframework.security.web.session.ConcurrentSessionFilter">
+    <beans:property name="sessionRegistry" ref="sessionRegistry" />
+    <beans:property name="expiredUrl" value="/sessionExpired.html" />
+  </beans:bean>
+  
+  <beans:bean id="sas"
+              class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
+    <beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+    <beans:property name="maximumSessions" value="1" />
+  </beans:bean>
+
+  <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+  
+  <!-- Use controller transactions -->
+  <aop:config>
+      <aop:pointcut id="omisUrlAuthenticationFailureHandlerOperation" expression="execution(* omis.security.handler.OmisUrlAuthenticationFailureHandler.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="omisUrlAuthenticationFailureHandlerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="omisUrlAuthenticationSuccessHandlerOperation" expression="execution(* omis.security.handler.OmisUrlAuthenticationSuccessHandler.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="omisUrlAuthenticationSuccessHandlerOperation"/>
+  </aop:config>
+  
+  <!-- Beans for dev profile -->
+  
+  <beans:beans profile="dev">
+    <ldap-server url="${ldap.server.url}"
+                 manager-dn="#{systemProperties['omis.auth.manager-dn']}"
+                 manager-password="#{systemProperties['omis.auth.manager-password']}"/>
+  </beans:beans>
+  
+  <!-- Beans for standalone profile -->
+  
+  <beans:beans profile="standalone">
+    <ldap-server ldif="classpath:directory.ldif" root="${ldap.root}"/>
+  </beans:beans>
+  
+  <!-- Beans for test profile -->
+  
+  <beans:beans profile="test">
+    <ldap-server url="${ldap.server.url}"
+                 manager-dn="#{systemProperties['omis.auth.manager-dn']}"
+                 manager-password="#{systemProperties['omis.auth.manager-password']}"/>
+  </beans:beans>
+  
+    <!-- Beans for preprod profile -->
+  
+  <beans:beans profile="preprod">
+    <ldap-server url="${ldap.server.url}"
+                 manager-dn="#{systemProperties['omis.auth.manager-dn']}"
+                 manager-password="#{systemProperties['omis.auth.manager-password']}"/>
+  </beans:beans>
+  
+  <!-- Beans for prod profile -->
+  
+  <beans:beans profile="prod">
+    <ldap-server url="${ldap.server.url}"
+                 manager-dn="#{systemProperties['omis.auth.manager-dn']}"
+                 manager-password="#{systemProperties['omis.auth.manager-password']}"/>
+  </beans:beans>
+  
+</beans:beans>

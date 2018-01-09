@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+          
+  <!--  Instance factories. -->
+  
+  <bean id="userAccountInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserAccount"/>
+  </bean>
+  
+  <bean id="userGroupInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserGroup"/>
+  </bean>
+  
+  <bean id="userRoleInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserRole"/>
+  </bean>
+  
+  <bean id="usedPasswordInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UsedPassword"/>
+  </bean>
+
+  <bean id="userGroupMembershipInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserGroupMembership"/>
+  </bean>
+  
+  <bean id="userRoleAssignmentInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserRoleAssignment"/>
+  </bean>
+  
+  <!-- Report services -->
+  <bean id="userAccountProfileItemReportService"
+  	class="omis.user.report.impl.hibernate.UserAccountProfileItemReportServiceHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	</bean>
+  <!-- Helper classes -->
+  
+  <bean id="userAccountDelegate"
+        class="omis.user.service.delegate.UserAccountDelegate">
+    <constructor-arg name="userAccountDao" ref="userAccountDao"/>
+    <constructor-arg name="userAccountInstanceFactory" ref="userAccountInstanceFactory"/>
+    <constructor-arg name="caseSensitiveUsername" value="false"/>
+    <constructor-arg name="allowPassword" value="false"/>
+    <constructor-arg name="maxAttempts" value="3"/>
+  </bean>
+
+  <bean id="monthlyPasswordExpirationDateCalculatorDelegate"
+        class="omis.user.service.delegate.MonthlyPasswordExpirationDateCalculatorDelegate">
+    <constructor-arg name="monthsUntilExpiration" value="3"/>
+  </bean>
+
+  <!-- Data access objects -->
+
+  <bean id="userAccountDao"
+        class="omis.user.dao.impl.hibernate.UserAccountDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserAccount"/>
+  </bean>
+  
+  <bean id="userGroupDao"
+        class="omis.user.dao.impl.hibernate.UserGroupDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserGroup"/>
+  </bean>
+
+  <bean id="userRoleDao"
+        class="omis.user.dao.impl.hibernate.UserRoleDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserRole"/>
+  </bean>
+  
+  <bean id="usedPasswordDao"
+        class="omis.user.dao.impl.hibernate.UsedPasswordDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UsedPassword"/>
+  </bean>
+
+  <bean id="userGroupMembershipDao"
+        class="omis.user.dao.impl.hibernate.UserGroupMembershipDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserGroupMembership"/>
+  </bean>
+  
+  <bean id="userRoleAssignmentDao"
+        class="omis.user.dao.impl.hibernate.UserRoleAssignmentDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserRoleAssignment"/>
+  </bean>
+  
+  <!-- Password encoder -->
+  
+  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+
+  <!-- Factory beans for user account property editors -->
+  
+  <bean id="userAccountPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="userAccountDao"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserAccount"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="userGroupPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="userGroupDao"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserGroup"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="userRolePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="userRoleDao"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UserRole"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="usedPasswordPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="usedPasswordDao"/>
+    <constructor-arg name="entityName" value="omis.user.domain.UsedPassword"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

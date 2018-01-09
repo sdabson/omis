@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<class entity-name="omis.victim.domain.VictimNote"
+	       proxy="omis.victim.domain.VictimNote"
+	       name="omis.victim.domain.impl.VictimNoteImpl"
+	       table="`VICTIM_NOTE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VICTIM_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueVictimNote">
+			<many-to-one name="victim" entity-name="omis.person.domain.Person" not-null="true" column="`VICTIM_ID`"/>
+			<many-to-one name="category" entity-name="omis.victim.domain.VictimNoteCategory" not-null="true" column="`CATEGORY_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+		</properties>
+		<many-to-one name="association" entity-name="omis.victim.domain.VictimAssociation" not-null="false" column="`ASSOCIATION_ID`"/>
+		<property name="value" type="string" not-null="true" column="`VALUE`"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+	</class>
+	<query name="findVictimNote"><![CDATA[
+	  select note
+	  from omis.victim.domain.VictimNote note
+	  where note.victim = :victim
+	    and note.category = :category
+	    and note.date = :date
+	]]></query>
+	<query name="findVictimNoteExcluding"><![CDATA[
+	  select note
+	  from omis.victim.domain.VictimNote note
+	  where note.victim = :victim
+	    and note.category = :category
+	    and note.date = :date
+	    and note not in (:excludedNotes)
+	]]></query>
+	<query name="findVictimNoteByVictim"><![CDATA[
+	  select note
+	  from omis.victim.domain.VictimNote note
+	  where note.victim = :victim
+	]]></query>
+	<query name="findVictimNotesByAssociation"><![CDATA[
+	  select note
+	  from omis.victim.domain.VictimNote note
+	  where note.association = :association
+	  order by note.date, note.category.sortOrder, note.category.name
+	]]></query>
+	<query name="countVictimNotesByAssociation"><![CDATA[
+	  select count(note)
+	  from omis.victim.domain.VictimNote note
+	    inner join note.association association
+	  where association = :association
+	]]></query>
+</hibernate-mapping>

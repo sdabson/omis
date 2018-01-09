@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboarditinerary.domain">
+	<class	entity-name="omis.paroleboarditinerary.domain.BoardMeetingSite"
+			proxy="omis.paroleboarditinerary.domain.BoardMeetingSite"
+			name="omis.paroleboarditinerary.domain.impl.BoardMeetingSiteImpl"
+			table="`BOARD_MEETING_SITE`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`BOARD_MEETING_SITE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="boardItinerary" entity-name="omis.paroleboarditinerary.domain.ParoleBoardItinerary" not-null="true" column="`PAROLE_BOARD_ITINERARY_ID`"/>
+		<many-to-one name="location" entity-name="omis.location.domain.Location" not-null="false" column="`LOCATION_ID`"/>
+		<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
+		<property name="order" type="java.lang.Integer" not-null="false" column="`ORDER`"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findBoardMeetingSite"><![CDATA[
+		select boardMeetingSite
+		from omis.paroleboarditinerary.domain.BoardMeetingSite boardMeetingSite
+		where
+			boardMeetingSite.boardItinerary = :boardItinerary
+		and
+			(boardMeetingSite.location = :location
+			or (boardMeetingSite.location is null and :location is null))
+			
+		and
+			boardMeetingSite.date = :date
+		and
+			(boardMeetingSite.order = :order
+			or (boardMeetingSite.order is null and :order is null))
+	]]></query>
+	<query name="findBoardMeetingSiteExcluding"><![CDATA[
+		select boardMeetingSite
+		from omis.paroleboarditinerary.domain.BoardMeetingSite boardMeetingSite
+		where
+			boardMeetingSite.boardItinerary = :boardItinerary
+		and
+			(boardMeetingSite.location = :location
+			or (boardMeetingSite.location is null and :location is null))
+			
+		and
+			boardMeetingSite.date = :date
+		and
+			(boardMeetingSite.order = :order
+			or (boardMeetingSite.order is null and :order is null))
+		and
+			boardMeetingSite <> :excludedBoardMeetingSite
+	]]></query>
+	<query name="findBoardMeetingSiteByBoardItinerary"><![CDATA[
+		select boardMeetingSite
+		from omis.paroleboarditinerary.domain.BoardMeetingSite boardMeetingSite
+		where
+			boardMeetingSite.boardItinerary = :boardItinerary
+		order by boardMeetingSite.order
+	]]></query>
+</hibernate-mapping>

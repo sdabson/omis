@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.bedplacement.domain">
+<query name="findBedPlacementByOffenderAndDate">
+<!--  Queries bed placement by offender and date.
+   	  Driving tables are  -->
+<![CDATA[
+	  select new omis.bedplacement.report.BedPlacementSummary(bp.id,
+			     bed.number, room.name, section.name, 
+		  		 unit.name, level.name, 
+		  		 case
+		  		 	when unitComplex is not null then unitComplex.name
+		  		 	when sectionComplex is not null then sectionComplex.name
+		  		 	when levelComplex is not null then levelComplex.name
+		  		 	when roomComplex is not null then roomComplex.name
+		  		 end,
+		  		 case
+		  		 	when unitFacility is not null then unitFacility.name
+		  		 	when sectionFacility is not null then sectionFacility.name
+		  		 	when levelFacility is not null then levelFacility.name
+		  		 	when roomFacility is not null then roomFacility.name
+		  		 	else 
+		  		 		case
+		  		 			when unitComplexFacility is not null then unitComplexFacility.name
+		  		 			when unitFacility is not null then unitFacility.name
+		  		 			when sectionComplexFacility is not null then sectionComplexFacility.name
+		  		 			when sectionFacility is not null then sectionFacility.name
+		  		 			when levelComplexFacility is not null then levelComplexFacility.name
+		  		 			when levelFacility is not null then levelFacility.name
+		  		 			when roomComplexFacility is not null then roomComplexFacility.name
+		  		 			when roomFacility is not null then roomFacility.name
+		  		 		end
+		  		 end)
+		    from omis.bedplacement.domain.BedPlacement bp
+right outer join bp.offender o
+ left outer join bp.bed bed
+ left outer join bed.room room
+ left outer join room.facility roomFacility
+ left outer join room.complex roomComplex
+ left outer join roomComplex.facility roomComplexFacility
+ left outer join room.level level
+ left outer join level.complex levelComplex
+ left outer join levelComplex.facility levelComplexFacility
+ left outer join level.facility levelFacility
+ left outer join room.section section
+ left outer join section.unit unit
+ left outer join section.complex sectionComplex
+ left outer join section.facility sectionFacility
+ left outer join sectionComplex.facility sectionComplexFacility
+ left outer join unit.complex unitComplex
+ left outer join unit.facility unitFacility
+ left outer join unitComplex.facility unitComplexFacility
+		   where o = :offender
+		     and ((bp.dateRange.startDate <= :date
+		      or bp.dateRange.startDate is null)
+		     and (bp.dateRange.endDate >= :date
+		      or bp.dateRange.endDate is null))	
+		 order by case when bp.confirmed = 'Y' then 0 else 1 end	 
+]]></query>
+<query name="findHousingUnitNameByOffenderOnDate"><![CDATA[
+		select
+			unit.name
+		from
+			omis.bedplacement.domain.BedPlacement bp
+			inner join bp.bed bed
+			inner join bed.room room
+			inner join room.unit unit
+		where
+			bp.offender = :offender
+		and
+			bp.dateRange.startDate <= :date
+		and
+			(bp.dateRange.endDate is null or bp.dateRange.endDate >= :date)
+	]]></query>
+<sql-query name="findLegacyUnitNameByOffender">
+	select LEGACY_FIND_OFNDR_UNIT_NAME(:offenderNumber) from dual
+</sql-query>
+</hibernate-mapping>

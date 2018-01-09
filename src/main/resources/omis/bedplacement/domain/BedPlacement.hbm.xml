@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.bedplacement.domain">
+	<class entity-name="omis.bedplacement.domain.BedPlacement"
+		proxy="omis.bedplacement.domain.BedPlacement"
+		name="omis.bedplacement.domain.impl.BedPlacementImpl"
+		table="BED_PLACEMENT">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`BED_PLACEMENT_SEQ`</param>
+			</generator>
+		</id>
+	<component name="dateRange">
+					<property name="startDate" column="`START_DATE`" not-null="true" unique-key="uk1"/>
+					<property name="endDate" column="`END_DATE`" not-null="false"/>
+	</component>
+	<many-to-one name="offender" not-null="true" column="`OFFENDER_ID`"
+		entity-name="omis.offender.domain.Offender"  unique-key="uk1"/>
+	<many-to-one name="bedPlacementReason" not-null="true" column="`BED_PLACEMENT_REASON_ID`"
+		entity-name="omis.bedplacement.domain.BedPlacementReason"  unique-key="uk1" />
+	<property name="description" column="`DESCRIPTION`" not-null="false" type="string"/>
+	<property name="confirmed" column="`CONFIRMED`"
+	type="yes_no" not-null="true"/>
+	<many-to-one name="bed" not-null="true" column="`BED_ID`"
+		entity-name="omis.facility.domain.Bed" unique-key="uk1"/>
+	<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/>
+	</component>
+	<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+					 not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+	</component>
+	</class>
+	<query name="findBedPlacementsWithinDateRange"><![CDATA[
+		from
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where
+			bedPlacement.offender = :offender
+		and
+			(bedPlacement.dateRange.startDate < :endDate
+		     or 
+		    (bedPlacement.dateRange.startDate is null or :endDate is null))
+		and 
+			(bedPlacement.dateRange.endDate > :startDate
+		     or 
+		    (bedPlacement.dateRange.endDate is null or :startDate is null))
+		and
+			bedPlacement.confirmed = true
+	]]></query>
+	<query name="findBedPlacementsWithinDateRangeExcluding"><![CDATA[
+		from
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where
+			bedPlacement.offender = :offender
+		and
+			(bedPlacement.dateRange.startDate < :endDate
+		     or 
+		    (bedPlacement.dateRange.startDate is null or :endDate is null))
+		and 
+			(bedPlacement.dateRange.endDate > :startDate
+		     or 
+		    (bedPlacement.dateRange.endDate is null or :startDate is null))
+		and
+			bedPlacement <> :bedPlacement
+		and
+			bedPlacement.confirmed = true
+	]]></query>
+	<query name="findBedPlacementByOffenderAndDateRange"><![CDATA[
+		from 
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where 
+			bedPlacement.offender = :offender
+		and
+			(bedPlacement.dateRange.startDate = :startDate
+			or
+			(bedPlacement.dateRange.startDate is null
+			and
+			:startDate is null))
+		and
+			(bedPlacement.dateRange.endDate = :endDate
+			or
+			(bedPlacement.dateRange.endDate is null
+			 and
+			 :endDate is null))
+		order by
+			bedPlacement.dateRange.startDate desc
+	]]></query>
+	<query name="findBedPlacementByOffenderAndDateRangeExcluding"><![CDATA[
+		from 
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where 
+			bedPlacement.offender = :offender
+		and
+			(bedPlacement.dateRange.startDate = :startDate
+			or
+			(bedPlacement.dateRange.startDate is null
+			and
+			:startDate is null))
+		and
+			(bedPlacement.dateRange.endDate = :endDate
+			or
+				(bedPlacement.dateRange.endDate is null
+			 	and
+				:endDate is null))
+		and
+			bedPlacement <> :bedPlacement
+		order by
+			bedPlacement.dateRange.startDate desc
+	]]></query>
+	<query name="findBedPlacementsByOffender">
+	from 
+		omis.bedplacement.domain.BedPlacement bedPlacement
+	where 
+		bedPlacement.offender = :offender
+	order by
+		bedPlacement.dateRange.startDate desc
+	</query>
+	<query name="findBedPlacementByOffenderOnDate">
+	from 
+		omis.bedplacement.domain.BedPlacement bedPlacement
+	where 
+		bedPlacement.offender = :offender
+	and 
+		bedPlacement.dateRange.endDate > :date
+	or  
+		bedPlacement.offender = :offender
+	and 
+		bedPlacement.dateRange.endDate is null
+	and  
+		bedPlacement.confirmed = true
+	</query>
+	<query name="findSpecificBedPlacementsByFacility"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.facility = :facility
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	]]> 
+	</query>
+	<query name="findPlannedBedPlacements"><![CDATA[
+		select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.facility = :facility
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = false
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsByFacility"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.facility = :facility
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsByComplex"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.complex = :complex
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsByUnit"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.unit = :unit
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsByLevel"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.level = :level
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsBySection"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room.section = :section
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findSpecificOccupiedBedsByRoom"><![CDATA[
+	select
+		bedPlacement
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+		inner join bedPlacement.bed as bed
+	where
+		bed.room = :room
+	and 
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate >= :date
+		or
+		bedPlacement.dateRange.endDate = null)
+	and 
+		bedPlacement.confirmed = true
+	]]>
+	</query>
+	<query name="findConfirmedBedPlacementByOffenderOnDate"><![CDATA[
+	from
+		omis.bedplacement.domain.BedPlacement bedPlacement
+	where
+		bedPlacement.offender = :offender
+	and
+		bedPlacement.dateRange.startDate <= :date
+	and
+		(bedPlacement.dateRange.endDate is null 
+		or 
+		bedPlacement.dateRange.endDate > :date)
+	and
+		bedPlacement.confirmed = true
+	]]></query>
+	<query name="findConfirmedBedPlacementByBedOnDate"><![CDATA[
+		from
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where
+			bedPlacement.dateRange.startDate <= :date
+		and
+			(bedPlacement.dateRange.endDate is null
+			or
+			bedPlacement.dateRange.endDate > :date)
+		and
+			bedPlacement.bed = :bed
+		and
+			bedPlacement.confirmed = true
+		and
+			bedPlacement.offender <> :offender
+	]]></query>
+	<query name="findConfirmedBedPlacementByBedOnDateExcluding"><![CDATA[
+		from
+			omis.bedplacement.domain.BedPlacement bedPlacement
+		where
+			bedPlacement.dateRange.startDate <= :date
+		and
+			(bedPlacement.dateRange.endDate is null
+			or
+			bedPlacement.dateRange.endDate > :date)
+		and
+			bedPlacement.bed = :bed
+		and
+			bedPlacement.confirmed = true
+		and
+			bedPlacement <> :bedPlacement
+	]]></query>
+	<query name="findBedPlacementCountByOffenderAndDate"><![CDATA[
+	 select count(bedPlacement.id)
+	   from omis.bedplacement.domain.BedPlacement bedPlacement
+	  where bedPlacement.offender = :offender
+		and (bedPlacement.dateRange.startDate <= :effectiveDate
+		 or (bedPlacement.dateRange.startDate is null))
+		and (bedPlacement.dateRange.endDate > :effectiveDate
+		 or (bedPlacement.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

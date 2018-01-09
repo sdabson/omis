@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.substancetest.domain">
+		<class entity-name="omis.substancetest.domain.TestKitParameter"
+				proxy="omis.substancetest.domain.TestKitParameter"
+				name="omis.substancetest.domain.impl.TestKitParameterImpl"
+				table="`TEST_KIT_PARAMETER`">
+				<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`TEST_KIT_PARAMETER_SEQ`</param>
+					</generator>
+				</id>
+				<many-to-one name="substance" column="`SUBSTANCE_ID`"
+					not-null="true" />
+				<many-to-one name="testKit" column="`TEST_KIT_ID`"
+					not-null="true" />
+				<many-to-one name="defaultResultValue" column="`DEFAULT_RESULT_VALUE_ID`" cascade="none" not-null="false"
+					entity-name="omis.substancetest.domain.SubstanceTestResultValue" unique="false"/>
+				<property name="valid" column="`VALID`" type="yes_no"
+					not-null="true"/>
+		</class>
+		<query name="findParametersByKit">
+			from
+				omis.substancetest.domain.TestKitParameter testKitParameter
+			where
+				testKitParameter.testKit = :testKit
+			and
+				testKitParameter.valid = true
+			order by
+				testKitParameter.substance.name asc
+		</query>
+	</hibernate-mapping>

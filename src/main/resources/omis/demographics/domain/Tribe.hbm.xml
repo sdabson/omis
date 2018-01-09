@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.demographics.domain">
+	<class entity-name="omis.demographics.domain.Tribe"
+		   proxy="omis.demographics.domain.Tribe"
+		   name="omis.demographics.domain.impl.TribeImpl"
+	       table="`TRIBE`">
+	    <cache usage="transactional" region="demographics"/>
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TRIBE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String"
+				  not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findTribes" cacheable="true" cache-region="demographics"><![CDATA[
+	  select tribe from omis.demographics.domain.Tribe tribe order by tribe.name
+	]]></query>
+</hibernate-mapping>

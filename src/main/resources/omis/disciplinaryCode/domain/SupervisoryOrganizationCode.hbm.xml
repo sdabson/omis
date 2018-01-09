@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.disciplinaryCode.domain">
+	<class entity-name="omis.disciplinaryCode.domain.SupervisoryOrganizationCode"
+			proxy="omis.disciplinaryCode.domain.SupervisoryOrganizationCode"
+			name="omis.disciplinaryCode.domain.impl.SupervisoryOrganizationCodeImpl"
+			table="`SUPERVISORY_ORGANZTN_CD`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SUPERVISORY_ORGANZTN_CD_SEQ`</param>
+				</generator>
+			</id>
+			
+			<many-to-one name="supervisoryOrganization" column="`SUPERVISORY_ORGANIZATION_ID`" entity-name="omis.supervision.domain.SupervisoryOrganization" />
+			<component name="dateRange">
+				<property name="startDate" column="`START_DATE`" type="java.util.Date"/>
+				<property name="endDate" column="`END_DATE`" type="java.util.Date"/>
+			</component>
+			<many-to-one name="code" column="`DISCIPLINARY_CODE_ID`" entity-name="omis.disciplinaryCode.domain.DisciplinaryCode" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findSupervisoryOrganizationCode"><![CDATA[
+		select supervisoryOrganizationCode
+		from
+			omis.disciplinaryCode.domain.SupervisoryOrganizationCode supervisoryOrganizationCode
+		where
+			supervisoryOrganizationCode.supervisoryOrganization = :supervisoryOrganization
+		and
+			supervisoryOrganizationCode.code = :code
+	]]></query>
+	<query name="findSupervisoryOrganizationCodeExcluding"><![CDATA[
+		select supervisoryOrganizationCode
+		from
+			omis.disciplinaryCode.domain.SupervisoryOrganizationCode supervisoryOrganizationCode
+		where
+			supervisoryOrganizationCode.supervisoryOrganization = :supervisoryOrganization
+		and
+			supervisoryOrganizationCode.code = :code
+		and
+			supervisoryOrganizationCode != :supervisoryOrganizationCode
+	]]></query>
+	
+	
+</hibernate-mapping>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+   	<!-- Profile Item -->
+	<bean id="workAssignmentProfileItem"
+	      class="omis.workassignment.web.profile.WorkAssignmentProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+				<value>WORK_ASSIGNMENT_LIST</value>
+				<value>ADMIN</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/workAssignment/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="workAssignment"/>
+		<constructor-arg name="profileItemRegistry" ref="placementProfileItemRegistry"/>
+		<constructor-arg name="workAssignmentProfileItemReportService" ref="workAssignmentProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${workAssignmentProfileItemEnabled}"/>
+	</bean>
+	
+	<!-- Summary Item -->
+	<bean id="workAssignmentSummaryItem"
+    	class="omis.workassignment.web.summary.WorkAssignmentSummaryItem">
+    	<constructor-arg name="workAssignmentSummaryItemReportService" ref="workAssignmentSummaryItemReportService"/>
+    	<constructor-arg name="summaryItemRegistry" ref="facilitySummaryItemRegistry"/>
+    	<constructor-arg name="includedPageName" value="/WEB-INF/views/workAssignment/summary/includes/summaryItem.jsp"/>
+    	<constructor-arg name="order" value="2"/>
+    	<constructor-arg name="enabled" value="${workAssignmentSummaryItemEnabled}"/>
+    </bean>
+	
+	
+   <!--  Validator -->
+   <bean id="workAssignmentFormValidator"
+        class="omis.workassignment.web.validator.WorkAssignmentFormValidator">
+        <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+        <constructor-arg name="workAssignmentNoteItemValidatorDelegate" ref="workAssignmentNoteItemValidatorDelegate"/>
+  </bean> 
+  
+  <!--  Validator delegate -->
+  <bean id="workAssignmentNoteItemValidatorDelegate"
+	     class="omis.workassignment.web.validator.delegate.WorkAssignmentNoteItemValidatorDelegate"/>
+  
+  <!-- Web controller packages -->
+  
+  <context:component-scan base-package="omis.workassignment.web.controller"/>
+  
+   <!-- Use controller transactions -->
+  <aop:config>
+      <aop:pointcut id="workAssignmentControllerOperation" expression="execution(* omis.workassignment.web.controller.WorkAssignmentController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="workAssignmentControllerOperation"/>
+  </aop:config>
+  
+</beans>        

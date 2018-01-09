@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.contact.domain">
+	<class entity-name="omis.contact.domain.Contact"
+		proxy="omis.contact.domain.Contact"
+		name="omis.contact.domain.impl.ContactImpl"
+		table="`CONTACT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CONTACT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="person" column="`PERSON_ID`" cascade="none" not-null="true"	entity-name="omis.person.domain.Person" unique="true"/>
+		<many-to-one name="mailingAddress" column="`MAILING_ADDRESS_ID`" cascade="none" not-null="false" entity-name="omis.address.domain.Address" unique="false"/>
+		<component name="poBox" class="omis.contact.domain.component.PoBox">
+			<property name="value" type="java.lang.String" column="`PO_BOX_VALUE`" not-null="false"/>
+			<many-to-one name="zipCode" entity-name="omis.address.domain.ZipCode" column="`PO_BOX_ZIP_CODE_ID`" not-null="false"/>
+		</component>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	
+	<query name="findContact"><![CDATA[
+		select contact 
+		from omis.contact.domain.Contact contact
+		where
+			contact.person = :person
+	]]></query>
+	
+	<query name="findContactsByPerson"><![CDATA[
+		select contact 
+		from omis.contact.domain.Contact contact
+		where
+			contact.person = :person
+	]]></query>
+	
+	<query name="findContactExcluding"><![CDATA[
+		select contact from omis.contact.domain.Contact contact
+	  where contact.person = :person
+	    and contact <> :excludedContact
+	]]></query>
+</hibernate-mapping>

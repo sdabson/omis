@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Imports -->
+  
+  <import resource="applicationContext-stringLengthChecks.xml"/>
+  
+  <!-- MVC interceptors -->
+  
+  <mvc:interceptors>
+    <bean class="org.springframework.orm.hibernate4.support.OpenSessionInViewInterceptor">
+      <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+  </mvc:interceptors>
+  
+  <!--Web configuration -->
+
+  <bean
+      class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+    <property name="prefix" value="/WEB-INF/views/"/>
+    <property name="suffix" value=".jsp"/>
+  </bean>
+  
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+  </bean>
+
+  <!-- Helpers -->
+  
+  <bean id="auditComponentRetriever"
+        class="omis.audit.web.impl.springmvc.AuditComponentRetrieverSpringMvcImpl">
+    <constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+  </bean>
+  
+  <bean id="businessExceptionHandlerDelegate"
+  		class="omis.web.controller.delegate.BusinessExceptionHandlerDelegate"/>
+
+  <!-- Application web packages. -->
+  
+  <context:component-scan base-package="omis.error.web.controller"/>
+  
+  <context:component-scan base-package="omis.security.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="administrationControllerOperation" expression="execution(* omis.web.controller.AdministrationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="administrationControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="indexControllerOperation" expression="execution(* omis.web.controller.IndexController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="indexControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="sessionManagerControllerOperation" expression="execution(* omis.web.controller.SessionManagerController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="sessionManagerControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="changeExpiredPasswordControllerOperation" expression="execution(* omis.security.web.controller.ChangeExpiredPasswordController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="changeExpiredPasswordControllerOperation"/>
+  </aop:config>
+
+  <aop:config>
+      <aop:pointcut id="formFieldTipControllerOperation" expression="execution(* omis.web.controller.FormFieldTipController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="formFieldTipControllerOperation"/>
+  </aop:config>
+
+</beans>

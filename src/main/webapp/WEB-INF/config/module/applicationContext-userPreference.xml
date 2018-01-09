@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+	<!--  Instance factories -->
+  
+	<bean id="userPreferenceInstanceFactory"
+	      class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	  <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	  <constructor-arg name="entityName" value="omis.userpreference.domain.UserPreference"/>
+	</bean>
+  
+	<!-- Services -->
+      
+	<bean id="userPreferenceService"
+		class="omis.userpreference.service.impl.UserPreferenceServiceImpl">
+			<constructor-arg name="userPreferenceDao" ref="userPreferenceDao"/>
+			<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+			<constructor-arg name="userPreferenceDelegate" ref="userPreferenceDelegate"/>
+	</bean>
+
+	<!--  Data access objects -->
+
+	<bean id="userPreferenceDao"
+ 		class="omis.userpreference.dao.impl.hibernate.UserPreferenceDaoHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		<constructor-arg name="entityName" value="omis.userpreference.domain.UserPreference"/>	
+ 	</bean>
+ 	
+ 	<!--  Property Editor Factories -->
+ 	
+ 	<bean id="userPreferencePropertyEditorFactory"
+       class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+	   <constructor-arg name="dao" ref="userPreferenceDao"/>
+	   <constructor-arg name="entityName" value="omis.userpreference.domain.UserPreference"/>
+	   <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	</bean>
+	
+	<!--  Service delegates -->
+	
+	<bean id="userPreferenceDelegate"
+		class="omis.userpreference.service.delegate.UserPreferenceDelegate">
+		<constructor-arg name="userPreferenceDao" ref="userPreferenceDao"/>
+		<constructor-arg name="userPreferenceInstanceFactory" ref="userPreferenceInstanceFactory"/>
+	</bean>
+</beans>        

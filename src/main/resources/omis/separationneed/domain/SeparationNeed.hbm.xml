@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.separationneed.domain">
+		<class entity-name="omis.separationneed.domain.SeparationNeed"
+			proxy="omis.separationneed.domain.SeparationNeed"
+			name="omis.separationneed.domain.impl.SeparationNeedImpl"
+			table="`SEPARATION_NEED`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`SEPARATION_NEED_SEQ`</param>
+					</generator>
+			</id>
+			<property name="date" column="`DATE`" not-null="true"/>
+			<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`"
+				cascade="none" entity-name="omis.relationship.domain.Relationship"/>
+			<property name="creationComment" column="`CREATION_COMMENT`" not-null="false" type="string"/>
+			<many-to-one name="reportingStaff" column="`REPORTING_STAFF_ID`" cascade="none" not-null="true"
+				entity-name="omis.person.domain.Person" unique="false"/>
+			<component name="removal">
+					<property name="date" column="`REMOVAL_DATE`" not-null="false"/>
+					<property name="comment" column="`REMOVAL_COMMENT`" not-null="false" type="string"/>
+					<many-to-one name="reason" column="`REMOVAL_REASON_ID`" cascade="none" not-null="true"
+						entity-name="omis.separationneed.domain.SeparationNeedRemovalReason" unique="false"/>
+			</component>
+			<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+					<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>		
+		</class>
+		<query name="findSeparationNeedsByOffender">
+		from 
+			omis.separationneed.domain.SeparationNeed separationNeed
+		where 
+			separationNeed.relationship.firstPerson = :offender
+		order by 
+			separationNeed.relationship.secondPerson.name.lastName
+		</query>
+		<query name="findSeparationNeedsByTargetOffender">
+		from 
+			omis.separationneed.domain.SeparationNeed separationNeed
+		where 
+			separationNeed.relationship.secondPerson= :targetOffender
+		order by 
+			separationNeed.relationship.firstPerson.name.lastName
+		</query>
+		<query name="findSeparationNeed"><![CDATA[
+			from
+				omis.separationneed.domain.SeparationNeed separationNeed
+			where
+				separationNeed.relationship = :relationship
+			and
+				separationNeed.date = :date
+		]]></query>
+		<query name="findSeparationNeedExcluding"><![CDATA[
+			from
+				omis.separationneed.domain.SeparationNeed separationNeed
+			where
+				separationNeed.relationship = :relationship
+			and
+				separationNeed.date = :date
+			and
+				separationNeed <> :separationNeed
+		]]></query>
+		<query name="findSeparationNeedsInDateRange"><![CDATA[
+			from
+				omis.separationneed.domain.SeparationNeed separationNeed
+			where
+				separationNeed.relationship = :relationship
+			and
+				(separationNeed.date < :endDate
+			     or 
+			    :endDate is null)
+			and 
+				(separationNeed.removal.date > :startDate
+			     or 
+			    separationNeed.removal.date is null)
+		]]></query>
+		<query name="findSeparationNeedsInDateRangeExcluding"><![CDATA[
+			from
+				omis.separationneed.domain.SeparationNeed separationNeed
+			where
+				separationNeed.relationship = :relationship
+			and
+				(separationNeed.date < :endDate
+			     or 
+			    :endDate is null)
+			and 
+				(separationNeed.removal.date > :startDate
+			     or 
+			    separationNeed.removal.date is null)
+			and
+				separationNeed <> :separationNeed
+		]]></query>
+		<query name="findSeparationNeedProfileItemSummaryByOffenderAndDate"><![CDATA[
+			select new omis.separationneed.report.SeparationNeedProfileItemSummary(
+			       sum(case when ((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
+                                    from omis.offender.domain.Offender firstOffender
+                                   where firstOffender = relationship.firstPerson)) as string) = 'SEC')
+				and (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
+                                    from omis.offender.domain.Offender secondOffender
+                                   where secondOffender = relationship.secondPerson)) as string) = 'SEC')) 
+			          then 1 
+			          else 0 
+			           end),
+			    	sum(case when ((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
+                                    from omis.offender.domain.Offender firstOffender
+                                   where firstOffender = relationship.firstPerson)) as string) <> 'SEC')
+				or (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
+                                    from omis.offender.domain.Offender secondOffender
+                                   where secondOffender = relationship.secondPerson)) as string) <> 'SEC')) 
+			            then 1
+			            else 0
+			             end))
+			  from omis.separationneed.domain.SeparationNeed separationNeed
+   				left outer join separationNeed.relationship relationship
+			 where (relationship.firstPerson = :offender
+			    or relationship.secondPerson = :offender)
+			  
+		]]></query>
+	</hibernate-mapping>

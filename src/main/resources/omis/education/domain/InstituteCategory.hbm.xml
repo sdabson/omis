@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.education.domain">
+	<class entity-name="omis.education.domain.InstituteCategory"
+			proxy="omis.education.domain.InstituteCategory"
+			name="omis.education.domain.impl.InstituteCategoryImpl"
+			table="`EDUCATION_INSTE_CTGRY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`EDUCATION_INSTE_CTGRY_SEQ`</param>
+				</generator>
+			</id>
+			
+			<property name="name" column="`NAME`" type="java.lang.String"  not-null="true"/>
+			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+	</class>
+	
+	<query name="findInstituteCategory"><![CDATA[
+		select instituteCategory
+		from
+			omis.education.domain.InstituteCategory instituteCategory
+		where
+			instituteCategory.name = :name
+	]]></query>
+	
+	<query name="findInstituteCategoryExcluding"><![CDATA[
+		select instituteCategory
+		from
+			omis.education.domain.InstituteCategory instituteCategory
+		where
+			instituteCategory.name = :name
+		and
+			instituteCategory != :instituteCategory
+	]]></query>
+	<query name="findAllInstituteCategories"><![CDATA[
+		select instituteCategory
+		from
+			omis.education.domain.InstituteCategory instituteCategory
+		order by 
+			instituteCategory.sortOrder, instituteCategory.name
+	]]></query>
+</hibernate-mapping>

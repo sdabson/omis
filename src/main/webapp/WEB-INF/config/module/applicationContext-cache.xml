@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  
+  <!-- Cache manage -->
+  
+  <bean id="cacheManager" class="omis.cache.impl.hibernate.CacheManagerHibernateImpl">
+  	<property name="sessionFactory" ref="sessionFactory"/>
+  	<property name="cachingSupported" value="true"/>
+  	<property name="cachingByClassSupported" value="true"/>
+  	<property name="cachingByRegionSupported" value="true"/>
+  </bean>
+  
+  <!-- Web component packages -->
+
+  <context:component-scan base-package="omis.cache.web.controller"/>
+  
+</beans>

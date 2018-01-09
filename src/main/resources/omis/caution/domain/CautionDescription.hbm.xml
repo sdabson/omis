@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+  - Caution description mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.caution.domain">
+	<class entity-name="omis.caution.domain.CautionDescription"
+	       proxy="omis.caution.domain.CautionDescription"
+	       name="omis.caution.domain.impl.CautionDescriptionImpl"
+		   table="`CAUTION_DESCRIPTION`">
+		<cache usage="transactional" region="caution"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CAUTION_DESCRIPTION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String"
+				  not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findCautionDescriptions" cacheable="true" cache-region="caution"><![CDATA[
+		select description
+		from omis.caution.domain.CautionDescription description
+		order by description.name
+	]]></query>
+	<query name="findCautionDescription"><![CDATA[
+		select description
+		from omis.caution.domain.CautionDescription description
+		where description.name = :name
+	]]></query>
+</hibernate-mapping>

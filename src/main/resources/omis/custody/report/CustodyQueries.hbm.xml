@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.custody.report">
+	<query name="summarizeCustodyByOffender"><![CDATA[
+		select 
+			new omis.custody.report.CustodySummary(custodyReview.id,
+			custodyReview.changeReason.name, custodyReview.custodyLevel.name,
+			custodyReview.actionDate, custodyReview.nextReviewDate,  custodyOverride.id, 
+			overrideCustodyLevel.name, authorizationUserName.lastName||', 
+			'||authorizationUserName.firstName, 
+				case when custodyOverride != null 
+				then 
+					true 
+				else 
+					false 
+				end, 
+				case when overrideAuthorizationSignature != null 
+				then 
+					true 
+				else 
+					false 
+				end)
+		from 
+			omis.custody.domain.CustodyOverride as custodyOverride
+			left outer join custodyOverride.custodyLevel as overrideCustodyLevel
+			left outer join custodyOverride.authorizationSignature as overrideAuthorizationSignature
+			left outer join overrideAuthorizationSignature.userAccount as authorizationUserAccount
+			left outer join authorizationUserAccount.user as authorizationUser
+			left outer join authorizationUser.name as authorizationUserName
+			right outer join custodyOverride.custodyReview as custodyReview
+		where 
+			custodyReview.offender = :offender
+		order by
+			custodyReview.actionDate desc
+	]]></query>
+</hibernate-mapping>

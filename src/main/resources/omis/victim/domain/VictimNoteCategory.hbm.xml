@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<class entity-name="omis.victim.domain.VictimNoteCategory"
+	       proxy="omis.victim.domain.VictimNoteCategory"
+	       name="omis.victim.domain.impl.VictimNoteCategoryImpl"
+	       table="`VICTIM_NOTE_CAT`">
+	    <cache usage="transactional" region="victim"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VICTIM_NOTE_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+		<property name="sortOrder" column="`SORT_ORDER`" type="short" not-null="true"/>
+		<property name="contact" column="`CONTACT`" type="yes_no" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findVictimNoteCategories" cacheable="true" cache-region="victim"><![CDATA[
+		select category
+		from omis.victim.domain.VictimNoteCategory category
+		order by category.sortOrder, category.name
+	]]></query>
+</hibernate-mapping>

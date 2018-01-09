@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="probationTermService"
+  		class="omis.probationterm.service.impl.ProbationTermServiceImpl">
+  	<constructor-arg name="probationTermDelegate" ref="probationTermDelegate"/>
+  	<constructor-arg name="termCalculatorDelegate" ref="termCalculatorDelegate"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="probationTermDelegate" class="omis.probationterm.service.delegate.ProbationTermDelegate">
+	  <constructor-arg name="probationTermInstanceFactory" ref="probationTermInstanceFactory"/>
+	  <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  <constructor-arg name="probationTermDao" ref="probationTermDao"/>
+  </bean>
+  
+  <!-- Report Services -->
+  
+  <bean id="probationTermReportService" 
+  	class="omis.probationterm.report.impl.hibernate.ProbationTermReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="probationTermSummaryItemReportService"
+  	class="omis.probationterm.report.impl.hibernate.ProbationTermSummaryItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Data access objects -->
+  
+  <bean id="probationTermDao" 
+  		class="omis.probationterm.dao.impl.hibernate.ProbationTermDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.probationterm.domain.ProbationTerm"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="probationTermInstanceFactory" 
+  	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.probationterm.domain.ProbationTerm"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="probationTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="probationTermDao"/>
+    <constructor-arg name="entityName" value="omis.probationterm.domain.ProbationTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+</beans>

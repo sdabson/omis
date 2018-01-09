@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Mappings and query for identification number categories.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.identificationnumber.domain">
+	<class entity-name="omis.identificationnumber.domain.IdentificationNumberCategory"
+	       proxy="omis.identificationnumber.domain.IdentificationNumberCategory"
+	       name="omis.identificationnumber.domain.impl.IdentificationNumberCategoryImpl"
+	       table="`IDENTIFICATION_NUM_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`IDENTIFICATION_NUM_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" column="`NAME`" unique="true" not-null="true"/>
+		<property name="multitude" column="`MULTITUDE`" not-null="false" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.identificationnumber.domain.Multitude</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+		<property name="valid" type="yes_no" column="`VALID`" not-null="true"/>
+	</class>
+	<query name="findIdentificationNumberCategory"><![CDATA[
+		select identificationNumberCategory
+		from omis.identificationnumber.domain.IdentificationNumberCategory identificationNumberCategory
+		where identificationNumberCategory.name = :name
+	]]></query>
+	<query name="findIdentificationNumberCategoryExcluding"><![CDATA[
+		select identificationNumberCategory
+		from omis.identificationnumber.domain.IdentificationNumberCategory identificationNumberCategory
+		where identificationNumberCategory.name = :name
+		  and identificationNumberCategory not in (:excludedIdentificationNumberCategories)
+	]]></query>
+	<query name="findIdentificationNumberCategories"><![CDATA[
+		select identificationNumberCategory
+		from omis.identificationnumber.domain.IdentificationNumberCategory identificationNumberCategory
+		where identificationNumberCategory.valid = true
+		order by identificationNumberCategory.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  <!-- Validators. -->
+  
+  <bean id="userSearchFormValidator" class="omis.user.web.validator.UserSearchFormValidator"/>
+  
+  <bean id="userAccountFormValidator" class="omis.user.web.validator.UserAccountFormValidator"/>
+  
+  <!-- Profile items -->
+  
+  <bean id="userAccountProfileItem"
+  	class="omis.user.web.profile.UserAccountProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>USER_ACCOUNT_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/user/userAccount/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="userAccount"/>
+  	<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+  	<constructor-arg name="userAccountProfileItemReportService" ref="userAccountProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${userAccountProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.user.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="userSearchControllerOperation" expression="execution(* omis.user.web.controller.UserSearchController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userSearchControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="userAccountAdminControllerOperation" expression="execution(* omis.user.web.controller.UserAccountAdminController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userAccountAdminControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="userAccountControllerOperation" expression="execution(* omis.user.web.controller.UserAccountController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userAccountControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="userAdminControllerOperation" expression="execution(* omis.user.web.controller.UserAdminController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userAdminControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="userGroupAdminControllerOperation" expression="execution(* omis.user.web.controller.UserGroupAdminController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userGroupAdminControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="userManagerControllerOperation" expression="execution(* omis.user.web.controller.UserManagerController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userManagerControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="userRoleAdminControllerOperation" expression="execution(* omis.user.web.controller.UserRoleAdminController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="userRoleAdminControllerOperation"/>
+  </aop:config>
+  
+</beans>

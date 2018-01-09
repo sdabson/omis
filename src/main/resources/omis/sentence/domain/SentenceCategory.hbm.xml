@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.sentence.domain">
+	<class	entity-name="omis.sentence.domain.SentenceCategory"
+			proxy="omis.sentence.domain.SentenceCategory"
+			name="omis.sentence.domain.impl.SentenceCategoryImpl"
+			table="`SENTENCE_CATEGORY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`SENTENCE_CATEGORY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true"/>
+		<property name="prisonRequirement" column="`PRISON_REQUIREMENT`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.sentence.domain.TermRequirement</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<property name="probationRequirement" column="`PROBATION_REQUIREMENT`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.sentence.domain.TermRequirement</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<property name="deferredRequirement" column="`DEFERRED_REQUIREMENT`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.sentence.domain.TermRequirement</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findSentenceCategory"><![CDATA[
+		from 
+			omis.sentence.domain.SentenceCategory sentenceCategory
+		where 
+			sentenceCategory.name = :name
+		order by sentenceCategory.name
+	]]></query>
+	<query name="findSentenceCategoryExcluding"><![CDATA[
+		from 
+			omis.sentence.domain.SentenceCategory sentenceCategory
+		where 
+			sentenceCategory.name = :name
+		and
+			sentenceCategory <> :excludedCategory
+		order by sentenceCategory.name
+	]]></query>
+</hibernate-mapping>

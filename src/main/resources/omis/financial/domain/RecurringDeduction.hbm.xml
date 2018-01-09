@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.domain">
+	<class entity-name="omis.financial.domain.RecurringDeduction"
+			proxy="omis.financial.domain.RecurringDeduction"
+			name="omis.financial.domain.impl.RecurringDeductionImpl"
+			table="`RECURRING_DEDUCTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`RECURRING_DEDUCTION_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true" entity-name="omis.offender.domain.Offender" unique="false"/>
+			<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true" entity-name="omis.financial.domain.RecurringDeductionCategory" unique="false"/>
+			<property name="frequency" column="`FREQUENCY`" not-null="false" unique="false">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.financial.domain.RecurringDeductionFrequency</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" unique="false"/>
+			<property name="reportedDate" column="`REPORTED_DATE`" type="java.util.Date" not-null="true" unique="false"/>
+			<property name="amount" column="`AMOUNT`" type="big_decimal" unique="false"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findRecurringDeduction"><![CDATA[
+		select recurringDeduction
+		from
+			omis.financial.domain.RecurringDeduction recurringDeduction
+		where
+			recurringDeduction.offender = :offender
+			and recurringDeduction.reportedDate = :reportedDate
+			and recurringDeduction.amount = :amount
+			and recurringDeduction.description = :description
+			and recurringDeduction.frequency = :frequency
+			and recurringDeduction.category = :category
+	]]></query>
+	<query name="findRecurringDeductionExcluding"><![CDATA[
+		select recurringDeduction
+		from
+			omis.financial.domain.RecurringDeduction recurringDeduction
+		where
+			recurringDeduction.offender = :offender
+			and recurringDeduction.reportedDate = :reportedDate
+			and recurringDeduction.amount = :amount
+			and recurringDeduction.description = :description
+			and recurringDeduction.frequency = :frequency
+			and recurringDeduction.category = :category
+			and recurringDeduction <> :excludedRecurringDeduction
+	]]></query>
+	<query name="findAllRecurringDeductions"><![CDATA[
+		select recurringDeduction
+		from
+			omis.financial.domain.RecurringDeduction recurringDeduction
+		where
+			recurringDeduction.offender = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<class entity-name="omis.victim.domain.VictimDocketAssociation"
+		proxy="omis.victim.domain.VictimDocketAssociation"
+		name="omis.victim.domain.impl.VictimDocketAssociationImpl"
+		table="`VICTIM_DOCK_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VICTIM_DOCK_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="victim" column="`VICTIM_ID`" cascade="none" not-null="true"
+			entity-name="omis.person.domain.Person" unique="false"/>
+		<many-to-one name="docket" column="`DOCKET_ID`" cascade="none" not-null="true"
+			entity-name="omis.docket.domain.Docket" unique="false"/>
+		<property name="victimImpactSummary" column="`VICTIM_IMPACT_SUMMARY`" not-null="false" type="string"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findVictimDocketAssociation"><![CDATA[
+		select association
+		from omis.victim.domain.VictimDocketAssociation association
+		where association.victim = :victim
+		and association.docket = :docket
+	]]></query>
+	<query name="findVictimDocketAssociationExcluding"><![CDATA[
+		select association
+		from omis.victim.domain.VictimDocketAssociation association
+		where association.victim = :victim
+		and association.docket = :docket
+		and association <> :victimDocketAssociation
+	]]></query>
+	<query name="findVictimDocketAssociationByVictim"><![CDATA[
+		select association
+		from omis.victim.domain.VictimDocketAssociation association
+		inner join association.docket docket
+		where association.victim = :victim
+		order by docket.value desc
+	]]></query>
+	<query name="findVictimDocketAssociationByDocket"><![CDATA[
+		select association
+		from omis.victim.domain.VictimDocketAssociation association
+		inner join association.docket docket
+		where docket = :docket
+		order by docket.value desc
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.family.domain">
+	<class entity-name="omis.family.domain.FamilyAssociation"
+		proxy="omis.family.domain.FamilyAssociation"
+		name="omis.family.domain.impl.FamilyAssociationImpl"
+		table="`FAMILY_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FAMILY_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`"
+			cascade="save-update" entity-name="omis.relationship.domain.Relationship"/>
+		<component name="dateRange">
+			<property name="startDate" column="`START_DATE`" not-null="false" type="java.util.Date"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<many-to-one name="category" not-null="true" column="`CATEGORY_ID`"
+			entity-name="omis.family.domain.FamilyAssociationCategory"/>
+		<property name="marriageDate" column="`MARRIAGE_DATE`" not-null="false" type="java.util.Date"/>	
+		<property name="divorceDate" column="`DIVORCE_DATE`" not-null="false" type="java.util.Date"/>
+		<component name="flags">
+			<property name="cohabitant" column="`COHABITANT`" type="yes_no" not-null="false"/>
+			<property name="dependent" column="`DEPENDENT`" type="yes_no" not-null="false"/>
+			<property name="emergencyContact" column="`EMERGENCY_CONTACT`" type="yes_no" not-null="false"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+	</class>
+	<query name="findFamilyAssociationsByPerson"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship.firstPerson = :person
+		or
+			familyAssociation.relationship.secondPerson = :person
+	]]></query>
+	<query name="findFamilyAssociationByRelationshipAndDateRange"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and
+			((familyAssociation.dateRange.startDate is not null and familyAssociation.dateRange.endDate is not null and :startDate is not null and :endDate is not null and familyAssociation.dateRange.startDate = :startDate and familyAssociation.dateRange.endDate = :endDate)
+			 or (familyAssociation.dateRange.startDate is not null and familyAssociation.dateRange.endDate is null and :startDate is not null and familyAssociation.dateRange.startDate = :startDate and :endDate is null)
+			 or (familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is not null and :startDate is null and :endDate is not null and familyAssociation.dateRange.endDate = :endDate)
+			 or (familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is null and :startDate is null and :endDate is null))
+	]]></query>
+	<query name="findFamilyAssociationByRelationshipAndDateRangeExcluding"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and
+			((familyAssociation.dateRange.startDate is not null and familyAssociation.dateRange.endDate is not null and :startDate is not null and :endDate is not null and familyAssociation.dateRange.startDate = :startDate and familyAssociation.dateRange.endDate = :endDate)
+			 or (familyAssociation.dateRange.startDate is not null and familyAssociation.dateRange.endDate is null and :startDate is not null and familyAssociation.dateRange.startDate = :startDate and :endDate is null)
+			 or (familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is not null and :startDate is null and :endDate is not null and familyAssociation.dateRange.endDate = :endDate)
+			 or (familyAssociation.dateRange.startDate is null and familyAssociation.dateRange.endDate is null and :startDate is null and :endDate is null))
+		and
+			familyAssociation <> :association
+	]]></query>
+	<query name="findFamilyAssociationOnDate"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and
+					(familyAssociation.dateRange.startDate is null
+				or
+					familyAssociation.dateRange.startDate < :date)
+			and
+					(familyAssociation.dateRange.endDate is null
+				or
+					familyAssociation.dateRange.endDate > :date)
+	]]></query>
+	<query name="findFamilyAssociationDateRangeOverlap"><![CDATA[
+		select count(familyAssociation)
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and
+			((familyAssociation.dateRange.startDate is null   
+				and :startDate is null)
+			or
+ 			 (familyAssociation.dateRange.endDate is null 
+ 				and :endDate is null)
+			or
+			 ( :startDate is not null
+				and familyAssociation.dateRange.endDate is not null
+				and :endDate is null
+				and familyAssociation.dateRange.endDate>=:startDate)
+			or
+			 ( :endDate is not null
+				and familyAssociation.dateRange.startDate is not null
+				and :startDate is null
+				and familyAssociation.dateRange.startDate<=:endDate)
+			or
+			 ( familyAssociation.dateRange.endDate is not null
+				and :startDate is not null
+				and familyAssociation.dateRange.startDate is null
+				and :startDate<=familyAssociation.dateRange.endDate)
+			or
+			 ( familyAssociation.dateRange.startDate is not null
+				and :endDate is not null
+				and familyAssociation.dateRange.endDate is null
+				and :endDate>=familyAssociation.dateRange.startDate)
+			or
+			 (familyAssociation.dateRange.startDate is null
+				and familyAssociation.dateRange.endDate is null)
+			or
+			 (:startDate is null
+				and :endDate is null)
+			or
+			 (familyAssociation.dateRange.endDate is not null
+				and :endDate is not null
+				and familyAssociation.dateRange.startDate is not null
+				and :startDate is not null
+				and (:endDate>=familyAssociation.dateRange.startDate
+					or familyAssociation.dateRange.endDate>=:startDate)))
+	]]></query>
+	
+	<query name="findAllFamilyAssociations"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		order by familyAssociation.dateRange.startDate
+	]]></query>
+	
+	<query name="findConflictingFamilyAssociationsCount"><![CDATA[
+		select count(familyAssociation)
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and (familyAssociation.dateRange.startDate < :endDate
+		     or (familyAssociation.dateRange.startDate is null or :endDate is null))
+		and (familyAssociation.dateRange.endDate > :startDate
+		     or (familyAssociation.dateRange.endDate is null or :startDate is null))
+	]]></query>
+	
+	<query name="findConflictingFamilyAssociationsExcludingCount"><![CDATA[
+		select count(familyAssociation)
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+		where
+			familyAssociation.relationship = :relationship
+		and (familyAssociation.dateRange.startDate < :endDate
+		     or (familyAssociation.dateRange.startDate is null or :endDate is null))
+		and (familyAssociation.dateRange.endDate > :startDate
+		     or (familyAssociation.dateRange.endDate is null or :startDate is null))
+		and familyAssociation != :excludedFamilyAssociation
+	]]></query>
+	
+	<query name="findAllAssociationsByOffender"><![CDATA[
+		select familyAssociation
+		from
+			omis.family.domain.FamilyAssociation familyAssociation
+			inner join familyAssociation.relationship relationship
+			inner join relationship.firstPerson firstPerson
+		where
+			firstPerson = :offender
+		order by familyAssociation.dateRange.startDate
+	]]></query>
+</hibernate-mapping>

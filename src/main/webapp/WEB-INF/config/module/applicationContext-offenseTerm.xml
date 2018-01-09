@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Configuration for offense term.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+
+  <bean id="offenseTermService" class="omis.offenseterm.service.impl.OffenseTermServiceImpl">
+  	<constructor-arg name="courtDelegate" ref="courtDelegate"/>
+  	<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  	<constructor-arg name="offenseDelegate" ref="offenseDelegate"/>
+  	<constructor-arg name="sentenceCategoryDelegate" ref="sentenceCategoryDelegate"/>
+  	<constructor-arg name="courtCaseDelegate" ref="courtCaseDelegate"/>
+  	<constructor-arg name="docketDelegate" ref="docketDelegate"/>
+  	<constructor-arg name="convictionDelegate" ref="convictionDelegate"/>
+  	<constructor-arg name="sentenceDelegate" ref="sentenceDelegate"/>
+  	<constructor-arg name="judgeTermDelegate" ref="judgeTermDelegate"/>
+  	<constructor-arg name="legalDispositionCategoryDelegate" ref="legalDispositionCategoryDelegate"/>
+  	<constructor-arg name="chargeDelegate" ref="chargeDelegate"/>
+  	<constructor-arg name="termCalculatorDelegate" ref="termCalculatorDelegate"/>
+  	<constructor-arg name="probationTermDelegate" ref="probationTermDelegate"/>
+  </bean>
+  
+  <bean id="currentOffenseService" class="omis.offenseterm.service.impl.CurrentOffenseServiceImpl">
+  	<constructor-arg name="convictionDelegate" ref="convictionDelegate"/>
+  	<constructor-arg name="sentenceDelegate" ref="sentenceDelegate"/>
+  </bean>
+  
+  <bean id="historicalOffenseTermService" class="omis.offenseterm.service.impl.HistoricalOffenseTermServiceImpl">
+  	<constructor-arg name="sentenceDelegate" ref="sentenceDelegate"/>
+  	<constructor-arg name="legalDispositionCategoryDelegate" ref="legalDispositionCategoryDelegate"/>
+  	<constructor-arg name="sentenceCategoryDelegate" ref="sentenceCategoryDelegate"/>
+  	<constructor-arg name="termCalculatorDelegate" ref="termCalculatorDelegate"/>
+  </bean>
+  
+  <bean id="offenseTermDocketService" class="omis.offenseterm.service.impl.OffenseTermDocketServiceImpl">
+  	<constructor-arg name="courtDelegate" ref="courtDelegate"/>
+  	<constructor-arg name="docketDelegate" ref="docketDelegate"/>
+  </bean>
+  
+  <!-- Report Services -->
+  <bean id="offenseTermProfileItemService" class="omis.offenseterm.report.impl.hibernate.OffenseTermProfileItemServiceImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+</beans>

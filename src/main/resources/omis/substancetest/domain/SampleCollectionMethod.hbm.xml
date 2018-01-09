@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.substancetest.domain">
+		<class entity-name="omis.substancetest.domain.SampleCollectionMethod"
+				proxy="omis.substancetest.domain.SampleCollectionMethod"
+				name="omis.substancetest.domain.impl.SampleCollectionMethodImpl"
+				table="`SAMPLE_COLLECTION_METHOD`">
+				<id name="id" column="`ID`" type="java.lang.Long">
+					<generator class="sequence">
+						<param name="sequence">`SAMPLE_COLLECTION_METHOD_SEQ`</param>
+					</generator>
+				</id>
+				<property name="name" column="`NAME`" not-null="true" type="string"/>
+				<property name="description" column="`DESCRIPTION`" not-null="true" type="string"/>
+				<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+		</class>
+		<query name="findValidSampleCollectionMethod"><![CDATA[
+			from
+				omis.substancetest.domain.SampleCollectionMethod collectionMethod
+			where
+				collectionMethod.valid = true
+		]]></query>
+	</hibernate-mapping>

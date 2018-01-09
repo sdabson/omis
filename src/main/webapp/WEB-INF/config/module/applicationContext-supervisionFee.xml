@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+    <!-- Services -->
+    
+    <bean id="supervisionFeeManager"
+    	class="omis.supervisionfee.service.impl.SupervisionFeeManagerImpl">
+    	<constructor-arg name="monthlySupervisionFeeDao" ref="monthlySupervisionFeeDao"/>
+    	<constructor-arg name="supervisionFeeRequirementDao" ref="supervisionFeeRequirementDao"/>
+    	<constructor-arg name="supervisionFeeRequirementReasonDao" ref="supervisionFeeRequirementReasonDao"/>
+    	<constructor-arg name="courtDao" ref="courtDao"/>
+    	<constructor-arg name="monthlySupervisionFeeInstanceFactory" ref="monthlySupervisionFeeInstanceFactory"/>
+    	<constructor-arg name="supervisionFeeRequirementInstanceFactory" ref="supervisionFeeRequirementInstanceFactory"/>
+    	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+    </bean>   
+    
+<!--     Report Services -->
+    
+    <bean id="supervisionFeeSummaryReportService"
+    	class="omis.supervisionfee.report.impl.hibernate.SupervisionFeeSummaryReportServiceHibernateImpl">
+    	    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <bean id="supervisionFeeProfileItemReportService"
+    	class="omis.supervisionfee.report.impl.hibernate.SupervisionFeeProfileItemReportServiceHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <!--  Data access objects. -->
+    
+    <bean id="monthlySupervisionFeeDao"
+    	class="omis.supervisionfee.dao.impl.hibernate.MonthlySupervisionFeeDaoHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    	<constructor-arg name="entityName" value="omis.supervisionfee.domain.MonthlySupervisionFee"/>
+    </bean>
+    
+    <bean id="supervisionFeeRequirementDao"
+    	class="omis.supervisionfee.dao.impl.hibernate.SupervisionFeeRequirementDaoHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    	<constructor-arg name="entityName" value="omis.supervisionfee.domain.SupervisionFeeRequirement"/>
+    </bean>
+    
+    <bean id="supervisionFeeRequirementReasonDao"
+    	class="omis.supervisionfee.dao.impl.hibernate.SupervisionFeeRequirementReasonDaoHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    	<constructor-arg name="entityName" value="omis.supervisionfee.domain.SupervisionFeeRequirementReason"/>
+    </bean>
+        
+<!--     Instance factories -->
+    
+    <bean id="monthlySupervisionFeeInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    <constructor-arg name="entityName" value="omis.supervisionfee.domain.MonthlySupervisionFee"/>
+  	</bean>
+  
+  	<bean id="supervisionFeeRequirementInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    <constructor-arg name="entityName" value="omis.supervisionfee.domain.SupervisionFeeRequirement"/>
+  	</bean>
+   
+<!--   Property editors -->
+  
+  	<bean id="monthlySupervisionFeePropertyEditorFactory"
+ 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="dao" ref="monthlySupervisionFeeDao"/>
+ 		<constructor-arg name="entityName" value="omis.supervisionfee.domain.MonthlySupervisionFee"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  	</bean>
+  	
+  	<bean id="supervisionFeeRequirementReasonPropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  		<constructor-arg name="dao" ref="supervisionFeeRequirementReasonDao"/>
+ 		<constructor-arg name="entityName" value="omis.supervisionfee.domain.SupervisionFeeRequirementReason"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  	</bean>
+  	
+  	<bean id="supervisionFeeRequirementPropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  		<constructor-arg name="dao" ref="supervisionFeeRequirementDao"/>
+ 		<constructor-arg name="entityName" value="omis.supervisionfee.domain.SupervisionFeeRequirement"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  	</bean>
+</beans>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.violationevent.report">
+	<query name="findViolationEventSummariesByOffender"><![CDATA[
+		select new omis.violationevent.report.ViolationEventSummary(
+			violationEvent.id,
+			violationEvent.event.date,
+			violationEvent.category,
+			jurisdiction.name,
+			((select count(disciplinaryCodeViolation.id)
+				from omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
+				right outer join
+					disciplinaryCodeViolation.violationEvent violationEventSub
+				where
+					violationEventSub = violationEvent
+				group by violationEvent) 
+			+
+			(select count(conditionViolation.id)
+				from omis.violationevent.domain.ConditionViolation conditionViolation
+				right outer join
+					conditionViolation.violationEvent violationEventSub2
+				where
+					violationEventSub2 = violationEvent
+				group by violationEvent)
+			))
+		from
+			omis.violationevent.domain.ViolationEvent violationEvent
+		left outer join
+			violationEvent.jurisdiction jurisdiction
+		where
+			violationEvent.offender = :offender
+		order by
+			violationEvent.event.date desc
+	]]></query>
+</hibernate-mapping>

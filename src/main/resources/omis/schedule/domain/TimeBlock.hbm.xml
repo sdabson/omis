@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping for time blocks.
+  - Author: Stephen Abson
+  - Version: 0.1.1 (Jan 14, 2013)
+  - Since: OMIS 3.0
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.schedule.domain">
+	<class entity-name="omis.schedule.domain.TimeBlock"
+	       proxy="omis.schedule.domain.TimeBlock"
+	       name="omis.schedule.domain.impl.TimeBlockImpl"
+	       table="`TIME_BLOCK`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`TIME_BLOCK_SEQ`</param>
+			</generator>
+		</id>
+		<component name="dateRange">
+			<property name="startDate" type="long" column="`START_DATE`"
+				access="field" not-null="true"/>
+			<property name="endDate" type="long" column="`END_DATE`"
+				access="field" not-null="true"/>
+		</component>
+		<property name="name" column="`NAME`" not-null="false" type="java.lang.String"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="java.lang.Short"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findAllValidTimeBlocks"><![CDATA[
+		from omis.schedule.domain.TimeBlock as timeBlock
+		where timeBlock.valid = true order by timeBlock.sortOrder
+	]]></query>
+	<query name="findAllValidTimeBlocksFreeForAttendeesOnDate"><![CDATA[
+		from omis.schedule.domain.TimeBlock as timeBlock
+		where timeBlock.valid = true
+		and not exists (
+			select distinct attendableEvent
+				from omis.schedule.domain.AttendableEvent attendableEvent
+			  inner join attendableEvent.attendees as attendee
+			where attendee in (:attendees)
+			and (attendableEvent.dateRange.startDate < (:date + timeBlock.dateRange.endDate))
+		  	   and (attendableEvent.dateRange.endDate > (:date + timeBlock.dateRange.startDate))
+		)
+		order by timeBlock.sortOrder
+	]]></query>
+	<query name="findTimeBlockForTimes"><![CDATA[
+		from omis.schedule.domain.TimeBlock as timeBlock
+		where timeBlock.dateRange.startDate = :startTime
+			and timeBlock.dateRange.endDate = :endTime
+	]]></query>
+</hibernate-mapping>

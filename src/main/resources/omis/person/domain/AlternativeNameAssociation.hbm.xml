@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Mapping and queries for alternative name association.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.AlternativeNameAssociation"
+	       proxy="omis.person.domain.AlternativeNameAssociation"
+	       name="omis.person.domain.impl.AlternativeNameAssociationImpl"
+	       table="`ALT_NAME_ASSOC`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`ALT_NAME_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<properties name="uniqueAlternativeNameAssociation">
+			<many-to-one name="name" entity-name="omis.person.domain.PersonName"
+		    	         not-null="true" column="`NAME_ID`" cascade="all"/>
+			<many-to-one name="category" entity-name="omis.person.domain.AlternativeNameCategory"
+			             not-null="true" column="`CATEGORY_ID`"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" column="`START_DATE`" not-null="false"/>
+				<property name="endDate" type="java.util.Date" column="`END_DATE`" not-null="false"/>
+			</component>
+		</properties>
+	</class>
+	<query name="findAlternativePersonNames"><![CDATA[
+		select personName
+		from omis.person.domain.PersonName personName
+			inner join fetch personName.person as person
+			inner join fetch person.name as realName 
+		where person = :person
+			and realName != personName
+		order by personName.lastName, personName.firstName,
+		         personName.middleName, personName.suffix
+	]]></query>
+	<query name="findAlternativeNameAssociationsByPerson"><![CDATA[
+		select association
+		from omis.person.domain.AlternativeNameAssociation association
+		  inner join fetch association.name as personName
+		  inner join fetch personName.person as person 
+		where person = :person
+		order by association.dateRange.startDate desc, association.dateRange.endDate desc,
+		         association.name.lastName, association.name.firstName,
+		         association.category
+	]]></query>
+	<query name="findAlternativeNameAssociation"><![CDATA[
+	select
+			case 
+				when count(association) > 0
+			then
+				true
+			else
+				false
+			end
+	from
+		omis.person.domain.AlternativeNameAssociation association
+	 	inner join association.name as personName
+		inner join personName.person as person 
+	where 
+		person = :person
+	and
+		personName = :personName
+	and
+		association.category = :alternativeNameCategory
+	and
+		association.dateRange = :dateRange
+	]]></query>
+	<query name="findAlternativeNameAssociationExcluding"><![CDATA[
+		select
+			case 
+				when count(association) > 0
+			then
+				true
+			else
+				false
+			end
+		from
+			omis.person.domain.AlternativeNameAssociation association
+		 	inner join association.name as personName
+			inner join personName.person as person 
+		where 
+			person = :person
+		and
+			personName = :personName
+		and
+			association.category = :alternativeNameCategory
+		and
+			association.dateRange = :dateRange
+		and
+			association <> :association
+	]]></query>
+	<query name="countAlternativeNameAssociationForPersonOnDate"><![CDATA[
+	  select count(alternativeNameAssociation)
+	  from omis.person.domain.AlternativeNameAssociation alternativeNameAssociation
+	  where alternativeNameAssociation.name.person = :person
+	    and (alternativeNameAssociation.dateRange.endDate is null
+	        or alternativeNameAssociation.dateRange.endDate > :date)
+	    and (alternativeNameAssociation.dateRange.startDate is null
+	        or alternativeNameAssociation.dateRange.startDate <= :date)
+	]]></query>
+	<query name="findAlternativeNames"><![CDATA[
+		select new omis.person.report.AlternateNameSummary(
+			alternativeNameAssociation.id,
+			name.firstName,
+			name.middleName,
+			name.lastName,
+			name.suffix,
+			category.name
+		)
+		from
+			omis.person.domain.AlternativeNameAssociation alternativeNameAssociation
+			inner join alternativeNameAssociation.name name
+			inner join alternativeNameAssociation.category category
+			left join alternativeNameAssociation.dateRange dateRange
+			inner join name.person person
+		where
+			person = :person
+		and
+			((dateRange.startDate is null and dateRange.endDate is not null and dateRange.endDate > :effectiveDate)
+			or (dateRange.endDate is null and dateRange.startDate is not null and dateRange.startDate <= :effectiveDate)
+			or (dateRange.endDate is not null and dateRange.startDate is not null and dateRange.startDate<=:effectiveDate and dateRange.endDate>:effectiveDate)
+			or (dateRange is null))
+		order by
+			name.lastName, name.firstName
+	]]></query>
+</hibernate-mapping>

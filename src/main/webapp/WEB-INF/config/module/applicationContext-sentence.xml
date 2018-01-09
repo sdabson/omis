@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+    
+  <bean id="sentenceService"
+      	class="omis.sentence.service.impl.SentenceServiceImpl">
+   	<constructor-arg name="sentenceDelegate" ref="sentenceDelegate"/>
+   	<constructor-arg name="sentenceCategoryDelegate" ref="sentenceCategoryDelegate" />
+   	<constructor-arg name="legalDispositionCategoryDelegate" ref="legalDispositionCategoryDelegate" />
+  </bean>     
+    
+ <!--  Report Services -->
+  
+ <bean id="sentenceReportService" 
+ 	class="omis.sentence.report.impl.hibernate.SentenceReportServiceImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean> 
+  <!-- Service helpers -->
+    
+  <bean id="sentenceDelegate"
+        class="omis.sentence.service.delegate.SentenceDelegate">
+    <constructor-arg name="sentenceDao" ref="sentenceDao"/>
+    <constructor-arg name="sentenceInstanceFactory" ref="sentenceInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="sentenceCategoryDelegate"
+        class="omis.sentence.service.delegate.SentenceCategoryDelegate">
+    <constructor-arg name="sentenceCategoryDao" ref="sentenceCategoryDao"/>
+    <constructor-arg name="sentenceCategoryInstanceFactory" ref="sentenceCategoryInstanceFactory"/>
+  </bean>
+    
+  <bean id="legalDispositionCategoryDelegate"
+        class="omis.sentence.service.delegate.LegalDispositionCategoryDelegate">
+    <constructor-arg name="legalDispositionCategoryDao" ref="legalDispositionCategoryDao"/>
+    <constructor-arg name="legalDispositionCategoryInstanceFactory" ref="legalDispositionCategoryInstanceFactory"/>
+  </bean>
+  
+  <!-- Data access objects -->
+    
+  <bean id="sentenceDao"
+      	class="omis.sentence.dao.impl.hibernate.SentenceDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.sentence.domain.Sentence"/>
+  </bean>
+  	
+  <bean id="sentenceCategoryDao"
+      	class="omis.sentence.dao.impl.hibernate.SentenceCategoryDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.sentence.domain.SentenceCategory"/>
+  </bean>
+  
+  <bean id="legalDispositionCategoryDao"
+      	class="omis.sentence.dao.impl.hibernate.LegalDispositionCategoryDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.sentence.domain.LegalDispositionCategory"/>
+  </bean>
+  <!-- Instance factories. -->
+  
+  <bean id="sentenceInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.sentence.domain.Sentence"/>
+  </bean>
+  
+  <bean id="sentenceCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.sentence.domain.SentenceCategory"/>
+  </bean>
+  
+   <bean id="legalDispositionCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.sentence.domain.LegalDispositionCategory"/>
+  </bean>
+  
+ 	<!-- Property editor factories -->
+ 	
+ 	<bean id="sentencePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="entityName" value="omis.sentence.domain.Sentence"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  		<constructor-arg name="dao" ref="sentenceDao"/>
+	</bean>
+	
+  <bean id="sentenceCategoryPropertyEditorFactory"
+     		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="entityName" value="omis.sentence.domain.SentenceCategory"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  	<constructor-arg name="dao" ref="sentenceCategoryDao"/>
+  </bean>
+   
+   <bean id="legalDispositionCategoryPropertyEditorFactory"
+     		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="entityName" value="omis.sentence.domain.LegalDispositionCategory"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  	<constructor-arg name="dao" ref="legalDispositionCategoryDao"/>
+  </bean>
+   
+</beans>

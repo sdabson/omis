@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Yidong Li
+ - Date:   March 12, 2014
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.report">
+	<query name="findEmploymentSummaryByOffender"><![CDATA[
+select new omis.employment.report.EmploymentSummary(
+		employmentTerm.id,   
+		employmentTerm.dateRange.startDate,
+		employmentTerm.dateRange.endDate,
+		organization.name,
+		address.value,
+		city.name,
+		state.name,
+		zipCode.value,
+		zipCode.extension,
+		job.jobTitle,
+		job.supervisorName,
+		country.name)
+    from
+    	omis.employment.domain.EmploymentTerm employmentTerm
+    	left outer join employmentTerm.job job
+    	left outer join job.employer employer
+    	left outer join employer.location location
+    	left outer join location.address address
+    	left outer join location.organization organization
+    	left outer join address.zipCode zipCode
+    	left outer join zipCode.city city
+    	left outer join city.state state
+    	left outer join city.country country
+    where employmentTerm.offender = :offender
+    order by employmentTerm.offender.name.lastName, employmentTerm.offender.name.firstName, employmentTerm.dateRange.startDate, employmentTerm.dateRange.endDate, employer.location.organization.name
+	]]></query>
+	
+	<query name="findLatestEmploymentSummaryByOffender"><![CDATA[
+	select new omis.employment.report.EmploymentSummary(
+		employmentTerm.id,   
+		employmentTerm.dateRange.startDate,
+		employmentTerm.dateRange.endDate,
+		organization.name,
+		address.value,
+		city.name,
+		state.name,
+		zipCode.value,
+		zipCode.extension,
+		job.jobTitle,
+		job.supervisorName,
+		country.name)
+    from
+    	omis.employment.domain.EmploymentTerm employmentTerm
+    	left outer join employmentTerm.job job
+    	left outer join job.employer employer
+    	left outer join employer.location location
+    	left outer join location.address address
+    	left outer join location.organization organization
+    	left outer join address.zipCode zipCode
+    	left outer join zipCode.city city
+    	left outer join city.state state
+    	left outer join city.country country
+    where employmentTerm.offender = :offender
+    order by employmentTerm.dateRange.endDate desc, employmentTerm.dateRange.startDate desc
+	]]></query>
+	
+</hibernate-mapping>

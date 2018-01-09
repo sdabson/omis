@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWorkRequirementRequestAssociation"
+		proxy="omis.health.domain.LabWorkRequirementRequestAssociation"
+		name="omis.health.domain.impl.LabWorkRequirementRequestAssociationImpl"
+		table="`LAB_WORK_REQRMNT_REQ_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_REQRMNT_REQ_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="unqiueLabWorkRequirementRequestAssociation">
+			<many-to-one name="request" entity-name="omis.health.domain.LabWorkRequirementRequest"
+		                 column="`REQUEST_ID`" not-null="true"/>
+		    <many-to-one name="requirement" entity-name="omis.health.domain.LabWorkRequirement"
+		                 column="`REQUIREMENT_ID`" not-null="true"/>
+		</properties>
+	</class>
+</hibernate-mapping>

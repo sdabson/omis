@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Queries for reporting parole board members.
+ -
+ - Author: Josh Divine
+ - Version: 0.1.0 (Nov 8, 2017)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="omis.paroleboardmember.report">
+	<query name="findParoleBoardMembersByDate"><![CDATA[
+	 	SELECT new omis.paroleboardmember.report.ParoleBoardMemberSummary(paroleBoardMember.id, 
+		       name.lastName, name.firstName, name.middleName, staffTitle.name, 
+		       paroleBoardMember.dateRange.startDate, paroleBoardMember.dateRange.endDate)
+		  FROM omis.paroleboardmember.domain.ParoleBoardMember as paroleBoardMember 
+		  LEFT JOIN paroleBoardMember.staffAssignment staffAssignment
+		  LEFT JOIN staffAssignment.staffMember as person
+		  LEFT JOIN staffAssignment.title as staffTitle
+		  LEFT JOIN person.name as name
+         WHERE 
+         	   ((paroleBoardMember.dateRange.startDate is null or
+         	    paroleBoardMember.dateRange.startDate <= :effectiveDate)
+          AND
+          	   (paroleBoardMember.dateRange.endDate is null or
+          	    paroleBoardMember.dateRange.endDate >= :effectiveDate))
+           OR
+           		:effectiveDate is null	    
+      ORDER BY
+      			paroleBoardMember.dateRange.startDate, 
+      			paroleBoardMember.dateRange.endDate desc,
+      			name.lastName,
+      			name.firstName
+	]]></query>
+	<query name="findParoleBoardMembersByDates"><![CDATA[
+	 	SELECT new omis.paroleboardmember.report.ParoleBoardMemberSummary(paroleBoardMember.id, 
+		       name.lastName, name.firstName, name.middleName, staffTitle.name, 
+		       paroleBoardMember.dateRange.startDate, paroleBoardMember.dateRange.endDate)
+		  FROM omis.paroleboardmember.domain.ParoleBoardMember as paroleBoardMember 
+		  LEFT JOIN paroleBoardMember.staffAssignment staffAssignment
+		  LEFT JOIN staffAssignment.staffMember as person
+		  LEFT JOIN staffAssignment.title as staffTitle
+		  LEFT JOIN person.name as name
+         WHERE 
+         	   (:startDate is null and :endDate is null)
+           OR
+           	   (paroleBoardMember.dateRange.startDate is null and
+           	    paroleBoardMember.dateRange.endDate is null)
+           OR
+         	   ((paroleBoardMember.dateRange.startDate is null or
+         	    paroleBoardMember.dateRange.startDate <= :endDate or 
+         	    :endDate is null) and
+         	    (paroleBoardMember.dateRange.endDate is null or
+         	     paroleBoardMember.dateRange.endDate >= :startDate or
+         	     :startDate is null))
+      ORDER BY
+      			paroleBoardMember.dateRange.startDate, 
+      			paroleBoardMember.dateRange.endDate desc,
+      			name.lastName,
+      			name.firstName
+	]]></query>
+</hibernate-mapping>

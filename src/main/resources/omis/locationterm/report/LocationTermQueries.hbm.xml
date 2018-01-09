@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.locationterm.domain">
+	<query name="summarizeLocationTermsByOffenderOnDate"><![CDATA[
+		select new omis.locationterm.report.LocationTermSummary(
+			locationTerm.id,
+			offenderName.lastName,
+			offenderName.firstName,
+			offenderName.middleName,
+			offenderName.suffix,
+			offender.offenderNumber,
+			organization.name,
+			locationTerm.dateRange.startDate,
+			locationTerm.dateRange.endDate,
+			(
+			  select count(locationReasonTerm)
+			  from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+			  where locationReasonTerm.locationTerm = locationTerm
+			),
+			(
+			  select reason.name
+			  from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+			    inner join locationReasonTerm.reason reason
+			  where locationReasonTerm.locationTerm = locationTerm
+			    and (locationReasonTerm.dateRange.startDate = locationTerm.dateRange.startDate
+			      or (locationReasonTerm.dateRange.startDate is null and locationTerm.dateRange.startDate is null))
+			    and (locationReasonTerm.dateRange.endDate = locationTerm.dateRange.endDate
+			      or (locationReasonTerm.dateRange.endDate is null and locationTerm.dateRange.endDate is null))
+			),
+			cast(:effectiveDate as timestamp)
+		)
+		from omis.locationterm.domain.LocationTerm locationTerm
+		  inner join locationTerm.offender offender
+		  inner join offender.name offenderName
+		  inner join locationTerm.location location
+		  inner join location.organization organization
+		where offender = :offender
+		order by locationTerm.dateRange.startDate desc
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Jail mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.jail.domain">
+	<class entity-name="omis.jail.domain.Jail"
+	       proxy="omis.jail.domain.Jail"
+	       name="omis.jail.domain.impl.JailImpl"
+	       table="`JAIL`">
+	    <cache usage="transactional" region="jail"/>
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`JAIL_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueJail">
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+			<many-to-one name="location" column="`LOCATION_ID`" entity-name="omis.location.domain.Location" not-null="true"/>
+		</properties>
+		<property name="active" column="`ACTIVE`" type="yes_no" not-null="true"/>
+		<property name="category" column="`CATEGORY`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.jail.domain.JailCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findJails" cacheable="true" cache-region="jail"><![CDATA[
+		select jail from omis.jail.domain.Jail jail
+		order by jail.name, jail.location.organization.name
+	]]></query>
+	<query name="findJailsByOrganization" cacheable="true" cache-region="jail"><![CDATA[
+		select jail from omis.jail.domain.Jail jail
+		  inner join jail.location location
+		  inner join location.organization organization
+		where organization = :organization
+		order by jail.name, organization.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.AlternativeIdentityCategory"
+	       proxy="omis.person.domain.AlternativeIdentityCategory"
+	       name="omis.person.domain.impl.AlternativeIdentityCategoryImpl"
+	       table="`ALT_IDENTITY_CATEGORY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`ALT_IDENTITY_CATEGORY_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+		<property name="description" type="java.lang.String" not-null="true" column="`DESCRIPTION`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+	</class>
+	<query name="findAlternativeIdentityCategories"><![CDATA[
+		select category
+		from omis.person.domain.AlternativeIdentityCategory category
+		where category.valid = true
+		order by category.sortOrder, category.name
+	]]></query>
+</hibernate-mapping>

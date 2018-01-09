@@ -1,0 +1,1 @@
+<jsp:include page="accommodationNotesTable.jsp"></jsp:include>

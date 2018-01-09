@@ -1,0 +1,50 @@
+.toBeDeleted, .removedRequestRow {
+	background-color: #FF6666;
+	box-shadow: 0 0 5px #FF0000;
+}
+
+.col-group > div {
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+@media screen and (min-width: 44em) {
+  .col-group {
+  	width:100%;
+    overflow: hidden;
+  }
+  .col-group .column1 {
+    float: left;
+    width: 45%;
+  }
+  
+  .col-group .column2 {
+  	float: left;
+  	width: 45%;
+  }
+}
+
+ul#labWorkItemsList {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+ul#labWorkItemsList li {
+  	border: 1px;
+  	border-color: #E6E6E6 #000000 #000000 #E6E6E6;
+  	border-style: solid;
+  	padding: 2px 0 2px 0;
+  	margin: 5px;
+  	display: inline-block; 
+  	width: 100%;
+}
+
+ul#labWorkItemsList li:nth-child(odd) { 
+  	background-color:#FFFFFF; 
+}
+
+ul#labWorkItemsList li:nth-child(even) { 
+  	background-color:#F5F5F5; 
+}

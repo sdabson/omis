@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Conviction web configuration.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+	<!-- Validators -->
+	
+	<bean id="convictionFormValidator" class="omis.conviction.validator.ConvictionFormValidator"/>
+	
+	<!-- Validator delegates -->
+	
+	<bean id="convictionFieldsValidatorDelegate" class="omis.conviction.web.validator.delegate.ConvictionFieldsValidatorDelegate"/>
+	
+	<!-- Web configuration -->
+	
+	<context:component-scan base-package="omis.conviction.web.controller"/>
+	
+	<!-- Use controller transactions -->
+  
+  	<aop:config>
+        <aop:pointcut id="convictionControllerOperation" expression="execution(* omis.conviction.web.controller.ConvictionController.*(..))"/>
+        <aop:advisor advice-ref="transactionAdvice" pointcut-ref="convictionControllerOperation"/>
+  	</aop:config>
+	       
+</beans>

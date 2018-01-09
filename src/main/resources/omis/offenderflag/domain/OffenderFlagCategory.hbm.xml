@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  - Author: Sheronda Vaughn
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offenderflag.domain">
+	<class	entity-name="omis.offenderflag.domain.OffenderFlagCategory"
+			proxy="omis.offenderflag.domain.OffenderFlagCategory"
+			name="omis.offenderflag.domain.impl.OffenderFlagCategoryImpl"
+			table="`OFFENDER_FLAG_CAT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`OFFENDER_FLAG_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+		<property name="description" type="java.lang.String" not-null="true" column="`DESCRIPTION`"/>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+		<property name="required" type="yes_no" not-null="true" column="`REQUIRED`"/>
+		<property name="sortOrder" type="java.lang.Short" not-null="true" column="`SORT_ORDER`"/>
+		<property name="usage" column="`USAGE`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.offenderflag.domain.FlagUsage</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findRequiredOffenderFlagCategories"><![CDATA[
+         select category
+           from omis.offenderflag.domain.OffenderFlagCategory category
+          where category.valid = true and category.required = true
+       order by category.sortOrder, category.name
+	]]></query>
+	<query name="findAllOffenderFlagCategories"><![CDATA[
+	     select category
+           from omis.offenderflag.domain.OffenderFlagCategory category
+       order by category.sortOrder, category.name
+	]]></query>
+	<query name="findOffenderFlagCategoryByName"><![CDATA[
+		select category
+			from omis.offenderflag.domain.OffenderFlagCategory category
+			where
+				category.name = :name	
+			order by category.sortOrder, category.name			
+	]]></query>
+	<query name="findOffenderFlagCategoryByNameExcluding"><![CDATA[
+		select category
+			from omis.offenderflag.domain.OffenderFlagCategory category
+			where
+				category.name = :name	
+				and 
+				category != :offenderFlagCategory	
+			order by category.sortOrder, category.name		
+	]]></query>
+</hibernate-mapping>

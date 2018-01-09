@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.military.report">
+	<query name="findServiceTermSummariesByOffender"><![CDATA[
+		select new omis.military.report.MilitaryServiceTermSummary(
+			serviceTerm.id, 
+			serviceTerm.dateRange.startDate, 
+			serviceTerm.dateRange.endDate, 
+			branch.name,
+			dischargeStatus.name)
+		from
+			omis.military.domain.MilitaryServiceTerm serviceTerm
+			left outer join serviceTerm.dischargeStatus dischargeStatus
+			left outer join serviceTerm.branch branch
+		where
+			serviceTerm.offender = :offender
+	]]></query>
+	<query name="findMilitaryServiceTermNoteSummariesByMilitaryServiceTerm"><![CDATA[
+		select new omis.military.report.MilitaryServiceTermNoteSummary(
+			serviceTerm.id,
+			serviceTermNote.date,
+			serviceTermNote.note
+		)
+		from
+			omis.military.domain.MilitaryServiceTermNote serviceTermNote
+			left outer join serviceTermNote.serviceTerm serviceTerm
+		where
+			serviceTermNote.serviceTerm = :serviceTerm
+	]]></query>
+</hibernate-mapping>

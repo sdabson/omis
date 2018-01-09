@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+	<!-- Services -->
+    <bean id="courtCaseDocumentAssociationService" class="omis.courtdocument.service.impl.CourtCaseDocumentAssociationServiceImpl">
+  		<constructor-arg name="courtCaseDocumentAssociationDelegate" ref="courtCaseDocumentAssociationDelegate"/>
+  		<constructor-arg name="courtDocumentCategoryDelegate" ref="courtDocumentCategoryDelegate"/>
+  		<constructor-arg name="documentDelegate" ref="documentDelegate"/>
+  		<constructor-arg name="documentTagDelegate" ref="documentTagDelegate"/>
+  		<constructor-arg name="courtCaseDelegate" ref="courtCaseDelegate"/>
+  		<constructor-arg name="courtCaseDocumentAssociationSummaryReportService" ref="courtCaseDocumentAssociationSummaryReportService"/>
+  	</bean>   
+  		
+  	<!--  Report Services -->
+  	<bean id="courtCaseDocumentAssociationSummaryReportService" class="omis.courtdocument.report.impl.hibernate.CourtCaseDocumentAssociationSummaryReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 	</bean>
+ 		
+ 	<bean id="courtCaseDocumentAssociationProfileItemReportService" class="omis.courtdocument.report.impl.hibernate.CourtCaseDocumentAssociationProfileItemReportServiceHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 	</bean>
+ 	<!-- Helpers -->
+ 	<bean id="courtDocumentCategoryDelegate" class="omis.courtdocument.service.delegate.CourtDocumentCategoryDelegate">
+ 		<constructor-arg name="courtDocumentCategoryDao" ref="courtDocumentCategoryDao"/>
+ 	</bean>
+ 	
+ 	<bean id="courtCaseDocumentAssociationDelegate" class="omis.courtdocument.service.delegate.CourtCaseDocumentAssociationDelegate">
+ 		<constructor-arg name="courtCaseDocumentAssociationInstanceFactory" ref="courtCaseDocumentAssociationInstanceFactory"/>
+ 		<constructor-arg name="courtCaseDocumentAssociationDao" ref="courtCaseDocumentAssociationDao"/>
+ 		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+ 	</bean>
+ 	<!-- Instance Factories -->
+ 	<bean id="courtCaseDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+ 		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+ 		<constructor-arg name="entityName" value="omis.courtdocument.domain.CourtCaseDocumentAssociation"/>
+ 	</bean>
+ 	<!-- Data access objects -->
+ 	<bean id="courtDocumentCategoryDao" class="omis.courtdocument.dao.impl.hibernate.CourtDocumentCategoryDaoHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		<constructor-arg name="entityName" value="omis.courtdocument.domain.CourtDocumentCategory"/>
+ 	</bean>
+ 	<bean id="courtCaseDocumentAssociationDao" class="omis.courtdocument.dao.impl.hibernate.CourtCaseDocumentAssociationDaoHibernateImpl">
+ 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		<constructor-arg name="entityName" value="omis.courtdocument.domain.CourtCaseDocumentAssociation"/>
+ 	</bean>
+ 	 	
+ 	<!-- Property editor factories -->
+ 	<bean id="courtDocumentCategoryPropertyEditorFactory"
+ 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="dao" ref="courtDocumentCategoryDao"/>
+ 		<constructor-arg name="entityName" value="omis.courtdocument.domain.CourtDocumentCategory"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+ 	</bean>
+ 	
+ 	<bean id="courtCaseDocumentAssociationPropertyEditorFactory"
+ 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="dao" ref="courtCaseDocumentAssociationDao"/>
+ 		<constructor-arg name="entityName" value="omis.courtdocument.domain.CourtCaseDocumentAssociation"/>
+ 		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+ 	</bean>
+</beans>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+  - Mapping and queries for correctional status terms.
+  -
+  - Author: Jason Nelson
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+
+	<!-- Mapping for correctional status terms. -->
+	<class entity-name="omis.supervision.domain.CorrectionalStatusTerm"
+	       proxy="omis.supervision.domain.CorrectionalStatusTerm"
+	       name="omis.supervision.domain.impl.CorrectionalStatusTermImpl"
+	       table="`CORRECTIONAL_STATUS_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CORRECTIONAL_STATUS_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCorrectionalStatusTerm">
+			<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+			<many-to-one name="correctionalStatus" entity-name="omis.supervision.domain.CorrectionalStatus" not-null="true" column="`CORRECTIONAL_STATUS_ID`"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+				<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+			</component>
+		</properties>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+	</class>
+	
+	<!-- Returns correctional status terms by offender. -->
+	<query name="findCorrectionalStatusTermsByOffender"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm as correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		order by correctionalStatusTerm.dateRange.startDate desc
+	]]></query>
+	
+	<!-- Returns correctional status for offender on date. -->
+	<query name="findCorrectionalStatusTermForOffenderOnDate"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm as correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		and (
+		 (correctionalStatusTerm.dateRange.endDate is null 
+					or correctionalStatusTerm.dateRange.endDate > :date)
+		 and (correctionalStatusTerm.dateRange.startDate is null 
+			 		or correctionalStatusTerm.dateRange.startDate <= :date)
+		)
+	]]></query>
+	
+	<!-- Counts correctional status terms for offender between dates. -->
+	<query name="countCorrectionalStatusTermsForOffenderBetweenDates"><![CDATA[
+		select count (correctionalStatusTerm)
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where (correctionalStatusTerm.dateRange.startDate <= :endDate or :endDate is null)
+			and (correctionalStatusTerm.dateRange.endDate > :startDate or :startDate is null
+				or correctionalStatusTerm.dateRange.endDate is null)
+			and correctionalStatusTerm.offender = :offender
+	]]></query>
+	
+	<!-- Counts correctional status terms for offender between dates (exclusive). -->
+	<query name="countCorrectionalStatusTermsForOffenderBetweenDatesExcluding"><![CDATA[
+		select count (correctionalStatusTerm)
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where (correctionalStatusTerm.dateRange.startDate <= :endDate or :endDate is null)
+			and (correctionalStatusTerm.dateRange.endDate > :startDate or :startDate is null
+				or correctionalStatusTerm.dateRange.endDate is null)
+			and correctionalStatusTerm.offender = :offender
+			and correctionalStatusTerm not in (:excludeCorrectionalStatusTerms)
+	]]></query>
+	
+	<!-- Returns correctional status term for offender with end date. -->
+	<query name="findCorrectionalStatusTermForOffenderWithEndDate"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		  and correctionalStatusTerm.dateRange.endDate = :endDate
+	]]></query>
+	
+	<!-- Returns correctional status term for offender with start date. -->
+	<query name="findCorrectionalStatusTermForOffenderWithStartDate"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		  and correctionalStatusTerm.dateRange.startDate = :startDate
+	]]></query>
+	
+	<!-- Returns correctional status term. -->
+	<query name="findCorrectionalStatusTerm"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		  and correctionalStatusTerm.correctionalStatus = :correctionalStatus
+		  and (correctionalStatusTerm.dateRange.startDate = :startDate
+		    or (correctionalStatusTerm.dateRange.startDate is null and :startDate is null))
+		  and (correctionalStatusTerm.dateRange.endDate = :endDate
+		    or (correctionalStatusTerm.dateRange.endDate is null and :endDate is null))
+	]]></query>
+	
+	<!-- Returns correctional status term (exclusive). -->
+	<query name="findCorrectionalStatusTermExcluding"><![CDATA[
+		select correctionalStatusTerm
+		from omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
+		where correctionalStatusTerm.offender = :offender
+		  and correctionalStatusTerm.correctionalStatus = :correctionalStatus
+		  and (correctionalStatusTerm.dateRange.startDate = :startDate
+		    or (correctionalStatusTerm.dateRange.startDate is null and :startDate is null))
+		  and (correctionalStatusTerm.dateRange.endDate = :endDate
+		    or (correctionalStatusTerm.dateRange.endDate is null and :endDate is null))
+		  and correctionalStatusTerm not in (:excludedCorrectionalStatusTerms)
+	]]></query>
+</hibernate-mapping>

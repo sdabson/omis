@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.Detainer"
+			proxy="omis.detainernotification.domain.Detainer"
+			name="omis.detainernotification.domain.impl.DetainerImpl"
+			table="`DETAINER`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`DETAINER_SEQ`</param>
+				</generator>
+			</id>
+	
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true"/>
+			<property name="alternateOffenderId" column="`ALTERNATE_OFFENDER_ID`" type="java.lang.String"/>
+			<property name="offenseDescription" column="`OFFENSE_DESCRIPTION`" type="java.lang.String"/>
+			<property name="courtCaseNumber" column="`COURT_CASE_NUMBER`" type="java.lang.String"/>
+			<many-to-one name="detainerType" column="`DETAINER_TYPE_ID`" entity-name="omis.detainernotification.domain.DetainerType" not-null="true"/>
+			<many-to-one name="detainerAgency" column="`DETAINER_AGENCY_ID`" entity-name="omis.detainernotification.domain.DetainerAgency"/>
+			<property name="jurisdiction" column="`JURISDICTION`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.detainernotification.domain.DetainerJurisdictionCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="receiveDate" column="`RECEIVE_DATE`" type="java.util.Date" not-null="true"/>
+			<property name="issueDate" column="`ISSUE_DATE`" type="java.util.Date"/>
+			<property name="warrantNumber" column="`WARRANT_NUMBER`" type="java.lang.String"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_USER_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_USER_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findDetainer"><![CDATA[
+		select detainer
+		from
+			omis.detainernotification.domain.Detainer detainer
+		where
+			detainer.offender = :offender
+		and
+			detainer.receiveDate = :receivedDate
+		and
+			detainer.courtCaseNumber = :courtCaseNumber
+		and
+			detainer.warrantNumber = :warrantNumber
+	]]></query>
+	<query name="findDetainerExcluding"><![CDATA[
+		select detainer
+		from
+			omis.detainernotification.domain.Detainer detainer
+		where
+			detainer.offender = :offender
+		and
+			detainer.receiveDate = :receivedDate
+		and
+			detainer.courtCaseNumber = :courtCaseNumber
+		and
+			detainer.warrantNumber = :warrantNumber
+		and
+			detainer != :detainer
+	]]></query>
+	<query name="findDetainerByOffender"><![CDATA[
+		select detainer
+		from
+			omis.detainernotification.domain.Detainer detainer
+		where
+			detainer.offender = :offender
+	]]></query>
+	<query name="findDetainerNotificationCount"><![CDATA[
+		select count(detainer.id)
+		from
+			omis.detainernotification.domain.DetainerWarrantProcessingStatus dwps
+		right outer join
+			dwps.detainer detainer
+		where
+			detainer.offender = :offender
+		and
+			dwps.cancellation.date is null
+	]]></query>
+</hibernate-mapping>

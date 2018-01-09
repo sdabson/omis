@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.domain">
+	<class entity-name="omis.employment.domain.EmploymentTerm"
+		proxy="omis.employment.domain.EmploymentTerm"
+		name="omis.employment.domain.impl.EmploymentTermImpl"
+		table="`EMPLOYMENT_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EMPLOYMENT_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<component name="dateRange" class="omis.datatype.DateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="false"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<component name="verificationSignature" class="omis.audit.domain.VerificationSignature">
+		    <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+		      <property name="date" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
+		      <property name="result" type="yes_no" not-null="false" column="`VERIFICATION_RESULT`"/>
+			<many-to-one name="method" entity-name="omis.audit.domain.VerificationMethod" not-null="true" column="`VERIFICATION_METHOD_ID`"/>
+	  	</component>
+		<property name="convictedOfEmployerTheft" column="`CONVICTED_OF_EMPLOYER_THEFT`" not-null="false" type="yes_no"/>
+		<component name="job" class="omis.employment.domain.component.Job">
+			<property name="supervisorName" column="`SUPERVISOR_NAME`" type="java.lang.String" not-null="false" unique="false"/>
+			<many-to-one name="employer" entity-name="omis.employment.domain.Employer" not-null="true" column="`EMPLOYER_ID`"/>
+			<property name="jobTitle" type="java.lang.String" not-null="true" column="`TITLE`"/>
+			<property name="phoneExtension" type="java.lang.String" not-null="false" column="`PHONE_EXTENSION`"/>
+			<component name="wage" class="omis.employment.domain.component.Wage">
+				<property name="amount" column="`AMOUNT`" type="big_decimal" not-null="false" unique="false"/>
+				<property name="hoursPerWeek" type="java.lang.Integer" not-null="false" column="`HOURS_PER_WEEK`"/>
+				<property name="wagePaymentFrequency" column="`WAGE_PAYMENT_FREQUENCY`" not-null="false">
+					<type name="org.hibernate.type.EnumType">
+						<param name="enumClass">omis.employment.domain.WagePaymentFrequency</param>
+						<param name="useNamed">true</param>
+						<param name="type">12</param>
+					</type>
+				</property>
+			</component>
+			<component name="workShift" class="omis.employment.domain.component.WorkShift">
+				<property name="scheduleStartTime" column="`WORK_SHIFT_START_TIME`" type="java.util.Date" not-null="false"/>
+				<property name="scheduleEndTime" column="`WORK_SHIFT_END_TIME`" type="java.util.Date" not-null="false"/>
+				<property name="timesMayVary" type="yes_no" not-null="false" column="`WORK_SHIFT_TIMES_MAY_VARY`"/>
+				<component name="workShiftDays" class="omis.employment.domain.component.WorkShiftDays">
+					<property name="sunday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_SUNDAY`"/>
+					<property name="monday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_MONDAY`"/>
+					<property name="tuesday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_TUESDAY`"/>
+					<property name="wednesday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_WEDNESDAY`"/>
+					<property name="thursday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_THURSDAY`"/>
+					<property name="friday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_FRIDAY`"/>
+					<property name="saturday" type="yes_no" not-null="false" column="`WORK_SHIFT_DAYS_SATURDAY`"/>
+				</component>
+				<property name="workShiftFrequency" column="`WORK_SHIFT_FREQUENCY`" not-null="false">
+					<type name="org.hibernate.type.EnumType">
+						<param name="enumClass">omis.employment.domain.WorkShiftFrequency</param>
+						<param name="useNamed">true</param>
+						<param name="type">12</param>
+					</type>
+				</property>
+			</component>
+		</component>
+		<many-to-one name="endReason" column="`END_REASON_ID`" cascade="none" not-null="false"	entity-name="omis.employment.domain.EmploymentChangeReason"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	
+	<query name="findEmploymentTerm"><![CDATA[
+		select employmentTerm
+			from
+			omis.employment.domain.EmploymentTerm employmentTerm
+		where
+			employmentTerm.offender = :offender
+		and
+			((employmentTerm.dateRange.startDate = :startDate) or (employmentTerm.dateRange.startDate is null and :startDate is null))
+		and
+			((employmentTerm.dateRange.endDate = :endDate) or (employmentTerm.dateRange.endDate is null and :endDate is null))
+		and 
+			employmentTerm.job.jobTitle = :title
+		and
+			employmentTerm.job.employer = :employer
+		and
+			employmentTerm.endReason = :endReason
+	]]></query>	
+		
+	<query name="findEmploymentTermExcluding"><![CDATA[
+		select employmentTerm
+		from
+			omis.employment.domain.EmploymentTerm employmentTerm
+		where
+			employmentTerm.offender = :offender
+		and
+			employmentTerm.endReason = :endReason
+		and
+			employmentTerm.job.employer.location = :employerLocation
+		and
+			employmentTerm.job.jobTitle = :jobTitle
+		and
+			((employmentTerm.dateRange.startDate = :startDate) or (employmentTerm.dateRange.startDate is null and :startDate is null))
+		and
+			((employmentTerm.dateRange.endDate = :endDate) or (employmentTerm.dateRange.endDate is null and :endDate is null))
+		and
+		    employmentTerm != :excludedEmploymentTerm
+	]]></query>   
+
+	<query name="findEmploymentTermsByOffender"><![CDATA[
+		select employmentTerm
+		from
+			omis.employment.domain.EmploymentTerm employmentTerm
+		where
+			employmentTerm.offender = :offender
+		order by employmentTerm.offender.name
+	]]></query>
+	
+	<query name="findEmploymentTermsByEmployer"><![CDATA[
+		select employmentTerm
+		from
+			omis.employment.domain.EmploymentTerm employmentTerm
+		where
+			employmentTerm.offender = :offender
+		and
+			employmentTerm.job.employer = :employer
+		and
+			employmentTerm.job.jobTitle = :jobTitle
+		and
+			((employmentTerm.dateRange.startDate = :startDate) or (employmentTerm.dateRange.startDate is null and :startDate is null))
+		and
+			((employmentTerm.dateRange.endDate = :endDate) or (employmentTerm.dateRange.endDate is null and :endDate is null))
+		and
+		    employmentTerm != :excludedEmploymentTerm
+	]]></query>
+	<query name="findEmploymentTermCountByOffenderAndDate"><![CDATA[
+		select count(employmentTerm.id)
+		  from omis.employment.domain.EmploymentTerm employmentTerm
+		 where employmentTerm.offender = :offender
+		   and ((employmentTerm.dateRange.startDate <= :effectiveDate
+		   		or employmentTerm.dateRange.startDate is null)
+		   		and (employmentTerm.dateRange.endDate > :effectiveDate
+		   		or employmentTerm.dateRange.endDate is null))
+	]]></query>   
+</hibernate-mapping>

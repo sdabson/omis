@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.report">
+	<query name="findIssuancesByAccommodation"><![CDATA[
+		select new omis.adaaccommodation.report.AccommodationIssuanceSummary(
+			issuance.id, issuance.description, issuance.timestamp, 
+			name.firstName, name.lastName)
+		from 
+			omis.adaaccommodation.domain.AccommodationIssuance issuance
+			left join issuance.issuer issuer
+			left join issuer.name name
+		where
+			issuance.accommodation = :accommodation
+		order by issuance.timestamp desc
+	]]></query>
+</hibernate-mapping>

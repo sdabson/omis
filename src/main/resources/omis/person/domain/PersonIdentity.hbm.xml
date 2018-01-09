@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<typedef name="sex" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.demographics.domain.Sex</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.person.domain.PersonIdentity"
+	       proxy="omis.person.domain.PersonIdentity"
+	       name="omis.person.domain.impl.PersonIdentityImpl"
+	       table="`PERSON_IDENTITY`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_IDENTITY_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<many-to-one name="person" entity-name="omis.person.domain.Person"
+		             column="`PERSON_ID`" not-null="true" cascade="none"/>
+		<many-to-one name="birthPlace" entity-name="omis.region.domain.City"
+		           	 not-null="false" column="`BIRTH_PLACE_ID`"/>
+		<many-to-one name="birthState" entity-name="omis.region.domain.State"
+		             not-null="false" column="`BIRTH_STATE_ID`"/>
+		<many-to-one name="birthCountry" entity-name="omis.country.domain.Country"
+                     not-null="false" column="`BIRTH_COUNTRY_ID`"/>
+		<property name="birthDate" type="date" not-null="false" column="`BIRTHDATE`"/>
+		<property name="socialSecurityNumber" not-null="false" column="`SSN`"/>
+		<property name="stateIdNumber" not-null="false" column="`SID`"/>
+		<property name="sex" column="`SEX`" type="sex" not-null="false"/>
+		<property name="deceased" column="`DECEASED`" type="yes_no" not-null="false"/>
+		<property name="deathDate" column="`DEATH_DATE`" type="java.util.Date" not-null="false"/>
+	</class>
+	<query name="findPersonIdentity"><![CDATA[
+		from
+			omis.person.domain.PersonIdentity identity
+		where
+			identity.person = :person
+		and
+			identity.socialSecurityNumber = :socialSecurityNumber
+		and
+			identity.birthDate = :birthDate
+		and
+			identity.birthPlace = :birthCity
+		and
+			identity.birthCountry = :birthCountry
+		and 
+			identity.sex = :sex
+	]]></query>
+	<query name="findPersonIdentityExcluding"><![CDATA[
+		from
+			omis.person.domain.PersonIdentity identity
+		where
+			identity.person = :person
+		and
+			identity.socialSecurityNumber = :socialSecurityNumber
+		and
+			identity.birthDate = :birthDate
+		and
+			identity.birthPlace = :birthCity
+		and
+			identity.birthCountry = :birthCountry
+		and 
+			identity.sex = :sex
+		and
+			identity <> :personIdentity
+	]]></query>
+	<query name="findAlternativePersonIdentities"><![CDATA[
+		from
+			omis.person.domain.PersonIdentity identity
+		where
+			identity.person = :person
+	]]></query>
+	<query name="findPersonIdentityByPerson"><![CDATA[
+		from
+			omis.person.domain.PersonIdentity identity
+		where
+			identity.person = :person
+	]]></query>
+</hibernate-mapping>

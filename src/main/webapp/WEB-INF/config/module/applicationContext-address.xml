@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="addressService" class="omis.address.service.impl.AddressServiceImpl">
+    <constructor-arg name="addressDelegate" ref="addressDelegate"/>
+    <constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
+    <constructor-arg name="addressUnitDesignatorDao" ref="addressUnitDesignatorDao"/>
+    <constructor-arg name="countryDao" ref="countryDao"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    <constructor-arg name="cityDelegate" ref="cityDelegate"/>
+    <constructor-arg name="zipCodeDao" ref="zipCodeDao"/>
+  </bean>
+
+  <!-- Service delegates -->
+  
+  <bean id="addressDelegate"
+        class="omis.address.service.delegate.AddressDelegate">
+    <constructor-arg name="addressDao" ref="addressDao"/>
+    <constructor-arg name="addressInstanceFactory" ref="addressInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="addressUnitDesignatorDelegate" class="omis.address.service.delegate.AddressUnitDesignatorDelegate">
+  	<constructor-arg name="addressUnitDesignatorInstanceFactory" ref="addressUnitDesignatorInstanceFactory"/>
+  	<constructor-arg name="addressUnitDesignatorDao" ref="addressUnitDesignatorDao"/>
+  </bean>
+
+  <bean id="streetSuffixDelegate" class="omis.address.service.delegate.StreetSuffixDelegate">
+    <constructor-arg name="streetSuffixInstanceFactory" ref="streetSuffixInstanceFactory"/>
+    <constructor-arg name="streetSuffixDao" ref="streetSuffixDao"/>
+  </bean>
+
+  <bean id="zipCodeDelegate" class="omis.address.service.delegate.ZipCodeDelegate">
+    <constructor-arg name="zipCodeDao" ref="zipCodeDao"/>
+    <constructor-arg name="zipCodeInstanceFactory" ref="zipCodeInstanceFactory"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="addressDao" class="omis.address.dao.impl.hibernate.AddressDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.address.domain.Address"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="addressUnitDesignatorDao" class="omis.address.dao.impl.hibernate.AddressUnitDesignatorDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.address.domain.AddressUnitDesignator"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="streetDirectionDao" class="omis.address.dao.impl.hibernate.StreetDirectionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.address.domain.StreetDirection"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="streetSuffixDao" class="omis.address.dao.impl.hibernate.StreetSuffixDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.address.domain.StreetSuffix"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="zipCodeDao" class="omis.address.dao.impl.hibernate.ZipCodeDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.address.domain.ZipCode"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="addressInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.address.domain.Address"/>
+  </bean>
+
+  <bean id="addressUnitDesignatorInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.address.domain.AddressUnitDesignator"/>
+  </bean>
+
+  <bean id="streetSuffixInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.address.domain.StreetSuffix"/>
+  </bean>
+
+  <bean id="zipCodeInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.address.domain.ZipCode"/>
+  </bean>
+  
+  <!-- Property editor factory -->
+  
+  <bean id="addressPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="addressDao"/>
+    <constructor-arg name="entityName" value="omis.address.domain.Address"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="streetDirectionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="streetDirectionDao"/>
+    <constructor-arg name="entityName" value="omis.address.domain.StreetDirection"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="streetSuffixPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="streetSuffixDao"/>
+    <constructor-arg name="entityName" value="omis.address.domain.StreetSuffix"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="addressUnitDesignatorPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="addressUnitDesignatorDao"/>
+    <constructor-arg name="entityName" value="omis.address.domain.AddressUnitDesignator"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="zipCodePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="zipCodeDao"/>
+    <constructor-arg name="entityName" value="omis.address.domain.ZipCode"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

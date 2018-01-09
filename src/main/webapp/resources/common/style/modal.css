@@ -1,0 +1,77 @@
+/*
+ * Cascading style sheet for modal displays.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (4/6/2017)
+ */
+
+/* Modal Container */
+
+div.modalContainer {
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	right: 0%;
+	bottom: 0%;
+	background: hsla(0, 0%, 0%, .5);
+}
+
+div.modalContainer.hidden {
+	display:none;
+}
+
+/* Modal content positioning */
+
+div.modalContainer .modalContent {
+	position: absolute;
+  	left: 50%;
+  	top: 50%;
+  	transform: translate(-50%, -50%);
+}
+
+div.modalContainer div.modalDialogue {
+	position: absolute;
+  	left: 50%;
+  	top: 50%;
+  	transform: translate(-50%, -50%);  
+  	width: 50%;
+}
+
+div.modalContainer .modalImage {
+	border: 2px solid white;
+}
+
+div.modalContainer a.modalClose:before {
+	content: url('../images/modalClose.png');
+	position: absolute;
+	right: 1%;
+	top: 1%;
+	cursor: pointer;
+}
+
+div.modalContainer div.modalDialogue p.buttons {
+	display: inline-block;
+	width: 100%;
+}
+
+div.modalContainer div.modalDialogue p.buttons > button, p.buttons > input, p.buttons > a.remove {
+    float: right;
+    margin: 0px 3px 2px 2px;
+}
+
+div.modalContainer div.modalDialogue p.buttons > a.remove:after {
+	content: url('../images/close.png');
+}
+
+div.modalContainer div.modalDialogue p.buttons {
+	margin: 0px;
+}
+
+div.modalContainer div.modalDialogue p.buttons {
+	margin:0px 0px 5px 0px;
+	vertical-align:middle;
+}
+
+form.modalForm span.error {
+	color: red;
+}

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="paroleBoardItineraryService"
+        	class="omis.paroleboarditinerary.service.impl.ParoleBoardItineraryServiceImpl">
+        	<constructor-arg name="paroleBoardItineraryDelegate" ref="paroleBoardItineraryDelegate"/>
+        	<constructor-arg name="paroleBoardItineraryNoteDelegate" ref="paroleBoardItineraryNoteDelegate"/>
+        	<constructor-arg name="boardAttendeeDelegate" ref="boardAttendeeDelegate"/>
+        	<constructor-arg name="boardMeetingSiteDelegate" ref="boardMeetingSiteDelegate"/>
+        	<constructor-arg name="locationDelegate" ref="locationDelegate"/>
+        	<constructor-arg name="paroleBoardMemberDelegate" ref="paroleBoardMemberDelegate"/>
+        </bean>        
+        
+        <!-- Report services -->
+        
+        <bean id="paroleBoardItinerarySummaryReportService"
+        	class="omis.paroleboarditinerary.report.impl.hibernate.ParoleBoardItinerarySummaryReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <!-- Delegates -->
+        
+        <bean id="paroleBoardItineraryDelegate"
+        	class="omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate">
+        	<constructor-arg name="paroleBoardItineraryDao" ref="paroleBoardItineraryDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="paroleBoardItineraryInstanceFactory" ref="paroleBoardItineraryInstanceFactory"/>
+        </bean>
+        
+        <bean id="paroleBoardItineraryNoteDelegate"
+        	class="omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryNoteDelegate">
+        	<constructor-arg name="paroleBoardItineraryNoteDao" ref="paroleBoardItineraryNoteDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="paroleBoardItineraryNoteInstanceFactory" ref="paroleBoardItineraryNoteInstanceFactory"/>
+        </bean>
+        
+        <bean id="boardAttendeeDelegate"
+        	class="omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate">
+        	<constructor-arg name="boardAttendeeDao" ref="boardAttendeeDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="boardAttendeeInstanceFactory" ref="boardAttendeeInstanceFactory"/>
+        </bean>
+        
+        <bean id="boardMeetingSiteDelegate"
+        	class="omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate">
+        	<constructor-arg name="boardMeetingSiteDao" ref="boardMeetingSiteDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="boardMeetingSiteInstanceFactory" ref="boardMeetingSiteInstanceFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="paroleBoardItineraryDao"
+        	class="omis.paroleboarditinerary.dao.impl.hibernate.ParoleBoardItineraryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItinerary"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="paroleBoardItineraryNoteDao"
+        	class="omis.paroleboarditinerary.dao.impl.hibernate.ParoleBoardItineraryNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItineraryNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="boardAttendeeDao"
+        	class="omis.paroleboarditinerary.dao.impl.hibernate.BoardAttendeeDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardAttendee"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="boardMeetingSiteDao"
+        	class="omis.paroleboarditinerary.dao.impl.hibernate.BoardMeetingSiteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardMeetingSite"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="paroleBoardItineraryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItinerary"/>
+		</bean>
+		
+		<bean id="paroleBoardItineraryNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItineraryNote"/>
+		</bean>
+		
+		<bean id="boardAttendeeInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardAttendee"/>
+		</bean>
+		
+		<bean id="boardMeetingSiteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardMeetingSite"/>
+		</bean>
+
+  		 <!--Property editor factories -->
+ 		 
+ 		 <bean id="paroleBoardItineraryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItinerary"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="paroleBoardItineraryDao"/>
+		</bean>
+		
+		<bean id="paroleBoardItineraryNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardItineraryNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="paroleBoardItineraryNoteDao"/>
+		</bean>
+		
+		<bean id="boardAttendeePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardAttendee"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="boardAttendeeDao"/>
+		</bean>
+		
+		<bean id="boardMeetingSitePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardMeetingSite"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="boardMeetingSiteDao"/>
+		</bean>
+		
+</beans>

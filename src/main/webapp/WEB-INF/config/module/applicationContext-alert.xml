@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- Services -->
+  
+  <bean id="offenderAlertService"
+        class="omis.alert.service.impl.OffenderAlertServiceImpl">
+    <constructor-arg name="offenderAlertDao" ref="offenderAlertDao"/>
+    <constructor-arg name="offenderAlertInstanceFactory" ref="offenderAlertInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!--  report services -->
+  <bean id="offenderAlertProfileItemReportService"
+  	class="omis.alert.report.impl.hibernate.OffenderAlertProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Data access objects -->
+
+  <bean id="offenderAlertDao"
+        class="omis.alert.dao.impl.hibernate.OffenderAlertDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.alert.domain.OffenderAlert"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+   <!-- Instance factories -->
+  
+  <bean id="offenderAlertInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.alert.domain.OffenderAlert"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="offenderAlertPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="offenderAlertDao"/>
+    <constructor-arg name="entityName" value="omis.alert.domain.OffenderAlert"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+</beans>

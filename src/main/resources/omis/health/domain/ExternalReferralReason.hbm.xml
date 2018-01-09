@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.ExternalReferralReason"
+		proxy="omis.health.domain.ExternalReferralReason"
+		name="omis.health.domain.impl.ExternalReferralReasonImpl"
+		table="`EXTERNAL_REF_REASON`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EXTERNAL_REF_REASON_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="short"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findExternalReferralReasons"><![CDATA[
+	  select reason from omis.health.domain.ExternalReferralReason reason
+	  order by reason.sortOrder, reason.name
+	]]></query>
+</hibernate-mapping>

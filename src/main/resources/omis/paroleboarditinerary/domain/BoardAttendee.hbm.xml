@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboarditinerary.domain">
+	<class	entity-name="omis.paroleboarditinerary.domain.BoardAttendee"
+			proxy="omis.paroleboarditinerary.domain.BoardAttendee"
+			name="omis.paroleboarditinerary.domain.impl.BoardAttendeeImpl"
+			table="`BOARD_ATTENDEE`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`BOARD_ATTENDEE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="boardMember" entity-name="omis.paroleboardmember.domain.ParoleBoardMember" not-null="true" column="`BOARD_MEMBER_ID`"/>
+		<many-to-one name="boardItinerary" entity-name="omis.paroleboarditinerary.domain.ParoleBoardItinerary" not-null="true" column="`PAROLE_BOARD_ITINERARY_ID`"/>
+		<property name="number" type="java.lang.Long" not-null="false" column="`NUMBER`"/>
+		<property name="role" column="`ATTENDEE_ROLE`" not-null="true">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.paroleboarditinerary.domain.AttendeeRoleCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findBoardAttendee"><![CDATA[
+		select boardAttendee
+		from omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
+		where
+			boardAttendee.boardMember = :boardMember
+		and
+			boardAttendee.boardItinerary = :boardItinerary
+		and
+			boardAttendee.number = :number
+		and
+			boardAttendee.role = :role
+	]]></query>
+	<query name="findBoardAttendeeExcluding"><![CDATA[
+		select boardAttendee
+		from omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
+		where
+			boardAttendee.boardMember = :boardMember
+		and
+			boardAttendee.boardItinerary = :boardItinerary
+		and
+			boardAttendee.number = :number
+		and
+			boardAttendee.role = :role
+		and
+			boardAttendee <> :excludedBoardAttendee
+	]]></query>
+	<query name="findBoardAttendeesByBoardItinerary"><![CDATA[
+		select boardAttendee
+		from omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
+		where
+			boardAttendee.boardItinerary = :boardItinerary
+		and
+			boardAttendee.role = 'PRIMARY'
+		order by boardAttendee.number
+	]]></query>
+	<query name="findBoardAttendeeAlternateByBoardItinerary"><![CDATA[
+		select boardAttendee
+		from omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
+		where
+			boardAttendee.boardItinerary = :boardItinerary
+		and
+			boardAttendee.role = 'ALTERNATE'
+	]]></query>
+</hibernate-mapping>

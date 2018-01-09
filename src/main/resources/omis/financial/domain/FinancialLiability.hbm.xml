@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.domain">
+	<class entity-name="omis.financial.domain.FinancialLiability"
+			proxy="omis.financial.domain.FinancialLiability"
+			name="omis.financial.domain.impl.FinancialLiabilityImpl"
+			table="`FINANCIAL_LIABILITY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FINANCIAL_LIABILITY_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+			<many-to-one name="category" column="`CATEGORY_ID`" entity-name="omis.financial.domain.FinancialLiabilityCategory" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String"  not-null="true"/>
+			<property name="amount" column="`AMOUNT`" type="big_decimal" />
+			<property name="reportedDate" column="`REPORTED_DATE`" type="java.util.Date"  not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findFinancialLiability"><![CDATA[
+		select financialLiability
+		from
+			omis.financial.domain.FinancialLiability financialLiability
+		where
+			financialLiability.offender = :offender
+		and
+			financialLiability.category = :category
+		and
+			financialLiability.description = :description
+		and
+			financialLiability.amount = :amount
+		and
+			financialLiability.reportedDate = :reportedDate
+	]]></query>	
+	<query name="findFinancialLiabilityExcluding"><![CDATA[
+		select financialLiability
+		from
+			omis.financial.domain.FinancialLiability financialLiability
+		where
+			financialLiability.offender = :offender
+		and
+			financialLiability.category = :category
+		and
+			financialLiability.description = :description
+		and
+			financialLiability.amount = :amount
+		and
+			financialLiability.reportedDate = :reportedDate
+		and
+			financialLiability != :excludedFinancialLiability
+	]]></query>	
+	<query name="findAllFinancialLiabilitiesByOffender"><![CDATA[
+		select financialLiability
+		from
+			omis.financial.domain.FinancialLiability financialLiability
+		where
+			financialLiability.offender = :offender
+	]]></query>	
+	<query name="findLiabilityTotalByOffender"><![CDATA[
+		select sum(financialLiability.amount)
+		from
+			omis.financial.domain.FinancialLiability financialLiability
+		where
+			financialLiability.offender = :offender
+		group by financialLiability.offender
+	]]></query>	
+</hibernate-mapping>

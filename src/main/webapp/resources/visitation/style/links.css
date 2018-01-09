@@ -1,0 +1,19 @@
+/*
+ * Links for visitation.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (Feb 1, 2016)
+ * Since: OMIS 3.0
+ */
+
+a.checkInLink:before {
+	content: url('../images/checkIn.png');
+	cursor: pointer;
+	vertical-align: -50%;
+}
+
+a.checkOutLink:before {
+	content: url('../images/checkOut.png');
+	cursor: pointer;
+	vertical-align: -50%;
+}

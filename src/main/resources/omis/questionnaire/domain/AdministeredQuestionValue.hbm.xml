@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.questionnaire.domain">
+	<class entity-name="omis.questionnaire.domain.AdministeredQuestionValue"
+			proxy="omis.questionnaire.domain.AdministeredQuestionValue"
+			name="omis.questionnaire.domain.impl.AdministeredQuestionValueImpl"
+			table="`OFFENDER_TEST_VALUE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`OFFENDER_TEST_VALUE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="question" column="`QUESTION_ID`" entity-name="omis.questionnaire.domain.Question" not-null="true"/>
+			<property name="comments" column="`COMMENTS`" type="java.lang.String"/>
+			<many-to-one name="answerValue" column="`ANSWER_VALUE_ID`" entity-name="omis.questionnaire.domain.AnswerValue" />
+			<property name="answerValueText" column="`ANSWER_VALUE_TEXT`" type="java.lang.String"/>
+			<many-to-one name="administeredQuestionnaire" column="`ADMINISTERED_QUESTIONNAIRE_ID`" entity-name="omis.questionnaire.domain.AdministeredQuestionnaire" not-null="true"/>
+			<many-to-one name="questionnaireSection" column="`QUESTIONNAIRE_SECTION_ID`" entity-name="omis.questionnaire.domain.QuestionnaireSection" not-null="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			
+	</class>
+	<query name="findAdministeredQuestionValue"><![CDATA[
+		select administeredQuestionValue
+		from
+			omis.questionnaire.domain.AdministeredQuestionValue administeredQuestionValue
+		where
+			administeredQuestionValue.question = :question
+		and
+			administeredQuestionValue.answerValue = :answerValue
+		and
+			administeredQuestionValue.answerValueText = :answerValueText
+		and
+			administeredQuestionValue.administeredQuestionnaire = :administeredQuestionnaire
+		and
+			administeredQuestionValue.questionnaireSection = :questionnaireSection
+	]]></query>
+	<query name="findAdministeredQuestionValueExcluding"><![CDATA[
+		select administeredQuestionValue
+		from
+			omis.questionnaire.domain.AdministeredQuestionValue administeredQuestionValue
+		where
+			administeredQuestionValue.question = :question
+		and
+			administeredQuestionValue.answerValue = :answerValue
+		and
+			administeredQuestionValue.answerValueText = :answerValueText
+		and
+			administeredQuestionValue.administeredQuestionnaire = :administeredQuestionnaire
+		and
+			administeredQuestionValue.questionnaireSection = :questionnaireSection
+		and
+			administeredQuestionValue != :administeredQuestionValue
+	]]></query>
+	<query name="findAdministeredQuestionValueByQuestionAndQuestionnaire"><![CDATA[
+		select administeredQuestionValue
+		from
+			omis.questionnaire.domain.AdministeredQuestionValue administeredQuestionValue
+		where
+			administeredQuestionValue.question = :question
+		and
+			administeredQuestionValue.administeredQuestionnaire = :administeredQuestionnaire
+	]]></query>
+	
+</hibernate-mapping>

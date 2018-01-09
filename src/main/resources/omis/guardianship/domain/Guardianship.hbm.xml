@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.guardianship.domain">
+		<class entity-name="omis.guardianship.domain.Guardianship"
+			proxy="omis.guardianship.domain.Guardianship"
+			name="omis.guardianship.domain.impl.GuardianshipImpl"
+			table="`GUARDIANSHIP`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`GUARDIANSHIP_SEQ`</param>
+				</generator>
+			</id>	
+			<many-to-one name="relationship" not-null="true" column="`RELATIONSHIP_ID`"
+				cascade="save-update" entity-name="omis.relationship.domain.Relationship"/>
+			<component name="dateRange">
+						<property name="startDate" column="`START_DATE`" not-null="false"/>
+						<property name="endDate" column="`END_DATE`" not-null="false"/>
+			</component>
+			<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+					<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+		</class>
+		<query name="findGuardianship"><![CDATA[
+		select guardianship
+			from
+			omis.guardianship.domain.Guardianship guardianship
+		where
+			guardianship.relationship = :relationship
+		and
+			((guardianship.dateRange.startDate = :startDate) or (guardianship.dateRange.startDate is null and :startDate is null))
+		and
+			((guardianship.dateRange.endDate = :endDate) or (guardianship.dateRange.endDate is null and :endDate is null))
+	]]></query>
+	</hibernate-mapping>

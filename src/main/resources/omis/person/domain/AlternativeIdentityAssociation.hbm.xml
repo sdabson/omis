@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.AlternativeIdentityAssociation"
+	       proxy="omis.person.domain.AlternativeIdentityAssociation"
+	       name="omis.person.domain.impl.AlternativeIdentityAssociationImpl"
+	       table="`ALT_IDENTITY_ASSOC`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`ALT_IDENTITY_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true"
+			             column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<properties name="uniqueAlternativeNameAssociation">
+			<many-to-one name="alternativeNameAssociation" entity-name="omis.person.domain.AlternativeNameAssociation"
+			             not-null="false" column="`ALT_NAME_ASSOC_ID`"/>
+			<many-to-one name="identity" entity-name="omis.person.domain.PersonIdentity"
+		    	         not-null="true" column="`IDENTITY_ID`" cascade="all"/>
+			<many-to-one name="category" entity-name="omis.person.domain.AlternativeIdentityCategory"
+			             not-null="true" column="`CATEGORY_ID`"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" column="`START_DATE`" not-null="false"/>
+				<property name="endDate" type="java.util.Date" column="`END_DATE`" not-null="false"/>
+			</component>
+		</properties>
+	</class>
+	<query name="findAlternativeIdentityAssociationsByPerson"><![CDATA[
+		select association
+		from omis.person.domain.AlternativeIdentityAssociation association
+			inner join fetch association.identity identity
+			inner join fetch identity.person person
+		where person = :person
+	]]></query>
+	<query name="findAlternativeIdentityAssociation"><![CDATA[
+		from
+			omis.person.domain.AlternativeIdentityAssociation association
+		where
+			association.identity = :identity
+		and
+			association.category = :category
+		and
+			association.dateRange = :dateRange
+	]]></query>
+	<query name="findAlternativeIdentityAssociationExcluding"><![CDATA[
+		from
+			omis.person.domain.AlternativeIdentityAssociation association
+		where
+			association.identity = :identity
+		and
+			association.category = :category
+		and
+			association.dateRange = :dateRange
+		and
+			association <> :association
+	]]></query>
+	<query name="findAlternativeOffenderIdentityCountByOffenderAndDate"><![CDATA[
+		 select count(association.id)
+		   from omis.person.domain.AlternativeIdentityAssociation association
+left outer join association.identity identity
+		  where identity.person = :offender
+		    and ((association.dateRange.startDate <= :effectiveDate
+		     or association.dateRange.startDate is null)
+		    and (association.dateRange.endDate > :effectiveDate
+		     or association.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

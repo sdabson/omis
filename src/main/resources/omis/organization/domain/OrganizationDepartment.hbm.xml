@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.organization.domain">
+	<class entity-name="omis.organization.domain.OrganizationDepartment"
+		proxy="omis.organization.domain.OrganizationDepartment"
+		name="omis.organization.domain.impl.OrganizationDepartmentImpl"
+		table="`ORGANIZATION_DEPT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ORGANIZATION_DEPT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="organization" column="`ORGANIZATION_ID`" cascade="none" not-null="true"
+				entity-name="omis.organization.domain.Organization" unique="false"/>
+		<property name="name" column="`Name`" not-null="false" type="string"/>
+		<property name="active" column="`ACTIVE`" not-null="false" type="yes_no"/>
+	</class>
+</hibernate-mapping>

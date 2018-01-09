@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.residence.domain">	
+	<typedef name="residenceStatus" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.residence.domain.ResidenceStatus</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.residence.domain.AllowedResidentialLocationRule"
+		proxy="omis.residence.domain.AllowedResidentialLocationRule"
+		name="omis.residence.domain.impl.AllowedResidentialLocationRuleImpl"
+		table="`ALLOWED_RESIDENT_LOC_RULE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ALLOWED_RESIDENT_LOC_RULE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="status" column="`STATUS`" not-null="true" type="residenceStatus"/>
+		<many-to-one name="location" column="`LOCATION_ID`" not-null="true" entity-name="omis.location.domain.Location"/>			
+	</class>
+	<query name="findAllowedResidentialLocationRule"><![CDATA[
+		select rule
+			from
+				omis.residence.domain.AllowedResidentialLocationRule rule
+			where 
+				rule.location = :location
+				and
+				rule.status = :status
+	]]></query>
+	<query name="findAllowedLocations"><![CDATA[
+		select location
+			from
+				omis.residence.domain.AllowedResidentialLocationRule rule
+				inner join rule.location location
+			where 
+				location = :location
+				and
+				rule.status = :status
+	]]></query>
+<!-- 	gets allowed locations based on the residence status that is set ???-->
+	<query name="findAllowedLocationsByResidenceStatus"><![CDATA[
+		select location
+			from 
+				omis.residence.domain.AllowedResidentialLocationRule rule
+			inner join rule.location location
+			inner join location.organization organization
+			where 
+				rule.status = :status
+		order by 
+			organization.name
+			
+	]]></query>
+<!-- 	gets allowed locations within a specified state based on residence status -->
+	<query name="findAllowedLocationsWithinState"><![CDATA[
+		select location
+		from omis.residence.domain.AllowedResidentialLocationRule rule
+			inner join rule.location location
+			inner join location.organization organization
+			inner join location.address address
+			inner join address.zipCode zipCode
+			inner join zipCode.city city
+			inner join city.state state
+		where 
+			rule.status = :status
+		and 
+			state = :state
+		order by 
+			organization.name
+	]]></query>
+<!-- 	gets allowed locations within a specified city based on residence status -->
+	<query name="findAllowedLocationsWithinCity"><![CDATA[
+		select location
+		from omis.residence.domain.AllowedResidentialLocationRule rule
+			inner join rule.location location
+			inner join location.organization organization
+			inner join location.address address
+			inner join address.zipCode zipCode
+			inner join zipCode.city city
+		where 
+			rule.status = :status
+		and 
+			city = :city
+		order by organization.name
+	]]></query>
+</hibernate-mapping>

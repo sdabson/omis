@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+	<class entity-name="omis.condition.domain.Agreement"
+	       proxy="omis.condition.domain.Agreement"
+	       name="omis.condition.domain.impl.AgreementImpl"
+	       table="`AGREEMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`AGREEMENT_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueCondition">
+			<many-to-one name="offender"  class="omis.offender.domain.Offender" column="`OFFENDER_ID`" not-null="true"/>
+			<component name="dateRange" class="omis.datatype.DateRange">
+				<property name="startDate" type="java.util.Date" column="`START_DATE`" not-null="true"/>
+				<property name="endDate" type="java.util.Date" column="`END_DATE`" not-null="false"/>
+			</component>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="false" />
+			<property name="category" column="`CATEGORY`" not-null="false" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.condition.domain.AgreementCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+		</properties>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findAgreementsByOffender"><![CDATA[
+		select agreement 
+			from omis.condition.domain.Agreement agreement
+		where
+			agreement.offender = :offender
+		order by agreement.dateRange.endDate
+	]]></query>
+	<query name="findAgreement"><![CDATA[
+	  	select agreement 
+	  		from omis.condition.domain.Agreement agreement
+	  	where 
+	  		agreement.offender = :offender
+	    and  
+	    	agreement.dateRange.startDate = :startDate
+	    and 
+	    	agreement.dateRange.endDate = :endDate
+	    and
+	    	agreement.description = :description
+	    and
+	    	agreement.category = :category
+		order by agreement.dateRange.endDate
+	]]></query>
+	<query name="findAgreementExcluding"><![CDATA[
+		select agreement
+			from omis.condition.domain.Agreement agreement
+		where  
+	  		agreement.offender = :offender
+	    and   
+	    	agreement.dateRange.startDate = :startDate
+	    and 
+	    	agreement.dateRange.endDate = :endDate
+	    and
+	    	agreement.description = :description
+	    and
+	    	agreement.category = :category
+	    and 
+	    	agreement != :agreement
+		order by agreement.dateRange.endDate
+	]]></query> 
+	<query name="findAgreementsByDocket"><![CDATA[
+		select agreement
+			from omis.courtcasecondition.domain.CourtCaseAgreement courtCaseAgreement
+		inner join
+			courtCaseAgreement.agreement agreement
+		where  
+	  		courtCaseAgreement.docket = :docket
+		order by courtCaseAgreement.agreement.dateRange.endDate
+	]]></query> 
+	<query name="findAgreementsByOffenderAndEffectiveDate"><![CDATA[
+		select agreement 
+			from omis.condition.domain.Agreement agreement
+		where
+			agreement.offender = :offender
+		and
+			((agreement.dateRange.startDate <= :effectiveDate)
+				and 
+				(agreement.dateRange.endDate is null 
+				or
+				agreement.dateRange.endDate > :effectiveDate))
+		order by agreement.dateRange.endDate
+	]]></query>
+</hibernate-mapping>

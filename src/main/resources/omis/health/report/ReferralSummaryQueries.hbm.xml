@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: 	Stephen Abson
+ - 			Joel Norris
+ 			Ryan Johns
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+<hibernate-mapping package="omis.health.report">
+  <query name="findInternalReferralSummaryForActionRequest"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        internalReferral.id,
+        internalReferral.schedulingNotes,
+        internalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        organization.name,
+        'INTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        case when provider is not null then true else false end,
+        providerName.lastName,
+        providerName.firstName,
+        providerTitle.name,
+        providerTitle.abbreviation,
+        reason.name,
+        '',
+        providerLevel.name,
+        internalReferral.locationDesignator,
+        ''
+      )
+    from omis.health.domain.ProviderInternalReferralAssociation providerInternalReferralAssociation
+      inner join providerInternalReferralAssociation.providerAssignment providerAssignment
+      inner join providerAssignment.provider provider
+      inner join provider.name providerName
+      inner join providerAssignment.title providerTitle
+      inner join providerInternalReferralAssociation.internalReferral internalReferral
+      inner join internalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join facility.location location
+      inner join location.organization organization
+      inner join internalReferral.reason reason
+      left outer join internalReferral.statusReason as statusReason
+      left outer join internalReferral.providerLevel providerLevel
+    where internalReferral.actionRequest = :actionRequest
+      and providerInternalReferralAssociation.primary = true
+  ]]></query>
+  <query name="findExternalReferralSummaryForActionRequest"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        externalReferral.id,
+        externalReferral.schedulingNotes,
+        externalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        medicalFacility.name,
+        'EXTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        ( select providerAssignment
+          from omis.health.domain.ProviderExternalReferralAssociation providerExternalReferralAssociation
+            inner join providerExternalReferralAssociation.externalReferral providerExternalReferral
+            inner join providerExternalReferralAssociation.providerAssignment providerAssignment
+            inner join providerAssignment.provider provider
+            inner join provider.name providerName
+            inner join providerAssignment.title providerTitle
+          where
+            providerExternalReferral = externalReferral and providerExternalReferralAssociation.primary = true),
+        reason.name,
+        request.reasonNotes,
+        externalReferral.reportedDate,
+        ''
+      )
+    from omis.health.domain.ExternalReferral externalReferral
+      inner join externalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join externalReferral.authorization authorization
+      inner join authorization.request request
+      inner join request.medicalFacility medicalFacility
+      inner join request.reason reason
+      left outer join externalReferral.statusReason statusReason
+    where externalReferral.actionRequest = :actionRequest
+  ]]></query>
+  <query name="findInternalReferralSummariesByFacility"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        internalReferral.id,
+        internalReferral.schedulingNotes,
+        internalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        organization.name,
+        'INTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        case when provider is not null then true else false end,
+        providerName.lastName,
+        providerName.firstName,
+        providerTitle.name,
+        providerTitle.abbreviation,
+        reason.name,
+        '',
+        providerLevel.name,
+        internalReferral.locationDesignator,
+        ''
+      )
+    from omis.health.domain.ProviderInternalReferralAssociation providerInternalReferralAssociation
+      inner join providerInternalReferralAssociation.providerAssignment providerAssignment
+      inner join providerAssignment.provider provider
+      inner join provider.name providerName
+      inner join providerAssignment.title providerTitle
+      inner join providerInternalReferralAssociation.internalReferral internalReferral
+      inner join internalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join facility.location location
+      inner join location.organization organization
+      inner join internalReferral.reason reason
+      left outer join internalReferral.statusReason as statusReason
+      left outer join internalReferral.providerLevel providerLevel
+    where facility = :facility
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+      and providerInternalReferralAssociation.primary = true
+  ]]></query>
+  <query name="findInternalReferralSummariesByOffender"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        internalReferral.id,
+        internalReferral.schedulingNotes,
+        internalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        organization.name,
+        'INTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        case when provider is not null then true else false end,
+        providerName.lastName,
+        providerName.firstName,
+        providerTitle.name,
+        providerTitle.abbreviation,
+        reason.name,
+        '',
+        providerLevel.name,
+        internalReferral.locationDesignator,
+        ''
+      )
+    from omis.health.domain.ProviderInternalReferralAssociation providerInternalReferralAssociation
+      inner join providerInternalReferralAssociation.providerAssignment providerAssignment
+      inner join providerAssignment.provider provider
+      inner join provider.name providerName
+      inner join providerAssignment.title providerTitle
+      inner join providerInternalReferralAssociation.internalReferral internalReferral
+      inner join internalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join facility.location location
+      inner join location.organization organization
+      inner join internalReferral.reason reason
+      left outer join internalReferral.statusReason as statusReason
+      left outer join internalReferral.providerLevel providerLevel
+    where offender = :offender
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+      and providerInternalReferralAssociation.primary = true
+  ]]></query>
+  <query name="findExternalReferralSummariesByFacility"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        externalReferral.id,
+        externalReferral.schedulingNotes,
+        externalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        medicalFacility.name,
+        'EXTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        ( select providerAssignment
+          from omis.health.domain.ProviderExternalReferralAssociation providerExternalReferralAssociation
+            inner join providerExternalReferralAssociation.externalReferral providerExternalReferral
+            inner join providerExternalReferralAssociation.providerAssignment providerAssignment
+            inner join providerAssignment.provider provider
+            inner join provider.name providerName
+            inner join providerAssignment.title providerTitle
+          where
+            providerExternalReferral = externalReferral and providerExternalReferralAssociation.primary = true),
+        reason.name,
+        request.reasonNotes,
+        externalReferral.reportedDate,
+        ''
+      )
+    from omis.health.domain.ExternalReferral externalReferral
+      inner join externalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join externalReferral.authorization authorization
+      inner join authorization.request request
+      inner join request.medicalFacility medicalFacility
+      inner join request.reason reason
+      left outer join externalReferral.statusReason statusReason
+    where facility = :facility
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+  ]]></query>
+  <query name="findExternalReferralSummariesByOffender"><![CDATA[
+    select new omis.health.report.ReferralSummary(
+        externalReferral.id,
+        externalReferral.schedulingNotes,
+        externalReferral.assessmentNotes,
+        offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        medicalFacility.name,
+        'EXTERNAL_MEDICAL',
+        appointment.date,
+        appointment.startTime,
+        statusReason.name,
+        ( select providerAssignment
+          from omis.health.domain.ProviderExternalReferralAssociation providerExternalReferralAssociation
+            inner join providerExternalReferralAssociation.externalReferral providerExternalReferral
+            inner join providerExternalReferralAssociation.providerAssignment providerAssignment
+            inner join providerAssignment.provider provider
+            inner join provider.name providerName
+            inner join providerAssignment.title providerTitle
+          where
+            providerExternalReferral = externalReferral and providerExternalReferralAssociation.primary = true),
+        reason.name,
+        request.reasonNotes,
+        externalReferral.reportedDate,
+        ''
+      )
+    from omis.health.domain.ExternalReferral externalReferral
+      inner join externalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join externalReferral.authorization authorization
+      inner join authorization.request request
+      inner join request.medicalFacility medicalFacility
+      inner join request.reason reason
+      left outer join externalReferral.statusReason statusReason
+    where offender = :offender
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+  ]]></query>
+   <query name="findLabWorkReferralSummariesByFacility"><![CDATA[
+     select new omis.health.report.ReferralSummary(
+        labWorkReferral.id,
+  		labWorkReferral.schedulingNotes,
+  		labWorkReferral.assessmentNotes,
+  		offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        'LAB',
+        appointment.date,
+        appointment.startTime,
+        '',
+        facility.name,
+        '')
+    from omis.health.domain.LabWorkReferral labWorkReferral
+      inner join labWorkReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offender.name as offenderName
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      inner join facility.location location
+      inner join location.organization organization
+      left outer join labWorkReferral.statusReason as statusReason
+    where facility = :facility
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+  ]]></query> 
+  <query name="findLabWorkReferralSummariesByOffender"><![CDATA[
+  	select new omis.health.report.ReferralSummary(
+  		labWorkReferral.id,
+  		labWorkReferral.schedulingNotes,
+  		labWorkReferral.assessmentNotes,
+  		offenderName.lastName,
+        offenderName.firstName,
+        offenderName.middleName,
+        offender.offenderNumber,
+        'LAB',
+        appointment.date,
+        appointment.startTime,
+        '',
+        facility.name,
+        '')
+  		from omis.health.domain.LabWorkReferral as labWorkReferral
+	  		inner join labWorkReferral.offenderAppointmentAssociation as offenderAppointmentAssociation
+	  		inner join offenderAppointmentAssociation.offender as offender
+	  		inner join offender.name as offenderName
+	  		inner join offenderAppointmentAssociation.appointment as appointment
+	  		inner join appointment.facility as facility
+	  		left outer join labWorkReferral.statusReason as statusReason
+	  	where offender = :offender
+	    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+	    		or (:appointmentStatusesContainsNull = false
+	    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+	      	and ((:startDate is null or appointment.date >= :startDate) and
+	           (:endDate is null or appointment.date <= :endDate))
+  ]]></query>
+  <query name="findLabWorksByOffender"><![CDATA[
+	  select new omis.health.report.ReferralSummary(
+	  	labWork.id,
+	  	labWork.schedulingNotes,
+	  	'',
+	  	offenderName.lastName,
+	  	offenderName.firstName,
+	  	offenderName.middleName,
+	  	offender.offenderNumber,
+	  	'LAB',
+	  	appointment.date,
+	  	appointment.startTime,
+	  	'',
+	  	facility.name,
+	  	labWork.labWorkCategory.name
+	  )
+	  from omis.health.domain.LabWork as labWork
+	  	inner join labWork.offenderAppointmentAssociation as offenderAppointmentAssociation
+	  	inner join offenderAppointmentAssociation.offender as offender
+	  	inner join offender.name as offenderName
+		inner join offenderAppointmentAssociation.appointment as appointment
+		inner join appointment.facility as facility
+	  where 
+	  		offender = :offender
+	  	and ((:appointmentStatusesContainsNull = true and appointment.status is null)
+	    		or (:appointmentStatusesContainsNull = false
+	    			and appointment.status in (:appointmentStatuses)))
+	  and 
+	  	((:startDate is null or appointment.date >= :startDate) and
+	          (:endDate is null or appointment.date <= :endDate))
+	]]></query>
+  <query name="findLabWorksByFacility"><![CDATA[
+	  select new omis.health.report.ReferralSummary(
+	  	labWork.id,
+	  	labWork.schedulingNotes,
+	  	'',
+	  	offenderName.lastName,
+	  	offenderName.firstName,
+	  	offenderName.middleName,
+	  	offender.offenderNumber,
+	  	'LAB',
+	  	appointment.date,
+	  	appointment.startTime,
+	  	'',
+	  	facility.name,
+	  	labWork.labWorkCategory.name
+	  )
+	  from omis.health.domain.LabWork labWork
+	  	inner join labWork.offenderAppointmentAssociation offenderAppointmentAssociation
+	  	inner join offenderAppointmentAssociation.offender offender
+	  	inner join offender.name as offenderName
+	  	inner join offenderAppointmentAssociation.appointment appointment
+	    inner join appointment.facility facility
+	    inner join facility.location location
+	    inner join location.organization organization
+	   where
+	   	facility = :facility
+	   	and ((:appointmentStatusesContainsNull = true and appointment.status is null)
+	    		or (:appointmentStatusesContainsNull = false
+	    			and appointment.status in (:appointmentStatuses)))
+	   and 
+	   		((:startDate is null or appointment.date >= :startDate) and
+	           (:endDate is null or appointment.date <= :endDate))
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  
+  <bean id="offenderFlagReportService" class="omis.offenderflag.report.impl.hibernate.OffenderFlagReportServiceHibernateImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="offendeFlagCategorySummaryReportService" class="omis.offenderflag.report.impl.hibernate.OffenderFlagCategorySummaryReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="offenderFlagSummaryItem"
+  		class="omis.offenderflag.web.summary.OffenderFlagSummaryItem">
+  	<constructor-arg name="offenderFlagReportService" ref="offenderFlagReportService"/>
+  	<constructor-arg name="summaryItemRegistry" ref="offenderFlagSummaryItemRegistry"/>
+  	<constructor-arg name="includedPageName" value="/WEB-INF/views/offenderFlag/summary/includes/summaryItem.jsp"/>
+  	<constructor-arg name="order" value="2"/>
+  	<constructor-arg name="enabled" value="${offenderFlagSummaryItemEnabled}"/>
+  </bean>
+  
+  <!-- Validators. -->
+  
+  <bean id="offenderFlagFormValidator" class="omis.offenderflag.web.validator.OffenderFlagFormValidator"/>
+  <bean id="offenderFlagCategoryFormValidator" class="omis.offenderflag.web.validator.OffenderFlagCategoryFormValidator"/>
+  
+  <!-- Profile Items -->
+  <bean id="offenderFlagProfileItem" class="omis.offenderflag.web.profile.OffenderFlagProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>OFFENDER_FLAG_VIEW</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/offenderFlag/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="flag"/>
+  	<constructor-arg name="profileItemRegistry" ref="basicInformationProfileItemRegistry"/>
+  	<constructor-arg name="offenderFlagProfileItemReportService" ref="offenderFlagProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${offenderFlagProfileItemEnabled}"/>
+  </bean>
+  
+  <!-- Web configuration -->
+  
+  <context:component-scan base-package="omis.offenderflag.web.controller"/>
+  
+  <!-- Use controller transactions -->
+  
+  <aop:config>
+      <aop:pointcut id="offenderFlagControllerOperation" expression="execution(* omis.offenderflag.web.controller.OffenderFlagController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderFlagControllerOperation"/>
+  </aop:config>
+  
+   <aop:config>
+      <aop:pointcut id="offenderFlagCategoryControllerOperation" expression="execution(* omis.offenderflag.web.controller.OffenderFlagCategoryController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="offenderFlagCategoryControllerOperation"/>
+  </aop:config>
+</beans>

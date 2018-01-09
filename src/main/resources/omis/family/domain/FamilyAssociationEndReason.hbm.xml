@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.family.domain">
+	<class entity-name="omis.family.domain.FamilyAssociationEndReason"
+		proxy="omis.family.domain.FamilyAssociationEndReason"
+		name="omis.family.domain.impl.FamilyAssociationEndReasonImpl"
+		table="`FAMILY_ASSOC_END_REASON`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FAMILY_ASSOC_END_REASON_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME" not-null="true" type="string"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="java.lang.Integer"/>
+	</class>
+	<query name="findFamilyAssociationEndReasons"><![CDATA[
+		from
+			omis.family.domain.FamilyAssociationEndReason reason
+		where
+			reason.valid = true
+		order by
+			reason.sortOrder
+	]]></query>
+	</hibernate-mapping>

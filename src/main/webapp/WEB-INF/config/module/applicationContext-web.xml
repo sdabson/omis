@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  
+  <!-- Services -->
+  
+  <bean id="formFieldTipService"
+        class="omis.web.service.impl.FormFieldTipServiceImpl">
+    <constructor-arg name="formFieldTipDelegate" ref="formFieldTipDelegate"/>
+  </bean>
+  
+  <!-- Service Delegates -->
+  
+  <bean id="formFieldTipDelegate"
+        class="omis.web.service.delegate.FormFieldTipDelegate">
+    <constructor-arg name="formFieldTipDao" ref="formFieldTipDao"/>
+    <constructor-arg name="formFieldTipInstanceFactory" ref="formFieldTipInstanceFactory"/>
+  </bean>
+  
+  <!-- DAOs -->
+  
+  <bean id="formFieldTipDao"
+        class="omis.web.dao.impl.hibernate.FormFieldTipDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.web.domain.FormFieldTip"/>
+  </bean>
+
+  <!-- Instance Factories -->
+  
+  <bean id="formFieldTipInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.web.domain.FormFieldTip"/>
+  </bean>
+  
+  <!-- Property Editor Factories -->
+  
+  <bean id="formFieldTipPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  	<constructor-arg name="dao" ref="formFieldTipDao"/>
+  	<constructor-arg name="entityName" value="omis.web.domain.FormFieldTip"/>
+  	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

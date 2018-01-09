@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Data access objects -->
+  
+  <bean id="personDao" class="omis.person.dao.impl.hibernate.PersonDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.Person"/>
+  </bean>
+  
+  <bean id="personNameDao" class="omis.person.dao.impl.hibernate.PersonNameDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.PersonName"/>
+  </bean>
+  
+  <bean id="personIdentityDao" class="omis.person.dao.impl.hibernate.PersonIdentityDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.PersonIdentity"/>
+  </bean>
+  
+  <bean id="suffixDao" class="omis.person.dao.impl.hibernate.SuffixDaoHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  	<constructor-arg name="entityName" value="omis.person.domain.Suffix"/>
+  </bean>
+  
+  <bean id="alternativeIdentityAssociationDao"
+        class="omis.person.dao.impl.hibernate.AlternativeIdentityAssociationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeIdentityAssociation"/>
+  </bean>
+  
+  <bean id="alternativeIdentityCategoryDao"
+        class="omis.person.dao.impl.hibernate.AlternativeIdentityCategoryDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeIdentityCategory"/>
+  </bean>
+  
+  <bean id="alternativeNameAssociationDao"
+        class="omis.person.dao.impl.hibernate.AlternativeNameAssociationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeNameAssociation"/>      
+  </bean>
+  
+  <bean id="alternativeNameCategoryDao"
+        class="omis.person.dao.impl.hibernate.AlternativeNameCategoryDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeNameCategory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="personInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.person.domain.Person"/>      
+  </bean>
+  
+  <bean id="personNameInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.person.domain.PersonName"/>
+  </bean>
+  
+  <bean id="personIdentityInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.person.domain.PersonIdentity"/>
+  </bean>
+
+  <bean id="alternativeNameAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeNameAssociation"/>
+  </bean>
+
+  <bean id="alternativeIdentityAssociationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeIdentityAssociation"/>
+  </bean>
+  
+  <bean id="alternativeNameCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+	<constructor-arg name="entityName" value="omis.person.domain.AlternativeNameCategory" />
+  </bean>
+  
+	
+  <!-- Services -->
+  
+  <bean id="suffixService" class="omis.person.service.impl.SuffixServiceImpl">
+  	<constructor-arg name="suffixDao" ref="suffixDao"/>
+  </bean>
+
+  <!-- Property editor factories -->
+  
+  <bean id="personPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.Person"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="personDao"/>
+  </bean>
+
+  <bean id="personIdentityPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.PersonIdentity"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="personIdentityDao"/>
+  </bean>
+  
+  <bean id="personNamePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.PersonName"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="personNameDao"/>
+  </bean>
+  
+  <bean id="alternativeNameAssociationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeNameAssociation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="alternativeNameAssociationDao"/>
+  </bean>
+
+  <bean id="alternativeIdentityAssociationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeIdentityAssociation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="alternativeIdentityAssociationDao"/>
+  </bean>
+  
+  <bean id="alternativeNameCategoryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeNameCategory"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="alternativeNameCategoryDao"/>
+  </bean>
+  
+  <bean id="alternativeIdentityCategoryPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.person.domain.AlternativeIdentityCategory"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="alternativeIdentityCategoryDao"/>
+  </bean>
+  
+  <bean id="suffixPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+	<constructor-arg name="dao" ref="suffixDao"/>
+	<constructor-arg name="entityName" value="omis.person.domain.Suffix"/>
+	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+   
+</beans>

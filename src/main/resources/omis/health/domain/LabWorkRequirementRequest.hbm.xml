@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.health.domain">
+	<class entity-name="omis.health.domain.LabWorkRequirementRequest"
+		proxy="omis.health.domain.LabWorkRequirementRequest"
+		name="omis.health.domain.impl.LabWorkRequirementRequestImpl"
+		table="`LAB_WORK_REQRMNT_REQ`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`LAB_WORK_REQRMNT_REQ_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		</component>
+		<properties name="uniqueLabWorkRequirementRequest">
+			<many-to-one name="healthRequest" entity-name="omis.health.domain.HealthRequest"
+		                 column="`HEALTH_REQUEST_ID`" not-null="true"/>
+			<many-to-one name="category" entity-name="omis.health.domain.LabWorkCategory"
+		                 column="`CATEGORY_ID`" not-null="false"/>
+			<property name="sampleDate" type="java.util.Date" column="`SAMPLE_DATE`" not-null="false"/>
+			<many-to-one name="sampleLab" entity-name="omis.health.domain.Lab"
+		                 column="`SAMPLE_LAB_ID`" not-null="false"/>
+			<many-to-one name="resultsLab" entity-name="omis.health.domain.Lab"
+		                 column="`RESULTS_LAB_ID`" not-null="false"/>
+		</properties>
+		<component name="order" class="omis.health.domain.component.LabWorkOrder">
+			<many-to-one name="byAssignment" entity-name="omis.health.domain.ProviderAssignment" not-null="false" column="`ORDERED_BY_ASSIGNMENT_ID`"/>
+			<property name="date" type="java.util.Date" not-null="false" column="`DATE_ORDERED`"/>
+		</component>
+		<component name="sampleRestrictions" class="omis.health.domain.component.LabWorkSampleRestrictions">
+			<property name="nothingPerOral" type="yes_no" not-null="false" column="`NOTHING_PER_ORAL`"/>
+			<property name="noLeaky" type="yes_no" not-null="false" column="`NO_LEAKY`"/>
+			<property name="noMeds" type="yes_no" not-null="false" column="`NO_MEDS`"/>
+		</component>
+		<property name="schedulingNotes" type="java.lang.String" column="`SCHEDULING_NOTES`" not-null="false"/>
+	</class>
+	<query name="findLabWorkRequirementRequestsByHealthRequest"><![CDATA[
+	  select request
+	  from omis.health.domain.LabWorkRequirementRequest request
+	    left outer join request.category category
+	    left outer join request.sampleLab sampleLab
+	    left outer join sampleLab.location sampleLabLocation
+	    left outer join sampleLabLocation.organization sampleLabLocationOrganization
+	    left outer join request.resultsLab resultsLab
+	    left outer join resultsLab.location resultsLabLocation
+	    left outer join resultsLabLocation.organization resultsLabLocationOrganization
+	  where request.healthRequest = :healthRequest
+	  order by request.sampleDate, category.name,
+	           sampleLabLocationOrganization.name,
+	           resultsLabLocationOrganization.name
+	]]></query>
+</hibernate-mapping>

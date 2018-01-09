@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		
+		<bean id="warrantService" class="omis.warrant.service.impl.WarrantServiceImpl">
+			<constructor-arg name="warrantDelegate" ref="warrantDelegate" />
+			<constructor-arg name="warrantCauseViolationDelegate" ref="warrantCauseViolationDelegate" />
+			<constructor-arg name="warrantNoteDelegate" ref="warrantNoteDelegate" />
+			<constructor-arg name="warrantArrestDelegate" ref="warrantArrestDelegate" />
+			<constructor-arg name="jailDelegate" ref="jailDelegate" />
+			<constructor-arg name="correctionalStatusTermDelegate" ref="correctionalStatusTermDelegate" />
+			<constructor-arg name="courtCaseDelegate" ref="courtCaseDelegate" />
+			<constructor-arg name="conditionDelegate" ref="conditionDelegate" />
+			<constructor-arg name="agreementDelegate" ref="agreementDelegate" />
+		</bean>
+		
+		<bean id="warrantReleaseService" class="omis.warrant.service.impl.WarrantReleaseServiceImpl">
+			<constructor-arg name="warrantReleaseDelegate" ref="warrantReleaseDelegate" />
+			<constructor-arg name="countyDelegate" ref="countyDelegate" />
+			<constructor-arg name="jailDelegate" ref="jailDelegate" />
+			<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
+		</bean>
+		
+		<bean id="warrantCancellationService" class="omis.warrant.service.impl.WarrantCancellationServiceImpl">
+			<constructor-arg name="warrantCancellationDelegate" ref="warrantCancellationDelegate" />
+		</bean>
+		
+		
+		<!-- Warrant Beans -->
+		
+		<bean id="warrantDao" class="omis.warrant.dao.impl.hibernate.WarrantDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.Warrant" />
+		</bean>
+		
+		<bean id="warrantDelegate" class="omis.warrant.service.delegate.WarrantDelegate">
+			<constructor-arg name="warrantDao" ref="warrantDao" />
+			<constructor-arg name="warrantInstanceFactory" ref="warrantInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.Warrant" />
+		</bean>
+		
+		<bean id="warrantPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.Warrant" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- WarrantCauseViolation Beans -->
+		
+		<bean id="warrantCauseViolationDao" class="omis.warrant.dao.impl.hibernate.WarrantCauseViolationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantCauseViolation" />
+		</bean>
+		
+		<bean id="warrantCauseViolationDelegate" class="omis.warrant.service.delegate.WarrantCauseViolationDelegate">
+			<constructor-arg name="warrantCauseViolationDao" ref="warrantCauseViolationDao" />
+			<constructor-arg name="warrantCauseViolationInstanceFactory" ref="warrantCauseViolationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantCauseViolationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantCauseViolation" />
+		</bean>
+		
+		<bean id="warrantCauseViolationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantCauseViolationDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.WarrantCauseViolation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- WarrantArrest Beans -->
+		
+		<bean id="warrantArrestDao" class="omis.warrant.dao.impl.hibernate.WarrantArrestDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantArrest" />
+		</bean>
+		
+		<bean id="warrantArrestDelegate" class="omis.warrant.service.delegate.WarrantArrestDelegate">
+			<constructor-arg name="warrantArrestDao" ref="warrantArrestDao" />
+			<constructor-arg name="warrantArrestInstanceFactory" ref="warrantArrestInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantArrestInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantArrest" />
+		</bean>
+		
+		<bean id="warrantArrestPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantArrestDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.WarrantArrest" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- WarrantNote Beans -->
+		
+		<bean id="warrantNoteDao" class="omis.warrant.dao.impl.hibernate.WarrantNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantNote" />
+		</bean>
+		
+		<bean id="warrantNoteDelegate" class="omis.warrant.service.delegate.WarrantNoteDelegate">
+			<constructor-arg name="warrantNoteDao" ref="warrantNoteDao" />
+			<constructor-arg name="warrantNoteInstanceFactory" ref="warrantNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantNote" />
+		</bean>
+		
+		<bean id="warrantNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.WarrantNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- WarrantCancellation Beans -->
+		
+		<bean id="warrantCancellationDao" class="omis.warrant.dao.impl.hibernate.WarrantCancellationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantCancellation" />
+		</bean>
+		
+		<bean id="warrantCancellationDelegate" class="omis.warrant.service.delegate.WarrantCancellationDelegate">
+			<constructor-arg name="warrantCancellationDao" ref="warrantCancellationDao" />
+			<constructor-arg name="warrantCancellationInstanceFactory" ref="warrantCancellationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantCancellationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantCancellation" />
+		</bean>
+		
+		<bean id="warrantCancellationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantCancellationDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.WarrantCancellation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- WarrantRelease Beans -->
+		
+		<bean id="warrantReleaseDao" class="omis.warrant.dao.impl.hibernate.WarrantReleaseDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantRelease" />
+		</bean>
+		
+		<bean id="warrantReleaseDelegate" class="omis.warrant.service.delegate.WarrantReleaseDelegate">
+			<constructor-arg name="warrantReleaseDao" ref="warrantReleaseDao" />
+			<constructor-arg name="warrantReleaseInstanceFactory" ref="warrantReleaseInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="warrantReleaseInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.warrant.domain.WarrantRelease" />
+		</bean>
+		
+		<bean id="warrantReleasePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="warrantReleaseDao" />
+			<constructor-arg name="entityName"
+				value="omis.warrant.domain.WarrantRelease" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

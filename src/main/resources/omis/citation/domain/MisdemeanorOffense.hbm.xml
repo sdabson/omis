@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - MisdemeanorCitation mapping.
+  -
+  - Author: Trevor Isles
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.citation.domain">
+	<class entity-name="omis.citation.domain.MisdemeanorOffense"
+		proxy="omis.citation.domain.MisdemeanorOffense"
+		name="omis.citation.domain.impl.MisdemeanorOffenseImpl"
+		table="`MISDEMEANOR_OFFENSE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`MISDEMEANOR_OFFENSE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true" unique="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findMisdemeanorOffense"><![CDATA[
+		select misdemeanorOffense
+		from
+			omis.citation.domain.MisdemeanorOffense misdemeanorOffense
+		where
+			misdemeanorOffense.name = :name
+	]]></query>
+		<query name="findMisdemeanorOffenses"><![CDATA[
+		select misdemeanorOffense
+		from
+			omis.citation.domain.MisdemeanorOffense misdemeanorOffense
+		where
+			misdemeanorOffense.valid = true
+		order by
+			misdemeanorOffense.name
+	]]></query>
+</hibernate-mapping>

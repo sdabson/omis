@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.religion.domain">
+	<class entity-name="omis.religion.domain.ReligiousPreference"
+	       proxy="omis.religion.domain.ReligiousPreference"
+	       name="omis.religion.domain.impl.ReligiousPreferenceImpl"
+	       table="`RELIGIOUS_PREF`">
+	  <id name="id" column="`ID`">
+	    <generator class="sequence">
+	      <param name="sequence">`RELIGIOUS_PREF_SEQ`</param>
+	    </generator>
+	  </id>
+	  <properties name="uniqueReligiousPreference">
+	    <many-to-one name="religion" entity-name="omis.religion.domain.Religion" not-null="true" column="`RELIGION_ID`"/>
+	    <many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+        <component name="dateRange" class="omis.datatype.DateRange">
+          <property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+          <property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+        </component>
+      </properties>
+	  <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+        <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+        <property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+        <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+        <property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+	  <component name="verificationSignature" class="omis.audit.domain.VerificationSignature">
+	    <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+	      <property name="date" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
+	      <property name="result" type="yes_no" not-null="false" column="`VERIFICATION_RESULT`"/>
+		<many-to-one name="method" entity-name="omis.audit.domain.VerificationMethod" not-null="false" column="`VERIFICATION_METHOD_ID`"/>
+	  </component>
+	  <property name="comment" type="java.lang.String" column="`COMMENT`"/>
+	</class>
+	<query name="findReligiousPreferencesByOffender"><![CDATA[
+		select religiousPreference
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		order by religiousPreference.dateRange.startDate,
+		         religiousPreference.religion.sortOrder, religiousPreference.religion.name
+	]]></query>
+	<query name="findReligiousPreferenceByOffenderOnDate"><![CDATA[
+		select religiousPreference
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and ((religiousPreference.dateRange.startDate is null
+		        or religiousPreference.dateRange.startDate <= :date)
+		   and (religiousPreference.dateRange.endDate is null
+		        or religiousPreference.dateRange.endDate > :date))
+		order by religiousPreference.dateRange.startDate,
+		         religiousPreference.religion.sortOrder, religiousPreference.religion.name
+	]]></query>
+	<query name="findReligiousPreferenceByOffenderOnDateExcluding"><![CDATA[
+		select religiousPreference
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and ((religiousPreference.dateRange.startDate is null
+		        or religiousPreference.dateRange.startDate <= :date)
+		   and (religiousPreference.dateRange.endDate is null
+		        or religiousPreference.dateRange.endDate > :date))
+		   and religiousPreference not in (:excludedPreferences)
+		order by religiousPreference.dateRange.startDate,
+		         religiousPreference.religion.sortOrder, religiousPreference.religion.name
+	]]></query>
+	<query name="countReligiousPreferencesByOffenderInDateRangeExcluding"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and ((religiousPreference.dateRange.startDate is null or :endDate is null
+		   or religiousPreference.dateRange.startDate < :endDate)
+		  and (religiousPreference.dateRange.endDate is null or :startDate is null
+		   or religiousPreference.dateRange.endDate > :startDate))
+		  and religiousPreference not in (:excludedPreferences)
+	]]></query>
+	<query name="countReligiousPreferencesByOffenderInDateRange"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and ((religiousPreference.dateRange.startDate is null or :endDate is null
+		   or religiousPreference.dateRange.startDate < :endDate)
+		  and (religiousPreference.dateRange.endDate is null or :startDate is null
+		   or religiousPreference.dateRange.endDate > :startDate))
+	]]></query>
+	<query name="countReligiousPreferences"><![CDATA[
+	  select count(religiousPreference)
+	  from omis.religion.domain.ReligiousPreference religiousPreference
+	    where religiousPreference.offender = :offender
+		  and (((religiousPreference.dateRange.startDate is null and :startDate is null)
+		   or religiousPreference.dateRange.startDate = :startDate)
+		  and ((religiousPreference.dateRange.endDate is null and :endDate is null)
+		   or religiousPreference.dateRange.endDate = :endDate))
+	      and religiousPreference.religion = :religion
+	]]></query>
+	<query name="countReligiousPreferencesExcluding"><![CDATA[
+	  select count(religiousPreference)
+	  from omis.religion.domain.ReligiousPreference religiousPreference
+	    where religiousPreference.offender = :offender
+		  and (((religiousPreference.dateRange.startDate is null and :startDate is null)
+		   or religiousPreference.dateRange.startDate = :startDate)
+		  and ((religiousPreference.dateRange.endDate is null and :endDate is null)
+		   or religiousPreference.dateRange.endDate = :endDate))
+	      and religiousPreference.religion = :religion
+	      and religiousPreference not in (:excludedPreferences)
+	]]></query>
+	<query name="countReligiousPreferenceStartDateChangesByOffenderInDateRange"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and (religiousPreference.dateRange.startDate > :startDate
+		    or :startDate is null)
+		  and (religiousPreference.dateRange.startDate <= :endDate
+		    or :endDate is null) 
+	]]></query>
+	<query name="countReligiousPreferenceEndDateChangesByOffenderInDateRange"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and (religiousPreference.dateRange.endDate >= :startDate
+		    or :startDate is null)
+		  and (religiousPreference.dateRange.endDate < :endDate
+		    or :endDate is null) 
+	]]></query>
+	<query name="countReligiousPreferenceStartDateChangesByOffenderInDateRangeExcluding"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and (religiousPreference.dateRange.startDate > :startDate
+		    or :startDate is null)
+		  and (religiousPreference.dateRange.startDate <= :endDate
+		    or :endDate is null)
+		  and religiousPreference not in (:excludedPreferences) 
+	]]></query>
+	<query name="countReligiousPreferenceEndDateChangesByOffenderInDateRangeExcluding"><![CDATA[
+		select count(religiousPreference)
+		from omis.religion.domain.ReligiousPreference religiousPreference
+		where religiousPreference.offender = :offender
+		  and (religiousPreference.dateRange.endDate >= :startDate
+		    or :startDate is null)
+		  and (religiousPreference.dateRange.endDate < :endDate
+		    or :endDate is null)
+		  and religiousPreference not in (:excludedPreferences)
+	]]></query>
+	<query name="findReligiousPreferenceCountByOffenderOnDate"><![CDATA[
+		select count(religiousPreference.id)
+		  from omis.religion.domain.ReligiousPreference religiousPreference
+		 where religiousPreference.offender = :offender
+		   and ((religiousPreference.dateRange.startDate <= :effectiveDate
+		       or religiousPreference.dateRange.startDate is null)
+		   and (religiousPreference.dateRange.endDate > :effectiveDate
+		       or religiousPreference.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

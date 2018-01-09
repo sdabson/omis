@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ <hibernate-mapping package="omis.offender.report">
+ <query name="summarizeOffenderPhotoByOffender">
+ <![CDATA[
+          select new omis.offenderphoto.report.OffenderPhotoAssociationSummary(p3.id, op.date, a.id)
+ 	        from omis.offenderphoto.domain.OffenderPhotoAssociation a
+right outer join a.person p3
+ left outer join a.photo op
+           where p3 = :offender
+             and a.profile = 'Y'
+ ]]></query>
+ </hibernate-mapping>

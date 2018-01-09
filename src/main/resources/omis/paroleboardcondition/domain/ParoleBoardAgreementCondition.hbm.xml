@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboardcondition.domain">
+	<class entity-name="omis.paroleboardcondition.domain.ParoleBoardAgreementCondition"
+			proxy="omis.paroleboardcondition.domain.ParoleBoardAgreementCondition"
+			name="omis.paroleboardcondition.domain.impl.ParoleBoardAgreementConditionImpl"
+			table="`PAROLE_BORD_AGREMNT_CONDTN`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PAROLE_BORD_AGREMNT_CONDTN_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="conditionClause" column="`CONDITION_CLAUSE_ID`" entity-name="omis.condition.domain.ConditionClause" not-null="true" />
+			<many-to-one name="category" column="`PAROLE_BORD_AGREMNT_CATGRY_ID`" entity-name="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+	</class>
+	<query name="findParoleBoardAgreementCondition"><![CDATA[
+		select paroleBoardAgreementCondition
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreementCondition paroleBoardAgreementCondition
+		where
+			paroleBoardAgreementCondition.conditionClause = :conditionClause
+		and
+			paroleBoardAgreementCondition.category = :category
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Author: Stephen Abson
+  - Author: Joel Norris
+  - Version: 0.1.1 (February 5, 2015)
+  - Since: OMIS 3.0 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.locationterm.domain">
+	<class entity-name="omis.locationterm.domain.LocationTerm"
+	       proxy="omis.locationterm.domain.LocationTerm"
+	       name="omis.locationterm.domain.impl.LocationTermImpl"
+		   table="`LOCATION_TERM`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`LOCATION_TERM_SEQ`</param>
+        </generator>
+	  </id>
+      <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+      <properties name="uniqueLocationTerm">
+      	<component name="dateRange" class="omis.datatype.DateRange">
+      		<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+      		<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+      	</component>
+      	<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+      </properties>
+      <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+      <property name="locked" type="yes_no" not-null="true" column="`LOCKED`"/>
+	</class>
+	<query name="findLocationTermsByOffender"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm as locationTerm
+			inner join locationTerm.location as location
+		where locationTerm.offender = :offender
+		order by
+			locationTerm.dateRange.startDate, locationTerm.dateRange.endDate,
+			location.organization.name
+	]]></query>
+	<query name="findLocationTerm"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where ((locationTerm.dateRange.startDate = :startDate or (locationTerm.dateRange.startDate is null and :startDate is null))
+		  and (locationTerm.dateRange.endDate = :endDate or (locationTerm.dateRange.endDate is null and :endDate is null)))
+		  and locationTerm.offender = :offender
+	]]></query>
+	<query name="findLocationTermExcluding"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where ((locationTerm.dateRange.startDate = :startDate or (locationTerm.dateRange.startDate is null and :startDate is null))
+		  and (locationTerm.dateRange.endDate = :endDate or (locationTerm.dateRange.endDate is null and :endDate is null)))
+		  and locationTerm.offender = :offender
+		  and locationTerm not in (:excludedLocationTerms)
+	]]></query>
+	<query name="findLocationTermByOffenderOnDate"><![CDATA[
+		select
+			locationTerm
+		from
+			omis.locationterm.domain.LocationTerm locationTerm
+		where
+			locationTerm.offender = :offender
+		and
+				(locationTerm.startDate <= :date 
+			and 
+				(locationTerm.endDate > :date or locationTerm.endDate is null))
+	]]></query>
+	<query name="countLocationTermsForOffenderBetweenDates"><![CDATA[
+		select count(locationTerm)
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where locationTerm.offender = :offender
+		  and (locationTerm.dateRange.startDate <= :endDate
+		      or (locationTerm.dateRange.startDate is null and :endDate is null))
+		    and (locationTerm.dateRange.endDate > :startDate
+		      or (locationTerm.dateRange.endDate is null and :startDate is null))
+	]]></query>
+	<query name="countLocationTermsForOffenderBetweenDatesExcluding"><![CDATA[
+		select count(locationTerm)
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where locationTerm.offender = :offender
+		  and (locationTerm.dateRange.startDate <= :endDate
+		      or (locationTerm.dateRange.startDate is null and :endDate is null))
+		    and (locationTerm.dateRange.endDate > :startDate
+		      or (locationTerm.dateRange.endDate is null and :startDate is null))
+		  and locationTerm not in (:excludedLocationTerms)
+	]]></query>
+	<query name="countLocationTermsForOffenderAfterDateExcluding"><![CDATA[
+		select count(locationTerm)
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where locationTerm.offender = :offender
+		  and locationTerm.dateRange.startDate >= :startDate
+		  and (locationTerm <> :excludedLocationTerm
+		  	   or :excludedLocationTerm is null)
+	]]></query>
+	<query name="findLocationTermForSupervisoryOrganizationBetweenDates"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm locationTerm
+			inner join locationTerm.offender offender
+			inner join offender.name offenderName
+			inner join locationTerm.location location
+			inner join location.organization organization
+		where organization = :supervisoryOrganization
+	  		and offender = :offender
+	  		and ((locationTerm.dateRange.startDate < :endDate or :endDate is null)
+	  		and (locationTerm.dateRange.endDate is null or locationTerm.dateRange.endDate > :startDate))
+	  	order by locationTerm.dateRange.startDate desc
+	]]></query>
+	<query name="findLocationTermsByOffenderBetweenDates"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm locationTerm
+			inner join locationTerm.offender offender
+			inner join offender.name offenderName
+			inner join locationTerm.location location
+		where  offender = :offender
+	  		and ((locationTerm.dateRange.startDate < :endDate or :endDate is null)
+	  		and (locationTerm.dateRange.endDate is null or locationTerm.dateRange.endDate > :startDate))
+	  	order by locationTerm.dateRange.startDate desc	
+	]]></query>
+	
+	<!-- 
+	  - Query to look up offender locations from legacy database.
+	  -->
+	<sql-query name="findLegacyLocationTermByOffenderOnDate">
+		<return entity-name="omis.locationterm.domain.LocationTerm"/>
+		<![CDATA[
+			select
+              0 as "ID",
+              user_account."ID" as "CREATE_ACCOUNT_ID",
+              ofndr_loc_hist.updt_dt as "CREATE_DATE",
+              user_account."ID" as "UPDATE_ACCOUNT_ID",
+              ofndr_loc_hist.updt_dt as "UPDATE_DATE",
+              ofndr_loc_hist.assgn_dt as "START_DATE",
+              ofndr_loc_hist.end_dt as "END_DATE",
+              offender."ID" as "OFFENDER_ID",
+              loc."ID" as "LOCATION_ID",
+              org."NAME",
+              tmp_facility_info.facility_desc,
+              'Y' as "LOCKED"
+			from omis.ofndr_loc_hist ofndr_loc_hist
+			  inner join "OFFENDER" offender
+			    on (ofndr_loc_hist.ofndr_num = offender."OFFENDER_NUMBER")
+			  inner join "USER_ACCOUNT" user_account
+			    on (upper(ofndr_loc_hist.updt_usr_id) = upper(user_account."USERNAME"))
+			  inner join omis.tmp_facility_info tmp_facility_info
+			    on (tmp_facility_info.body_loc_cd = ofndr_loc_hist.body_loc_cd)
+			  inner join "ORGANIZATION" org
+			    on (upper(tmp_facility_info.facility_desc) = upper(org."NAME"))
+			  inner join "LOCATION" loc
+			    on (org."ID" = loc."ORGANIZATION_ID"),
+			       "FACILITY" f
+			where offender."ID" = :offenderId
+			  and (ofndr_loc_hist.assgn_dt <= :effectiveDate
+			    and (ofndr_loc_hist.end_dt > :effectiveDate
+			      or ofndr_loc_hist.end_dt is null))
+			    and f."LOCATION_ID" = loc."ID"
+		]]>
+	</sql-query>
+</hibernate-mapping>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.workassignment.domain">
+	<class entity-name="omis.workassignment.domain.WorkAssignment"
+	       proxy="omis.workassignment.domain.WorkAssignment"
+	       name="omis.workassignment.domain.impl.WorkAssignmentImpl"
+		   table="`WORK_ASSIGNMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`WORK_ASSIGNMENT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null = "true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<many-to-one name="fenceRestriction" column="`FENCE_RESTRICTION_ID`" cascade="none" not-null="true"
+			entity-name="omis.workassignment.domain.FenceRestriction"/>
+		<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true"
+			entity-name="omis.workassignment.domain.WorkAssignmentCategory"/>
+		<many-to-one name="changeReason" column="`CHANGE_REASON_ID`" cascade="none" not-null="true"
+			entity-name="omis.workassignment.domain.WorkAssignmentChangeReason"/>
+		<property name="assignedDate" type="java.util.Date" column="`ASSIGNED_DATE`" not-null="true"/>
+		<property name="terminationDate" type="java.util.Date" column="`TERMINATION_DATE`" not-null="false"/>
+		<property name="comments" type="java.lang.String" column="`COMMENTS`" not-null="false" />
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+<!-- 	find an offender's all work assignments -->
+	<query name="findWorkAssignment"><![CDATA[
+	select workAssignment
+	from 
+		omis.workassignment.domain.WorkAssignment workAssignment	
+	where 
+		workAssignment.offender = :offender
+	order by
+		workAssignment.assignedDate
+	]]></query>
+	
+<!-- 	check if a work assignment already exist -->
+	<query name="findWorkAssignmentByCategory"><![CDATA[
+			select workAssignment 
+		from omis.workassignment.domain.WorkAssignment workAssignment
+		where
+			workAssignment.offender = :offender
+		and
+			workAssignment.category = :category
+		and
+			workAssignment.assignedDate = :assignedDate
+	]]></query>
+	
+	<query name="findExcludedWorkAssignment"><![CDATA[
+			select workAssignment 
+		from omis.workassignment.domain.WorkAssignment workAssignment
+		where
+			workAssignment.offender = :offender
+		and
+			workAssignment.category = :category
+		and
+			workAssignment.assignedDate = :assignedDate
+		and 
+			workAssignment != :excludedWorkAssignment
+	]]></query>
+	<query name="countWorkAssignmentsByOffenderOnDate"><![CDATA[
+	  select count(workAssignment)
+	  from omis.workassignment.domain.WorkAssignment workAssignment
+	  where workAssignment.offender = :offender
+	    and (workAssignment.terminationDate is null
+	        or workAssignment.terminationDate > :date)
+	    and (workAssignment.assignedDate is null
+	        or workAssignment.assignedDate <= :date)
+	]]></query>
+	
+	<query name="findExistingWorkAssignmentByDate"><![CDATA[
+			select workAssignment 
+		from omis.workassignment.domain.WorkAssignment workAssignment
+		where
+			workAssignment.offender = :offender
+		and
+			((workAssignment.terminationDate is null and workAssignment.assignedDate < :assignedDate)
+			or (workAssignment.terminationDate is not null and workAssignment.assignedDate < :assignedDate and workAssignment.terminationDate > :assignedDate)))
+	]]></query>
+</hibernate-mapping>

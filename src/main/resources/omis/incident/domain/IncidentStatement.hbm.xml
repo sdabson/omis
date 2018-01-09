@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.incident.domain">
+	<typedef name="informationSourceCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.incident.domain.InformationSourceCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<typedef name="incidentStatementSubmissionCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.incident.domain.IncidentStatementSubmissionCategory</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<class entity-name="omis.incident.domain.IncidentStatement"
+		proxy="omis.incident.domain.IncidentStatement"
+		name="omis.incident.domain.impl.IncidentStatementImpl"
+		table="`INCIDENT_STATEMENT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INCIDENT_STATEMENT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="reporter" column="`REPORTER_ID`" cascade="none" not-null="false" entity-name="omis.person.domain.Person"/>
+		<many-to-one name="documenter" column="`DOCUMENTER_ID`" cascade="none" not-null="true" entity-name="omis.user.domain.UserAccount"/>
+		<many-to-one name="jurisdiction" column="`JURISDICTION_ID`" cascade="none" not-null="false" entity-name="omis.incident.domain.Jurisdiction"/>
+		<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true"
+			entity-name="omis.incident.domain.IncidentStatementCategory" unique="false"/>
+		<property name="title" column="`TITLE`" not-null="true" type="java.lang.String"/>
+		<property name="number" column="`NUMBER`" not-null="true" type="java.lang.String"/>
+		<property name="incidentDate" type="java.util.Date" not-null="true" column="`INCIDENT_DATE`"/>
+		<property name="statementDate" type="java.util.Date" not-null="true" column="`STATEMENT_DATE`"/>
+		<property name="summary" type="java.lang.String" not-null="true" column="`SUMMARY`"/>
+		<property name="confidentialInformant" type="yes_no" not-null="true" column="`CONFIDENTIAL_INFORMANT`"/>
+		<property name="submissionCategory" column="`SUBMISSION_CATEGORY`" not-null="false" type="incidentStatementSubmissionCategory"/>
+		<component name="informationSource" class="omis.incident.domain.InformationSource">
+			<many-to-one name="informant" column="`INFORMANT_ID`" cascade="none" not-null="true" entity-name="omis.person.domain.Person"/>
+			<property name="category" column="`INFORMANT_CATEGORY`" not-null="true" type="informationSourceCategory"/>
+			<property name="name" column="`INFORMATION_SOURCE_NAME`" not-null="false" type="string"/>
+		</component>
+		<component name="scene" class="omis.incident.domain.component.IncidentScene">
+			<property name="location" column="`LOCATION_DESCRIPTION`" type="java.lang.String" not-null="false"/>
+			<many-to-one name="facility" column="`FACILITY_ID`"	entity-name="omis.facility.domain.Facility"/>
+			<many-to-one name="complex" column="`COMPLEX_ID`" cascade="none" not-null="false" entity-name="omis.facility.domain.Complex"/>
+			<many-to-one name="unit" column="`UNIT_ID`" cascade="none" not-null="false"	entity-name="omis.facility.domain.Unit"/>
+			<many-to-one name="room" column="`ROOM_ID`" entity-name="omis.facility.domain.Room"/>
+			<many-to-one name="level" column="`LEVEL_ID`" cascade="none" not-null="false" entity-name="omis.facility.domain.Level"/>
+			<many-to-one name="section" column="`SECTION_ID`" cascade="none" not-null="false" entity-name="omis.facility.domain.Section"/>
+			<many-to-one name="facilityArea" column="`FACILITY_AREA_ID`" cascade="none" not-null="false"
+				entity-name="omis.facility.domain.FacilityArea" unique="false"/>
+		</component>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findIncidentStatement"><![CDATA[
+		select statement
+		from
+			omis.incident.domain.IncidentStatement statement
+		where
+			statement.reporter = :reporter
+		and
+			statement.statementDate = :statementDate
+		and
+			statement.incidentDate = :incidentDate
+		and
+			statement.summary = :summary
+		and
+			statement.scene = :scene
+		order by statement.statementDate
+	]]></query>
+	<query name="findIncidentStatementExcluding"><![CDATA[
+		select statement
+		from
+			omis.incident.domain.IncidentStatement statement
+		where
+			statement.reporter = :reporter
+		and
+			statement.statementDate = :statementDate
+		and
+			statement.incidentDate = :incidentDate
+		and
+			statement.summary = :summary
+		and
+			statement.scene = :scene
+		and
+			statement != :statement
+		order by statement.statementDate
+	]]></query>
+	<sql-query name="getNextIncidentStatementNumber"><![CDATA[
+		select "INCIDENT_STATEMENT_SEQ".nextval from dual
+	]]></sql-query>
+</hibernate-mapping>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.custody.domain">
+		<class entity-name="omis.custody.domain.CustodyReview"
+		proxy="omis.custody.domain.CustodyReview"
+		name="omis.custody.domain.impl.CustodyReviewImpl"
+		table="`CUSTODY_REVIEW`">
+		<id name="id" column ="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`CUSTODY_REVIEW_SEQ`</param>
+			</generator>
+		</id>
+		<property name="actionDate" column="`ACTION_DATE`" not-null="true"/>
+		<property name="nextReviewDate" column="`NEXT_REVIEW_DATE`"/>
+		<many-to-one name="offender" not-null="true" column="`OFFENDER_ID`"
+			entity-name="omis.offender.domain.Offender" unique="true"/>
+		<many-to-one name="changeReason" column="`REASON_ID`"
+		entity-name="omis.custody.domain.CustodyChangeReason" not-null="true"/>
+		<many-to-one name="custodyLevel" column="`LEVEL_ID`"
+		entity-name="omis.custody.domain.CustodyLevel" not-null="true"/>
+		<component name="creationSignature">
+					<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+							 not-null="true"/>
+					<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+					<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+						 not-null="true"/>
+					<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		</class>
+		<query name="findCustodyReview"><![CDATA[
+			from
+				omis.custody.domain.CustodyReview custodyReview
+			where
+				custodyReview.offender = :offender
+			and
+				custodyReview.actionDate = :actionDate
+		]]></query>
+		<query name="findCustodyReviewExcluding"><![CDATA[
+			from
+				omis.custody.domain.CustodyReview custodyReview
+			where
+				custodyReview.offender = :offender
+			and
+				custodyReview.actionDate = :actionDate
+			and
+				custodyReview <> :excludedCustodyReview
+		]]></query>
+		<query name="findCustodyReviewsByOffender"><![CDATA[
+			from 
+				omis.custody.domain.CustodyReview custodyReview
+			where 
+				custodyReview.offender = :offender
+			order by 
+				custodyReview.actionDate
+		]]></query>
+		<query name="findSpecificCustodyReviewForOffender"><![CDATA[
+			from 
+				omis.custody.domain.CustodyReview custodyReview
+			where 
+				custodyReview.offender = :offender
+			and 
+				custodyReview.nextReviewDate >= :date 
+			and 
+				custodyReview.actionDate<= :date
+		]]></query>
+		<query name="findCustodyReviewCountByOffender"><![CDATA[
+			select count(custodyReview.id)
+			  from omis.custody.domain.CustodyReview custodyReview
+		     where custodyReview.offender = :offender
+		]]></query>
+	</hibernate-mapping>
+	

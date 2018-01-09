@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<query name="summarizeUsersByName"><![CDATA[
+		select new omis.user.report.UserSummary(user, userName, userAccount)
+		from omis.user.domain.UserAccount as userAccount
+		  inner join userAccount.user as user
+		  inner join user.name as userName
+		where upper(userName.lastName) like '%' || upper(:lastName) || '%'
+		  and upper(userName.firstName) like '%' || upper(:firstName) || '%'
+		order by userName.lastName, userName.firstName, userAccount.username
+	]]></query>
+	<query name="summarizeUsersByUsername"><![CDATA[
+		select new omis.user.report.UserSummary(user, userName, userAccount)
+		from omis.user.domain.UserAccount as userAccount
+		  inner join userAccount.user as user
+		  inner join user.name as userName
+		where upper(userAccount.username) like '%' || upper(:username) || '%'
+		order by userName.lastName, userName.firstName, userAccount.username
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Queries for reporting tasks.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.task.domain">
+	<query name="summarizeTasksBySourceAccountUsername"><![CDATA[
+		select new omis.task.report.TaskSummary(
+			task.id, task.controllerName, task.methodName, task.description,
+			sourceUserName.lastName, sourceUserName.firstName, sourceUserName.middleName,
+			sourceUserName.suffix, sourceAccount.username, task.originationDate,
+			task.completionDate)
+		from omis.task.domain.Task task
+			inner join task.sourceAccount sourceAccount
+			inner join sourceAccount.user sourceUser
+			inner join sourceUser.name sourceUserName
+		where sourceAccount.username = :username
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,90 @@
+/*
+ * Health module style.
+ * 
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Oct 16, 2012)
+ * Since: OMIS 3.0
+ */
+
+span#routingCategories {
+	width: 600px;
+	float: left;
+	clear: both;
+	margin-left: 25%;
+}
+
+span#routingCategories span {
+	display: inline-block;
+	width: 32%;
+}
+
+a.labLink:before {
+	content: url('../images/lab.png');
+}
+
+a.healthLink:before {
+	content: url('../images/health.png');
+}
+
+a.healthProfileLink:before {
+	content: url('../images/healthProfile.png');
+}
+
+a.healthAssessLink:before {
+	content: url('../images/healthAssess.png');
+}
+
+a.healthProfileLink:before, a.healthAssessLink:before,
+a.labLink:before {
+	vertical-align: -50%;
+}
+
+a.healthLink:before {
+	vertical-align: -20%;
+}
+
+a.healthLink, a.healthProfileLink, a.healthAssessLink, a.labLink {
+	vertical-align: middle;
+}
+
+#internalWeeklyProviderScheduleContainer {
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+table.internalWeeklyProviderSchedule {
+	border: solid 1px;
+	border-collapse:collapse;
+}
+
+table.internalWeeklyProviderSchedule, #scheduleDate\.errors.error {
+	width: 60%;
+	margin-left: 22%;
+}
+
+table.internalWeeklyProviderSchedule td, table.internalWeeklyProviderSchedule th,
+table.internalWeeklyProviderSchedule tr {
+	border: solid 1px;
+}
+
+table.internalWeeklyProviderSchedule th.inputColumn {
+	width: 160px;
+}
+
+table.internalWeeklyProviderSchedule td.weekRange {
+	text-align: left;
+}
+
+tr.messageRow td {
+	text-align: center;
+}
+
+div.requestInfo, div.authorizationInfo {
+	border: 1px solid;
+	padding: 4px 4px 4px 16px;
+}
+
+div.requestInfo p, div.authorizationInfo p {
+	margin: 4px;
+	padding: 0px;
+}

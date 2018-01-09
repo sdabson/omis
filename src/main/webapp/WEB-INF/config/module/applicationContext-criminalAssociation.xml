@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="criminalAssociationService"
+        	class="omis.criminalassociation.service.impl.CriminalAssociationServiceImpl">
+        	<constructor-arg name="criminalAssociationDao" ref="criminalAssociationDao"/>
+        	<constructor-arg name="criminalAssociationCategoryDao" ref="criminalAssociationCategoryDao"/>
+        	<constructor-arg name="addressDao" ref="addressDao"/>
+        	<constructor-arg name="personDao" ref="personDao"/>
+        	<constructor-arg name="contactDao" ref="contactDao"/>
+        	<constructor-arg name="telephoneNumberDao" ref="telephoneNumberDao"/>
+        	<constructor-arg name="criminalAssociationServiceDelegate" ref="criminalAssociationServiceDelegate"/>
+        	<constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+        	<constructor-arg name="personInstanceFactory" ref="personInstanceFactory"/>
+        	<constructor-arg name="personNameInstanceFactory" ref="personNameInstanceFactory"/>
+        	<constructor-arg name="addressInstanceFactory" ref="addressInstanceFactory"/>
+        	<constructor-arg name="contactInstanceFactory" ref="contactInstanceFactory"/>
+        	<constructor-arg name="telephoneNumberInstanceFactory" ref="telephoneNumberInstanceFactory"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        </bean>
+		<!--  Report Services -->
+		<bean id="criminalAssociationProfileItemService"
+			class="omis.criminalassociation.report.impl.hibernate.CriminalAssociationProfileItemServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+		</bean>
+         <!-- Data access objects -->
+        
+        <bean id="criminalAssociationDao"
+        	class="omis.criminalassociation.dao.impl.hibernate.CriminalAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="criminalAssociationCategoryDao"
+        	class="omis.criminalassociation.dao.impl.hibernate.CriminalAssociationCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociationCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		 <!-- Instance factories -->
+  		 
+		<bean id="criminalAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociation"/>
+		</bean>
+        
+        <bean id="criminalAssociationCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociationCategory"/>
+		</bean>
+		
+ 		 <!--Property editor factories -->
+        
+        <bean id="criminalAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="criminalAssociationDao"/>
+		</bean>
+		
+		<bean id="criminalAssociationCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.criminalassociation.domain.CriminalAssociationCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="criminalAssociationCategoryDao"/>
+		</bean>
+		
+		<!-- Helper classes -->
+	  	<bean id="criminalAssociationServiceDelegate"
+	    	class="omis.criminalassociation.service.delegate.CriminalAssociationServiceDelegate">
+	    	<constructor-arg name="criminalAssociationInstanceFactory" ref="criminalAssociationInstanceFactory"/>
+	    	<constructor-arg name="relationshipInstanceFactory" ref="relationshipInstanceFactory"/>
+	    	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	    	<constructor-arg name="criminalAssociationDao" ref="criminalAssociationDao"/>
+	    	<constructor-arg name="relationshipDao" ref="relationshipDao"/>
+	  	</bean>
+</beans>        

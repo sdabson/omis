@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.Suffix"
+	       proxy="omis.person.domain.Suffix"
+	       name="omis.person.domain.impl.SuffixImpl"
+	       table="`PERSON_NAME_SUFFIX`" lazy="true">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_NAME_SUFFIX_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true"/>
+	</class>
+	<query name="findAllValidSuffixes"><![CDATA[
+		select suffix
+		from omis.person.domain.Suffix as suffix
+		where suffix.valid = true
+		order by suffix.sortOrder, suffix.name
+	]]></query>
+</hibernate-mapping>

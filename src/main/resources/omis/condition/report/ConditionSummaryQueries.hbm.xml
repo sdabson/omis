@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.condition.domain">
+<query name="findConditionSummariesByAgreement"><![CDATA[
+	select new omis.condition.report.ConditionSummary(
+		condition.id,
+		title.title,
+		condition.clause,
+		case when current_date between agreement.dateRange.startDate and
+				agreement.dateRange.endDate
+		then true
+		else false
+		end,
+		cast(condition.category as string),
+		condition.waived)
+	from omis.condition.domain.Condition condition
+	inner join condition.agreement agreement
+	inner join condition.conditionClause clause
+	inner join clause.conditionTitle title
+	where 
+		condition.agreement = :agreement
+]]></query>
+
+<query name="findWaivedConditionSummariesByAgreement"><![CDATA[
+	select new omis.condition.report.ConditionSummary(
+		condition.id,
+		title.title,
+		condition.clause,
+		case when :effectiveDate between agreement.dateRange.startDate and
+				agreement.dateRange.endDate
+		then true
+		else false
+		end,
+		cast(condition.category as string),
+		condition.waived)
+	from omis.condition.domain.Condition condition
+	inner join condition.agreement agreement
+	inner join condition.conditionClause clause
+	inner join clause.conditionTitle title
+	where 
+		condition.agreement = :agreement
+	and
+		condition.waived = true
+]]></query>
+<query name="summarizeAgreement"><![CDATA[
+	select new omis.condition.report.AgreementSummary(
+		agreement.id,
+		agreement.dateRange.startDate,
+		agreement.dateRange.endDate
+	)
+	from omis.condition.domain.Agreement agreement
+	inner join agreement.offender offender
+	where agreement = :agreement
+]]></query>
+
+<query name="findConditionSummariesByAgreementAndConditionGroup"><![CDATA[
+	select new omis.condition.report.ConditionSummary(
+		condition.id,
+		title.title,
+		condition.clause,
+		case when current_date between agreement.dateRange.startDate and
+				agreement.dateRange.endDate
+		then true
+		else false
+		end,
+		cast(condition.category as string),
+		condition.waived)
+	from omis.condition.domain.Condition condition
+	inner join condition.agreement agreement
+	inner join condition.conditionClause clause
+	inner join clause.conditionTitle title,
+		omis.condition.domain.ConditionGroupClause conditionGroupClause
+	inner join
+		conditionGroupClause.conditionClause conditionClause2
+	inner join
+		conditionGroupClause.conditionGroup conditionGroup
+	where 
+		agreement = :agreement
+	and
+		conditionGroup = :conditionGroup
+	and
+		clause = conditionClause2
+]]></query>
+<query name="findConditionSummariesByAgreementAndConditionCategory"><![CDATA[
+	select new omis.condition.report.ConditionSummary(
+		condition.id,
+		title.title,
+		condition.clause,
+		case when current_date between agreement.dateRange.startDate and
+				agreement.dateRange.endDate
+		then true
+		else false
+		end,
+		cast(condition.category as string),
+		condition.waived)
+	from omis.condition.domain.Condition condition
+	inner join condition.agreement agreement
+	inner join condition.conditionClause clause
+	inner join clause.conditionTitle title
+	where 
+		agreement = :agreement
+	and
+		condition.category = :conditionCategory
+]]></query>
+</hibernate-mapping>

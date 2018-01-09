@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!-- 
+  - Configuration for cautions.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="offenderCautionService"
+        class="omis.caution.service.impl.OffenderCautionServiceImpl">
+    <constructor-arg name="offenderCautionDao" ref="offenderCautionDao"/>
+    <constructor-arg name="offenderCautionInstanceFactory" ref="offenderCautionInstanceFactory"/>
+    <constructor-arg name="cautionSourceDao" ref="cautionSourceDao"/>
+    <constructor-arg name="cautionDescriptionDao" ref="cautionDescriptionDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="cautionSourceDelegate" class="omis.caution.service.delegate.CautionSourceDelegate">
+    <constructor-arg name="cautionSourceInstanceFactory" ref="cautionSourceInstanceFactory"/>
+    <constructor-arg name="cautionSourceDao" ref="cautionSourceDao"/>
+  </bean>
+  
+  <bean id="cautionDescriptionDelegate" class="omis.caution.service.delegate.CautionDescriptionDelegate">
+    <constructor-arg name="cautionDescriptionInstanceFactory" ref="cautionDescriptionInstanceFactory"/>
+    <constructor-arg name="cautionDescriptionDao" ref="cautionDescriptionDao"/>
+  </bean>
+  
+  <bean id="offenderCautionDelegate" class="omis.caution.service.delegate.OffenderCautionDelegate">
+  	<constructor-arg name="offenderCautionInstanceFactory" ref="offenderCautionInstanceFactory"/>
+  	<constructor-arg name="offenderCautionDao" ref="offenderCautionDao"/>
+  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <!-- Report Services -->
+  
+  <bean id="offenderCautionProfileItemReportService"
+  	class="omis.caution.report.impl.hibernate.OffenderCautionProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <!-- Data access objects -->
+   
+  <bean id="cautionDescriptionDao"
+        class="omis.caution.dao.impl.hibernate.CautionDescriptionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionDescription"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="cautionSourceDao"
+        class="omis.caution.dao.impl.hibernate.CautionSourceDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionSource"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="offenderCautionDao"
+        class="omis.caution.dao.impl.hibernate.OffenderCautionDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.caution.domain.OffenderCaution"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Instance factories -->
+  
+  <bean id="offenderCautionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.OffenderCaution"/>
+  </bean>
+
+  <bean id="cautionSourceInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionSource"/>
+  </bean>
+
+  <bean id="cautionDescriptionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionDescription"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="cautionDescriptionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="cautionDescriptionDao"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionDescription"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="cautionSourcePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="cautionSourceDao"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.CautionSource"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="offenderCautionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="offenderCautionDao"/>
+    <constructor-arg name="entityName" value="omis.caution.domain.OffenderCaution"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+</beans>

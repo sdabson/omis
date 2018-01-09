@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<!-- Service -->
+		
+		<bean id="workRestrictionService" class="omis.workrestriction.service.impl.WorkRestrictionServiceImpl">
+			<constructor-arg name="workRestrictionDelegate" ref="workRestrictionDelegate" />
+			<constructor-arg name="categoryDelegate" ref="workRestrictionCategoryDelegate" />
+			<constructor-arg name="userAccountDelegate" ref="userAccountDelegate" />
+			<constructor-arg name="workRestrictionNoteDelegate" ref="workRestrictionNoteDelegate" />
+		</bean>
+		
+		<bean id="workRestrictionProfileSummaryReportService"
+			class="omis.workrestriction.report.impl.hibernate.WorkRestrictionProfileSummaryReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+		</bean>
+		
+		<!-- DAOs -->
+		
+		<bean id="workRestrictionDao" class="omis.workrestriction.dao.impl.hibernate.WorkRestrictionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestriction" />
+		</bean>
+		
+		<bean id="workRestrictionCategoryDao" class="omis.workrestriction.dao.impl.hibernate.WorkRestrictionCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestrictionCategory" />
+		</bean>
+		
+		<bean id="workRestrictionNoteDao" class="omis.workrestriction.dao.impl.hibernate.WorkRestrictionNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestrictionNote" />
+		</bean>
+		
+		<!-- Delegates -->
+		
+		<bean id="workRestrictionDelegate" class="omis.workrestriction.service.delegate.WorkRestrictionDelegate">
+			<constructor-arg name="workRestrictionDao" ref="workRestrictionDao" />
+			<constructor-arg name="workRestrictionInstanceFactory" ref="workRestrictionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="workRestrictionCategoryDelegate" class="omis.workrestriction.service.delegate.WorkRestrictionCategoryDelegate">
+			<constructor-arg name="categoryDao" ref="workRestrictionCategoryDao" />
+			<constructor-arg name="workRestrictionCategoryInstanceFactory" ref="workRestrictionCategoryInstanceFactory" />
+		</bean>
+		
+		<bean id="workRestrictionNoteDelegate" class="omis.workrestriction.service.delegate.WorkRestrictionNoteDelegate">
+			<constructor-arg name="workRestrictionNoteDao" ref="workRestrictionNoteDao" />
+			<constructor-arg name="workRestrictionNoteInstanceFactory" ref="workRestrictionNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<!-- Instance Factory -->
+		
+		<bean id="workRestrictionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestriction" />
+		</bean>
+		
+		<bean id="workRestrictionCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestrictionCategory" />
+		</bean>
+		
+		<bean id="workRestrictionNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.workrestriction.domain.WorkRestrictionNote" />
+		</bean>
+		
+		<!-- Property Editor Factories -->
+		
+		<bean id="workRestrictionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="workRestrictionDao" />
+			<constructor-arg name="entityName"
+				value="omis.workrestriction.domain.WorkRestriction" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<bean id="workRestrictionNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="workRestrictionNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.workrestriction.domain.WorkRestrictionNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+		<!-- Validators -->
+		
+		<bean id="specialNeedFormValidator" 
+			class="omis.specialneed.web.validator.SpecialNeedFormValidator">
+			<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+		</bean>
+		
+		<!-- Profile item -->
+		<bean id="specialNeedProfileItem"
+			class="omis.specialneed.web.profile.SpecialNeedProfileItem">
+			<constructor-arg name="requiredAuthorizations">
+				<set>
+					<value>SPECIAL_NEED_LIST</value>
+					<value>ADMIN</value>
+				</set>
+			</constructor-arg>
+        	<constructor-arg name="includePage" value="/WEB-INF/views/specialNeed/profile/includes/profileItem.jsp"/>
+        	<constructor-arg name="name" value="specialNeed"/>
+        	<constructor-arg name="profileItemRegistry" ref="safetyProfileItemRegistry"/>
+        	<constructor-arg name="specialNeedProfileItemReportService" ref="specialNeedProfileItemReportService"/>
+        	<constructor-arg name="enabled" value="${specialNeedProfileItemEnabled}"/>	
+		</bean>
+		 <!-- Web configuration -->
+ 		 
+ 		 <context:component-scan base-package="omis.specialneed.web.controller"/>
+ 		 
+ 		 <!-- Use controller transactions -->
+  
+		 <aop:config>
+		     <aop:pointcut id="reportSpecialNeedControllerOperation" expression="execution(* omis.specialneed.web.controller.ReportSpecialNeedController.*(..))"/>
+		     <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportSpecialNeedControllerOperation"/>
+		 </aop:config>
+		 
+		  <aop:config>
+		     <aop:pointcut id="manageSpecialNeedControllerOperation" expression="execution(* omis.specialneed.web.controller.ManageSpecialNeedController.*(..))"/>
+		     <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageSpecialNeedControllerOperation"/>
+		 </aop:config>
+</beans>        

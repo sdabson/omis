@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation"
+			proxy="omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation"
+			name="omis.presentenceinvestigation.domain.impl.HealthSectionSummaryDocumentAssociationImpl"
+			table="`HEALTH_SCTN_SMRY_DCMNT_ASC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEALTH_SCTN_SMRY_DCMNT_ASC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<many-to-one name="healthSectionSummary" column="`HEALTH_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.HealthSectionSummary" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findHealthSectionSummaryDocumentAssociation"><![CDATA[
+		select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation summary
+		where
+			healthSectionSummary = :healthSectionSummary
+		and
+			summary.document = :document
+	]]></query>	
+	<query name="findHealthSectionSummaryDocumentAssociationExcluding"><![CDATA[
+			select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation summary
+		where
+			healthSectionSummary = :healthSectionSummary
+		and
+			summary.document = :document
+		and
+			summary != :healthSectionSummaryDocumentAssociation
+	]]></query>		
+	<query name="findHealthSectionSummaryDocumentAssociationsByHealthSectionSummary"><![CDATA[
+			select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryDocumentAssociation summary
+		where
+			healthSectionSummary = :healthSectionSummary
+	]]></query>
+</hibernate-mapping>

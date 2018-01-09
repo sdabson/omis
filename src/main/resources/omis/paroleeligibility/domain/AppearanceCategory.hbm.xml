@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleeligibility.domain">
+	<class entity-name="omis.paroleeligibility.domain.AppearanceCategory"
+		proxy="omis.paroleeligibility.domain.AppearanceCategory"
+		name="omis.paroleeligibility.domain.impl.AppearanceCategoryImpl"
+		table="`PAROLE_ELGBLIY_APPRNC_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PAROLE_ELGBLIY_APPRNC_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="java.lang.String"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findAppearanceCategory"><![CDATA[
+		select category
+		from
+			omis.paroleeligibility.domain.AppearanceCategory category
+		where
+			category.name = :name
+	]]></query>
+	<query name="findAppearanceCategories"><![CDATA[
+		select category
+		from
+			omis.paroleeligibility.domain.AppearanceCategory category
+		where
+			category.valid = true
+	]]></query>
+	<query name="findAppearanceCategoryExcluding"><![CDATA[
+		select category
+		from
+			omis.paroleeligibility.domain.AppearanceCategory category
+		where
+			category.name = :name
+		and
+			category <> :excludedCategory
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.userpreference.domain">
+	<class entity-name="omis.userpreference.domain.UserPreference"
+		proxy="omis.userpreference.domain.UserPreference"
+		name="omis.userpreference.domain.impl.UserPreferenceImpl"
+		table="`USER_PREFERENCE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`USER_PREFERENCE_SEQ`</param>
+			</generator>
+		</id>
+		<component name="foregroundColorValue">
+			<property name="hue" column="`FOREGROUND_HUE_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+			<property name="saturation" column="`FOREGROUND_SAT_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+		</component>
+		<component name="backgroundColorValue">
+			<property name="hue" column="`BACKGROUND_HUE_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+			<property name="saturation" column="`BACKGROUND_SAT_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+		</component>
+		<component name="accentColorValue">
+			<property name="hue" column="`ACCENT_HUE_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+			<property name="saturation" column="`ACCENT_SAT_COLOR_VALUE`" type="java.lang.Short" not-null="false"/>
+		</component>
+		<property name="whiteBackground" column="`WHITE_BACKGROUND`" not-null="false" type="yes_no"/>
+		<many-to-one name="userAccount" column="`USER_ACCOUNT_ID`" cascade="none" not-null="true"
+			entity-name="omis.user.domain.UserAccount" unique="false"/>
+	</class>
+	<query name="findUserPreferenceByUserAccount"><![CDATA[
+		from
+			omis.userpreference.domain.UserPreference userPreference
+		where
+			userPreference.userAccount = :userAccount
+	]]></query>
+</hibernate-mapping>

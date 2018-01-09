@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="personSearchReportService" class="omis.search.report.service.impl.hibernate.PersonSearchReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="offenderSearchReportService" class="omis.search.report.service.impl.hibernate.OffenderPersonSearchReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="userPersonSearchReportService" class="omis.search.report.service.impl.hibernate.UserPersonSearchReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="caseLoadOffenderSearchReportSarvice" class="omis.search.report.service.impl.hibernate.CaseLoadOffenderSearchReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="caseLoadSearchReportService" class="omis.search.report.service.impl.hibernate.CaseLoadSearchReportServiceHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean id="employerSearchService" class="omis.search.report.service.impl.hibernate.EmployerSearchServiceHibernateImpl">
+   		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 	</bean>
+	
+	<context:component-scan base-package="omis.search.web.controller"/>
+</beans>

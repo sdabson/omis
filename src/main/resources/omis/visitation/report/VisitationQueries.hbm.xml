@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.visitation.report">
+	<query name="summarizeVisitorListByOffender"><![CDATA[
+		select new omis.visitation.report.VisitationAssociationSummary(
+			visitationAssociation,
+			(
+			    select mailingAddress
+			    from omis.contact.domain.Contact contact
+			      left join contact.mailingAddress mailingAddress
+			    where contact.person = visitor
+			 ),
+			 (
+			    select telephoneNumber
+			    from omis.contact.domain.TelephoneNumber telephoneNumber
+			      inner join telephoneNumber.contact contact
+			    where contact.person = visitor
+			    and telephoneNumber.primary = true
+			 ),
+			 (
+			    select offender
+			    from omis.offender.domain.Offender offender
+			    where offender = visitor
+			 ),
+			 (
+			  	select count(alternativeNameAssociation)
+				from
+					omis.person.domain.AlternativeNameAssociation alternativeNameAssociation
+					inner join alternativeNameAssociation.name personName
+					inner join personName.person person
+					left join alternativeNameAssociation.dateRange dateRange
+				where
+					person = visitor
+				and
+					((dateRange.startDate is null and dateRange.endDate is not null and dateRange.endDate > :date)
+					or (dateRange.endDate is null and dateRange.startDate is not null and dateRange.startDate <= :date)
+					or (dateRange.endDate is not null and dateRange.startDate is not null and dateRange.startDate<=:date and dateRange.endDate>:date)
+					or (dateRange is null))
+			  ),
+			case
+				when 
+					(select 
+						count(*)
+					from
+						omis.visitation.domain.Visit visit
+					where
+						trunc(visit.dateRange.startDate) = trunc(:date)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id
+					and
+						visit.dateRange.endDate is null) > 0
+				then
+					true 
+				else
+					false
+			end,
+			(select 
+						visit.id
+					from
+						omis.visitation.domain.Visit visit
+					where
+						trunc(visit.dateRange.startDate) = trunc(:date)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id
+					and
+						visit.dateRange.endDate is null))
+		from 
+			omis.visitation.domain.VisitationAssociation visitationAssociation
+			inner join visitationAssociation.relationship relationship
+			inner join relationship.secondPerson visitor
+		where relationship.firstPerson = :offender
+		and
+			(visitationAssociation.dateRange.startDate is null
+			or
+			trunc(visitationAssociation.dateRange.startDate) <= trunc(:date))
+		and
+				(visitationAssociation.dateRange.endDate >= :date
+			or
+				visitationAssociation.dateRange.endDate is null)
+		order by
+			visitor.name.lastName, visitor.name.firstName
+	]]></query>
+	<query name="findVisitSummariesByOffenderOnDate"><![CDATA[
+		select 
+			new omis.visitation.report.VisitSummary(
+			case
+				when 
+					visit.dateRange.endDate is null
+				then
+					true 
+				else
+					false
+			end, 
+			visit.id, visitationAssociation.relationship.secondPerson.name.lastName,
+			visitationAssociation.relationship.secondPerson.name.firstName,
+			visit.dateRange.startDate, visit.badgeNumber)
+		from
+			omis.visitation.domain.Visit as visit
+			left outer join visit.visitationAssociation as visitationAssociation
+		where
+			visitationAssociation.relationship.firstPerson = :offender
+		and
+			trunc(visit.dateRange.startDate) = trunc(:date)
+		order by
+			visit.dateRange.startDate desc
+	]]></query>
+	<query name="findVisitsByOffenderInDateRange"><![CDATA[
+		select 
+			new omis.visitation.report.VisitSummary(
+			case
+				when 
+		      			visit.dateRange.endDate is null	
+				then
+					true 
+				else
+					false
+			end, 
+			visit.id, visitationAssociation.relationship.secondPerson.name.lastName,
+			visitationAssociation.relationship.secondPerson.name.firstName,
+			visit.dateRange.startDate, visit.badgeNumber)
+		from
+			omis.visitation.domain.Visit as visit
+			left outer join visit.visitationAssociation as visitationAssociation
+		where
+			visitationAssociation.relationship.firstPerson = :offender
+		and
+				(trunc(visit.dateRange.startDate) <= trunc(:endDate)
+			or
+				:endDate is null)
+		and
+				(trunc(visit.dateRange.endDate) >= trunc(:startDate)
+      		or
+      			visit.dateRange.endDate is null
+      		or 
+      			:startDate is null)
+		order by
+			visit.dateRange.startDate desc
+	]]></query>
+	<query name="findVisitLogSummariesByFacilityInRange"><![CDATA[
+		select 
+			new omis.visitation.report.VisitSummary(
+			case
+				when 
+		      			visit.dateRange.endDate is null	
+				then
+					true 
+				else
+					false
+			end, 
+			visit.id, visitorName.lastName, visitorName.firstName,
+			visit.dateRange.startDate, visit.badgeNumber,
+			offenderName.lastName, offenderName.firstName,
+			offenderName.middleName, offender.offenderNumber)
+		from
+			omis.visitation.domain.Visit as visit
+				left outer join visit.visitationAssociation as visitationAssociation
+				inner join visitationAssociation.relationship relationship
+				inner join relationship.firstPerson offender
+				inner join offender.name offenderName
+				inner join relationship.secondPerson visitor
+				inner join visitor.name visitorName,
+			omis.locationterm.domain.LocationTerm locationTerm
+			    inner join locationTerm.offender locOffender
+			    inner join locationTerm.location location
+		where
+			offender = locOffender
+		and
+			location = :location
+		and
+				(trunc(visit.dateRange.startDate) <= trunc(:endDate)
+			or
+				:endDate is null)
+		and
+				(trunc(visit.dateRange.endDate) >= trunc(:startDate)
+      		or
+      			visit.dateRange.endDate is null
+      		or 
+      			:startDate is null)
+		order by
+			visit.dateRange.startDate desc
+	]]></query>
+	<query name="summarizeVisitationAssociationsByOffenderInRange"><![CDATA[
+		select new omis.visitation.report.VisitationAssociationSummary(
+		visitationAssociation,
+			(
+			    select mailingAddress
+			    from omis.contact.domain.Contact contact
+			      left join contact.mailingAddress mailingAddress
+			    where contact.person = visitor
+			 ),
+			 (
+			    select telephoneNumber
+			    from omis.contact.domain.TelephoneNumber telephoneNumber
+			      inner join telephoneNumber.contact contact
+			    where contact.person = visitor
+			    and telephoneNumber.primary = true
+			 ),
+			 (
+			    select offender
+			    from omis.offender.domain.Offender offender
+			    where offender = visitor
+			 ),
+			 (
+			  	select count(alternativeNameAssociation)
+				from
+					omis.person.domain.AlternativeNameAssociation alternativeNameAssociation
+					inner join alternativeNameAssociation.name personName
+					inner join personName.person person
+					left join alternativeNameAssociation.dateRange dateRange
+				where
+					person = visitor
+				and
+					(trunc(dateRange.startDate) <= trunc(:endDate)
+				or
+					:endDate is null)
+				and
+					(trunc(dateRange.endDate) >= trunc(:startDate)
+    			or
+      				dateRange.endDate is null
+      			or 
+      				:startDate is null)
+			  ),
+			  (case
+				when 
+					(select 
+						count(*)
+					from
+						omis.visitation.domain.Visit visit
+					where
+						(trunc(visit.dateRange.startDate) <= trunc(:endDate)
+							or
+								:endDate is null)
+						and
+								(trunc(visit.dateRange.endDate) >= trunc(:startDate)
+				      		or
+				      			visit.dateRange.endDate is null
+				      		or 
+				      			:startDate is null)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id
+					and
+						visit.dateRange.endDate is null) > 0
+				then
+					true 
+				else
+					false
+			end),
+			(select 
+						visit.id
+					from
+						omis.visitation.domain.Visit visit
+					where
+						(trunc(visit.dateRange.startDate) <= trunc(:endDate)
+							or
+								:endDate is null)
+						and
+								(trunc(visit.dateRange.endDate) >= trunc(:startDate)
+				      		or
+				      			visit.dateRange.endDate is null
+				      		or 
+				      			:startDate is null)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id
+					and
+						visit.dateRange.endDate is null)
+			)
+		from
+			omis.visitation.domain.VisitationAssociation visitationAssociation
+			left outer join visitationAssociation.relationship relationship
+			left outer join relationship.secondPerson visitor
+		where
+			relationship.firstPerson = :offender
+		and
+			(trunc(visitationAssociation.dateRange.startDate) <= trunc(:endDate)
+			or
+				:endDate is null)
+		and
+				(trunc(visitationAssociation.dateRange.endDate) >= trunc(:startDate)
+    		or
+      			visitationAssociation.dateRange.endDate is null
+      		or 
+      			:startDate is null)
+		order by
+			visitor.name.lastName, visitor.name.firstName
+	]]></query>
+	<!-- <query name="summarizeVisitorListByFacility"><![CDATA[
+		select new omis.visitation.report.VisitorSummary
+			(case
+				when 
+					(select 
+						count(*)
+					from
+						omis.visitation.domain.Visit visit
+					where
+						trunc(visit.date) = trunc(:date)
+					and
+						visit.startTime<= :time
+					and
+							(visit.endTime > :time
+						or
+							visit.endTime is null)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id) > 0
+				then
+					true 
+				else
+					false
+			end, visitationAssociation.approved, visitationAssociation.money, visitationAssociation.relationship.secondPerson.name.firstName
+			||' '|| visitationAssociation.relationship.secondPerson.name.lastName, visitationAssociation.id
+			,(select 
+						visit.id
+					from
+						omis.visitation.domain.Visit visit
+					where
+						trunc(visit.date) = trunc(:date)
+					and
+						visit.startTime<= :time
+					and
+							(visit.endTime > :time
+						or
+							visit.endTime is null)
+					and 
+						visit.visitationAssociation.id = visitationAssociation.id), 
+			identity.birthDate, identity.socialSecurityNumber
+			,(select
+						familyAssociation.category.name
+					from
+						omis.family.domain.FamilyAssociation familyAssociation
+					where
+						familyAssociation.relationship = visitationAssociation.relationship))
+		from
+			omis.visitation.domain.VisitationAssociation visitationAssociation
+			left outer join visitationAssociation.relationship.secondPerson.identity identity
+		where
+			visitationAssociation.relationship.firstPerson. = :facility
+		and
+			trunc(visitationAssociation.dateRange.startDate) <= trunc(:date)
+		and
+				(visitationAssociation.dateRange.endDate >= :date
+			or
+				visitationAssociation.dateRange.endDate is null)
+		order by
+			visitationAssociation.relationship.secondPerson.name.lastName
+	]]></query> -->
+	
+</hibernate-mapping>

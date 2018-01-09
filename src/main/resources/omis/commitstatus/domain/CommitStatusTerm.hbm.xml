@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.commitstatus.domain">
+	<class entity-name="omis.commitstatus.domain.CommitStatusTerm"
+		proxy="omis.commitstatus.domain.CommitStatusTerm"
+		name="omis.commitstatus.domain.impl.CommitStatusTermImpl"
+		table="`COMMIT_STATUS_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`COMMIT_STATUS_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		<many-to-one name="status" column="`STATUS_ID`" cascade="none" not-null="true"
+			entity-name="omis.commitstatus.domain.CommitStatus" unique="false"/>	
+		<component name="dateRange" class="omis.datatype.DateRange">
+			<property name="startDate" column="`START_DATE`" type="java.util.Date" not-null="true"/>
+			<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
+		</component>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	
+	<query name="findCommitStatusTerm"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			term.status = :commitStatus
+		and
+			term.dateRange.startDate = :startDate
+	]]></query>	
+	
+	<query name="findConflictCommitStatusTerm"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			term.dateRange.endDate is not null
+		and ((:endDate is null and :startDate<term.dateRange.endDate)
+			or(:endDate > term.dateRange.startDate and :startDate < term.dateRange.endDate))
+	]]></query>
+	
+	<query name="findConflictCommitStatusTermExcluding"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			term.dateRange.endDate is not null
+		and ((:endDate is null and :startDate<term.dateRange.endDate)
+			or(:endDate > term.dateRange.startDate and :startDate < term.dateRange.endDate))
+		and
+			term != :excludedCommitStatusTerm
+	]]></query>
+	
+	<query name="findAfterCommitStatusTerm"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			term.dateRange.endDate is null and :startDate < term.dateRange.startDate and (:endDate> term.dateRange.startDate or :endDate is null)
+	]]></query>
+	
+	<query name="findAfterCommitStatusTermExcluding"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			((term.dateRange.endDate is null and :endDate is null) or (term.dateRange.endDate is null and :endDate is not null and :endDate > term.dateRange.startDate))
+		and
+			term != :excludedCommitStatusTerm
+	]]></query>
+			
+	<query name="findCommitStatusTermExcluding"><![CDATA[
+		select term
+		from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			term.dateRange.startDate = :startDate
+		and
+			term.status = :commitStatus
+		and
+		    term != :excludedCommitStatusTerm
+	]]></query> 
+	
+	<query name="countCommitStatusTermForPersonOnDate"><![CDATA[
+		select term
+		from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :person
+		and
+			((term.dateRange.startDate is not null and term.dateRange.endDate is not null and term.dateRange.startDate<:date and term.dateRange.endDate>:date)
+				or(term.dateRange.startDate is not null and term.dateRange.endDate is null and term.dateRange.startDate<:date))
+	]]></query>
+	
+	<query name="findCommitStatusTermForOffenderOnDate"><![CDATA[
+		select term
+			from
+			omis.commitstatus.domain.CommitStatusTerm term
+		where
+			term.offender = :offender
+		and
+			:startDate > term.dateRange.startDate
+		and
+			term.dateRange.endDate is null
+	]]></query>
+</hibernate-mapping>

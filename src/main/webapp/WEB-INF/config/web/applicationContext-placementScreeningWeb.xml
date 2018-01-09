@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+	<context:component-scan base-package="omis.placementscreening.web.controller"/>	
+
+	<bean id="placementReferralFormValidator"
+		class="omis.placementscreening.web.validator.PlacementReferralFormValidator">
+		<constructor-arg name="prereleaseScreeningItemValidator" ref="prereleaseScreeningItemValidator"/>
+		<constructor-arg name="treatmentScreeningItemValidator" ref="treatmentScreeningItemValidator"/>
+	</bean>
+	
+	<bean id="prereleaseScreeningItemValidator"
+		class="omis.placementscreening.web.validator.PrereleaseScreeningItemValidator"></bean>
+	
+	<bean id="treatmentScreeningItemValidator"
+		class="omis.placementscreening.web.validator.TreatmentScreeningItemValidator"></bean>
+	
+	<bean id="placementReferralControllerDelegate"
+		class="omis.placementscreening.web.controller.PlacementReferralControllerDelegate">
+		<constructor-arg name="facilityService" ref="facilityService"/>
+		<constructor-arg name="offenderSummaryModelDelegate" ref="offenderSummaryModelDelegate"/>
+		<constructor-arg name="placementReferralService" ref="placementReferralService"/>
+	</bean>
+	
+	<aop:config>
+		<aop:pointcut id="placementReferralControllerOperation" expression="execution(* omis.placementscreening.web.controller.PlacementReferralController.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="placementReferralControllerOperation"/>
+	</aop:config>
+</beans>

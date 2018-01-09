@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Configuration for string length checks.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+  <!-- String length checks -->
+  
+  <bean id="stringLengthChecks" class="omis.web.validator.StringLengthChecks">
+    <constructor-arg name="verySmallCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="verySmallStringLength.exceeded"/>
+    		<constructor-arg name="length" value="32"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="smallCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="smallStringLength.exceeded"/>
+    		<constructor-arg name="length" value="64"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="mediumCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="mediumStringLength.exceeded"/>
+    		<constructor-arg name="length" value="128"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="largeCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="largeStringLength.exceeded"/>
+    		<constructor-arg name="length" value="256"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="veryLargeCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="veryLargeStringLength.exceeded"/>
+    		<constructor-arg name="length" value="512"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="hugeCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="hugeStringLength.exceeded"/>
+    		<constructor-arg name="length" value="1024"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="veryHugeCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="veryHugeStringLength.exceeded"/>
+    		<constructor-arg name="length" value="2048"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="humongousCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="humongousStringLength.exceeded"/>
+    		<constructor-arg name="length" value="4000"/>
+    	</bean>
+    </constructor-arg>
+    <constructor-arg name="documentCheck">
+    	<bean class="omis.web.validator.StringLengthChecks.StringLengthCheck">
+    		<constructor-arg name="messageKey" value="documentStringLength.exceeded"/>
+    		<constructor-arg name="length" value="32760"/>
+    	</bean>
+    </constructor-arg>
+  </bean>
+
+</beans>

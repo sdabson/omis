@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Author: Stephen Abson -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.demographics.domain">
+	<class entity-name="omis.demographics.domain.HairColor"
+	       proxy="omis.demographics.domain.HairColor"
+	       name="omis.demographics.domain.impl.HairColorImpl"
+	       table="`HAIR_COLOR`">
+	    <cache usage="transactional" region="demographics"/>
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`HAIR_COLOR_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" type="java.lang.String" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findHairColorByName" cacheable="true" cache-region="demographics"><![CDATA[
+		select hairColor from omis.demographics.domain.HairColor hairColor
+		where hairColor.name = :name
+	]]></query>
+	<query name="findHairColors" cacheable="true" cache-region="demographics"><![CDATA[
+		select hairColor from omis.demographics.domain.HairColor hairColor order by hairColor.name
+	]]></query>
+</hibernate-mapping>

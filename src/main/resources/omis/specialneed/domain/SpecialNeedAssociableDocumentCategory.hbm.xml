@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.specialneed.domain">
+	<class entity-name="omis.specialneed.domain.SpecialNeedAssociableDocumentCategory"
+		proxy="omis.specialneed.domain.SpecialNeedAssociableDocumentCategory" name="omis.specialneed.domain.impl.SpecialNeedAssociableDocumentCategoryImpl"
+		table="`SPECIAL_NEED_DOCUMNT_CAT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`SPECIAL_NEED_DOCUMNT_CAT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string" />
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`CREATE_DATE`" not-null="true" />
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+				not-null="true" />
+			<property name="date" column="`UPDATE_DATE`" not-null="true" />
+		</component>
+	</class>
+	<query name="findSpecialNeedAssociableDocumentCategory"><![CDATA[
+		select category
+		from 
+			omis.specialneed.domain.SpecialNeedAssociableDocumentCategory category
+		where
+			category.name = :name
+	]]></query>
+	<query name="findSpecialNeedAssociableDocumentCategoryExcluding"><![CDATA[
+		select category
+		from 
+			omis.specialneed.domain.SpecialNeedAssociableDocumentCategory category
+		where
+			category.name = :name
+		and 
+			category != :excludedCategory
+	]]></query>
+</hibernate-mapping>

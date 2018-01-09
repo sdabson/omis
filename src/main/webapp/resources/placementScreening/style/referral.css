@@ -1,0 +1,41 @@
+/* Program referral styling.
+ * Author: Ryan Johns
+ * Version: 0.1.0 (Feb 23, 2015) */
+ 
+ .upLink:before {
+	content: url("../../common/images/arrowUp.png");
+	cursor: pointer;
+    left: 20px;
+    position: relative;
+    top: -4px;
+}
+ 
+.downLink:before {
+	bottom: -6px;
+    content: url("../../common/images/arrowDown.png");
+    cursor: pointer;
+    left: 0;
+    position: relative;
+}
+
+tr.removed {
+	background: #F00;
+}
+
+span.error {
+	padding-left: 10px;
+}
+
+form.editForm .editTable tbody tr td span.error {
+	float:none;
+}
+
+div.error {
+	border: 3px solid #E00;
+	padding-left: 3px;
+	color: #d8000c;
+	font-size: 76%;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 99%
+}

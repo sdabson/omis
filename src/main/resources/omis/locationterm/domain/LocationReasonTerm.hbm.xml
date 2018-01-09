@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Location reason term mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.locationterm.domain">
+	<class entity-name="omis.locationterm.domain.LocationReasonTerm"
+	       proxy="omis.locationterm.domain.LocationReasonTerm"
+	       name="omis.locationterm.domain.impl.LocationReasonTermImpl"
+		   table="`LOCATION_REASON_TERM`">
+	  <id name="id" column="`ID`" type="java.lang.Long">
+        <generator class="sequence">
+          <param name="sequence">`LOCATION_REASON_TERM_SEQ`</param>
+        </generator>
+	  </id>
+      <component name="creationSignature" class="omis.audit.domain.CreationSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+      </component>
+      <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+      	<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+      	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+      </component>
+      <properties name="uniqueLocationReasonTerm">
+      	<component name="dateRange" class="omis.datatype.DateRange">
+      		<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+      		<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+      	</component>
+      	<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
+      	<many-to-one name="locationTerm" entity-name="omis.locationterm.domain.LocationTerm" not-null="true" column="`LOCATION_TERM_ID`"/>
+      </properties>
+      <many-to-one name="reason" entity-name="omis.locationterm.domain.LocationReason" not-null="true" column="`REASON_ID`"/>
+	</class>
+	<query name="findLocationReasonTermsByOffender"><![CDATA[
+		select locationReasonTerm
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		inner join locationReasonTerm.locationTerm as locationTerm
+		where locationTerm.offender = :offender
+		order by
+			locationReasonTerm.dateRange.startDate desc
+	]]></query>
+	<query name="findLocationReasonTerm"><![CDATA[
+		select locationReasonTerm
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where ((locationReasonTerm.dateRange.startDate = :startDate or (locationReasonTerm.dateRange.startDate is null and :startDate is null))
+		  and (locationReasonTerm.dateRange.endDate = :endDate or (locationReasonTerm.dateRange.endDate is null and :endDate is null)))
+		  and locationReasonTerm.offender = :offender
+		  and locationReasonTerm.locationTerm = :locationTerm
+	]]></query>
+	<query name="findLocationReasonTermExcluding"><![CDATA[
+		select locationReasonTerm
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where ((locationReasonTerm.dateRange.startDate = :startDate or (locationReasonTerm.dateRange.startDate is null and :startDate is null))
+		  and (locationReasonTerm.dateRange.endDate = :endDate or (locationReasonTerm.dateRange.endDate is null and :endDate is null)))
+		  and locationReasonTerm.offender = :offender
+		  and locationReasonTerm.locationTerm = :locationTerm
+		  and locationReasonTerm not in (:excludedLocationReasonTerms)
+	]]></query>
+	<query name="countLocationReasonTermsByLocationTerm"><![CDATA[
+		select count (locationReasonTerm)
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.locationTerm = :locationTerm
+	]]></query>
+	<query name="findLocationReasonTermsByLocationTerm"><![CDATA[
+		select locationReasonTerm
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.locationTerm = :locationTerm
+		order by locationReasonTerm.dateRange.startDate desc
+	]]></query>
+	<query name="countLocationReasonTermsByLocationTermBetweenDates"><![CDATA[
+		select count(locationReasonTerm)
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.locationTerm = :locationTerm
+		  and (locationReasonTerm.dateRange.startDate <= :endDate
+		   or (locationReasonTerm.dateRange.startDate is null or :endDate is null))
+		  and (locationReasonTerm.dateRange.endDate > :startDate
+		   or (locationReasonTerm.dateRange.endDate is null or :startDate is null))
+	]]></query>
+	<query name="countLocationReasonTermsByLocationTermBetweenDatesExcluding"><![CDATA[
+		select count(locationReasonTerm)
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.locationTerm = :locationTerm
+		  and (locationReasonTerm.dateRange.startDate <= :endDate
+		   or (locationReasonTerm.dateRange.startDate is null or :endDate is null))
+		  and (locationReasonTerm.dateRange.endDate > :startDate
+		   or (locationReasonTerm.dateRange.endDate is null or :startDate is null))
+		  and locationReasonTerm not in (:excludedLocationReasonTerms)
+	]]></query>
+	<query name="countLocationReasonTermsByLocationTermOutsideOfDates"><![CDATA[
+	  select count(locationReasonTerm)
+	  from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+	  where locationReasonTerm.locationTerm = :locationTerm
+	    and ((locationReasonTerm.dateRange.startDate > :endDate or locationReasonTerm.dateRange.endDate > :endDate
+	      or (locationReasonTerm.dateRange.startDate is null and :startDate is not null))
+	    or (locationReasonTerm.dateRange.endDate < :startDate or locationReasonTerm.dateRange.startDate < :startDate
+	      or (locationReasonTerm.dateRange.endDate is null and :endDate is not null)))
+	]]></query>
+	<query name="findLocationReasonTermForLocationTermOnDate"><![CDATA[
+	  select locationReasonTerm
+	  from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+	  where locationReasonTerm.locationTerm = :locationTerm
+	    and (locationReasonTerm.dateRange.startDate <= :date
+	    	or locationReasonTerm.dateRange.startDate is null)
+	   	and (locationReasonTerm.dateRange.endDate > :date
+	   		or locationReasonTerm.dateRange.endDate is null)
+	]]></query>
+	<query name="findLocationReasonTermForOffenderOnDate"><![CDATA[
+	  select locationReasonTerm
+	  from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+	  where locationReasonTerm.offender = :offender
+	    and (locationReasonTerm.dateRange.startDate <= :date
+	    	or locationReasonTerm.dateRange.startDate is null)
+	   	and (locationReasonTerm.dateRange.endDate > :date
+	   		or locationReasonTerm.dateRange.endDate is null)
+	]]></query>
+	<query name="countLocationReasonTermsForOffenderAfterDateExcluding"><![CDATA[
+		select count(locationReasonTerm)
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.offender = :offender
+		  and locationReasonTerm.dateRange.startDate >= :date
+		  and (locationReasonTerm <> :excludedLocationReasonTerm
+		  	or :excludedLocationReasonTerm is null)
+	]]></query>
+	<query name="deleteLocationReasonTermsByLocationTerm"><![CDATA[
+		delete from omis.locationterm.domain.LocationReasonTerm reasonTerm
+		where reasonTerm.locationTerm = :locationTerm
+	]]></query>
+</hibernate-mapping>

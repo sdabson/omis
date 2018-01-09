@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	<hibernate-mapping package="omis.physicalfeature.report">
+		<query name="findPhysicalFeatureByOffender"><![CDATA[
+			select new omis.physicalfeature.report.PhysicalFeatureSummary(
+			association.id, offender.name.firstName, offender.name.lastName, offender.name.middleName,
+			offender.name.suffix, offender.offenderNumber, association.feature.featureClassification.name, association.feature.name, 
+			association.description, association.originationDate)
+			from
+				omis.physicalfeature.domain.PhysicalFeatureAssociation association
+				left outer join association.offender offender					
+			where
+				offender = :offender
+			order by association.feature.featureClassification.name asc,
+					association.feature.name asc,
+					association.description asc
+		]]></query>
+	</hibernate-mapping>

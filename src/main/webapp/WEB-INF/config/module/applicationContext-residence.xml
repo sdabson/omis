@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+  
+  <!-- Services -->
+  
+  <bean id="residenceService" 
+  		class="omis.residence.service.impl.ResidenceServiceImpl">
+  		<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+  		<constructor-arg name="cityDelegate" ref="cityDelegate"/>
+  		<constructor-arg name="allowedResidentialLocationRuleDelegate" ref="allowedResidentialLocationRuleDelegate"/>
+  		<constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
+  		<constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+  		<constructor-arg name="addressDelegate" ref="addressDelegate"/>
+  		<constructor-arg name="nonResidenceTermDelegate" ref="nonResidenceTermDelegate"/>
+  		<constructor-arg name="locationDelegate" ref="locationDelegate"/>
+  		<constructor-arg name="organizationDelegate" ref="organizationDelegate"/>
+  		<constructor-arg name="verificationMethodDelegate" ref="verificationMethodDelegate"/>
+	</bean>
+  		
+  <!--  Report services -->
+  
+  <bean id="residenceReportService"
+    	class="omis.residence.report.impl.hibernate.ResidenceReportServiceHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="residenceProfileItemReportService"
+  	class="omis.residence.report.impl.hibernate.ResidenceProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <bean id="residenceSearchSummaryReportService"
+  	class="omis.residence.report.impl.hibernate.ResidenceSearchSummaryReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <bean id="residenceSummaryItemReportService"
+  	class="omis.residence.report.impl.hibernate.ResidenceSummaryItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
+  </bean>
+  
+  <!-- Delegates -->
+  
+  <bean id="residenceTermDelegate"
+    	class="omis.residence.service.delegate.ResidenceTermDelegate">
+    	<constructor-arg name="residenceTermDao" ref="residenceTermDao"/>
+    	<constructor-arg name="residenceTermInstanceFactory" ref="residenceTermInstanceFactory"/>
+    	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="nonResidenceTermDelegate"
+    	class="omis.residence.service.delegate.NonResidenceTermDelegate">
+    	<constructor-arg name="nonResidenceTermDao" ref="nonResidenceTermDao"/>
+    	<constructor-arg name="nonResidenceTermInstanceFactory" ref="nonResidenceTermInstanceFactory"/>
+    	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="allowedResidentialLocationRuleDelegate"
+    	class="omis.residence.service.delegate.AllowedResidentialLocationRuleDelegate">
+    	<constructor-arg name="allowedResidentialLocationRuleDao" ref="allowedResidentialLocationRuleDao"/>
+    	<constructor-arg name="allowedResidentialLocationRuleInstanceFactory" ref="allowedResidentialLocationRuleInstanceFactory"/>
+  </bean>
+  
+  <!--  Data Access Objects -->
+  
+  <bean id="residenceTermDao"
+  		class="omis.residence.dao.impl.hibernate.ResidenceTermDaoHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		<constructor-arg name="entityName" value="omis.residence.domain.ResidenceTerm"/>
+  </bean>
+  
+  <bean id="nonResidenceTermDao"
+  		class="omis.residence.dao.impl.hibernate.NonResidenceTermDaoHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		<constructor-arg name="entityName" value="omis.residence.domain.NonResidenceTerm"/>
+  </bean>
+  
+  <bean id="allowedResidentialLocationRuleDao"
+  		class="omis.residence.dao.impl.hibernate.AllowedResidentialLocationRuleDaoHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		<constructor-arg name="entityName" value="omis.residence.domain.AllowedResidentialLocationRule"/>
+  </bean>   
+  
+<!--   Instance factories -->
+  
+  <bean id="residenceTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    <constructor-arg name="entityName" value="omis.residence.domain.ResidenceTerm"/>
+  </bean>
+  
+    <bean id="nonResidenceTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    <constructor-arg name="entityName" value="omis.residence.domain.NonResidenceTerm"/>
+  </bean>  
+  
+  <bean id="allowedResidentialLocationRuleInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    <constructor-arg name="entityName" value="omis.residence.domain.AllowedResidentialLocationRule"/>
+  </bean>
+ 
+<!--   Property editors -->
+  
+  <bean id="residenceTermPropertyEditorFactory"
+ 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="dao" ref="residenceTermDao"/>
+ 		<constructor-arg name="entityName" value="omis.residence.domain.ResidenceTerm"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  	
+  <bean id="nonResidenceTermPropertyEditorFactory"
+ 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 		<constructor-arg name="dao" ref="nonResidenceTermDao"/>
+ 		<constructor-arg name="entityName" value="omis.residence.domain.NonResidenceTerm"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+   <bean id="allowedResidentialLocationRulePropertyEditorFactory"
+  		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  		<constructor-arg name="dao" ref="allowedResidentialLocationRuleDao"/>
+  		<constructor-arg name="entityName" value="omis.residence.domain.AllowedResidentialLocationRule"/>
+  		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+</beans>    

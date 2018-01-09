@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.HealthSectionSummaryNote"
+			proxy="omis.presentenceinvestigation.domain.HealthSectionSummaryNote"
+			name="omis.presentenceinvestigation.domain.impl.HealthSectionSummaryNoteImpl"
+			table="`HEALTH_SECTION_SUMMRY_NT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEALTH_SECTION_SUMMRY_NT_SEQ`</param>
+				</generator>
+			</id>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<many-to-one name="healthSectionSummary" column="`HEALTH_SECTION_SUMMARY_ID`" entity-name="omis.presentenceinvestigation.domain.HealthSectionSummary" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findHealthSectionSummaryNote"><![CDATA[
+		select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryNote summary
+		where
+			summary.description = :description
+		and 
+			date = :date
+		and 
+			healthSectionSummary = :healthSectionSummary
+	]]></query>	
+	<query name="findHealthSectionSummaryNoteExcluding"><![CDATA[
+		select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryNote summary
+		where
+			summary.description = :description
+		and 
+			date = :date
+		and 
+			healthSectionSummary = :healthSectionSummary
+		and
+			summary != :healthSectionSummaryNote
+	]]></query>		
+	<query name="findHealthSectionSummaryNotesByHealthSectionSummary"><![CDATA[
+			select summary
+		from
+			omis.presentenceinvestigation.domain.HealthSectionSummaryNote summary
+		where
+			healthSectionSummary = :healthSectionSummary
+	]]></query>
+</hibernate-mapping>

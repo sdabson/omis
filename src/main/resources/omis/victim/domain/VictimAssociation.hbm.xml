@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.domain">
+	<class entity-name="omis.victim.domain.VictimAssociation"
+	       proxy="omis.victim.domain.VictimAssociation"
+	       name="omis.victim.domain.impl.VictimAssociationImpl"
+	       table="`VICTIM_ASSOC`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`VICTIM_ASSOC_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueVictimAssociation">
+			<many-to-one name="relationship" entity-name="omis.relationship.domain.Relationship" not-null="true" column="`RELATIONSHIP_ID`" unique="true"/>
+		</properties>
+		<property name="registerDate" type="java.util.Date" column="`REGISTER_DATE`" not-null="false"/>
+		<property name="packetSent" type="yes_no" column="`PACKET_SENT`" not-null="false"/>
+		<property name="packetSendDate" type="java.util.Date" column="`PACKET_SEND_DATE`" not-null="false"/>
+		<component name="flags" class="omis.victim.domain.component.VictimAssociationFlags">
+			<property name="victim" type="yes_no" not-null="false" column="`VICTIM`"/>
+			<property name="docRegistered" type="yes_no" not-null="false" column="`DOC_REGISTERED`"/>
+			<property name="business" type="yes_no" not-null="false" column="`BUSINESS`"/>
+			<property name="vineRegistered" type="yes_no" not-null="false" column="`VINE_REGISTERED`"/>
+		</component>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true" type="java.util.Date"/>
+		</component>
+	</class>
+	<query name="findVictimAssociation"><![CDATA[
+		select association
+		from omis.victim.domain.VictimAssociation association
+		where association.relationship = :relationship
+	]]></query>
+	<query name="findVictimAssociationExcluding"><![CDATA[
+		select association
+		from omis.victim.domain.VictimAssociation association
+		where association.relationship = :relationship
+		  and association not in (:excludedAssociations)
+	]]></query>
+	<query name="findVictimAssociationsByOffender"><![CDATA[
+		select association
+		from omis.victim.domain.VictimAssociation association
+		where association.relationship.firstPerson = :offender
+	]]></query>
+	<query name="findVictimAssociationsByVictim"><![CDATA[
+		select association
+		from omis.victim.domain.VictimAssociation association
+		where association.relationship.secondPerson = :victim
+	]]></query>
+	<query name="findVictimAssociationCountByOffender"><![CDATA[
+		select count(association.id)
+		  from omis.victim.domain.VictimAssociation association
+		 where association.relationship.firstPerson = :offender
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.facility.domain">
+	<class entity-name="omis.facility.domain.FacilityArea"
+		proxy="omis.facility.domain.FacilityArea"
+		name="omis.facility.domain.impl.FacilityAreaImpl"
+		table="`FACILITY_AREA`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FACILITY_AREA_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="false" type="string"/>
+		<many-to-one name="facility" column="`FACILITY_ID`" cascade="none" not-null="true"
+			entity-name="omis.facility.domain.Facility" unique="false"/>
+		<many-to-one name="complex" column="`COMPLEX_ID`" cascade="none" not-null="false"
+			entity-name="omis.facility.domain.Complex" unique="false"/>
+	</class>
+	<query name="findFacilityAreasByComplex"><![CDATA[
+		select area
+		from omis.facility.domain.FacilityArea area
+		where
+			area.complex = :complex
+		order by
+			area.name
+	]]></query>
+	<query name="findFacilityAreasByFacility"><![CDATA[
+		select area
+		from omis.facility.domain.FacilityArea area
+		where
+			area.facility = :facility
+		order by
+			area.name
+	]]></query>
+</hibernate-mapping>

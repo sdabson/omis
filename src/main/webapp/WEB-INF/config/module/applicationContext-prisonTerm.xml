@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Services -->
+  
+  <bean id="prisonTermService"
+  		class="omis.prisonterm.service.impl.PrisonTermServiceImpl">
+  	<constructor-arg name="prisonTermDelegate" ref="prisonTermDelegate"/>
+  	<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>		
+  	<constructor-arg name="prisonTermDao" ref="prisonTermDao"/>	
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  <bean id="prisonTermDelegate" class="omis.prisonterm.service.delegate.PrisonTermDelegate">
+	  <constructor-arg name="prisonTermInstanceFactory" ref="prisonTermInstanceFactory"/>
+	  <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  <constructor-arg name="prisonTermDao" ref="prisonTermDao"/>
+  </bean>
+  
+  <!-- Report Services -->
+  
+  <bean id="prisonTermReportService" 
+  	class="omis.prisonterm.report.impl.hibernate.PrisonTermReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="prisonTermProfileItemReportService"
+  	class="omis.prisonterm.report.impl.hibernate.PrisonTermProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="prisonTermSummaryItemReportService"
+  	class="omis.prisonterm.report.impl.hibernate.PrisonTermSummaryItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Data access objects -->
+  
+  <bean id="prisonTermDao" 
+  		class="omis.prisonterm.dao.impl.hibernate.PrisonTermDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="facilityDao" 
+  		class="omis.facility.dao.impl.hibernate.FacilityDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.facility.domain.Facility"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="userAccountDao" 
+  		class="omis.user.dao.impl.hibernate.UserAccountDaoHibernateImpl">
+  	<constructor-arg name="entityName" value="omis.user.domain.UserAccount"/>
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="prisonTermInstanceFactory" 
+  	class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
+  </bean>
+  
+  <!-- Property editor factories -->
+  
+  <bean id="prisonTermPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="prisonTermDao"/>
+    <constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+</beans>

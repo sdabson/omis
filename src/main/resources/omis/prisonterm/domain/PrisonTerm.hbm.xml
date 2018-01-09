@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - PrisonTerm mapping.
+  -
+  - Author: Trevor Isles
+  -->
+ <!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.prisonterm.domain">
+	<class entity-name="omis.prisonterm.domain.PrisonTerm"
+		proxy="omis.prisonterm.domain.PrisonTerm"
+		name="omis.prisonterm.domain.impl.PrisonTermImpl"
+		table="`PRISON_TERM`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PRISON_TERM_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+		   <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`CREATE_ACCOUNT_ID`"/>
+		   	<property name="date" type="java.util.Date" not-null="true" column="`CREATE_DATE`"/>
+		   </component>
+		   <component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+		     <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
+		 	  	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
+		  	</component>
+		       
+		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
+			entity-name="omis.offender.domain.Offender" unique="false"/>
+		
+		<property name="status" column="`STATUS`" not-null="true">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.prisonterm.domain.PrisonTermStatus</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		
+		<property name="sentenceToFollow" column="`SENTENCE_TO_FOLLOW`" type="yes_no" not-null="false"/>
+		
+		<property name="preSentenceCredits" column="`PRE_SENTENCE_CREDITS`" type="java.lang.Integer" not-null="false"/>
+		<property name="sentenceTermYears" column="`SENTENCE_TERM_YEARS`" type="java.lang.Integer" not-null="false"/>
+		<property name="sentenceTermDays" column="`SENTENCE_TERM_DAYS`" type="java.lang.Integer" not-null="false"/>
+		
+		<property name="actionDate" type="java.util.Date" not-null="true" column="`ACTION_DATE`"/>
+		<property name="sentenceDate" type="java.util.Date" not-null="false" column="`SENTENCE_DATE`"/>
+		<property name="paroleEligibilityDate" type="java.util.Date" not-null="false" column="`PAROLE_ELIGIBILITY_DATE`"/>
+		<property name="projectedDischargeDate" type="java.util.Date" not-null="false" column="`PROJECTED_DISCHARGE_DATE`"/>
+		<property name="maximumDischargeDate" type="java.util.Date" not-null="false" column="`MAXIMUM_DISCHARGE_DATE`"/>
+		<property name="comments" type="java.lang.String" not-null="true" column="`COMMENTS`"/>
+		<property name="verificationDate" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
+		
+		<many-to-one name="verificationUser" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+ 	</class>
+	<query name="findPrisonTerm"><![CDATA[
+		select prisonTerm
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		where
+			prisonTerm.offender = :offender
+		and
+			prisonTerm.actionDate = :actionDate
+		and
+			prisonTerm.status = :status
+	]]></query>
+	<query name="findPrisonTermByOffender"><![CDATA[
+		select prisonTerm
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		where
+			prisonTerm.offender = :offender
+	]]></query>
+	<query name="findExcludingPrisonTerm"><![CDATA[
+		select prisonTerm
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		where
+			prisonTerm.offender = :offender
+		and
+			prisonTerm.actionDate = :actionDate
+		and
+			prisonTerm.status = :status
+		and
+			prisonTerm <> :excludedPrisonTerm
+	]]></query>
+	<query name="findPrisonTermCountByPrisonTerms"><![CDATA[
+		select count(prisonTerm.id)
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		where
+			prisonTerm.offender = :offender
+	]]></query>
+	<query name="findExcludingActiveByOffender"><![CDATA[
+		select prisonTerm
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		where
+			prisonTerm.offender = :offender
+		and
+			prisonTerm.status = 'ACTIVE'
+		and
+			(prisonTerm <> :excludedPrisonTerm
+			or :excludedPrisonTerm is null)
+	]]></query>
+</hibernate-mapping>

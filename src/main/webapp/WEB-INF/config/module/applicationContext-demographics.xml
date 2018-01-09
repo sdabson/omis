@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Demographics services -->
+  
+  <bean id="buildService"
+        class="omis.demographics.service.impl.BuildServiceImpl">
+    <constructor-arg name="buildDao" ref="buildDao"/>
+  </bean>
+  
+  <bean id="complexionService"
+        class="omis.demographics.service.impl.ComplexionServiceImpl">
+    <constructor-arg name="complexionDao" ref="complexionDao"/>
+  </bean>
+  
+  <bean id="eyeColorService"
+  		  class="omis.demographics.service.impl.EyeColorServiceImpl">
+    <constructor-arg name="eyeColorDao" ref="eyeColorDao"/>
+  </bean>
+  
+  <bean id="hairColorService"
+  		class="omis.demographics.service.impl.HairColorServiceImpl">
+  	<constructor-arg name="hairColorDao" ref="hairColorDao"/>
+  </bean>
+
+  <bean id="maritalStatusService"
+  		class="omis.demographics.service.impl.MaritalStatusServiceImpl">
+  	<constructor-arg name="maritalStatusDao" ref="maritalStatusDao"/>
+  </bean>
+
+  <bean id="raceService"
+  		class="omis.demographics.service.impl.RaceServiceImpl">
+  	<constructor-arg name="raceDao" ref="raceDao"/>
+  </bean>
+
+  <bean id="tribeService"
+  		class="omis.demographics.service.impl.TribeServiceImpl">
+  	<constructor-arg name="tribeDao" ref="tribeDao"/>
+  </bean>
+
+  <!-- Data access objects -->
+
+  <bean id="buildDao"
+        class="omis.demographics.dao.impl.hibernate.BuildDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Build"/>
+  </bean>
+
+  <bean id="complexionDao"
+        class="omis.demographics.dao.impl.hibernate.ComplexionDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Complexion"/>
+  </bean>
+
+  <bean id="eyeColorDao"
+        class="omis.demographics.dao.impl.hibernate.EyeColorDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.demographics.domain.EyeColor"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="hairColorDao"
+        class="omis.demographics.dao.impl.hibernate.HairColorDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.demographics.domain.HairColor"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="maritalStatusDao"
+        class="omis.demographics.dao.impl.hibernate.MaritalStatusDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.demographics.domain.MaritalStatus"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="personDemographicsDao"
+        class="omis.demographics.dao.impl.hibernate.PersonDemographicsDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.PersonDemographics"/>
+  </bean>
+
+  <bean id="raceDao"
+        class="omis.demographics.dao.impl.hibernate.RaceDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.demographics.domain.Race"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <bean id="tribeDao"
+        class="omis.demographics.dao.impl.hibernate.TribeDaoHibernateImpl">
+    <constructor-arg name="entityName" value="omis.demographics.domain.Tribe"/>
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <!-- Instance factories. -->
+  
+  <bean id="personDemographicsInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.PersonDemographics"/>
+  </bean>
+
+  <!-- Factories for property editors -->
+  
+  <bean id="buildPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="buildDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Build"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="complexionPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="complexionDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Complexion"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>      
+  </bean>
+  
+  <bean id="eyeColorPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="eyeColorDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.EyeColor"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+  
+  <bean id="hairColorPropertyEditorFactory"
+       class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="hairColorDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.HairColor"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="maritalStatusPropertyEditorFactory"
+       class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="maritalStatusDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.MaritalStatus"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="personDemographicsPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="personDemographicsDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.PersonDemographics"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="racePropertyEditorFactory"
+       class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="raceDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Race"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="tribePropertyEditorFactory"
+       class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="tribeDao"/>
+    <constructor-arg name="entityName" value="omis.demographics.domain.Tribe"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>
+
+  <bean id="sexPropertyEditorFactory" class="omis.beans.factory.impl.EnumPropertyEditorFactoryImpl">
+    <constructor-arg name="enumName" value="omis.demographics.domain.Sex"/>
+    <constructor-arg name="enumPropertyName" value="name"/>
+  </bean>
+
+  <bean id="dominantSidePropertyEditorFactory" class="omis.beans.factory.impl.EnumPropertyEditorFactoryImpl">
+    <constructor-arg name="enumName" value="omis.demographics.domain.DominantSide"/>
+    <constructor-arg name="enumPropertyName" value="name"/>
+  </bean>
+  
+  <!-- Delegates -->
+  
+  <bean id="personDemographicsDelegate" class="omis.demographics.service.delegate.PersonDemographicsDelegate">
+		<constructor-arg name="personDemographicsDao" ref="personDemographicsDao" />
+		<constructor-arg name="personDemographicsInstanceFactory" ref="personDemographicsInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
+	
+	<bean id="eyeColorDelegate" class="omis.demographics.service.delegate.EyeColorDelegate">
+		<constructor-arg name="eyeColorDao" ref="eyeColorDao" />
+	</bean>
+	
+	<bean id="hairColorDelegate" class="omis.demographics.service.delegate.HairColorDelegate">
+		<constructor-arg name="hairColorDao" ref="hairColorDao" />
+	</bean>
+	
+	<bean id="complexionDelegate" class="omis.demographics.service.delegate.ComplexionDelegate">
+		<constructor-arg name="complexionDao" ref="complexionDao" />
+	</bean>
+	
+	<bean id="buildDelegate" class="omis.demographics.service.delegate.BuildDelegate">
+		<constructor-arg name="buildDao" ref="buildDao" />
+	</bean>
+	
+	<bean id="raceDelegate" class="omis.demographics.service.delegate.RaceDelegate">
+		<constructor-arg name="raceDao" ref="raceDao" />
+	</bean>
+	
+	<bean id="tribeDelegate" class="omis.demographics.service.delegate.TribeDelegate">
+		<constructor-arg name="tribeDao" ref="tribeDao" />
+	</bean>
+	
+	<bean id="maritalStatusDelegate" class="omis.demographics.service.delegate.MaritalStatusDelegate">
+		<constructor-arg name="maritalStatusDao" ref="maritalStatusDao" />
+	</bean>
+
+</beans>

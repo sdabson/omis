@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearing.domain">
+	<class entity-name="omis.hearing.domain.Infraction"
+			proxy="omis.hearing.domain.Infraction"
+			name="omis.hearing.domain.impl.InfractionImpl"
+			table="`INFRACTION`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`INFRACTION_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="hearing" column="`HEARING_ID`" entity-name="omis.hearing.domain.Hearing" not-null="false" />
+			<many-to-one name="conditionViolation" column="`CONDITION_VIOLATION_ID`" entity-name="omis.violationevent.domain.ConditionViolation" not-null="false" />
+			<many-to-one name="disciplinaryCodeViolation" column="`DISCIPLINARY_CODE_VIOLATION_ID`" entity-name="omis.violationevent.domain.DisciplinaryCodeViolation" not-null="false" />
+			<component name="resolution">
+				<property name="date" column="`RESOLUTION_DATE`" type="java.util.Date" not-null="false" />
+				<property name="descision" column="`RESOLUTION_DECISION`" type="java.lang.String" not-null="false" />
+				<property name="reason" column="`RESOLUTION_REASON`" type="java.lang.String" not-null="true" />
+				<many-to-one name="authority" column="`RESOLUTION_PERSON_ID`" entity-name="omis.person.domain.Person" not-null="true" />
+				<property name="appealDate" column="`RESOLUTION_APPEAL_DATE`" type="java.util.Date" not-null="false" />
+				<property name="category" column="`RESOLUTION_CATEGORY`" not-null="false" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.hearing.domain.ResolutionClassificationCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+				</property>
+				<property name="disposition" column="`RESOLUTION_DISPOSITION`" not-null="false" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.hearing.domain.DispositionCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+				</property>
+			</component>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findInfraction"><![CDATA[
+		select infraction
+		from
+			omis.hearing.domain.Infraction infraction
+		where
+			infraction.hearing = :hearing
+		and
+			infraction.conditionViolation = :conditionViolation
+		and
+			infraction.disciplinaryCodeViolation = :disciplinaryCodeViolation
+	]]></query>
+	<query name="findInfractionExcluding"><![CDATA[
+		select infraction
+		from
+			omis.hearing.domain.Infraction infraction
+		where
+			infraction.hearing = :hearing
+		and
+			infraction.conditionViolation = :conditionViolation
+		and
+			infraction.disciplinaryCodeViolation = :disciplinaryCodeViolation
+		and
+			infraction != :infraction
+	]]></query>
+	<query name="findInfractionsByHearing"><![CDATA[
+		select infraction
+		from
+			omis.hearing.domain.Infraction infraction
+		where
+			infraction.hearing = :hearing
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource"
+			proxy="omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource"
+			name="omis.presentenceinvestigation.domain.impl.PresentenceInvestigationTaskSourceImpl"
+			table="`PRSNTNC_INVSTGTN_TSK_SRC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PRSNTNC_INVSTGTN_TSK_SRC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="taskTemplate" column="`TASK_TEMPLATE_ID`" entity-name="omis.task.domain.TaskTemplate" not-null="true" />
+			<property name="usage" column="`PRSTNC_INVSTGTN_TSK_ASSC_USG`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociationUsageCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<property name="category" column="`PRSTNC_INVSTGTN_TSK_ASSC_CAT`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociationCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findPresentenceInvestigationTaskSource"><![CDATA[
+		select presentenceInvestigationTaskSource
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource presentenceInvestigationTaskSource
+		where
+			presentenceInvestigationTaskSource.taskTemplate = :taskTemplate
+		and
+			presentenceInvestigationTaskSource.usage = :usage
+		and
+			presentenceInvestigationTaskSource.category = :category
+	]]></query>
+	<query name="findPresentenceInvestigationTaskSourceExcluding"><![CDATA[
+		select presentenceInvestigationTaskSource
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource presentenceInvestigationTaskSource
+		where
+			presentenceInvestigationTaskSource.taskTemplate = :taskTemplate
+		and
+			presentenceInvestigationTaskSource.usage = :usage
+		and
+			presentenceInvestigationTaskSource.category = :category
+		and
+			presentenceInvestigationTaskSource != :presentenceInvestigationTaskSource
+	]]></query>
+	<query name="findPresentenceInvestigationTaskSourcesByTaskTemplateGroup"><![CDATA[
+		select presentenceInvestigationTaskSource
+		from
+			omis.presentenceinvestigation.domain.PresentenceInvestigationTaskSource presentenceInvestigationTaskSource
+		inner join
+			presentenceInvestigationTaskSource.taskTemplate taskTemplate
+		where
+			taskTemplate.group = :group
+	]]></query>
+</hibernate-mapping>

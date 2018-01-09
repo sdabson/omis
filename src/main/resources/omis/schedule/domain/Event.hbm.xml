@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Mapping and queries for events and event scheduler module subtypes.
+  - Author: Stephen Abson
+  - Version: 0.1.1 (Jan 14, 2013)
+  - Since: OMIS 3.0
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.schedule.domain">
+	<class entity-name="omis.schedule.domain.Event"
+	       proxy="omis.schedule.domain.Event"
+	       name="omis.schedule.domain.Event"
+	       abstract="true"
+	       table="`EVENT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`EVENT_SEQ`</param>
+			</generator>
+		</id>
+		<component name="dateRange">
+			<property name="startDate" type="long" column="`START_DATE`"
+				not-null="true" access="field"/>
+			<property name="endDate" type="long" column="`END_DATE`"
+				not-null="true" access="field"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount"
+						 column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount"
+						 column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`"/>		
+		</component>
+		<joined-subclass entity-name="omis.schedule.domain.SchedulableEvent"
+		                 proxy="omis.schedule.domain.SchedulableEvent"
+		                 name="omis.schedule.domain.SchedulableEvent"
+		                 abstract="true"
+		                 table="`SCHEDULABLE_EVENT`">
+			<key column="`ID`"/>
+			<many-to-one name="schedule" column="`SCHEDULE_ID`" cascade="save-update"/>
+			<joined-subclass entity-name="omis.schedule.domain.AttendableEvent"
+			                 proxy="omis.schedule.domain.AttendableEvent"
+			                 name="omis.schedule.domain.AttendableEvent"
+			                 abstract="true"
+			                 table="`ATTENDABLE_EVENT`">
+				<key column="`ID`"/>
+				<set name="attendees" table="`ATTENDABLE_EVENT_TO_ATTENDEE`">
+					<key column="`ATTENDABLE_EVENT_ID`"/>
+					<many-to-many entity-name="omis.person.domain.Person"
+					              column="`PERSON_ID`"/>
+				</set>
+			</joined-subclass>
+		</joined-subclass>
+	</class>
+	<query name="findOrderedListOfEvents"><![CDATA[
+		from Event event
+		order by event.dateRange.startDate, event.dateRange.endDate
+	]]></query>
+	<query name="findAttendableEventsWithinDateRange"><![CDATA[
+		select event
+		from omis.schedule.domain.Event event
+		where (event.dateRange.startDate <= :endDate
+		     and event.dateRange.endDate >= :startDate)
+		order by
+		     event.dateRange.startDate, event.dateRange.endDate
+	]]></query>
+	<query name="findAttendableEventsForAttendeesWithinDateRange"><![CDATA[
+		select distinct attendableEvent
+		from omis.schedule.domain.AttendableEvent attendableEvent
+			inner join attendableEvent.attendees as attendee
+		where attendee in (:attendees)
+		and (attendableEvent.dateRange.startDate <= :endDate
+		     and attendableEvent.dateRange.endDate >= :startDate)
+		order by
+		     attendableEvent.dateRange.startDate,
+		     attendableEvent.dateRange.endDate
+	]]></query>
+</hibernate-mapping>

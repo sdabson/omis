@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboardcondition.domain">
+	<class entity-name="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory"
+			proxy="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory"
+			name="omis.paroleboardcondition.domain.impl.ParoleBoardAgreementCategoryImpl"
+			table="`PAROLE_BOARD_AGREMNT_CAT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PAROLE_BOARD_AGREMNT_CAT_SEQ`</param>
+				</generator>
+			</id>
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findParoleBoardAgreementCategory"><![CDATA[
+		select paroleBoardAgreementCategory
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreementCategory paroleBoardAgreementCategory
+		where
+			paroleBoardAgreementCategory.name = :name
+	]]></query>
+	<query name="findParoleBoardAgreementCategoryExcluding"><![CDATA[
+		select paroleBoardAgreementCategory
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreementCategory paroleBoardAgreementCategory
+		where
+			paroleBoardAgreementCategory.name = :name
+		and
+			paroleBoardAgreementCategory != :paroleBoardAgreementCategory
+	]]></query>
+	<query name="findParoleBoardAgreementCategories"><![CDATA[
+		select paroleBoardAgreementCategory
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreementCategory paroleBoardAgreementCategory
+		order by
+			paroleBoardAgreementCategory.name
+	]]></query>
+</hibernate-mapping>

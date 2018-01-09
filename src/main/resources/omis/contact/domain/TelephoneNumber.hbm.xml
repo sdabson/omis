@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.contact.domain">
+	<class entity-name="omis.contact.domain.TelephoneNumber"
+		proxy="omis.contact.domain.TelephoneNumber"
+		name="omis.contact.domain.impl.TelephoneNumberImpl"
+		table="`TELEPHONE_NUMBER`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`TELEPHONE_NUMBER_SEQ`</param>
+			</generator>
+		</id>
+		<property name="value" type="java.lang.Long" not-null="true" column="`VALUE`"/>
+		<property name="extension" type="java.lang.Integer" not-null="false" column="`EXTENSION`"/>
+		<property name="primary" type="yes_no" not-null="true" column="`PRIMARY`"/>
+		<property name="active" type="yes_no" not-null="true" column="`ACTIVE`"/>
+		<property name="category" column="`CATEGORY`" not-null="false">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.contact.domain.TelephoneNumberCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<many-to-one name="contact" column="`CONTACT_ID`" cascade="none" not-null="true" entity-name="omis.contact.domain.Contact"/>
+		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true"/>
+			<property name="date" type="java.util.Date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+
+	<query name="findTelephoneNumber"><![CDATA[
+		select telephoneNumber 
+		from omis.contact.domain.TelephoneNumber telephoneNumber
+		where
+			telephoneNumber.contact = :contact
+		and
+			telephoneNumber.value = :telephoneNumber
+		order by
+			telephoneNumber.contact.person.name.lastName
+	]]></query>
+
+	<query name="findTelephoneNumberExcluding"><![CDATA[
+		select telephoneNumber 
+		from omis.contact.domain.TelephoneNumber telephoneNumber
+		where
+			telephoneNumber.value = :value
+		and
+			telephoneNumber.contact = :contact
+		and
+			telephoneNumber <> :excludedTelephoneNumber
+	]]></query>
+	
+	<query name="findTelephoneNumbersByContact"><![CDATA[
+		select telephoneNumber 
+		from omis.contact.domain.TelephoneNumber telephoneNumber
+		where
+			telephoneNumber.contact = :contact
+		order by
+			telephoneNumber.primary desc
+	]]></query>
+</hibernate-mapping>

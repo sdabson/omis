@@ -1,0 +1,36 @@
+/* Styling for financial profile.
+ * author: Josh Divine
+ * version: 0.1.0 (November 23, 2016)
+ * since: OMIS 3.0 */
+ .totalEquityDisplay{
+ 	text-align: center;
+ }
+ 
+ span.documentItem {
+   display: block;
+ }
+ 
+ form.editForm span.fieldGroup.tagLinkContainer {
+ 	display: inline-block;
+ 	width: 20%;
+ 	float: left;
+	clear: both;
+ 	text-align: right;
+ }
+ 
+ form.editForm span.fieldGroup.documentTag a{
+ 	display: inline-block;
+ 	width: 20%;
+ 	float: left;
+	clear: both;
+ 	text-align: right;
+ 	margin-right: 2%;
+ }
+ 
+ form.editForm span.documentItem.removeContent {
+ 	background-color: hsla(355, 100%, 50%, 0.3);
+ } 
+ 
+  form.editForm span.documentTag.removeContent {
+ 	background-color: hsla(355, 100%, 50%, 0.3);
+ } 

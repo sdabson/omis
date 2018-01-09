@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcase.domain">
+	<class	entity-name="omis.courtcase.domain.CourtCase"
+			proxy="omis.courtcase.domain.CourtCase"
+			name="omis.courtcase.domain.impl.CourtCaseImpl"
+			table="`COURT_CASE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COURT_CASE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="docket" entity-name="omis.docket.domain.Docket" not-null="true" column="`DOCKET_ID`"/>
+		<property name="pronouncementDate" column="`PRONOUNCEMENT_DATE`" not-null="false"/>
+		<property name="sentenceReviewDate" column="`SENTENCE_REVIEW_DATE`" not-null="false"/>
+		<component name="personnel" class="omis.courtcase.domain.component.CourtCasePersonnel">
+			<property name="defenseAttorneyName" column="`DEFENSE_ATTORNEY_NAME`" not-null="false"/>
+			<property name="prosecutingAttorneyName" column="`PROSECUTING_ATTORNEY_NAME`" not-null="false"/>
+			<many-to-one name="judge" entity-name="omis.person.domain.Person"
+			             not-null="false" column="`JUDGE_ID`"/>
+		</component>
+		<component name="flags" class="omis.courtcase.domain.component.CourtCaseFlags">
+			<property name="criminallyConvictedYouth" column="`CRIMINALLY_CONVICTED_YOUTH`" not-null="false" type="yes_no"/>
+			<property name="youthTransfer" column="`YOUTH_TRANSFER`" not-null="false" type="yes_no"/>
+			<property name="dismissed" column="`DISMISSED`" not-null="false" type="yes_no"/>
+			<property name="convictionOverturned" column="`CONVICTION_OVERTURNED`" not-null="false" type="yes_no"/>
+		</component>
+		<property name="comments" column="`COMMENTS`" type="string" not-null="false"/>
+		<property name="interStateNumber" column="`INTER_STATE_NUMBER`" type="string" not-null="false"/>
+		<many-to-one name="interState" entity-name="omis.region.domain.State" not-null="false" column="`INTER_STATE_ID`"/>
+		<property name="jurisdictionAuthority" column="`JURISDICTION_AUTHORITY`" not-null="false">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.courtcase.domain.JurisdictionAuthority</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<property name="dangerDesignator" column="`DANGER_DESIGNATOR`" not-null="false">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.courtcase.domain.OffenderDangerDesignator</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findCourtCasesByDefendant"><![CDATA[
+		select courtCase
+		from omis.courtcase.domain.CourtCase as courtCase
+		where courtCase.docket.person = :defendant
+	]]></query>
+	<query name="findCourtCase"><![CDATA[
+		from
+			omis.courtcase.domain.CourtCase as courtCase
+		where
+			courtCase.docket.person = :defendant
+		and
+			courtCase.docket.value = :docket
+	]]></query>
+	<query name="findCourtCaseExcluding"><![CDATA[
+		from
+			omis.courtcase.domain.CourtCase as courtCase
+		where
+			courtCase.docket.person = :defendant
+		and
+			courtCase.docket.value = :docket
+		and
+			courtCase <> :courtCase
+	]]></query>
+	<query name="findCourtCaseCountByDefendant"><![CDATA[
+		select count(courtCase.id)
+		  from omis.courtcase.domain.CourtCase as courtCase
+		 where courtCase.docket.person = :defendant
+	]]></query>
+	<query name="findCourtCasesByDocket"><![CDATA[
+		select courtCase
+		from omis.courtcase.domain.CourtCase as courtCase
+		where courtCase.docket = :docket
+	]]></query>
+</hibernate-mapping>

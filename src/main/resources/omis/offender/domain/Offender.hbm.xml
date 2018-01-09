@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.offender.domain">
+	<typedef name="dominantSide" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.demographics.domain.DominantSide</param>
+		<param name="useNamed">true</param>
+		<param name="type">12</param>
+	</typedef>
+	<joined-subclass
+	        entity-name="omis.offender.domain.Offender"
+			proxy="omis.offender.domain.Offender"
+	        name="omis.offender.domain.impl.OffenderImpl"
+	        table="`OFFENDER`"
+	        extends="omis.person.domain.Person">
+		<key column="`ID`"/>
+		<property name="offenderNumber" column="`OFFENDER_NUMBER`"
+		          not-null="true" unique="true"/> 
+	</joined-subclass>
+	<query name="findOffenderByOffenderNumber"><![CDATA[
+		from Offender offender where offender.offenderNumber = :offenderNumber
+	]]></query>
+	<query name="findOffendersByName"><![CDATA[
+		select offender
+		from
+			omis.person.domain.PersonName personName
+			inner join personName.person offender
+        where
+        	upper(offender.name.firstName) like concat('%', :firstName, '%')
+            and upper(offender.name.lastName) like concat('%',  :lastName, '%')
+            and offender.class in (omis.offender.domain.Offender)
+	]]></query>
+	<query name="findOffenderById"><![CDATA[
+		select offender from omis.offender.domain.Offender offender
+		where offender.id = :id
+	]]></query>
+	<query name="findOffenderByPerson"><![CDATA[
+		select offender from omis.offender.domain.Offender offender
+		where offender.id = :id
+	]]></query>
+	<query name="findNextOffenderNumber"><![CDATA[
+		select coalesce(max(offender.offenderNumber), 0) + 1
+		from omis.offender.domain.Offender offender
+	]]></query>
+	<query name="findOffenderByIdentityAndName"><![CDATA[
+		from
+			omis.offender.domain.Offender offender
+		where
+			offender.identity = :identity
+		and
+			offender.name = :personName
+	]]></query>
+	<sql-query name="expungeOffender"><![CDATA[
+		call expunge_offender_prc(:offenderId)
+	]]></sql-query>
+	<sql-query name="insertOffender"><![CDATA[
+		insert into "OFFENDER" ("ID", "OFFENDER_NUMBER") values (:id, :offenderNumber)
+	]]></sql-query>
+</hibernate-mapping>

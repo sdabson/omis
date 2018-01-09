@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.adaaccommodation.report">	
+	<query name="summarizeAccommodations"><![CDATA[
+	select new omis.adaaccommodation.report.AccommodationSummary(
+		accommodation.id, disability.description, accommodation.description, 
+		authorization.authorizationSource.name,
+		authorization.authorizationTerm.startDate, authorization.authorizationTerm.endDate, 
+		authorization.authorizationSignature.userAccount.user.name.firstName,
+		authorization.authorizationSignature.userAccount.username,
+		authorization.authorizationSignature.userAccount.user.name.lastName,
+		authorization.authorizationSignature.date, disability.disabilityClassification.name, 
+		accommodation.accommodationCategory.name)
+	from
+		omis.adaaccommodation.domain.Authorization authorization		
+		left outer join authorization.accommodation accommodation
+		right outer join accommodation.disability disability	
+	where
+		accommodation = :accommodation
+	order by
+		authorization.authorizationTerm.endDate desc
+	]]></query>
+	<query name="findByOffenderAccommodation"><![CDATA[
+		select new omis.adaaccommodation.report.AccommodationSummary(
+		accommodation.id, disability.description, accommodation.description, 
+		authorization.authorizationSource.name,
+		authorization.authorizationTerm.startDate, authorization.authorizationTerm.endDate, 
+		authorization.authorizationSignature.userAccount.user.name.firstName,
+		authorization.authorizationSignature.userAccount.username,
+		authorization.authorizationSignature.userAccount.user.name.lastName,
+		authorization.authorizationSignature.date, disability.disabilityClassification.name, 
+		accommodation.accommodationCategory.name)
+	from
+		omis.adaaccommodation.domain.Authorization authorization		
+		left outer join authorization.accommodation accommodation
+		right outer join accommodation.disability disability
+	where 
+		disability.offender = :offender	
+	order by
+		authorization.authorizationTerm.endDate	desc
+	]]></query>	
+	<query name="countIssuancesByAccommodation"><![CDATA[
+	select
+		case
+			when count(*) > 0
+			then
+				true
+			else
+				false
+		end
+	from 
+		omis.adaaccommodation.domain.AccommodationIssuance issuance
+	where
+		issuance.accommodation = :accommodation	
+	]]></query>	
+</hibernate-mapping>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearing.domain">
+	<class entity-name="omis.hearing.domain.HearingStatus"
+			proxy="omis.hearing.domain.HearingStatus"
+			name="omis.hearing.domain.impl.HearingStatusImpl"
+			table="`HEARING_STATUS`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEARING_STATUS_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="hearing" column="`HEARING_ID`" entity-name="omis.hearing.domain.Hearing" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="false" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<property name="category" column="`CATEGORY`" not-null="true" >
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.hearing.domain.HearingStatusCategory</param>
+					<param name="useNamed">true</param>
+					<param name="type">12</param>
+				</type>
+			</property>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findHearingStatus"><![CDATA[
+		select hearingStatus
+		from
+			omis.hearing.domain.HearingStatus hearingStatus
+		where
+			hearingStatus.hearing = :hearing
+		and
+			hearingStatus.date = :date
+		and
+			hearingStatus.category = :category
+	]]></query>
+	<query name="findHearingStatusExcluding"><![CDATA[
+		select hearingStatus
+		from
+			omis.hearing.domain.HearingStatus hearingStatus
+		where
+			hearingStatus.hearing = :hearing
+		and
+			hearingStatus.date = :date
+		and
+			hearingStatus.category = :category
+		and
+			hearingStatus != :hearingStatus
+	]]></query>
+	<query name="findLatestHearingStatus"><![CDATA[
+		select hearingStatus
+		from
+			omis.hearing.domain.HearingStatus hearingStatus
+		where
+			hearingStatus.hearing = :hearing
+		order by
+			hearingStatus.date desc
+	]]></query>
+	<query name="findHearingStatusesByHearing"><![CDATA[
+		select hearingStatus
+		from
+			omis.hearing.domain.HearingStatus hearingStatus
+		where
+			hearingStatus.hearing = :hearing
+	]]></query>
+</hibernate-mapping>

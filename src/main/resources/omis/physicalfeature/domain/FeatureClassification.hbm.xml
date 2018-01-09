@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.physicalfeature.domain">
+	<class entity-name="omis.physicalfeature.domain.FeatureClassification"
+		proxy="omis.physicalfeature.domain.FeatureClassification"
+		name="omis.physicalfeature.domain.impl.FeatureClassificationImpl"
+		table="`FEATURE_CLASSIFICATION`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`FEATURE_CLASSIFICATION_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" not-null="true" column="`NAME`"
+			type="java.lang.String"/>
+		<property name="valid" column="`VALID`"
+			type="yes_no" not-null="false"/>
+		</class>
+		<query name="findValidFeatureClassification"><![CDATA[
+			from
+				omis.physicalfeature.domain.FeatureClassification featureClassification
+			where
+				featureClassification.valid = true
+			order by
+				name asc
+		]]></query>
+</hibernate-mapping>

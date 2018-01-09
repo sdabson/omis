@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcase.report">
+	<query name="summarizePendingChargesByPerson"><![CDATA[
+		select new omis.courtcase.report.ChargeSummary(
+			charge.id,
+			offense.violationCode,
+			offense.name,
+			offense.url,
+			charge.date,
+			charge.fileDate,
+		    defendant.id,
+		    defendantName.firstName,
+		    defendantName.lastName,
+		    defendantName.middleName,
+		    defendantName.suffix,
+		    case when (select count(*) from omis.offender.domain.Offender offender where offender = defendant) > 0 then true else false end as defendantOffender,
+		    (select offender.offenderNumber from omis.offender.domain.Offender offender where offender = defendant) as defendantOffenderNumber,
+		    court.name,
+			courtCase.docket.value,
+   			courtCase.id,
+   			charge.counts)
+		from omis.courtcase.domain.Charge charge
+		left outer join charge.courtCase courtCase
+		left outer join courtCase.docket.person defendant
+		left outer join defendant.name defendantName
+		left outer join courtCase.docket.court court
+		left outer join charge.offense offense
+		where defendant = :person
+		and
+			(select count(*) from omis.conviction.domain.Conviction conviction where conviction.courtCase = courtCase) = 0
+	]]></query>
+	<query name="findPendingChargeCountByDefendant"><![CDATA[
+		select count(charge.id)
+		from omis.courtcase.domain.Charge charge
+		left outer join charge.courtCase courtCase
+		left outer join courtCase.docket.person defendant
+		left outer join defendant.name defendantName
+		left outer join courtCase.docket.court court
+		left outer join charge.offense offense
+		where defendant = :defendant
+		and
+			(select count(*) from omis.conviction.domain.Conviction conviction where conviction.courtCase = courtCase) = 0
+	]]></query>
+</hibernate-mapping>

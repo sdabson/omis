@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ - Mapping and queries for user group memberships.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<class entity-name="omis.user.domain.UserGroupMembership"
+	       proxy="omis.user.domain.UserGroupMembership"
+	       name="omis.user.domain.impl.UserGroupMembershipImpl"
+	       table="`USER_GROUP_MEMBERSHIP`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`USER_GROUP_MEMBERSHIP_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueUserGroupMembership">
+			<many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" column="`ACCOUNT_ID`" not-null="true"/>
+			<many-to-one name="userGroup" entity-name="omis.user.domain.UserGroup" column="`GROUP_ID`" not-null="true"/>
+		</properties>
+	</class>
+	<query name="deleteUserGroupMembershipsByUserGroup"><![CDATA[
+	  delete from omis.user.domain.UserGroupMembership membership
+	  where membership.userGroup = :userGroup
+	]]></query>
+	<query name="deleteUserGroupMembershipsByUserAccount"><![CDATA[
+	  delete from omis.user.domain.UserGroupMembership membership
+	  where membership.userAccount = :userAccount
+	]]></query>
+</hibernate-mapping>

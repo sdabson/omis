@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+        
+        <!-- Delegates -->
+        <bean name="treatmentCenterDelegate"
+        	class="omis.treatment.service.delegate.TreatmentCenterDelegate">
+        	<constructor-arg name="treatmentCenterDao" ref="treatmentCenterDao"/>
+        	<constructor-arg name="treatmentCenterInstanceFactory" ref="treatmentCenterInstanceFactory"/>
+        </bean>
+        
+        <!--  Data Access Objects -->
+        <bean id="treatmentCenterDao"
+	  		class="omis.treatment.dao.impl.hibernate.TreatmentCenterDaoHibernateImpl">
+	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	  		<constructor-arg name="entityName" value="omis.treatment.domain.TreatmentCenter"/>
+ 		</bean>
+ 		 
+        <!--   Instance factories -->
+    	<bean id="treatmentCenterInstanceFactory"
+	        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+	    	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+	    	<constructor-arg name="entityName" value="omis.treatment.domain.TreatmentCenter"/>
+  		</bean>
+    	
+		<!--   Property editors -->
+		<bean id="treatmentCenterPropertyEditorFactory"
+	        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		    <constructor-arg name="dao" ref="treatmentCenterDao"/>
+		    <constructor-arg name="entityName" value="omis.treatment.domain.TreatmentCenter"/>
+		    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	  	</bean>  
+</beans>

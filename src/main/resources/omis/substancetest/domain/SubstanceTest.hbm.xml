@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.substancetest.domain">
+	<class entity-name="omis.substancetest.domain.SubstanceTest"
+			proxy="omis.substancetest.domain.SubstanceTest"
+			name="omis.substancetest.domain.impl.SubstanceTestImpl"
+			table="`SUBSTANCE_TEST`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`SUBSTANCE_TEST_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="substanceTestSample" column="`SAMPLE_ID`" 
+				not-null="true" unique="true"/>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+						 not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/>
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+					 not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+			<property name="resultDate" column="`RESULT_DATE`" not-null="true"/>
+			<property name="testComment" column="`TEST_COMMENT`" not-null="false"/>
+			<property name="labInvolved" column="`LAB_INVOLVED`" not-null="true"
+				type="yes_no"/>
+			<property name="labRequestDate" column="`LAB_REQUEST_DATE`" not-null="false"/>
+			<property name="labResultDate" column="`LAB_RESULT_DATE`" not-null="false"/>
+			<property name="privateLabJustification" column="`PRIVATE_LAB_JUSTIFICATION`" not-null="false"/>
+			<many-to-one name="authorizingStaff" column="`AUTHORIZING_STAFF_ID`" not-null="false"
+				entity-name="omis.person.domain.Person" unique="false"/>
+			<many-to-one name="lab" column="`LAB_ID`" cascade="none" not-null="false"
+				entity-name="omis.substance.domain.SubstanceLab" unique="false"/>
+	</class>
+	<query name="findSubstanceTest">
+		from
+			omis.substancetest.domain.SubstanceTest test
+		where
+			test.substanceTestSample = :sample
+	</query>
+	<query name="findSubstanceTestExcluding"><![CDATA[
+		from
+			omis.substancetest.domain.SubstanceTest test
+		where
+			test.substanceTestSample = :sample
+		and
+			test <> :substanceTest
+	]]></query>
+</hibernate-mapping>

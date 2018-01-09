@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  - Application configuration.
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+  <mvc:annotation-driven validator="validator"/>
+  
+  <!--
+   - Hibernate mapping locations
+   -
+   - For application configuration, use all HBM locations.
+   -->
+  
+  <util:list id="hibernateMappingLocations">
+    <value>classpath*:**/domain/*.hbm.xml</value>
+    <value>classpath*:**/report/*.hbm.xml</value>
+  </util:list>
+    
+  <!-- Imports -->
+  
+  <import resource="applicationContext-sessionFactory.xml"/>
+
+  <!-- Context configuration -->
+  
+  <context:annotation-config/>
+
+  <context:component-scan base-package="omis.logger" />
+
+  <!-- Validators -->
+  
+  <bean id="validator"
+        class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+    <property name="validationMessageSource" ref="messageSource"/>
+  </bean>
+
+  <!-- Factory beans for custom editors -->
+  
+  <bean id="datePropertyEditorFactory"
+       class="omis.beans.factory.spring.impl.CustomDateEditorFactoryImpl">
+   <constructor-arg><value>MM/dd/yyyy</value></constructor-arg>
+   <constructor-arg><value>h:mm a</value></constructor-arg>
+   <constructor-arg><value>MM/dd/yyyy k:mm</value></constructor-arg>
+  </bean>
+  
+  <!--  AOP configuration -->
+  
+  <aop:aspectj-autoproxy/>
+
+  <bean id="requestContentMappingScanner"
+        class="omis.content.impl.springmvc.RequestContentMappingScannerSpringMvcImpl">
+  </bean>
+  
+  <!-- Message sources for modules -->
+  
+   <bean id="messageSource"
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    	<property name="basenames">
+    		<list>
+    			<value>/WEB-INF/classes/omis/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/adaaccommodation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/address/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/alert/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/audit/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/biographicandcontactsection/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/bedplacement/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/caseload/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/caution/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/citation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/condition/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/conviction/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/contact/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/courtcase/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/courtcasecondition/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/criminalassociation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/commitstatus/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/custody/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/demographics/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/detainernotification/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/disciplinaryCode/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/dna/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/document/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/employment/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/education/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/facility/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/family/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/financial/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/health/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/hearing/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/hearingAnalysis/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/identificationnumber/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/incident/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/grievance/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/location/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/locationterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/military/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/need/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offenderflag/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offender/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offenderrelationship/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offense/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offenseterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleboardcondition/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleboarditinerary/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleboardmember/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleeligibility/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/person/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/photo/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/physicalfeature/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/placement/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/placementscreening/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/presentenceinvestigation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/prisonterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/probationterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/program/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/questionnaire/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/region/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/religion/msgs/forms</value>
+    			<value>/WEB-INF/classes/omis/residence/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/sentence/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/separationneed/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/specialneed/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/staff/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/stg/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/substancetest/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/substance/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/supervision/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/supervisionfee/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/task/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/tierdesignation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/trackeddocument/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/user/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/userpreference/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/victim/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/violationevent/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/visitation/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/vehicle/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/warrant/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/workassignment/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/workrestriction/msgs/form</value>
+    		</list>
+    	</property>
+    	<property name="defaultEncoding" value="UTF-8" />
+  </bean>
+  
+  <!-- Module application contexts -->
+  
+  <import resource="module/applicationContext-module.xml"/>
+  
+  <!-- Web configuration -->
+  
+  <import resource="web/applicationContext-web.xml"/>
+  
+  <!-- Module web configuration -->
+  
+  <import resource="web/applicationContext-moduleWeb.xml"/>
+  
+  <!--Reporting context -->
+  
+  <import resource="reporting/applicationContext-reporting.xml"/>
+  
+  <!-- Properties to load -->
+  
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  	<property name="locations" ref="configurationPropertyFiles"/>
+  </bean>
+  
+  <bean id="hostingEnvPropertyHolder" class="omis.config.util.PropertyHolder">
+  	<constructor-arg name="propertyValue" value="${application.hosting.env}"/>
+  </bean>
+
+  <bean id="helpLinkPropertyHolder" class="omis.config.util.PropertyHolder">
+  	<constructor-arg name="propertyValue" value="${application.help.link}"/>
+  </bean>
+  
+  <!--
+    - Configuration property files for profiles that do not support report
+    - servers.
+    -->
+  
+  <beans profile="standalone,dev,test,preprod,prod">
+    	<util:list id="configurationPropertyFiles">
+  			<value>classpath:offenderProfileItems.properties</value>
+  			<value>classpath:offenderSummaryItems.properties</value>
+  			<value>classpath:application.properties</value>
+  		</util:list>
+  </beans>
+
+  <!--
+    - Configuration property files for profiles that support report servers.
+    -->
+
+  <beans profile="none">
+    	<util:list id="configurationPropertyFiles">
+  			<value>classpath:offenderProfileItems.properties</value>
+  			<value>classpath:offenderSummaryItems.properties</value>
+  			<value>classpath:application.properties</value>
+  			<value>classpath:report.properties</value>
+  		</util:list>
+  </beans>
+  
+</beans>

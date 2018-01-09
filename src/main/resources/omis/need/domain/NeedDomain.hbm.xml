@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.need.domain">
+	<class entity-name="omis.need.domain.NeedDomain"
+		proxy="omis.need.domain.NeedDomain"
+		name="omis.need.domain.impl.NeedDomainImpl"
+		table="`NEED_DOMAIN`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`NEED_DOMAIN_SEQ`</param>
+			</generator>
+		</id>
+		
+		<property name="name" column="`NAME`" not-null="true" type="java.lang.String"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="java.lang.Short"/>
+		<property name="criminogenic" column="`CRIMINOGENIC`" not-null="true" type="yes_no"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+	</class>
+	<query name="findNeedDomains">
+	<![CDATA[
+		from
+			omis.need.domain.NeedDomain needDomain
+		where
+			needDomain.valid = true
+		order by
+			needDomain.sortOrder
+	]]></query>
+</hibernate-mapping>

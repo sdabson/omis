@@ -1,0 +1,52 @@
+/*
+ * Application tool bar.
+ *
+ * Author: Stephen Abson
+ */
+
+#applicationToolbar {
+	list-style-type: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    height: 32px;
+    margin: 0px;
+    padding-left: 2px;
+    padding-right: 2px;
+    top: 0px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+}
+
+#applicationToolbar li {
+	padding: 2px;
+	top: 2px;
+	position: absolute;
+}
+
+#applicationToolbar li * {
+	vertical-align: middle;
+}
+
+#applicationToolbar li#dataSource, #applicationToolbar li#productName {
+	left: 16px;
+	text-align: left;
+}
+
+#applicationToolbar li#dataSource {
+	width: 260px;
+}
+
+#applicationToolbar li#developerTools {
+	left: 260px;
+	text-align: left;
+}
+
+#applicationToolbar li#developerTools, #applicationToolbar li#productName {
+	right: 288px;
+}
+
+#applicationToolbar li#user {
+	right: 16px;
+	text-align: right;
+}

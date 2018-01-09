@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.education.domain">
+	<class entity-name="omis.education.domain.EducationTerm"
+			proxy="omis.education.domain.EducationTerm"
+			name="omis.education.domain.impl.EducationTermImpl"
+			table="`EDUCATION_TERM`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`EDUCATION_TERM_SEQ`</param>
+				</generator>
+			</id>
+			
+			<component name="institute">
+				<property name="name" column="`INSTITUTE_NAME`" type="java.lang.String" not-null="true" />
+				<many-to-one name="category" column="`INSTITUTE_CATEGORY_ID`" entity-name="omis.education.domain.InstituteCategory" not-null="true" />
+			</component>
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" />
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true"/>
+			<many-to-one name="achievement" column="`EDUCATIONAL_ACHIEVEMENT_ID`" entity-name="omis.education.domain.EducationalAchievement" />
+			<property name="specialEducation" column="`SPECIAL_EDUCATION`" type="yes_no" not-null="true"/>
+			<component name="attendedDateRange">
+				<property name="startDate" column="`START_DATE`" type="java.util.Date"/>
+				<property name="endDate" column="`END_DATE`" type="java.util.Date"/>
+			</component>
+			<component name="verificationSignature">
+				<property name="date" column="`VERIFICATION_DATE`" type="java.util.Date"/>
+				<many-to-one name="userAccount" column="`VERIFICATION_USER_ID`" entity-name="omis.user.domain.UserAccount" />
+				<property name="result" column="`VERIFICATION_RESULT`" type="yes_no" />
+				<many-to-one name="method" column="`EDCTN_VERIFCTN_MTHD_ID`" entity-name="omis.audit.domain.VerificationMethod" />
+			</component>
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findEducationTerm"><![CDATA[
+		select educationTerm
+		from
+			omis.education.domain.EducationTerm educationTerm
+		where
+			(educationTerm.offender = :offender
+		and
+			((educationTerm.description = :description) or (educationTerm.description is null and :description is null)))
+	]]></query>
+	
+	<query name="findEducationTermExcluding"><![CDATA[
+		select educationTerm
+		from
+			omis.education.domain.EducationTerm educationTerm
+		where
+			educationTerm.offender = :offender
+		and
+			((educationTerm.description = :description) or (educationTerm.description is null and :description is null))
+		and
+			(educationTerm.institute.category = :instituteCategory or (educationTerm.institute.category is null and :instituteCategory is null))
+		and 
+			(educationTerm.institute.name = :instituteName or (educationTerm.institute.name is null and :instituteName is null))	
+		and
+			educationTerm != :educationTerm
+	]]></query>
+	
+	<query name="findEducationTermsByOffender"><![CDATA[
+		select educationTerm
+		from
+			omis.education.domain.EducationTerm educationTerm
+		where
+			educationTerm.offender = :offender
+	]]></query>
+</hibernate-mapping>

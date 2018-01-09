@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.presentenceinvestigation.domain">
+	<class entity-name="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument"
+			proxy="omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument"
+			name="omis.presentenceinvestigation.domain.impl.PsychologicalSectionSummaryDocumentImpl"
+			table="`PSYCHLGICAL_SCTN_SMRY_DOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PSYCHLGICAL_SCTN_SMRY_DOC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<many-to-one name="psychologicalSectionSummary" column="`PSYCHOLOGICAL_SCTION_SMMRY_ID`" entity-name="omis.presentenceinvestigation.domain.PsychologicalSectionSummary" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findPsychologicalSectionSummaryDocument"><![CDATA[
+		select psychologicalSectionSummaryDocument
+		from
+			omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument psychologicalSectionSummaryDocument
+		where
+			psychologicalSectionSummaryDocument.document = :document
+		and
+			psychologicalSectionSummary = :psychologicalSectionSummary
+	]]></query>
+	<query name="findPsychologicalSectionSummaryDocumentExcluding"><![CDATA[
+		select psychologicalSectionSummaryDocument
+		from
+			omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument psychologicalSectionSummaryDocument
+		where
+			psychologicalSectionSummaryDocument.document = :document
+		and
+			psychologicalSectionSummary = :psychologicalSectionSummary
+		and
+			psychologicalSectionSummaryDocument != :psychologicalSectionSummaryDocument
+	]]></query>
+	<query name="findPsychologicalSectionDocumentsByPsychologicalSectionSummary"><![CDATA[
+		select psychologicalSectionSummaryDocument
+		from
+			omis.presentenceinvestigation.domain.PsychologicalSectionSummaryDocument psychologicalSectionSummaryDocument
+		where
+			psychologicalSectionSummary = :psychologicalSectionSummary
+	]]></query>
+</hibernate-mapping>

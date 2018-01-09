@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.court.domain">
+	<typedef name="courtCategory" class="org.hibernate.type.EnumType">
+		<param name="enumClass">omis.court.domain.CourtCategory</param>
+		<param name="type">12</param>
+	</typedef>
+	<class	entity-name="omis.court.domain.Court"
+			proxy="omis.court.domain.Court"
+			name="omis.court.domain.impl.CourtImpl"
+			table="`COURT`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COURT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" type="string"/>
+		<many-to-one name="location" column="`LOCATION_ID`" not-null="true"
+		             entity-name="omis.location.domain.Location" lazy="false" fetch="join"/>
+		<property name="category" column="`CATEGORY`" not-null="true"
+		             type="courtCategory"/>
+	</class>
+	<query name="findAllCourts"><![CDATA[
+		select court from omis.court.domain.Court as court
+		inner join fetch court.location as location
+		inner join fetch location.organization as organization
+		order by organization.name
+	]]></query>
+	<query name="findCourt"><![CDATA[
+		from 
+			omis.court.domain.Court as court
+		where
+			court.name = :name
+		and
+			court.category = :category
+		and
+			court.location = :location
+	]]></query>
+	<query name="findCourtExcluding"><![CDATA[
+		from 
+			omis.court.domain.Court as court
+		where
+			court.name = :name
+		and
+			court.category = :category
+		and
+			court.location = :location
+		and
+			court <> :excludedCourt
+	]]></query>
+</hibernate-mapping>

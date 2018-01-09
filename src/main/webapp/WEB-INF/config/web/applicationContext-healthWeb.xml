@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  
+  	<!-- Validators -->
+ 		 
+	<bean id="scheduleInternalReferralFormValidator" 
+		class="omis.health.validator.ScheduleInternalReferralFormValidator">
+		<constructor-arg name="labWorkAppointmentItemValidatorDelegate" ref="labWorkAppointmentItemValidatorDelegate"/>
+	</bean>
+	
+    <bean id="assessInternalReferralFormValidator"
+	      class="omis.health.validator.AssessInternalReferralFormValidator">
+	   <constructor-arg name="labWorkAppointmentItemValidatorDelegate" ref="labWorkAppointmentItemValidatorDelegate"/>
+	</bean>
+	
+	<bean id="assessLabWorkReferralFormValidator"
+	      class="omis.health.validator.AssessLabWorkReferralFormValidator">
+	   <constructor-arg name="labWorkAssessmentItemValidatorDelegate" ref="labWorkAssessmentItemValidatorDelegate"/>
+	</bean>
+	
+    <bean id="cancelInternalReferralFormValidator"
+	   class="omis.health.validator.CancelInternalReferralFormValidator"/>
+	
+	<bean id="cancelLabWorkReferralFormValidator"
+	   class="omis.health.validator.CancelLabWorkReferralFormValidator"/>
+	
+    <bean id="healthRequestFormValidator"
+       class="omis.health.validator.HealthRequestFormValidator"/>
+
+	<bean id="providerAssignmentFormValidator"
+		class="omis.health.validator.ProviderAssignmentFormValidator"/>
+	
+	<bean id="requestExternalReferralAuthorizationFormValidator"
+	   class="omis.health.validator.RequestExternalReferralAuthorizationFormValidator"/>
+	
+	<bean id="requestLabWorkRequirementFormValidator"
+	   class="omis.health.validator.RequestLabWorkRequirementFormValidator"/>
+
+	<bean id="scheduleAuthorizedExternalReferralFormValidator"
+	   class="omis.health.validator.ScheduleAuthorizedExternalReferralFormValidator"/>
+	   
+	<bean id="assessExternalReferralFormValidator"
+	   class="omis.health.validator.AssessExternalReferralFormValidator">
+	  <constructor-arg name="labWorkAppointmentItemValidatorDelegate" ref="labWorkAppointmentItemValidatorDelegate"/>   
+	</bean>
+	   
+	<bean id="scheduleLabWorkReferralFormValidator"
+		class="omis.health.validator.ScheduleLabWorkReferralFormValidator">
+		<constructor-arg name="labWorkSampleItemValidatorDelegate" ref="labWorkSampleItemValidatorDelegate"/>
+	</bean>
+	   
+	<bean id="cancelExternalReferralFormValidator"
+	   class="omis.health.validator.CancelExternalReferralFormValidator"/>
+	   
+	<bean id="providerScheduleFormValidator"
+		class="omis.health.validator.ProviderScheduleFormValidator"/>
+		
+	<bean id="createLabWorksFormValidator"
+		class="omis.health.validator.CreateLabWorksFormValidator"/>
+		
+	<bean id="editLabWorkFormValidator"
+		class="omis.health.validator.EditLabWorkFormValidator"/>
+		
+	<bean id="resolveLabWorkFormValidator"
+		class="omis.health.validator.ResolveLabWorkFormValidator"/>
+    
+    <!--  Validator Delegate -->
+    
+    <bean id="labWorkAppointmentItemValidatorDelegate"
+    	class="omis.health.validator.delegate.LabWorkAppointmentItemValidatorDelegate"/>
+   
+   <bean id="labWorkSampleItemValidatorDelegate"
+   	class="omis.health.validator.delegate.LabWorkSampleItemValidatorDelegate"/>
+   	
+   	<bean id="labWorkAssessmentItemValidatorDelegate"
+   		class="omis.health.validator.delegate.LabWorkAssessmentItemValidatorDelegate"/>
+  
+  	<!-- Controller Delegate -->
+  	
+  	<bean id="healthControllerDelegate" class="omis.health.web.controller.delegate.HealthControllerDelegate">
+  		<constructor-arg name="customDateEditorFactory" ref="datePropertyEditorFactory"/>
+  	</bean>
+  
+  	<bean id="internalReferralControllerDelegate" class="omis.health.web.controller.delegate.InternalReferralControllerDelegate">
+  		<constructor-arg name="internalReferralScheduler" ref="internalReferralScheduler"/>
+  	</bean>
+  	
+  	<bean id="labWorkControllerDelegate" class="omis.health.web.controller.delegate.LabWorkControllerDelegate">
+  		<constructor-arg name="labWorkManager" ref="labWorkManager"/>
+  		<constructor-arg name="internalReferralScheduler" ref="internalReferralScheduler"/>
+  	</bean>
+  	
+  	<bean id="referralTypeResolverDelegate" class="omis.health.web.controller.delegate.ReferralTypeResolverDelegate"/>
+  	
+  	<bean id="providerScheduleDelegate" class="omis.health.web.controller.delegate.ProviderScheduleDelegate">
+  	  <constructor-arg name="providerScheduleReportService" ref="providerScheduleReportService"/>
+    </bean>
+    
+    <bean id="referralSummaryControllerDelegate"
+       class="omis.health.web.controller.delegate.ReferralSummaryControllerDelegate">
+      <constructor-arg name="referralSummaryReportService" ref="referralSummaryReportService"/>   
+    </bean>
+  	
+	<!-- Web configuration -->
+	
+	<context:component-scan base-package="omis.health.web.controller"/>
+	
+	<!-- Configure transactions for controllers -->
+	
+	<aop:config>
+      <aop:pointcut id="requestExternalReferralAuthorizationControllerOperation" expression="execution(* omis.health.web.controller.RequestExternalReferralAuthorizationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="requestExternalReferralAuthorizationControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="rescheduleInternalReferralControllerOperation" expression="execution(* omis.health.web.controller.RescheduleInternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="rescheduleInternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="rescheduleLabWorkReferralControllerOperation" expression="execution(* omis.health.web.controller.RescheduleLabWorkReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="rescheduleLabWorkReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="scheduleInternalReferralControllerOperation" expression="execution(* omis.health.web.controller.ScheduleInternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="scheduleInternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="cancelInternalReferralControllerOperation" expression="execution(* omis.health.web.controller.CancelInternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="cancelInternalReferralControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="cancelLabWorkReferralControllerOperation" expression="execution(* omis.health.web.controller.CancelLabWorkReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="cancelLabWorkReferralControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="assessInternalReferralControllerOperation" expression="execution(* omis.health.web.controller.AssessInternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="assessInternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="assessLabWorkReferralControllerOperation" expression="execution(* omis.health.web.controller.AssessLabWorkReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="assessLabWorkReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="cancelExternalReferralControllerOperation" expression="execution(* omis.health.web.controller.CancelExternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="cancelExternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="assessExternalReferralControllerOperation" expression="execution(* omis.health.web.controller.AssessExternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="assessExternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="scheduleAuthorizedExternalReferralControllerOperation" expression="execution(* omis.health.web.controller.ScheduleAuthorizedExternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="scheduleAuthorizedExternalReferralControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="rescheduleAuthorizedExternalReferralControllerOperation" expression="execution(* omis.health.web.controller.RescheduleAuthorizedExternalReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="rescheduleAuthorizedExternalReferralControllerOperation"/>
+    </aop:config>
+
+    <aop:config>
+      <aop:pointcut id="unitControllerOperation" expression="execution(* omis.health.web.controller.UnitController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="unitControllerOperation"/>
+    </aop:config>
+
+	<aop:config>
+      <aop:pointcut id="healthRequestControllerOperation" expression="execution(* omis.health.web.controller.HealthRequestController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="healthRequestControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="referralCenterControllerOperation" expression="execution(* omis.health.web.controller.ReferralCenterController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="referralCenterControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="requestLabWorkRequirementControllerOperation" expression="execution(* omis.health.web.controller.RequestLabWorkRequirementController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="requestLabWorkRequirementControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="providerScheduleControllerOperation" expression="execution(* omis.health.web.controller.ProviderScheduleController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="providerScheduleControllerOperation"/>
+    </aop:config>
+ 
+    <aop:config>
+      <aop:pointcut id="providerScheduleReportControllerOperation" expression="execution(* omis.health.web.controller.ProviderScheduleReportController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="providerScheduleReportControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="providerControllerOperation" expression="execution(* omis.health.web.controller.ProviderController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="providerControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="labWorkControllerOperation" expression="execution(* omis.health.web.controller.LabWorkController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="labWorkControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="internalReferralLabWorkControllerOperation" expression="execution(* omis.health.web.controller.InternalReferralLabWorkController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="internalReferralLabWorkControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="referralLabWorkControllerOperation" expression="execution(* omis.health.web.controller.ReferralLabWorkController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="referralLabWorkControllerOperation"/>
+    </aop:config>
+    
+    <aop:config>
+      <aop:pointcut id="scheduleLabWorkReferralControllerOperation" expression="execution(* omis.health.web.controller.ScheduleLabWorkReferralController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="scheduleLabWorkReferralControllerOperation"/>
+    </aop:config>
+    
+       <aop:config>
+      <aop:pointcut id="resolveLabWorkControllerOperation" expression="execution(* omis.health.web.controller.ResolveLabWorksController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="resolveLabWorkControllerOperation"/>
+    </aop:config>
+</beans>

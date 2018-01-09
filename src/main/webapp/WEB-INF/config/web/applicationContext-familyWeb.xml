@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+  <!--  Validator Delegates -->
+   <bean id="familyAssociationFieldsValidatorDelegate"
+		class="omis.family.web.validator.delegate.FamilyAssociationFieldsValidatorDelegate">
+		<constructor-arg name="addressFieldsValidatorDelegate" ref="addressFieldsValidatorDelegate"/>
+		<constructor-arg name="poBoxFieldsValidatorDelegate" ref="poBoxFieldsValidatorDelegate"/>
+		<constructor-arg name="personFieldsValidatorDelegate" ref="personFieldsValidatorDelegate"/>
+		<constructor-arg name="telephoneNumberFieldsValidatorDelegate" ref="telephoneNumberFieldsValidatorDelegate"/>
+		<constructor-arg name="onlineAccountFieldsValidatorDelegate" ref="onlineAccountFieldsValidatorDelegate"/>
+	</bean>
+  	<bean id="familyAssociationFieldsCreateValidatorDelegate"
+		class="omis.family.web.validator.delegate.FamilyAssociationFieldsCreateValidatorDelegate">
+	</bean>
+  <!-- Validators -->
+	<bean id="familyAssociationFormValidator" class="omis.family.web.validator.FamilyAssociationFormValidator">
+		<constructor-arg name="familyAssociationFieldsValidatorDelegate" ref="familyAssociationFieldsValidatorDelegate"/>
+	</bean> 
+	<bean id="familyAssociationFieldsEditValidator" class="omis.family.web.validator.FamilyAssociationFieldsEditValidator">
+	</bean>
+
+	<!-- Profile Items -->
+	<bean id="familyProfileItem" class="omis.family.web.profile.FamilyProfileItem">
+		<constructor-arg name="requiredAuthorizations">
+			<set>
+			 	<value>FAMILY_ASSOCIATION_LIST</value>
+			 	<value>ADMIN</value>
+			 </set>
+		</constructor-arg>
+		<constructor-arg name="includePage" value="/WEB-INF/views/family/profile/includes/profileItem.jsp"/>
+		<constructor-arg name="name" value="family"/>
+		<constructor-arg name="profileItemRegistry" ref="relationshipsProfileItemRegistry"/>
+		<constructor-arg name="familyProfileItemReportService" ref="familyProfileItemReportService"/>
+		<constructor-arg name="enabled" value="${familyProfileItemEnabled}"/>
+	</bean>
+
+  <!-- Web controller packages -->
+    <context:component-scan base-package="omis.family.web.controller"/>
+  
+  <!-- Use controller transactions -->
+   <aop:config>
+      <aop:pointcut id="familyAssociationControllerOperation" expression="execution(* omis.family.web.controller.FamilyAssociationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="familyAssociationControllerOperation"/>
+  </aop:config>
+</beans>

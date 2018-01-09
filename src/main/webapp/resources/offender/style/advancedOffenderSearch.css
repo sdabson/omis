@@ -1,0 +1,35 @@
+/*
+ * Advanced offender search styling.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (Oct 30, 2017)
+ * Since: OMIS 3.0
+ */
+
+/* Specialty table styling */
+
+/* Highlight row over which cursor is positioned and color odd/even rows. */
+
+table.listTable tbody tr.listTableRow.odd td{
+	background-color: #FFFFFF;
+}
+
+table.listTable tbody tr.listTableRow.even td{
+	background-color: #F5F5F5;
+}
+
+table.listTable tbody tr td table.listTable tbody tr:nth-child(odd) td {
+	background-color: #FFFFFF;
+}
+
+table.listTable tbody tr td table.listTable tbody tr:nth-child(even) td {
+	background-color: #F5F5F5;
+}
+
+table.listTable tbody tr:not(.listTableRowNoHighlight):hover td, table.listTable tbody tr.activeRecord:hover td {
+	background-color: #E6E6FA;
+}
+
+table.listTable tbody tr.noContent td, table.listTable tbody tr.noContent td {
+	padding: 0;
+}

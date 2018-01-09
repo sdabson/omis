@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  - Mapping and queries for user accounts.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<class entity-name="omis.user.domain.UserAccount"
+	       proxy="omis.user.domain.UserAccount"
+	       name="omis.user.domain.impl.UserAccountDeferredSecurityImpl"
+	       table="`USER_ACCOUNT`">
+	    <id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`USER_ACCOUNT_SEQ`</param>
+			</generator>
+		</id>
+		<property name="username" type="string" column="`USERNAME`" not-null="true" unique="true"/>
+		<many-to-one name="user" entity-name="omis.person.domain.Person" column="`USER_ID`" not-null="true"/>
+	</class>
+	<query name="findUserAccounts"><![CDATA[
+		select distinct ua
+		from omis.user.domain.UserAccount as ua
+			inner join fetch ua.user as user
+			inner join fetch user.name as name
+		order by
+			name.lastName, name.firstName, ua.username
+	]]></query>
+	<query name="findUserAccountsByUser"><![CDATA[
+		from omis.user.domain.UserAccount as ua
+		where ua.user = :user
+		order by ua.username
+	]]></query>
+	<query name="findUserAccountByUsername"><![CDATA[
+		from omis.user.domain.UserAccount as ua
+		where upper(ua.username) = :username
+		order by ua.username
+	]]></query>
+		<query name="findUserAccountByUsernameCaseInsensitive"><![CDATA[
+		from omis.user.domain.UserAccount as ua
+		where upper(ua.username) = :username
+	]]></query>
+	<query name="searchUserAccountsCaseInsensitive"><![CDATA[
+		select userAccount
+		from omis.user.domain.UserAccount userAccount
+		  inner join userAccount.user user
+		  inner join user.name userName
+		where upper(userName.lastName) like upper('%' || :query || '%')
+		  or upper(userName.firstName) like upper('%' || :query || '%')
+		  or upper(userAccount.username) like upper('%' || :query || '%')
+	]]></query>
+	<query name="searchUserAccounts"><![CDATA[
+		select userAccount
+		from omis.user.domain.UserAccount userAccount
+		  inner join userAccount.user user
+		  inner join user.name userName
+		where userName.lastName like '%' || :query || '%'
+		  or userName.firstName like '%' || :query || '%'
+		  or userAccount.username like '%' || :query || '%'
+	]]></query>
+	<query name="findUserAccountCountByUser"><![CDATA[
+		select count(userAccount.id)
+		  from omis.user.domain.UserAccount userAccount
+		 where userAccount.user = :user
+	]]></query>
+	<query name="findUserAccountsByUserGroup"><![CDATA[
+		select userAccount
+	    from omis.user.domain.UserGroupMembership as userGroupMembership
+	      inner join userGroupMembership.userAccount as userAccount
+	      inner join userGroupMembership.userGroup as userGroup
+	    where userGroup = :userGroup
+	]]></query>
+</hibernate-mapping>

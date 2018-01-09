@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placement.domain">
+	<query name="findPlacementSummary"><![CDATA[
+		select new omis.placement.report.PlacementSummary(
+			placementTermOffender,
+			correctionalStatusTerm,
+			supervisoryOrganizationTerm,
+		    (select locationTerm
+		    from omis.locationterm.domain.LocationTerm locationTerm
+			  right outer join locationTerm.location location
+			  right outer join location.organization locationOrganization
+			where locationTerm.offender = placementTermOffender
+			  and ((locationTerm.dateRange.startDate is null or locationTerm.dateRange.startDate <= :effectiveDate)
+			  and (locationTerm.dateRange.endDate is null or locationTerm.dateRange.endDate > :effectiveDate))),
+			(select locationReasonTerm
+		    from 
+		      omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		      right outer join locationReasonTerm.locationTerm locationTerm
+			where locationTerm.offender = placementTermOffender
+			  and ((locationReasonTerm.dateRange.startDate is null or locationReasonTerm.dateRange.startDate <= :effectiveDate)
+			  and (locationReasonTerm.dateRange.endDate is null or locationReasonTerm.dateRange.endDate > :effectiveDate))
+			  and ((locationTerm.dateRange.startDate is null or locationTerm.dateRange.startDate <= :effectiveDate)
+			  and (locationTerm.dateRange.endDate is null or locationTerm.dateRange.endDate > :effectiveDate))),
+			(select address
+			from omis.residence.domain.ResidenceTerm residenceTerm
+			   inner join residenceTerm.address address
+			where residenceTerm.person = :offender
+			  and residenceTerm.category = 'PRIMARY'
+			  and residenceTerm.status = 'RESIDENT'
+			  and ((residenceTerm.dateRange.startDate is null
+			      or residenceTerm.dateRange.startDate <= :effectiveDate)
+			    and (residenceTerm.dateRange.endDate is null
+			      or residenceTerm.dateRange.endDate > :effectiveDate))),
+		    cast(:effectiveDate as timestamp)
+		) from
+			omis.supervision.domain.PlacementTerm placementTerm
+			inner join placementTerm.offender placementTermOffender
+			inner join placementTerm.correctionalStatusTerm correctionalStatusTerm
+			inner join correctionalStatusTerm.correctionalStatus correctionalStatus
+			inner join correctionalStatusTerm.offender correctionalStatusTermOffender
+			inner join placementTerm.supervisoryOrganizationTerm supervisoryOrganizationTerm
+			inner join supervisoryOrganizationTerm.supervisoryOrganization supervisoryOrganization
+			inner join supervisoryOrganizationTerm.offender supervisoryOrganizationTermOffender
+		where
+			placementTermOffender = :offender
+			and correctionalStatusTermOffender = :offender
+			and supervisoryOrganizationTermOffender = :offender
+			and ((correctionalStatusTerm.dateRange.startDate is null or correctionalStatusTerm.dateRange.startDate <= :effectiveDate)
+				and (correctionalStatusTerm.dateRange.endDate is null or correctionalStatusTerm.dateRange.endDate > :effectiveDate))
+			and ((supervisoryOrganizationTerm.dateRange.startDate is null or supervisoryOrganizationTerm.dateRange.startDate <= :effectiveDate)
+				and (supervisoryOrganizationTerm.dateRange.endDate is null or supervisoryOrganizationTerm.dateRange.endDate > :effectiveDate))
+			and ((placementTerm.dateRange.startDate is null or placementTerm.dateRange.startDate <= :effectiveDate)
+				and (placementTerm.dateRange.endDate is null or placementTerm.dateRange.endDate > :effectiveDate))
+	]]></query>
+</hibernate-mapping>

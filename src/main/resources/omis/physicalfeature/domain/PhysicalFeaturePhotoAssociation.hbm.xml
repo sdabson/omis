@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+       "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+       "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.photo.domain">
+	<joined-subclass
+		entity-name="omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation"
+		proxy="omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation"
+		name="omis.physicalfeature.domain.impl.PhysicalFeaturePhotoAssociationImpl"
+		extends="omis.personphoto.domain.PersonPhotoAssociation"
+		table="`PHYS_FEAT_PHOTO_ASSOC`">
+		<key column="`ID`"/>
+		<many-to-one name="physicalFeatureAssociation" column="`PHYS_FEAT_ASSOC_ID`"
+				entity-name="omis.physicalfeature.domain.PhysicalFeatureAssociation" not-null="false"/>
+	</joined-subclass>
+	<query name="findPhotoByOffenderPhysicalFeature"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation photoAssoc
+		where
+			photoAssoc.physicalFeatureAssociation = :pFAssociation
+		order by
+			photoAssoc.photo.date desc
+	]]></query>
+	<query name="findPhysicalFeaturePhotoAssociation"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation pFPhotoAssoc
+		where
+			pFPhotoAssoc.physicalFeatureAssociation = :pFAssociation
+		and
+			pFPhotoAssoc.photo = :photo
+	]]></query>
+	<query name="findPhysicalFeaturePhotoAssociationExcluding"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation pFPhotoAssoc
+		where
+			pFPhotoAssoc.physicalFeatureAssociation = :pFAssociation
+		and
+			pFPhotoAssoc.photo = :photo
+		and
+			pFPhotoAssoc <> :excludedPFPhotoAssociation
+	]]></query>
+	<query name="removeByPhysicalFeatureExcluding"><![CDATA[
+			delete 
+				PhysicalFeaturePhotoAssociation association
+			where 
+				association.physicalFeatureAssociation = :pFAssociation
+			and
+				association not in (:associations)
+	]]></query>
+	<query name="findPhysicalFeaturePhotoOrphans"><![CDATA[
+		select
+			photo
+		from
+			omis.media.domain.Photo photo
+		where
+			photo in (:photos)
+		and
+			photo not in (:persistedPhotos)
+	]]></query>
+	<query name="findMatchingPhysicalFeaturePhoto"><![CDATA[
+		select
+			photo
+		from
+			omis.media.domain.Photo photo
+		where
+			photo.filename = :filename
+	]]></query>
+	<query name="findOrphanedPhysicalFeaturePhotoAssociations"><![CDATA[
+		from
+			omis.physicalfeature.domain.PhysicalFeaturePhotoAssociation photoAssociation
+		where
+			photoAssociation.person = :offender
+		and
+			photoAssociation.physicalFeatureAssociation is null
+	]]></query>
+</hibernate-mapping>

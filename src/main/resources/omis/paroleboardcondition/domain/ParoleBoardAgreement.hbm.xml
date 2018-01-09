@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboardcondition.domain">
+	<class entity-name="omis.paroleboardcondition.domain.ParoleBoardAgreement"
+			proxy="omis.paroleboardcondition.domain.ParoleBoardAgreement"
+			name="omis.paroleboardcondition.domain.impl.ParoleBoardAgreementImpl"
+			table="`PAROLE_BOARD_AGREEMENT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PAROLE_BOARD_AGREEMENT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="agreement" column="`AGREEMENT_ID`" entity-name="omis.condition.domain.Agreement" not-null="true" />
+			<many-to-one name="category" column="`CATEGORY_ID`" entity-name="omis.paroleboardcondition.domain.ParoleBoardAgreementCategory" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findParoleBoardAgreement"><![CDATA[
+		select paroleBoardAgreement
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+		where
+			paroleBoardAgreement.agreement = :agreement
+		and
+			paroleBoardAgreement.category = :category
+	]]></query>
+	<query name="findParoleBoardAgreementExcluding"><![CDATA[
+		select paroleBoardAgreement
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+		where
+			paroleBoardAgreement.agreement = :agreement
+		and
+			paroleBoardAgreement.category = :category
+		and
+			paroleBoardAgreement != :paroleBoardAgreement
+	]]></query>
+</hibernate-mapping>

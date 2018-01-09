@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placementscreening.domain">
+	<class entity-name="omis.placementscreening.domain.ReferralScreeningCenter"
+		proxy="omis.placementscreening.domain.ReferralScreeningCenter"
+		name="omis.placementscreening.domain.impl.ReferralScreeningCenterImpl"
+		table="PRGRAM_RFERRAL_SCRNG_CENTER">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`PRGRM_RFRAL_SCRNG_CNTR_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="categoryIndex" unique="true">
+			<property name="programCategory" column="`PROGRAM_CATEGORY`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.placementscreening.domain.ProgramCategory</param>
+					<param name="type">12</param>
+					<param name="useNamed">true</param>
+				</type>
+			</property> 
+			<property name="order" column="`ORDER`" type="java.lang.Integer" not-null="true"/>
+			<property name="sex" column="`SEX`" not-null="true">
+				<type name="org.hibernate.type.EnumType">
+					<param name="enumClass">omis.demographics.domain.Sex</param>
+					<param name="type">12</param>
+					<param name="useNamed">true</param>
+				</type>
+			</property>
+		</properties>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+		<many-to-one name="facility" column="`FACILITY_ID`" class="omis.facility.domain.Facility" not-null="true" unique="true"/>
+		<component name="creationSignature">
+			<many-to-one class="omis.user.domain.UserAccount" name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+</hibernate-mapping>

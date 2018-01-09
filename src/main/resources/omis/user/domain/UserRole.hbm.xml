@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ - Mapping and queries for user roles.
+ -
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.user.domain">
+	<class entity-name="omis.user.domain.UserRole"
+	       proxy="omis.user.domain.UserRole"
+	       name="omis.user.domain.impl.UserRoleImpl"
+	       table="`USER_ROLE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`USER_ROLE_SEQ`</param>
+			</generator>
+		</id>
+		<property name="name" column="`NAME`" not-null="true" unique="true"/>
+		<property name="description" column="`DESCRIPTION`" not-null="true"/>
+		<property name="sortOrder" column="`SORT_ORDER`" not-null="true"/>
+		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
+	</class>
+	<query name="findUserRolesByUserGroups"><![CDATA[
+		select distinct userRole
+		from
+		    omis.user.domain.UserRoleAssignment as userRoleAssignment
+			inner join userRoleAssignment.userGroup as userGroup
+			inner join userRoleAssignment.userRole as userRole
+		where
+			userGroup in (:userGroups)
+		order by userRole.sortOrder, userRole.name
+	]]></query>
+	<query name="findAllUserRoles"><![CDATA[
+		select userRole
+		from omis.user.domain.UserRole userRole
+		order by userRole.sortOrder, userRole.name
+	]]></query>
+	<query name="findMaxUserRoleSortOrder"><![CDATA[
+		select coalesce(max(userRole.sortOrder), 0)
+		from omis.user.domain.UserRole userRole
+	]]></query>
+	<query name="findUserRolesByUserGroup"><![CDATA[
+		select userRole
+		from omis.user.domain.UserRoleAssignment as userRoleAssignment
+		  inner join userRoleAssignment.userRole as userRole
+		  inner join userRoleAssignment.userGroup as userGroup
+		where userGroup = :userGroup
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.financial.domain">
+	<class entity-name="omis.financial.domain.FinancialDocumentAssociation"
+			proxy="omis.financial.domain.FinancialDocumentAssociation"
+			name="omis.financial.domain.impl.FinancialDocumentAssociationImpl"
+			table="`FINANCIAL_DCMNT_ASSOC`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`FINANCIAL_DCMNT_ASSOC_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="offender" column="`OFFENDER_ID`" entity-name="omis.offender.domain.Offender" not-null="true"/>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findFinancialDocument"><![CDATA[
+		select financialDocumentAssociation
+		from
+			omis.financial.domain.FinancialDocumentAssociation financialDocumentAssociation
+		where
+			financialDocumentAssociation.offender = :offender
+		and
+			financialDocumentAssociation.document = :document
+	]]></query>
+	<query name="findFinancialDocumentAssociationExcluding"><![CDATA[
+		select financialDocumentAssociation
+		from
+			omis.financial.domain.FinancialDocumentAssociation financialDocumentAssociation
+		where
+			financialDocumentAssociation.offender = :offender
+		and
+			financialDocumentAssociation.document = :document
+		and
+			financialDocumentAssociation != :financialDocumentAssociation
+	]]></query>
+	<query name="findFinancialDocumentAssociationsByOffender"><![CDATA[
+		select financialDocumentAssociation
+		from
+			omis.financial.domain.FinancialDocumentAssociation financialDocumentAssociation
+		where
+			financialDocumentAssociation.offender = :offender
+		order by 
+			financialDocumentAssociation.document.date desc
+	]]></query>
+</hibernate-mapping>

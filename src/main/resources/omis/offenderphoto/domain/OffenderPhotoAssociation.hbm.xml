@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.photo.domain">
+	<joined-subclass
+	       entity-name="omis.offenderphoto.domain.OffenderPhotoAssociation"
+	       proxy="omis.offenderphoto.domain.OffenderPhotoAssociation"
+	       name="omis.offenderphoto.domain.impl.OffenderPhotoAssociationImpl"
+	       extends="omis.personphoto.domain.PersonPhotoAssociation"
+	       table="`OFFENDER_PHOTO_ASSOC`">
+		<key column="`ID`"/>
+		<property name="profile" type="yes_no" not-null="true" column="`PROFILE`"/>
+	</joined-subclass>
+	<query name="findOffenderProfilePhotoAssociation"><![CDATA[
+		select association
+		from omis.offenderphoto.domain.OffenderPhotoAssociation association
+		where association.person = :offender
+		  and association.profile = true
+	]]></query>
+	<query name="findOffenderPhotoAssociationsByOffender"><![CDATA[
+		select association
+		from omis.offenderphoto.domain.OffenderPhotoAssociation association
+		where association.person = :offender
+		order by association.photo.date
+	]]></query>
+	<query name="findOffenderPhotoAssociationCountByOffender"><![CDATA[
+		select count(association.id)
+		  from omis.offenderphoto.domain.OffenderPhotoAssociation association
+		 where association.person = :offender
+	]]></query>
+</hibernate-mapping>

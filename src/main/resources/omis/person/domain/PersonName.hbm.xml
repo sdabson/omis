@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - Author: Stephen Abson
+ - Version: 0.1.0 (Nov 21, 2013)
+ - Since: OMIS 3.0 
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.person.domain">
+	<class entity-name="omis.person.domain.PersonName"
+	       proxy="omis.person.domain.PersonName"
+	       name="omis.person.domain.impl.PersonNameImpl"
+	       table="`PERSON_NAME`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PERSON_NAME_SEQ`</param>
+			</generator>
+		</id>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+		<many-to-one name="person" entity-name="omis.person.domain.Person"
+		             column="`PERSON_ID`" not-null="true" cascade="none"/>
+		<property name="lastName" type="string" column="`LAST_NAME`" not-null="true"/>
+		<property name="firstName" type="string" column="`FIRST_NAME`" not-null="true"/>
+		<property name="middleName" type="string" column="`MIDDLE_NAME`" not-null="false"/>
+		<property name="suffix" type="string" column="`SUFFIX`" not-null="false"/>
+	</class>
+	<query name="findPersonName"><![CDATA[
+		select
+				case 
+					when count(name) > 0
+				then
+					true
+				else
+					false
+				end
+		from
+			omis.person.domain.PersonName name
+		where 
+			name.person = :person
+		and
+			name.firstName = :firstName
+		and
+			name.lastName = :lastName
+		and
+			name.middleName = :middleName
+		and
+			name.suffix = :suffix
+	]]></query>
+	<query name="findPersonNameExcluding"><![CDATA[
+		select
+				case 
+					when count(name) > 0
+				then
+					true
+				else
+					false
+				end
+		from
+			omis.person.domain.PersonName name
+		where 
+			name.person = :person
+		and
+			name.firstName = :firstName
+		and
+			name.lastName = :lastName
+		and
+			name.middleName = :middleName
+		and
+			name.suffix = :suffix
+		and
+			name <> :name
+	]]></query>
+</hibernate-mapping>

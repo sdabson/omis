@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.detainernotification.domain">
+	<class entity-name="omis.detainernotification.domain.DetainerActivityCategory"
+			proxy="omis.detainernotification.domain.DetainerActivityCategory"
+			name="omis.detainernotification.domain.impl.DetainerActivityCategoryImpl"
+			table="`DETAINER_ACTIVITY_CATEGORY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`DETAINER_ACTIVITY_CATEGORY_SEQ`</param>
+				</generator>
+			</id>
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" />
+			<property name="receivable" column="`RECEIVABLE`" type="yes_no" not-null="true" />
+			<property name="sendable" column="`SENDABLE`" type="yes_no" not-null="true" />
+	</class>
+	<query name="findCategoriesByInitiatedBy"><![CDATA[
+		select detainerActivityCategory
+		from
+			omis.detainernotification.domain.ActivityInitiatedByAssociation activityInitiatedByAssociation
+		inner join
+			activityInitiatedByAssociation.activity detainerActivityCategory
+		where
+			activityInitiatedByAssociation.initiatedBy = :initiatedBy
+		order by
+			detainerActivityCategory.name asc
+	]]></query>
+</hibernate-mapping>

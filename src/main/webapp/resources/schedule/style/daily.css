@@ -1,0 +1,11 @@
+/*
+ * Daily schedule styling.
+ *
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Feb 12, 2012)
+ * Since: OMIS 3.0
+ */
+#schedule-scheduleTable tbody tr td.timeData,
+#scheduler tbody tr td.timeData {
+	width: 12.5%;
+}

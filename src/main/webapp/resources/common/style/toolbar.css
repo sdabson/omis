@@ -1,0 +1,25 @@
+/*
+ * Toolbar items.
+ * Author: Stephen Abson
+ * Version: 0.1.0 (Feb 14, 2013)
+ * Since: OMIS 3.0
+ */
+
+ul.toolbar {
+	padding: 2px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	border-width: 0px;
+	border-style: solid;
+}
+
+ul.toolbar li {
+	display: inline-block;
+	padding: 1px;
+}
+
+ul.toolbar li a {
+	border-width: 1px;
+	border-style: solid;
+	padding: 4px;
+}

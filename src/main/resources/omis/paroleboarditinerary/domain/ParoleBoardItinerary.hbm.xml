@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.paroleboarditinerary.domain">
+	<class	entity-name="omis.paroleboarditinerary.domain.ParoleBoardItinerary"
+			proxy="omis.paroleboarditinerary.domain.ParoleBoardItinerary"
+			name="omis.paroleboarditinerary.domain.impl.ParoleBoardItineraryImpl"
+			table="`PAROLE_BOARD_ITINERARY`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PAROLE_BOARD_ITINERARY_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+		<component name="dateRange" class="omis.datatype.DateRange">
+			<property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
+			<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+		</component>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findParoleBoardItinerary"><![CDATA[
+		select paroleBoardItinerary
+		from omis.paroleboarditinerary.domain.ParoleBoardItinerary paroleBoardItinerary
+		where
+			paroleBoardItinerary.location = :location
+		and
+			(paroleBoardItinerary.dateRange.startDate = :startDate
+			or (paroleBoardItinerary.dateRange.startDate is null and :startDate is null))
+		and
+			(paroleBoardItinerary.dateRange.endDate = :endDate
+			or (paroleBoardItinerary.dateRange.endDate is null and :endDate is null))
+	]]></query>
+	<query name="findParoleBoardItineraryExcluding"><![CDATA[
+		select paroleBoardItinerary
+		from omis.paroleboarditinerary.domain.ParoleBoardItinerary paroleBoardItinerary
+		where
+			paroleBoardItinerary.location = :location
+		and
+			(paroleBoardItinerary.dateRange.startDate = :startDate
+			or (paroleBoardItinerary.dateRange.startDate is null and :startDate is null))
+		and
+			(paroleBoardItinerary.dateRange.endDate = :endDate
+			or (paroleBoardItinerary.dateRange.endDate is null and :endDate is null))
+		and
+			paroleBoardItinerary <> :excludedItinerary
+	]]></query>
+	<query name="findParoleBoardItineraryAfterDate"><![CDATA[
+		select paroleBoardItinerary
+		from omis.paroleboarditinerary.domain.ParoleBoardItinerary paroleBoardItinerary
+		where
+			(paroleBoardItinerary.dateRange.startDate <= :date
+			or paroleBoardItinerary.dateRange.startDate is null)
+		and
+			(paroleBoardItinerary.dateRange.endDate >= :date
+			or paroleBoardItinerary.dateRange.endDate is null)
+	]]></query>
+</hibernate-mapping>

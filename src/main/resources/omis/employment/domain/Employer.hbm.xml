@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+      "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.employment.domain">
+	<class entity-name="omis.employment.domain.Employer"
+		proxy="omis.employment.domain.Employer"
+		name="omis.employment.domain.impl.EmployerImpl"
+		table="`EMPLOYER`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`EMPLOYER_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="location" column="`LOCATION_ID`" cascade="none" not-null="true"
+			entity-name="omis.location.domain.Location" unique="false"/>
+		<property name="telephoneNumber" column="`TELEPHONE_NUMBER`" type="java.lang.Long" not-null="true" unique="false"/>
+	</class>
+ 	<!-- <query name="findEmployerSummaryByName"><![CDATA[ 
+ 		select new omis.employment.report.EmployerSummary( 
+ 			employer.id, 
+ 			name, 
+ 			location.dataRange.startDate, 
+			location.dataRange.endDate, 
+   			location.address
+ 		)
+ 		from 
+ 			omis.employment.domain.Employer employer 
+ 			inner join employer.location location
+ 			inner join location.organization organization 
+ 			inner join organization.name name
+ 		where 
+ 			name = :employerName 
+ 		
+ 	]]></query> --> 
+	<query name="findEmployer"><![CDATA[
+		select employer
+		from
+			omis.employment.domain.Employer employer
+		where
+			employer.location.organization.name = :employerName
+		and
+			employer.location.address = :employerAddress 
+		order by employer.location.organization.name
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,9 @@
+.bedPlacementCompleteLink{
+	background-image: url('../../common/images/bedPlacement.png');
+	height: 24px;
+	width: 24px;
+}
+
+td img:hover {
+	cursor: hand; cursor: pointer;
+}

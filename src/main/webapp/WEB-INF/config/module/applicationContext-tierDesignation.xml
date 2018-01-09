@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- Services -->
+  
+  <bean id="offenderTierDesignationService"
+        class="omis.tierdesignation.service.impl.OffenderTierDesignationServiceImpl">
+    <constructor-arg name="offenderTierDesignationDelegate" ref="offenderTierDesignationDelegate"/>
+    <constructor-arg name="tierLevelDelegate" ref="tierLevelDelegate"/>
+    <constructor-arg name="tierSourceDelegate" ref="tierSourceDelegate"/>
+    <constructor-arg name="tierChangeReasonDelegate" ref="tierChangeReasonDelegate"/>
+  </bean>
+  <!-- Report services. -->
+  <bean id="tierDesignationProfileItemReportService"
+  	class="omis.tierdesignation.report.impl.hibernate.TierDesignationProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  <!-- Data access objects -->
+
+  <bean id="offenderTierDesignationDao"
+        class="omis.tierdesignation.dao.impl.hibernate.OffenderTierDesignationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.OffenderTierDesignation"/>
+  </bean>
+  
+    <bean id="tierLevelDao"
+        class="omis.tierdesignation.dao.impl.hibernate.TierLevelDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierLevel"/>
+  </bean>
+  
+  <bean id="tierSourceDao"
+        class="omis.tierdesignation.dao.impl.hibernate.TierSourceDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierSource"/>
+  </bean>
+  
+  <bean id="tierChangeReasonDao"
+        class="omis.tierdesignation.dao.impl.hibernate.TierChangeReasonDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierChangeReason"/>
+  </bean>
+  
+  <!-- Instance factories -->
+  
+  <bean id="offenderTierDesignationInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.OffenderTierDesignation"/>
+  </bean>
+  
+  <bean id="tierChangeReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierChangeReason"/>
+  </bean>
+  
+  <bean id="tierLevelInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierLevel"/>
+  </bean>
+  
+   <bean id="tierSourceInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierSource"/>
+  </bean>  
+  
+  <!-- Property editor factories -->
+  
+  <bean id="offenderTierDesignationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.OffenderTierDesignation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="offenderTierDesignationDao"/>
+  </bean>
+
+  <bean id="tierChangeReasonPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierChangeReason"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="tierChangeReasonDao"/>
+  </bean>
+
+  <bean id="tierLevelPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierLevel"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="tierLevelDao"/>
+  </bean>
+  
+  <bean id="tierSourcePropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="entityName" value="omis.tierdesignation.domain.TierSource"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+    <constructor-arg name="dao" ref="tierSourceDao"/>
+  </bean>
+  
+  <!-- Service helpers -->
+    
+  <bean id="offenderTierDesignationDelegate"
+        class="omis.tierdesignation.service.delegate.OffenderTierDesignationDelegate">
+    <constructor-arg name="offenderTierDesignationDao" ref="offenderTierDesignationDao"/>
+    <constructor-arg name="offenderTierDesignationInstanceFactory" ref="offenderTierDesignationInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="tierChangeReasonDelegate"
+        class="omis.tierdesignation.service.delegate.TierChangeReasonDelegate">
+    <constructor-arg name="tierChangeReasonDao" ref="tierChangeReasonDao"/>
+    <constructor-arg name="tierChangeReasonInstanceFactory" ref="tierChangeReasonInstanceFactory"/>
+  </bean>
+  
+  <bean id="tierLevelDelegate"
+        class="omis.tierdesignation.service.delegate.TierLevelDelegate">
+    <constructor-arg name="tierLevelDao" ref="tierLevelDao"/>
+    <constructor-arg name="tierLevelInstanceFactory" ref="tierLevelInstanceFactory"/>
+  </bean>
+  
+  <bean id="tierSourceDelegate"
+        class="omis.tierdesignation.service.delegate.TierSourceDelegate">
+    <constructor-arg name="tierSourceDao" ref="tierSourceDao"/>
+    <constructor-arg name="tierSourceInstanceFactory" ref="tierSourceInstanceFactory"/>
+  </bean>
+</beans>

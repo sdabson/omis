@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="bedService"
+        	class="omis.facility.service.impl.BedServiceImpl">
+        	<constructor-arg name="bedDao" ref="bedDao"/>
+        </bean>
+        
+        <bean id="roomDetailService"
+        	class="omis.facility.service.impl.RoomDetailServiceImpl">
+        	<constructor-arg name="roomDetailDao" ref="roomDetailDao"/>
+        </bean>
+        
+        <bean id="roomService"
+        	class="omis.facility.service.impl.RoomServiceImpl">
+        	<constructor-arg name="roomDao" ref="roomDao"/>
+        </bean>
+        
+        <bean id="sectionService"
+        	class="omis.facility.service.impl.SectionServiceImpl">
+        	<constructor-arg name="sectionDao" ref="sectionDao"/>
+        </bean>
+        
+        <bean id="levelService"
+        	class="omis.facility.service.impl.LevelServiceImpl">
+        	<constructor-arg name="levelDao" ref="levelDao"/>
+        </bean>
+        
+        <bean id="complexService"
+        	class="omis.facility.service.impl.ComplexServiceImpl">
+        	<constructor-arg name="complexDao" ref="complexDao"/>
+        </bean>
+        
+        <bean id="unitService"
+        	class="omis.facility.service.impl.UnitServiceImpl">
+        	<constructor-arg name="unitDao" ref="unitDao"/>
+        </bean>
+        
+        <bean id="facilityService"
+        	class="omis.facility.service.impl.FacilityServiceImpl">
+        	<constructor-arg name="facilityDao" ref="facilityDao"/>
+        </bean>
+        
+        <bean id="facilityStaffReportService"
+			class="omis.facility.report.impl.hibernate.FacilityStaffReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+	
+		<!-- Service Delegates -->
+		
+		<bean id="facilityServiceDelegate"
+			class="omis.facility.service.delegate.FacilityServiceDelegate">
+			<constructor-arg name="unitDao" ref="unitDao"/>
+			<constructor-arg name="levelDao" ref="levelDao"/>
+			<constructor-arg name="sectionDao" ref="sectionDao"/>
+			<constructor-arg name="complexDao" ref="complexDao"/>
+		</bean>
+		
+		<bean id="facilityDelegate" class="omis.facility.service.delegate.FacilityDelegate">
+			<constructor-arg name="facilityDao" ref="facilityDao"/>
+			<constructor-arg name="facilityInstanceFactory" ref="facilityInstanceFactory"/>
+		</bean>
+        
+        <bean id="complexDelegate" class="omis.facility.service.delegate.ComplexDelegate">
+			<constructor-arg name="complexDao" ref="complexDao"/>
+			<constructor-arg name="complexInstanceFactory" ref="complexInstanceFactory"/>
+		</bean>
+		
+		<bean id="unitDelegate" class="omis.facility.service.delegate.UnitDelegate">
+			<constructor-arg name="unitDao" ref="unitDao"/>
+			<constructor-arg name="unitInstanceFactory" ref="unitInstanceFactory"/>
+		</bean>
+        
+        <bean id="bedDelegate" class="omis.facility.service.delegate.BedDelegate">
+			<constructor-arg name="bedDao" ref="bedDao"/>
+			<constructor-arg name="bedInstanceFactory" ref="bedInstanceFactory"/>
+		</bean>
+		
+		<bean id="levelDelegate" class="omis.facility.service.delegate.LevelDelegate">
+			<constructor-arg name="levelDao" ref="levelDao"/>
+			<constructor-arg name="levelInstanceFactory" ref="levelInstanceFactory"/>
+		</bean>
+		
+		<bean id="roomDelegate" class="omis.facility.service.delegate.RoomDelegate">
+			<constructor-arg name="roomDao" ref="roomDao"/>
+			<constructor-arg name="roomInstanceFactory" ref="roomInstanceFactory"/>
+		</bean>
+		
+		<bean id="sectionDelegate" class="omis.facility.service.delegate.SectionDelegate">
+			<constructor-arg name="sectionDao" ref="sectionDao"/>
+			<constructor-arg name="sectionInstanceFactory" ref="sectionInstanceFactory"/>
+		</bean>
+        <!-- Data access objects -->
+        
+        <bean id="facilityAreaDao"
+        	class="omis.facility.dao.impl.hibernate.FacilityAreaDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.FacilityArea"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="roomDetailDao"
+        	class="omis.facility.dao.impl.hibernate.RoomDetailDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.RoomDetail"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="bedDao"
+        	class="omis.facility.dao.impl.hibernate.BedDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Bed"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="roomDao"
+        	class="omis.facility.dao.impl.hibernate.RoomDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Room"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="sectionDao"
+        	class="omis.facility.dao.impl.hibernate.SectionDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Section"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="levelDao"
+        	class="omis.facility.dao.impl.hibernate.LevelDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Level"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="unitDao"
+        	class="omis.facility.dao.impl.hibernate.UnitDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Unit"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="complexDao"
+        	class="omis.facility.dao.impl.hibernate.ComplexDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Complex"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="facilityDao"
+        	class="omis.facility.dao.impl.hibernate.FacilityDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.facility.domain.Facility"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+		
+		<bean id="facilityAreaInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.FacilityArea"/>
+		</bean>
+		
+		<bean id="bedInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Bed"/>
+		</bean>
+		
+		<bean id="roomInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Room"/>
+		</bean>
+  		
+  		<bean id="sectionInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Section"/>
+		</bean>
+		
+		<bean id="levelInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Level"/>
+		</bean>
+		
+		<bean id="complexInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Complex"/>
+		</bean>
+		
+		<bean id="unitInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Unit"/>
+		</bean>
+		
+		<bean id="facilityInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.facility.domain.Facility"/>
+		</bean>
+ 		 
+ 		 <!--Property editor factories -->
+ 		
+ 		<bean id="facilityAreaPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="facilityAreaDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.FacilityArea"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+ 		
+		<bean id="roomDetailPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="roomDetailDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.RoomDetail"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="bedPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="bedDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Bed"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="roomPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="roomDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Room"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="sectionPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="sectionDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Section"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="levelPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="levelDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Level"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="complexPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="complexDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Complex"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="unitPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="unitDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Unit"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+		<bean id="facilityPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+       		<constructor-arg name="dao" ref="facilityDao"/>
+ 			<constructor-arg name="entityName" value="omis.facility.domain.Facility"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+		</bean>
+		
+</beans>

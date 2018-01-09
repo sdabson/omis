@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+        
+        <!-- Validators -->
+		
+		<bean id="visitationAssociationFormValidator" 
+			class="omis.visitation.validator.VisitationAssociationFormValidator">
+			<constructor-arg name="personFieldsValidatorDelegate" ref="personFieldsValidatorDelegate"/>
+			<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+		</bean>
+			
+		<bean id="visitFormValidator"
+			class="omis.visitation.validator.VisitFormValidator"/>
+	
+		<bean id="visitorCheckInFormValidator"
+			class="omis.visitation.validator.VisitorCheckInFormValidator"/>
+			
+		<bean id="visitorLogFormValidator"
+			class="omis.visitation.validator.VisitorLogFormValidator"/>
+		
+		<bean id="facilityVisitationLogFormValidator"
+			class="omis.visitation.validator.FacilityVisitationLogFormValidator"/>
+		
+		<!-- Profile items. -->
+		<bean id="visitationProfileItem"
+			class="omis.visitation.web.profile.VisitationProfileItem">
+			<constructor-arg name="requiredAuthorizations">
+				<set>
+					<value>VISITATION_ASSOCIATION_LIST</value>
+					<value>ADMIN</value>
+				</set>
+			</constructor-arg>
+			<constructor-arg name="includePage" value="/WEB-INF/views/visitation/visitationAssociation/profile/includes/profileItem.jsp"/>
+			<constructor-arg name="name" value="visitation"/>
+			<constructor-arg name="profileItemRegistry" ref="relationshipsProfileItemRegistry"/>
+			<constructor-arg name="visitationProfileItemReportService" ref="visitationProfileItemReportService"/>
+			<constructor-arg name="enabled" value="${visitationProfileItemEnabled}"/>
+		</bean>
+		
+		<!-- Validator Delegates -->
+		<bean id="visitationAssociationFieldsValidatorDelegate" class="omis.visitation.web.validator.delegate.VisitationAssociationFieldsValidatorDelegate"/>
+		<!-- Web configuration -->
+ 		 
+ 		 <context:component-scan base-package="omis.visitation.web.controller"/>
+ 		
+ 		 <!-- Use controller transactions -->
+   
+   		<aop:config>
+		      <aop:pointcut id="visitationAssociationControllerOperation" expression="execution(* omis.visitation.web.controller.VisitationAssociationController.*(..))"/>
+		      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="visitationAssociationControllerOperation"/>
+		  </aop:config>
+		  
+		<aop:config>
+			<aop:pointcut id="visitControllerOperation" expression="execution(* omis.visitation.web.controller.VisitController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="visitControllerOperation"/>
+		</aop:config>
+		
+		<aop:config>
+			<aop:pointcut id="facilityVisitationControllerOperation" expression="execution(* omis.visitation.web.controller.FacilityVisitationController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="facilityVisitationControllerOperation"/>
+		</aop:config>
+</beans>        

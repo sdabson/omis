@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.address.domain">
+	<class entity-name="omis.address.domain.ZipCode"
+	       proxy="omis.address.domain.ZipCode"
+	       name="omis.address.domain.impl.ZipCodeImpl"
+		   table="`ZIPCODE`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`ZIPCODE_SEQ`</param>
+			</generator>
+		</id>
+		<properties name="uniqueZipCode">
+			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
+			<many-to-one name="city" entity-name="omis.region.domain.City" not-null="true" column="`CITY_ID`"/>
+			<property name="extension" type="java.lang.String" not-null="false" column="`EXTENSION`"/>
+		</properties>
+		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
+	</class>
+	<query name="findAllZipCodes"><![CDATA[
+		select zipCode from omis.address.domain.ZipCode zipCode
+			inner join zipCode.city as city
+			inner join city.state as state
+			inner join state.country as country 
+		order by country.name, state.name, city.name,
+		         zipCode.value, zipCode.extension
+	]]></query>	
+	<query name="findZipCodesInCity"><![CDATA[
+	select zipCode
+		from 
+			omis.address.domain.ZipCode zipCode
+		inner join 
+			zipCode.city city
+		where 
+			zipCode.city = :city		
+	]]></query>
+	<query name="findZipCodesInState"><![CDATA[
+	select zipCode
+		from
+			omis.address.domain.ZipCode zipCode
+		inner join 
+			zipCode.city city
+		inner join
+			city.state state
+		where
+			city.state = :state
+	]]></query>
+	<query name="findZipCode"><![CDATA[
+	  select zipCode from omis.address.domain.ZipCode zipCode
+	  where zipCode.city = :city
+	    and zipCode.value = :value
+	    and (zipCode.extension = :extension
+	      or (zipCode.extension is null and :extension is null))
+	]]></query>
+</hibernate-mapping>

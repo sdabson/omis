@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+ 
+<!--
+ - Queries to report supervision.
+ -
+ - Author: Ryan Johns
+ - Author: Stephen Abson
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.supervision.domain">
+	<query name="findSupervisionSummaryByOffenderAndDate">
+	
+	<!-- Summarizes supervision for offender on date. -->
+	<![CDATA[
+	  select new omis.supervision.report.SupervisionSummary(cs.name,
+		         cst.dateRange.startDate, so.name, stcr.name, 
+		         sot.dateRange.startDate)
+ 	        from omis.supervision.domain.PlacementTerm pt
+ left outer join pt.correctionalStatusTerm cst
+right outer join cst.offender o
+ left outer join cst.correctionalStatus cs
+ left outer join pt.supervisoryOrganizationTerm sot
+ left outer join sot.supervisoryOrganization so
+ left outer join pt.startChangeReason stcr
+           where o = :offender
+             and ((cst.dateRange.startDate <= :date
+		      or cst.dateRange.startDate is null) 
+             and (cst.dateRange.endDate >= :date
+              or cst.dateRange.endDate is null))
+	]]></query>
+</hibernate-mapping>

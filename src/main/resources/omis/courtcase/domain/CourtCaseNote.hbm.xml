@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.courtcase.domain">
+	<class	entity-name="omis.courtcase.domain.CourtCaseNote"
+			proxy="omis.courtcase.domain.CourtCaseNote"
+			name="omis.courtcase.domain.impl.CourtCaseNoteImpl"
+			table="`COURT_CASE_NOTE`">
+		<id name="id" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`COURT_CASE_NOTE_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="courtCase" entity-name="omis.courtcase.domain.CourtCase"
+		             not-null="true" column="`COURT_CASE_ID`"/>
+		<property name="date" column="`DATE`" not-null="true"/>
+		<property name="value" column="`VALUE`" type="string" not-null="true"/>               
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findCourtCaseNote"><![CDATA[
+		from
+			omis.courtcase.domain.CourtCaseNote as courtCaseNote
+		where
+			courtCaseNote.courtCase = :courtCase
+		and
+			courtCaseNote.date = :date
+		and
+			courtCaseNote.value = :value
+	]]></query>
+	<query name="findCourtCaseNoteExcluding"><![CDATA[
+		from
+			omis.courtcase.domain.CourtCaseNote as courtCaseNote
+		where
+			courtCaseNote.courtCase = :courtCase
+		and
+			courtCaseNote.date = :date
+		and
+			courtCaseNote.value = :value
+		and
+			courtCaseNote <> :excludedNote
+	]]></query>
+	<query name="findCourtCaseNotesByCourtCase"><![CDATA[
+		from 
+			omis.courtcase.domain.CourtCaseNote as courtCaseNote
+		where 
+			courtCaseNote.courtCase = :courtCase
+	]]></query>
+</hibernate-mapping>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Configuration for location term module.
+  -
+  - Author: Stephen Abson
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+  <!-- Instance factories. -->
+  
+  <bean id="locationTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTerm"/>
+  </bean>
+  
+  <bean id="locationReasonTermInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReasonTerm"/>
+  </bean>
+  
+  <bean id="locationReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReason"/>
+  </bean>
+  
+  <bean id="locationTermChangeActionInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTermChangeAction"/>    
+  </bean>
+
+  <!-- Services -->
+
+  <bean id="locationTermService"
+        class="omis.locationterm.service.impl.LocationTermServiceImpl">
+    <constructor-arg name="locationTermDao" ref="locationTermDao"/>
+    <constructor-arg name="locationTermInstanceFactory" ref="locationTermInstanceFactory"/>
+    <constructor-arg name="locationReasonTermDelegate" ref="locationReasonTermDelegate"/>
+    <constructor-arg name="locationReasonDelegate" ref="locationReasonDelegate"/>
+    <constructor-arg name="locationTermChangeActionDelegate" ref="locationTermChangeActionDelegate"/>
+    <constructor-arg name="allowedLocationChangeDelegate" ref="allowedLocationChangeDelegate"/>
+    <constructor-arg name="allowedLocationChangeReasonRuleDelegate" ref="allowedLocationChangeReasonRuleDelegate"/>
+    <constructor-arg name="placementTermDelegate" ref="placementTermDelegate"/>
+    <constructor-arg name="supervisoryOrganizationDelegate" ref="supervisoryOrganizationDelegate"/>
+    <constructor-arg name="locationDelegate" ref="locationDelegate"/>
+    <constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+
+  <bean id="locationReasonTermService"
+        class="omis.locationterm.service.impl.LocationReasonTermServiceImpl">
+    <constructor-arg name="locationReasonTermDao" ref="locationReasonTermDao"/>
+    <constructor-arg name="locationReasonTermInstanceFactory" ref="locationReasonTermInstanceFactory"/>
+    <constructor-arg name="locationTermDao" ref="locationTermDao"/>
+    <constructor-arg name="locationReasonDao" ref="locationReasonDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+
+  <!-- Report services -->
+  
+  <bean id="locationTermReportService" class="omis.locationterm.report.impl.hibernate.LocationTermReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
+  <bean id="locationTermProfileItemReportService" class="omis.locationterm.report.impl.hibernate.LocationTermProfileItemReportServiceHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
+  <!-- Data access objects -->
+  
+  <bean id="locationTermDao"
+        class="omis.locationterm.dao.impl.hibernate.LocationTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTerm"/>
+  </bean>
+  
+  <bean id="locationReasonTermDao"
+        class="omis.locationterm.dao.impl.hibernate.LocationReasonTermDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReasonTerm"/>
+  </bean>
+  
+  <bean id="locationReasonDao"
+        class="omis.locationterm.dao.impl.hibernate.LocationReasonDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationReason"/>
+  </bean>
+  
+  <bean id="allowedLocationChangeDao"
+        class="omis.locationterm.dao.impl.hibernate.AllowedLocationChangeDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.AllowedLocationChange"/>
+  </bean>
+  
+  <bean id="locationTermChangeActionDao"
+        class="omis.locationterm.dao.impl.hibernate.LocationTermChangeActionDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTermChangeAction"/>
+  </bean>
+  
+  <bean id="allowedLocationChangeReasonRuleDao"
+        class="omis.locationterm.dao.impl.hibernate.AllowedLocationChangeReasonRuleDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.locationterm.domain.AllowedLocationChangeReasonRule"/>
+  </bean>
+  
+  <!-- Report delegates -->
+  
+  <bean id="locationTermSummaryDelegate" class="omis.locationterm.report.delegate.LocationTermSummaryDelegate">
+  	<constructor-arg name="locationTermDao" ref="locationTermDao"/>
+  	<constructor-arg name="locationReasonTermDao" ref="locationReasonTermDao"/>
+  </bean>
+  
+  <!-- Service delegates -->
+  
+  
+  
+  <bean id="locationReasonTermDelegate" class="omis.locationterm.service.delegate.LocationReasonTermDelegate">
+    <constructor-arg name="locationReasonTermDao" ref="locationReasonTermDao"/>
+    <constructor-arg name="locationReasonTermInstanceFactory" ref="locationReasonTermInstanceFactory"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="locationReasonDelegate" class="omis.locationterm.service.delegate.LocationReasonDelegate">
+    <constructor-arg name="locationReasonInstanceFactory" ref="locationReasonInstanceFactory"/>
+    <constructor-arg name="locationReasonDao" ref="locationReasonDao"/>
+  </bean>
+  
+  <bean id="locationTermChangeActionDelegate" class="omis.locationterm.service.delegate.LocationTermChangeActionDelegate">
+  	<constructor-arg name="locationTermChangeActionInstanceFactory" ref="locationTermChangeActionInstanceFactory"/>
+  	<constructor-arg name="locationTermChangeActionDao" ref="locationTermChangeActionDao"/>
+  </bean>
+  
+  <bean id="allowedLocationChangeDelegate" class="omis.locationterm.service.delegate.AllowedLocationChangeDelegate">
+    <constructor-arg name="allowedLocationChangeDao" ref="allowedLocationChangeDao"/>
+  </bean>
+  
+  <bean id="allowedLocationChangeReasonRuleDelegate" class="omis.locationterm.service.delegate.AllowedLocationChangeReasonRuleDelegate">
+  	<constructor-arg name="allowedLocationChangeReasonRuleDao" ref="allowedLocationChangeReasonRuleDao"/>
+  </bean>
+  
+  <!-- Profile specific Service delegates -->
+  
+	<bean id="locationTermDelegate" class="omis.locationterm.service.delegate.LocationTermDelegate">
+	  	<constructor-arg name="locationTermDao" ref="locationTermDao"/>
+	  	<constructor-arg name="locationTermInstanceFactory" ref="locationTermInstanceFactory"/>
+	  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <beans profile="prod,preprod,test">
+	  <bean id="legacyLocationTermDelegate" class="omis.locationterm.service.delegate.LocationTermDelegate">
+	  	<constructor-arg name="locationTermDao" ref="legacyLocationTermDao"/>
+	  	<constructor-arg name="locationTermInstanceFactory" ref="locationTermInstanceFactory"/>
+	  	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  </bean>
+	</beans>
+  <!-- Profile specific DAOs -->
+
+  <beans profile="prod,preprod,test">
+	  <bean id="legacyLocationTermDao"
+	        class="omis.locationterm.dao.impl.hibernate.LegacyLocationTermDaoHibernateImpl">
+	    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+	    <constructor-arg name="entityName" value="omis.locationterm.domain.LocationTerm"/>
+	  </bean>
+  </beans>
+  
+</beans>
