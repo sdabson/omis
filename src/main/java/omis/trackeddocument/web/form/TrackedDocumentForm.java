@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import omis.docket.domain.Docket;
-import omis.user.domain.UserAccount;
 
 /** Form object for tracked document creation/edit.
  * @author: Yidong Li
@@ -16,8 +15,6 @@ public class TrackedDocumentForm implements Serializable {
 	private Docket docket;
 	private List<TrackedDocumentReceivalItem> trackedDocumentReceivalItems 
 		= new ArrayList<TrackedDocumentReceivalItem>();
-	private UserAccount createUserAccount;
-	
 	
 	/** Instantiates a tracked document form. */
 	public TrackedDocumentForm() {
@@ -56,20 +53,4 @@ public class TrackedDocumentForm implements Serializable {
 	public void setDocket(final Docket docket) {
 		this.docket = docket;
 	}
-	
-	/**
-	 * Get create user account.
-	 * @return create user account
-	 */
-	public UserAccount getCreateUserAccount() {
-		return this.createUserAccount;
-	}
-	
-	/**
-	 * Set user account.
-	 * @param createUserAccount creator's user account
-	 */
-	public void setCreateUserAccount(final UserAccount createUserAccount) {
-		this.createUserAccount = createUserAccount;
-	}
-}
+}	

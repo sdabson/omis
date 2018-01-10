@@ -70,8 +70,9 @@ public interface DocumentTrackingService {
 	
 	/**
 	 * Finds user account.
+	 * @param username user name
 	 * 
 	 * @return a user account
 	 */
-	UserAccount findUserAccount();
+	UserAccount findUserAccount(String username);
 }

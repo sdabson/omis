@@ -137,14 +137,16 @@ public class TrackedDocumentReceivalImpl implements TrackedDocumentReceival {
 			that.getCategory())) {
 			return false;
 		}
-		if (this.getReceivedByUserAccount() == null) {
-			throw new IllegalStateException("User account required");
-		}
-		if (this.getReceivedDate() == null) {
-			throw new IllegalStateException("Received date required");
-		}
-		if (!this.getReceivedDate().equals(that.getReceivedDate())) {
+		if(that.getReceivedDate()!=null&&this.getReceivedDate()!=null){
+			if (!this.getReceivedDate().equals(that.getReceivedDate())) {
+				return false;
+			} 
+		} else if (that.getReceivedDate()!=null&&this.getReceivedDate()==null){
 			return false;
+		} else if (that.getReceivedDate()==null&&this.getReceivedDate()!=null){
+			return false;
+		} else {
+			;
 		}
 		return true;
 	}
@@ -161,16 +163,12 @@ public class TrackedDocumentReceivalImpl implements TrackedDocumentReceival {
 		if (this.getCategory() == null) {
 			throw new IllegalStateException("Category required");
 		}
-		if (this.getReceivedByUserAccount() == null) {
-			throw new IllegalStateException("Received user account required");
-		}
-		if (this.getReceivedDate() == null) {
-			throw new IllegalStateException("Received date required");
-		}
+		
 		hashCode += 29 * this.getDocket().hashCode();
 		hashCode += 29 * this.getCategory().hashCode();
-		hashCode += 29 * this.getReceivedByUserAccount().hashCode(); 
-		hashCode += 29 * this.getReceivedDate().hashCode();
+		if(this.getReceivedDate()!=null){
+			hashCode += 29 * this.getReceivedDate().hashCode();
+		}
 		return hashCode;
 	}
 }

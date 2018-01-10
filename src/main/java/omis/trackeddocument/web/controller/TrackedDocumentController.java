@@ -1,11 +1,13 @@
 package omis.trackeddocument.web.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import omis.audit.AuditComponentRetriever;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.docket.domain.Docket;
@@ -35,8 +36,8 @@ import omis.trackeddocument.service.delegate.TrackedDocumentReceivalDelegate;
 import omis.trackeddocument.web.form.TrackedDocumentForm;
 import omis.trackeddocument.web.form.TrackedDocumentReceivalItem;
 import omis.trackeddocument.web.form.TrackedDocumentReceivalItemOperation;
+import omis.trackeddocument.web.validator.TrackedDocumentFormValidator;
 import omis.user.domain.UserAccount;
-import omis.user.service.delegate.UserAccountDelegate;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
@@ -51,23 +52,23 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 @PreAuthorize("hasRole('USER')")
 public class TrackedDocumentController {
 	/* views */
-	private static final String EDIT_VIEW_NAME = "trackeddocument/edit";
-	private static final String LIST_VIEW_NAME = "trackeddocument/list";
+	private static final String EDIT_VIEW_NAME = "trackedDocument/edit";
+	private static final String LIST_VIEW_NAME = "trackedDocument/list";
 	private static final String 
 		TRACKED_DOCUMENT_LIST_SCREEN_ACTION_MENU_VIEW_NAME
-		= "trackeddocument/includes/trackedDocumentListScreenActionMenu";
+		= "trackedDocument/includes/trackedDocumentListScreenActionMenu";
 	private static final String 
 		TRACKED_DOCUMENT_LIST_ROW_ACTION_MENU_VIEW_NAME
-		= "trackeddocument/includes/trackedDocumentListRowActionMenu";
+		= "trackedDocument/includes/trackedDocumentListRowActionMenu";
 	private static final String
 		TRACKED_DOCUMENT_EDIT_TABLE_ACTION_MENU_VIEW_NAME
-		= "trackeddocument/includes/trackedDocumentEditTableActionMenu";
+		= "trackedDocument/includes/trackedDocumentEditTableActionMenu";
 	private static final String	
 		TRACKED_DOCUMENT_EDIT_SCREEN_ACTION_MENU_VIEW_NAME
-		= "trackeddocument/includes/trackedDocumentEditScreenActionMenu";
+		= "trackedDocument/includes/trackedDocumentEditScreenActionMenu";
 	private static final String 
 	CREATE_TRACKED_DOCUMENTS_TABLE_ROW_VIEW_NAME 
-		= "trackeddocument/includes/createTrackedDocumentsTableRow";
+		= "trackedDocument/includes/createTrackedDocumentsTableRow";
 	
 	/* model keys */
 	private static final String TRACKED_DOCUMENT_EDIT_FORM_MODEL_KEY 
@@ -91,6 +92,8 @@ public class TrackedDocumentController {
 	= "offender";
 	private static final String CREATE_FLAG_MODEL_KEY
 	= "createFlag";
+	private static final String TRACKED_DOCUMENT_MODEL_KEY 
+	= "trackeddocument";
 	
 	/* Message bundles. */
 	private static final String ERROR_BUNDLE_NAME = "omis.family.msgs.form";
@@ -127,6 +130,10 @@ public class TrackedDocumentController {
 	@Autowired
 	@Qualifier("docketPropertyEditorFactory")
 	private PropertyEditorFactory docketPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("datePropertyEditorFactory")
+	private CustomDateEditorFactory customDateEditorFactory;
 		
 	/* Services. */
 	@Autowired
@@ -150,17 +157,11 @@ public class TrackedDocumentController {
 	@Autowired
 	@Qualifier("businessExceptionHandlerDelegate")
 	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
-
-	@Autowired
-	@Qualifier("userAccountDelegate")
-	private UserAccountDelegate userAccountDelegate;
 	
 	/* Validator */
-		
-	/* Retriever */
 	@Autowired
-	@Qualifier("auditComponentRetriever")
-	private AuditComponentRetriever auditComponentRetriever;
+	@Qualifier("trackedDocumentFormValidator")
+	private TrackedDocumentFormValidator trackedDocumentFormValidator;	
 	
 	/* Constructor. */
 	/** Instantiates a default tracked document controller. */
@@ -204,8 +205,6 @@ public class TrackedDocumentController {
 		List<TrackedDocumentCategory> categories
 		= this.documentTrackingService.findCategories();
 		TrackedDocumentForm trackedDocumentForm = new TrackedDocumentForm();
-		trackedDocumentForm.setCreateUserAccount(
-			this.auditComponentRetriever.retrieveUserAccount());
 		Boolean createFlag = true;
 		return prepareEditMav(trackedDocumentForm, categories, offender,
 			createFlag, 0);
@@ -226,10 +225,16 @@ public class TrackedDocumentController {
 		final TrackedDocumentForm trackedDocumentForm,
 		final BindingResult result)
 		throws TrackedDocumentReceivalExistsException {
-		/* 
 		this.trackedDocumentFormValidator.validate(trackedDocumentForm,
 			result);
-		*/
+		if(result.hasErrors()){
+			List<TrackedDocumentCategory> categories
+			= this.documentTrackingService.findCategories();
+			int itemIndex = trackedDocumentForm
+				.getTrackedDocumentReceivalItems().size();
+			return prepareRedisplayEditMav(trackedDocumentForm, categories,
+				offender, true, itemIndex, result);
+		}
 		
 		List<TrackedDocumentReceivalItem> trackedDocumentReceivalItems 
 		= new ArrayList<TrackedDocumentReceivalItem>();
@@ -270,6 +275,7 @@ public class TrackedDocumentController {
 			item.setOperation(TrackedDocumentReceivalItemOperation.EDIT);
 			item.setReceivedByUserAccount(receival.getReceivedByUserAccount());
 			item.setReceivedDate(receival.getReceivedDate());
+			item.setTrackedDocumentReceival(receival);
 			trackedDocumentForm.getTrackedDocumentReceivalItems().add(item);
 		}
 		List<TrackedDocumentCategory> categories
@@ -296,10 +302,16 @@ public class TrackedDocumentController {
 		final TrackedDocumentForm trackedDocumentForm,
 		final BindingResult result)
 		throws TrackedDocumentReceivalExistsException {
-		/* 
-		this.trackedDocumentFormValidator.validate(trackedDocumentForm,
-			result);
-		*/
+		this.trackedDocumentFormValidator.validate(trackedDocumentForm, result);
+		if(result.hasErrors()){
+			List<TrackedDocumentCategory> categories
+			= this.documentTrackingService.findCategories();
+			int itemIndex = trackedDocumentForm
+				.getTrackedDocumentReceivalItems().size();
+			return prepareRedisplayEditMav(trackedDocumentForm, categories,
+				(Offender)docket.getPerson(), false, itemIndex, result);
+		}
+		
 		List<TrackedDocumentReceivalItem> trackedDocumentReceivalItems 
 		= new ArrayList<TrackedDocumentReceivalItem>();
 		trackedDocumentReceivalItems
@@ -312,6 +324,15 @@ public class TrackedDocumentController {
 				trackedDocumentReceivalItem.getCategory(), 
 				trackedDocumentReceivalItem.getReceivedDate(), 
 				trackedDocumentReceivalItem.getReceivedByUserAccount());
+			} else if(TrackedDocumentReceivalItemOperation.REMOVE.equals(
+				trackedDocumentReceivalItem.getOperation())){
+				this.documentTrackingService.remove(trackedDocumentReceivalItem
+					.getTrackedDocumentReceival());
+			} else if(TrackedDocumentReceivalItemOperation.EDIT.equals(
+				trackedDocumentReceivalItem.getOperation())){
+					;
+			} else if(trackedDocumentReceivalItem.getOperation()==null){
+				;
 			} else {
 				throw new UnsupportedOperationException(
 					String.format("Unsupported operation: %s",
@@ -432,18 +453,20 @@ public class TrackedDocumentController {
 			= this.documentTrackingService.findCategories(); 
 		map.addAttribute(TRACKED_DOCUMENT_CATEGORIES_MODEL_KEY, categories);
 		
-		
 		TrackedDocumentReceivalItem trackedDocumentReceivalItem 
 			= new TrackedDocumentReceivalItem();
 		trackedDocumentReceivalItem.setOperation(
 			TrackedDocumentReceivalItemOperation.CREATE);
+		String username = SecurityContextHolder.getContext()
+			.getAuthentication().getName();
 		UserAccount userAccount
-		= this.documentTrackingService.findUserAccount();
+		= this.documentTrackingService.findUserAccount(username);
 		
 		trackedDocumentReceivalItem.setReceivedByUserAccount(userAccount);
 		
 		map.addAttribute(TRACKED_DOCUMENT_RECEIVAL_ITEM_MODEL_KEY, 
 			trackedDocumentReceivalItem);
+//		map.addAttribute(CREATE_FLAG_MODEL_KEY, true);
 		return new ModelAndView(
 			CREATE_TRACKED_DOCUMENTS_TABLE_ROW_VIEW_NAME, map);
 	}
@@ -460,13 +483,25 @@ public class TrackedDocumentController {
 		mav.addObject(CREATE_FLAG_MODEL_KEY, createFlag);
 		mav.addObject(ITEM_INDEX_MODEL_KEY, itemIndex);
 		List<Docket> dockets = this.documentTrackingService
-			.findDockets((Person)offender);
+			.findDockets(offender);
 		mav.addObject(DOCKETS_MODEL_KEY, dockets);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
-//		return new ModelAndView(EDIT_VIEW_NAME, mav.getModelMap());
 		return mav;
 	}	
+	
+	// Prepares redisplay edit/create screen
+		private ModelAndView prepareRedisplayEditMav(
+				TrackedDocumentForm trackedDocumentForm,
+				final List<TrackedDocumentCategory> categories,
+				final Offender offender, final Boolean createFlag,
+				final int itemIndex, final BindingResult result) {
+			ModelAndView mav = this.prepareEditMav(trackedDocumentForm,
+				categories, offender,createFlag, itemIndex);
+			mav.addObject(BindingResult.MODEL_KEY_PREFIX
+				+ TRACKED_DOCUMENT_MODEL_KEY, result);
+			return mav;
+		}	
 		
 	/**
 	 * Handles {@code TrackedDocumentReceivalExistsException}.
@@ -504,5 +539,7 @@ public class TrackedDocumentController {
 		binder.registerCustomEditor(TrackedDocumentCategory.class,
 			this.trackedDocumentCategoryPropertyEditorFactory
 			.createPropertyEditor());
+		binder.registerCustomEditor(Date.class, this.customDateEditorFactory
+			.createCustomDateOnlyEditor(true));
 	}	
 }

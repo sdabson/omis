@@ -13,10 +13,9 @@
   
   <!-- Validators -->
   
-  <!-- <bean id="trackedDocumentFormValidator"
+  <bean id="trackedDocumentFormValidator"
         class="omis.trackeddocument.web.validator.TrackedDocumentFormValidator">
-        <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
-  </bean>  --> 
+  </bean>  
 
   <!-- Web controller packages -->
   
@@ -25,7 +24,17 @@
   <!-- Use controller transactions -->
   
   <aop:config>
+      <aop:pointcut id="reportTrackedDocumentControllerOperation" expression="execution(* omis.trackeddocument.web.controller.ReportTrackedDocumentController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportTrackedDocumentControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="manageTrackedDocumentControllerOperation" expression="execution(* omis.trackeddocument.web.controller.ManageTrackedDocumentController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageTrackedDocumentControllerOperation"/>
+  </aop:config>
+  
+  <!-- <aop:config>
       <aop:pointcut id="trackedDocumentControllerOperation" expression="execution(* omis.trackeddocument.web.controller.TrackedDocumentController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="trackedDocumentControllerOperation"/>
-  </aop:config>
+  </aop:config> -->
 </beans>

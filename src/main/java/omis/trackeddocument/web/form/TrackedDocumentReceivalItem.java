@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import omis.trackeddocument.domain.TrackedDocumentCategory;
+import omis.trackeddocument.domain.TrackedDocumentReceival;
 import omis.user.domain.UserAccount;
 
 /**
@@ -20,30 +21,13 @@ public class TrackedDocumentReceivalItem implements Serializable {
 	private Date receivedDate;
 	private UserAccount receivedByUserAccount;
 	private TrackedDocumentReceivalItemOperation operation;
+	private TrackedDocumentReceival trackedDocumentReceival;
 	
 	/**
 	 * Instantiates a default instance of tracked document receival.
 	 */
 	public TrackedDocumentReceivalItem() {
 		//Default constructor.
-	}
-
-	/**
-	 * Gets the ID.
-	 *
-	 * @return the id
-	 */
-	public Long getId() {
-		return this.id;
-	}
-
-	/**
-	 * Sets the ID.
-	 *
-	 * @param id id
-	 */
-	public void setId(final Long id) {
-		this.id = id;
 	}
 
 	/**
@@ -118,5 +102,40 @@ public class TrackedDocumentReceivalItem implements Serializable {
 	public void setOperation(final TrackedDocumentReceivalItemOperation
 		operation) {
 		this.operation = operation;
+	}
+	
+	/**
+	 * Get tracked document receival.
+	 * @return tracked document receival
+	 */
+	public TrackedDocumentReceival getTrackedDocumentReceival() {
+		return this.trackedDocumentReceival;
+	}
+	
+	/**
+	 * Set tracked document receival.
+	 * @param trackedDocumentReceival tracked document receival
+	 */
+	public void setTrackedDocumentReceival(final TrackedDocumentReceival
+		trackedDocumentReceival) {
+		this.trackedDocumentReceival = trackedDocumentReceival;
+	}
+	
+	/**
+	 * Gets the ID.
+	 *
+	 * @return the id
+	 */
+	public Long getId() {
+		return this.id;
+	}
+
+	/**
+	 * Sets the ID.
+	 *
+	 * @param id id
+	 */
+	public void setId(final Long id) {
+		this.id = id;
 	}
 }

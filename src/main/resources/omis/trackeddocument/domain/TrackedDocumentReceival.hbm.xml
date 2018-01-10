@@ -16,9 +16,9 @@
 			entity-name="omis.docket.domain.Docket" unique="false"/>
 		<many-to-one name="category" column="`CATEGORY_ID`" cascade="none" not-null="true"
 			entity-name="omis.trackeddocument.domain.TrackedDocumentCategory" unique="false"/>
-		<many-to-one name="receivedByUserAccount" column="`RECEIVED_BY_ACCOUNT_ID`" cascade="none" not-null="true"
+		<many-to-one name="receivedByUserAccount" column="`RECEIVED_BY_ACCOUNT_ID`" cascade="none" not-null="false"
 			entity-name="omis.user.domain.UserAccount" unique="false"/>
-		<property name="receivedDate" column="`RECEIVED_DATE`" type="java.util.Date" not-null="true"/>
+		<property name="receivedDate" column="`RECEIVED_DATE`" type="java.util.Date" not-null="false"/>
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 				not-null="true" />

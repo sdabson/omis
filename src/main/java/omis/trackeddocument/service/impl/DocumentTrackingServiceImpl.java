@@ -3,8 +3,6 @@ package omis.trackeddocument.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import omis.docket.domain.Docket;
 import omis.docket.service.delegate.DocketDelegate;
 import omis.person.domain.Person;
@@ -100,9 +98,7 @@ public class DocumentTrackingServiceImpl
 	
 	/** {@inheritDoc} */
 	@Override
-	public UserAccount findUserAccount() {
-		String username = SecurityContextHolder.getContext()
-			.getAuthentication().getName();
+	public UserAccount findUserAccount(final String username) {
 		return this.userAccountDelegate.findByUsername(username);
 	}
 }

@@ -13,7 +13,10 @@ public enum TrackedDocumentReceivalItemOperation {
 	CREATE,
 	
 	/** Edit an existing tracked document. */
-	EDIT;
+	EDIT,
+	
+	/** Remove an existing tracked document. */
+	REMOVE;
 	
 	/**
 	 * Returns {@code this.name()}.

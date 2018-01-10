@@ -5,26 +5,52 @@
  */
 
 window.onload = function() {
-	for(var x=0; x<itemIndex; x++){
-		var trackedDocumentItemRemoveLink = document.getElementById("trackedDocumentItemRemoveLink[" + x + "]");
-		trackedDocumentItemRemoveLink.onclick = function() {
-			alert("3");
-			var operation = document.getElementById(this.getAttribute("id").replace("trackedDocumentItemRemoveLink", "trackedDocumentItemOperation"));
-			trackedDocumentTableRow = document.getElementById(this.getAttribute("id").replace("trackedDocumentItemRemoveLink", "trackedDocumentItemTableRow"));
-			trackedDocumentTableRow.parentNode.removeChild(trackedDocumentTableRow);
+	function applyExistingReceivalItemBehavior(x){
+		var existingItemRemoveLink = document.getElementById("trackedDocumentItemRemoveLink[" + x + "]");
+		existingItemRemoveLink.onclick = function() {
+			var existingItemOperation = document.getElementById(this.getAttribute("id").replace("trackedDocumentItemRemoveLink", "trackedDocumentItemOperation"));
+			var existingItemRow = document.getElementById("trackedDocumentItemTableRow[" + x + "]");
+			if(existingItemOperation.value == "EDIT"){
+				if (!ui.hasClass(existingItemRow, "removeRow")) {
+					ui.addClass(existingItemRow, "removeRow");
+					existingItemOperation.value = "REMOVE";
+				} 
+			} else if (existingItemOperation.value == "REMOVE"){
+				if(ui.hasClass(existingItemRow, "removeRow")) {
+					ui.removeClass(existingItemRow, "removeRow");
+					existingItemOperation.value = "EDIT";
+				}
+			}
 			return false;
-		};
+		}
 	}
-	
+
 	function applyTrackedDocumentRowBehavior(trackedDocumentItemIndex) {
-		var trackedDocumentItemRemoveLink = document.getElementById("trackedDocumentItemRemoveLink[" + trackedDocumentItemIndex + "]");
-		trackedDocumentItemRemoveLink.onclick = function() {
+		var newTrackedDocumentItemRemoveLink = document.getElementById("trackedDocumentItemRemoveLink[" + trackedDocumentItemIndex + "]");
+		newTrackedDocumentItemRemoveLink.onclick = function() {
 			var operation = document.getElementById(this.getAttribute("id").replace("trackedDocumentItemRemoveLink", "trackedDocumentItemOperation"));
 			trackedDocumentTableRow = document.getElementById(this.getAttribute("id").replace("trackedDocumentItemRemoveLink", "trackedDocumentItemTableRow"));
 			trackedDocumentTableRow.parentNode.removeChild(trackedDocumentTableRow);
 			return false;
 		};
 		applyDatePicker(document.getElementById("trackedDocumentItemsDate["+trackedDocumentItemIndex + "]"));
+	}
+
+	for(var x=0; x<itemIndex; x++){
+		var existingTrackedDocumentItemRemoveLink = document.getElementById("trackedDocumentItemRemoveLink[" + x + "]");
+		var operation = document.getElementById("trackedDocumentItemOperation[" + x + "]");
+		var row = document.getElementById("trackedDocumentItemTableRow[" + x + "]");
+		if(operation.value == "REMOVE"){
+			if(!ui.hasClass(row, "removeRow")) {
+				ui.addClass(row, "removeRow");
+			}
+		}
+		if(operation.value == "REMOVE" || operation.value == "EDIT"){
+			applyExistingReceivalItemBehavior(x)
+		}
+		if(operation.value == "CREATE"){
+			applyTrackedDocumentRowBehavior(x);
+		}
 	}
 	
 	applyActionMenu(document.getElementById("trackedDocumentEditTableActionMenuLink"), function() {
