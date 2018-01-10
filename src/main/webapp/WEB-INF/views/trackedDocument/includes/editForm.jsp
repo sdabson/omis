@@ -9,13 +9,12 @@
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:bundle basename="omis.trackeddocument.msgs.trackedDocument">
 <form:form commandName="trackedDocumentForm" class="editForm">
-	<form:hidden path="createUserAccount"/>
 	<fieldset>
 		<span class="fieldGroup">
 		 <c:choose>
 			<c:when test="${createFlag}">
 				<form:label path="docket" class="fieldLabel">
-					<fmt:message key="createDocketLabel"></fmt:message>
+					<fmt:message key="docketLabel"></fmt:message>
 				</form:label>
 				<form:select path="docket">
 					<option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></option>
@@ -25,7 +24,7 @@
 								<option value="${optionDocket.id}" selected="selected"><c:out value="${optionDocket.value}"/><c:out value="${optionDocket.court.location.address.value }"/>
 							</c:when>
 							<c:otherwise>
-								<option value="${optionDocket.id}"><c:out value="${optionDocket.value}"/><c:out value="${optionDocket.court.location.address.value }"/>
+								<option value="${optionDocket.id}"><c:out value="${optionDocket.value}"/> <c:out value="${optionDocket.court.name}"/>
 							</c:otherwise>
 						</c:choose>
 					</c:forEach>
@@ -33,7 +32,7 @@
 				<form:errors path="docket" cssClass="error"/>
 			</c:when>
 			<c:otherwise>
-				<fmt:message key="existingDocketLabel"> </fmt:message><c:out value="${trackedDocumentForm.docket.value}"/><c:out value="${trackedDocumentForm.docket.court.location.address.value }"/>
+				<fmt:message key="existingDocketLabel"> </fmt:message><c:out value="${trackedDocumentForm.docket.value}"/> <c:out value="${trackedDocumentForm.docket.court.name}"/>
 			</c:otherwise>
 		</c:choose>
 		</span>
@@ -42,7 +41,7 @@
 		<thead>
 			<tr>
 				<th class="operation">
-					<a class="actionMenuItem" id="trackedDocumentEditTableActionMenuLink" href="${pageContext.request.contextPath}/trackedDocument/trackedDocumentEditTableActionMenu.html?offender=${offender.id}"></a>
+					<a class="actionMenuItem" id="trackedDocumentEditTableActionMenuLink" href="${pageContext.request.contextPath}/trackedDocumentManage/trackedDocumentEditTableActionMenu.html?offender=${offender.id}"></a>
 				</th>			
 				<th><fmt:message key="documentLabel"/></th>
 				<th><fmt:message key="receivedDateLabel"/></th>

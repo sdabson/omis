@@ -11,7 +11,7 @@
 	<ul>
 		<sec:authorize access="hasRole('TRACKED_DOCUMENT_LIST') or hasRole('ADMIN')">
 			<li>
-				<a class="listLink" href="${pageContext.request.contextPath}/trackedDocument/list.html?offender=${offender.id}">
+				<a class="listLink" href="${pageContext.request.contextPath}/trackedDocumentReport/list.html?offender=${offender.id}">
 					<span class="visibleLinkLabel"><fmt:message key="listTrackedDocuments" /></span>
 				</a>
 			</li>

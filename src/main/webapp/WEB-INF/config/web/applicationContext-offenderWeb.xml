@@ -37,6 +37,9 @@
   <bean id="relationshipsProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
     <constructor-arg name="defaultEnabled" value="true"/>
   </bean>
+  <bean id="boardOfPardonsAndParoleProfileItemRegistry" class="omis.web.profile.ProfileItemRegistry">
+    <constructor-arg name="defaultEnabled" value="true"/>
+  </bean>
 	
 	
 

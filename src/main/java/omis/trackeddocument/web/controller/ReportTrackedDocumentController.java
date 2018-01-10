@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
-import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.docket.domain.Docket;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
@@ -25,15 +24,12 @@ import omis.person.domain.Person;
 import omis.trackeddocument.report.DocketDocumentReceivalSummary;
 import omis.trackeddocument.report.DocketDocumentTrackingReportService;
 import omis.trackeddocument.service.DocumentTrackingService;
-import omis.trackeddocument.service.delegate.TrackedDocumentReceivalDelegate;
-import omis.trackeddocument.web.validator.TrackedDocumentFormValidator;
-import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * Controller for tracked document.
+ * Controller for tracked document report.
  * 
  * @author Yidong Li
- * @version 0.1.5 (Jan 8, 2017)
+ * @version 0.1.5 (Jan 8, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -64,36 +60,12 @@ public class ReportTrackedDocumentController {
 	
 	/* Property editor. */
 	@Autowired
-	@Qualifier("trackedDocumentReceivalPropertyEditorFactory")
-	private PropertyEditorFactory trackedDocumentReceivalPropertyEditorFactory;
-	
-	@Autowired
-	@Qualifier("trackedDocumentCategoryPropertyEditorFactory")
-	private PropertyEditorFactory trackedDocumentCategoryPropertyEditorFactory;
-	
-	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
 	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
 	
 	@Autowired
-	@Qualifier("datePropertyEditorFactory")
-	private CustomDateEditorFactory customDateEditorFactory1;
-		
-	@Autowired
-	@Qualifier("personPropertyEditorFactory")
-	private PropertyEditorFactory personPropertyEditorFactory;
-		
-	@Autowired
-	@Qualifier("userAccountPropertyEditorFactory")
-	private PropertyEditorFactory userAccountPropertyEditorFactory;
-	
-	@Autowired
 	@Qualifier("docketPropertyEditorFactory")
 	private PropertyEditorFactory docketPropertyEditorFactory;
-	
-	@Autowired
-	@Qualifier("datePropertyEditorFactory")
-	private CustomDateEditorFactory customDateEditorFactory;
 		
 	/* Services. */
 	@Autowired
@@ -107,24 +79,11 @@ public class ReportTrackedDocumentController {
 	
 	/* Delegate */
 	@Autowired
-	@Qualifier("trackedDocumentReceivalDelegate")
-	private TrackedDocumentReceivalDelegate trackedDocumentReceivalDelegate;
-	
-	@Autowired
 	@Qualifier("offenderSummaryModelDelegate")
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
 	
-	@Autowired
-	@Qualifier("businessExceptionHandlerDelegate")
-	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
-	
-	/* Validator */
-	@Autowired
-	@Qualifier("trackedDocumentFormValidator")
-	private TrackedDocumentFormValidator trackedDocumentFormValidator;	
-	
 	/* Constructor. */
-	/** Instantiates a default tracked document controller. */
+	/** Instantiates a default tracked document report controller. */
 	public ReportTrackedDocumentController() {
 		// Default instantiation
 	}
@@ -153,11 +112,10 @@ public class ReportTrackedDocumentController {
 	}
 	
 	/**
-	 * Removes an existing tracked document receival.
+	 * Removes existing tracked document receival related to certain docket.
 	 * 
-	 * @param familyAssociation family association
-	 * @param trackedDocumentReceival tracked document receival
-	 * @return redirect to list religious preferences
+	 * @param offender offender
+	 * @return redirect to list screen
 	 */
 	@RequestMapping("/remove.html")
 	@PreAuthorize("hasRole('TRACKED_DOCUMENT_REMOVE') or hasRole('ADMIN')")
@@ -191,7 +149,7 @@ public class ReportTrackedDocumentController {
 	 * pertaining to the specified docket.
 	 * 
 	 * @param docket docket
-	 * @return model and view for document tracking list screen action menu
+	 * @return model and view for document tracking row action menu
 	 */
 	@RequestMapping(value = "/trackedDocumentListRowActionMenu.html",
 	method = RequestMethod.GET)

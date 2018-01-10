@@ -137,7 +137,7 @@
     </sec:authorize>
     <sec:authorize access="hasRole('TRACKED_DOCUMENT_LIST') or hasRole('ADMIN')">
     	<li class="moduleLink">
-    		<a href="${pageContext.request.contextPath}/trackedDocument/list.html?offender=${offenderSummary.id}">
+    		<a href="${pageContext.request.contextPath}/trackedDocumentReport/list.html?offender=${offenderSummary.id}">
     			<fmt:message key="documentTrackingLink"/>
     		</a>
     	</li>

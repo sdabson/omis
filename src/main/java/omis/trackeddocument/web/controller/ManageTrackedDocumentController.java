@@ -29,9 +29,7 @@ import omis.person.domain.Person;
 import omis.trackeddocument.domain.TrackedDocumentCategory;
 import omis.trackeddocument.domain.TrackedDocumentReceival;
 import omis.trackeddocument.exception.TrackedDocumentReceivalExistsException;
-import omis.trackeddocument.report.DocketDocumentTrackingReportService;
 import omis.trackeddocument.service.DocumentTrackingService;
-import omis.trackeddocument.service.delegate.TrackedDocumentReceivalDelegate;
 import omis.trackeddocument.web.form.TrackedDocumentForm;
 import omis.trackeddocument.web.form.TrackedDocumentReceivalItem;
 import omis.trackeddocument.web.form.TrackedDocumentReceivalItemOperation;
@@ -43,7 +41,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Controller for tracked document.
  * 
  * @author Yidong Li
- * @version 0.1.5 (Jan 8, 2017)
+ * @version 0.1.5 (Jan 8, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -85,11 +83,12 @@ public class ManageTrackedDocumentController {
 	= "trackeddocument";
 	
 	/* Message bundles. */
-	private static final String ERROR_BUNDLE_NAME = "omis.family.msgs.form";
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.trackeddocument.msgs.form";
 				
 	/* Redirects. */
 	private static final String LIST_REDIRECT
-		= "redirect:/trackedDocumentManage/list.html?offender=%d";
+		= "redirect:/trackedDocumentReport/list.html?offender=%d";
 	
 	/* Property editor. */
 	@Autowired
@@ -103,10 +102,6 @@ public class ManageTrackedDocumentController {
 	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
 	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
-	
-	@Autowired
-	@Qualifier("datePropertyEditorFactory")
-	private CustomDateEditorFactory customDateEditorFactory1;
 		
 	@Autowired
 	@Qualifier("personPropertyEditorFactory")
@@ -129,16 +124,7 @@ public class ManageTrackedDocumentController {
 	@Qualifier("documentTrackingService")
 	private DocumentTrackingService documentTrackingService;
 	
-	@Autowired
-	@Qualifier("docketDocumentTrackingReportService")
-	private DocketDocumentTrackingReportService
-	docketDocumentTrackingReportService;
-	
 	/* Delegate */
-	@Autowired
-	@Qualifier("trackedDocumentReceivalDelegate")
-	private TrackedDocumentReceivalDelegate trackedDocumentReceivalDelegate;
-	
 	@Autowired
 	@Qualifier("offenderSummaryModelDelegate")
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
@@ -153,7 +139,7 @@ public class ManageTrackedDocumentController {
 	private TrackedDocumentFormValidator trackedDocumentFormValidator;	
 	
 	/* Constructor. */
-	/** Instantiates a default tracked document controller. */
+	/** Instantiates a default tracked document management controller. */
 	public ManageTrackedDocumentController() {
 		// Default instantiation
 	}
@@ -181,7 +167,8 @@ public class ManageTrackedDocumentController {
 	 * 
 	 * @param offender offender
 	 * @param trackedDocumentForm tracked document form
-	 * @return model and view to create a new tracked document
+	 * @param result binding result
+	 * @return model and view of list screen
 	 * @throws TrackedDocumentReceivalExistsException 
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
@@ -224,7 +211,7 @@ public class ManageTrackedDocumentController {
 	 * Edit tracked documents.
 	 * 
 	 * @param docket docket
-	 * @return model and view to edit tracked documents
+	 * @return model and view to edit tracked documents screen
 	 * 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.GET)
@@ -258,7 +245,8 @@ public class ManageTrackedDocumentController {
 	 * 
 	 * @param docket docket
 	 * @param trackedDocumentForm submitted form
-	 * @return model and view to list screen
+	 * @param result binding result
+	 * @return model and view for list screen
 	 * @throws TrackedDocumentReceivalExistsException 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
@@ -310,29 +298,11 @@ public class ManageTrackedDocumentController {
 	}
 	
 	/**
-	 * Removes an existing tracked document receival.
-	 * 
-	 * @param familyAssociation family association
-	 * @param trackedDocumentReceival tracked document receival
-	 * @return redirect to list religious preferences
-	 */
-	@RequestMapping("/remove.html")
-	@PreAuthorize("hasRole('TRACKED_DOCUMENT_REMOVE') or hasRole('ADMIN')")
-	public ModelAndView remove(
-		@RequestParam(value = "docket", required = true)
-			final Docket docket) {
-		Offender offender = (Offender) docket.getPerson();
-		this.documentTrackingService.removeByDocket(docket);
-		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
-	}	
-	
-	/**
-	 * Returns a view for action menu of the screen 
-	 * pertaining to a specific offender.
+	 * Returns an action menu of the edit screen action menu 
 	 * 
 	 * @param offender offender
-	 * @return model and view for for a list of tracked documents 
-	 * pertaining to a specific offender.
+	 * @return model and view for action menu of the edit screen action menu 
+	 *
 	 */
 	@RequestMapping(value = "/trackedDocumentEditScreenActionMenu.html",
 	method = RequestMethod.GET)
@@ -345,12 +315,10 @@ public class ManageTrackedDocumentController {
 	}
 	
 	/**
-	 * Returns an action menu for the table of edit screen of tracked documents 
-	 * pertaining to a specific offender.
+	 * Returns an action menu for the table of edit screen
 	 * 
 	 * @param offender offender
-	 * @return model and view for an action menu for the table of edit screen of
-	 * tracked documents
+	 * @return An action menu for the table of edit screen
 	 */
 	@RequestMapping(value = "/trackedDocumentEditTableActionMenu.html",
 	method = RequestMethod.GET)
@@ -367,6 +335,7 @@ public class ManageTrackedDocumentController {
 	 * Adds a row for a tracked document item.
 	 * 
 	 * @param trackedDocumentIndex tracked document index
+	 * @param offender offender
 	 * @return model and view for a row of tracked document
 	 */
 	@RequestMapping(value = "/addTrackedDocumentItem.html",
@@ -422,18 +391,17 @@ public class ManageTrackedDocumentController {
 		return mav;
 	}	
 	
-	// Prepares redisplay edit/create screen
-		private ModelAndView prepareRedisplayEditMav(
-				TrackedDocumentForm trackedDocumentForm,
-				final List<TrackedDocumentCategory> categories,
-				final Offender offender, final Boolean createFlag,
-				final int itemIndex, final BindingResult result) {
-			ModelAndView mav = this.prepareEditMav(trackedDocumentForm,
-				categories, offender,createFlag, itemIndex);
-			mav.addObject(BindingResult.MODEL_KEY_PREFIX
-				+ TRACKED_DOCUMENT_MODEL_KEY, result);
-			return mav;
-		}	
+	private ModelAndView prepareRedisplayEditMav(
+			TrackedDocumentForm trackedDocumentForm,
+			final List<TrackedDocumentCategory> categories,
+			final Offender offender, final Boolean createFlag,
+			final int itemIndex, final BindingResult result) {
+		ModelAndView mav = this.prepareEditMav(trackedDocumentForm,
+			categories, offender,createFlag, itemIndex);
+		mav.addObject(BindingResult.MODEL_KEY_PREFIX
+			+ TRACKED_DOCUMENT_MODEL_KEY, result);
+		return mav;
+	}	
 		
 	/**
 	 * Handles {@code TrackedDocumentReceivalExistsException}.

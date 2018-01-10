@@ -25,7 +25,9 @@
 				<c:out value="${trackedDocumentReceivalItem.category.name}"/>
 			</td>
 			<td>
-				<c:out value="${trackedDocumentReceivalItem.receivedDate}"/>
+				<c:if test="${trackedDocumentReceivalItem.receivedDate!=null}">
+					<fmt:formatDate value="${trackedDocumentReceivalItem.receivedDate}" pattern="MM/dd/yyyy" />
+				</c:if>
 			</td>
 			<input id="trackedDocumentItemCategory[${trackedDocumentReceivalIndex}]" name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].category" type="hidden" value="${trackedDocumentReceivalItem.category.id}"/>
 			<input id="trackedDocumentItemReceivedDate[${trackedDocumentReceivalIndex}]" name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" type="hidden" value="<fmt:formatDate value="${trackedDocumentReceivalItem.receivedDate}" pattern="MM/dd/yyyy"/>"/>
@@ -48,28 +50,15 @@
 				<form:errors path="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].category" cssClass="error"/>
 			</td>
 			<td>
-				<%-- <fmt:formatDate var="noteDate" value="${trackedDocumentReceivalItem.receivedDate}" pattern="MM/dd/yyyy"/>
-				<input type="text" class="date" name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" id="trackedDocumentItemsDate[${trackedDocumentReceivalIndex}]" value="${noteDate}"/>
-				<form:errors path="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" cssClass="error"/> --%>
-			
-				<%-- <form:select path = "workAssignmentChangeReason">
-					<form:option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></form:option>
-					<form:options items="${workAssignmentChangeReasons}" itemValue="id" itemLabel="name"/>
-				</form:select>
-				<form:errors path="workAssignmentChangeReason" cssClass="error"/> --%>
-			
-			
-				<%-- <input name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" id="trackedDocumentItemsDate[${trackedDocumentReceivalIndex}]"
-					class="date" value="${trackedDocumentReceivalItem.receivedDate}"/>
-				<form:errors path="accommodationNotes[${noteIndex}].date" cssClass="error"/> --%>
-				<fmt:formatDate value="${trackedDocumentReceivalItem.receivedDate}" type="date" var="formattedResultsDate"/>
-				<input type="text" class="date" id="trackedDocumentItemsDate[${trackedDocumentReceivalIndex}]" name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" value="${trackedDocumentReceivalItem.receivedDate}"/>
+				<input type="text" class="date" id="trackedDocumentItemsDate[${trackedDocumentReceivalIndex}]" name="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${trackedDocumentReceivalItem.receivedDate}'/>"/>
 				<form:errors path="trackedDocumentReceivalItems[${trackedDocumentReceivalIndex}].receivedDate" cssClass="error"/>
 			</td>
 		</c:otherwise>
 	</c:choose>
 	<td>
-		<c:out value="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.lastName}"/>, <c:out value="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.firstName}"/> <c:if test="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.middleName ne null}"><c:out value="${fn:substring(trackedDocumentReceivalItem.receivedByUserAccount.user.name.middleName, 0, 1)}."/></c:if> <c:out value="(${trackedDocumentReceivalItem.receivedByUserAccount.username})"/>
+		<c:if test="${trackedDocumentReceivalItem.receivedByUserAccount!=null}">
+			<c:out value="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.lastName}"/>, <c:out value="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.firstName}"/> <c:if test="${trackedDocumentReceivalItem.receivedByUserAccount.user.name.middleName ne null}"><c:out value="${fn:substring(trackedDocumentReceivalItem.receivedByUserAccount.user.name.middleName, 0, 1)}."/></c:if> <c:out value="(${trackedDocumentReceivalItem.receivedByUserAccount.username})"/>
+		</c:if>
 	</td>
 </tr>
 </fmt:bundle>

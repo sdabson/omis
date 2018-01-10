@@ -32,9 +32,4 @@
       <aop:pointcut id="manageTrackedDocumentControllerOperation" expression="execution(* omis.trackeddocument.web.controller.ManageTrackedDocumentController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageTrackedDocumentControllerOperation"/>
   </aop:config>
-  
-  <!-- <aop:config>
-      <aop:pointcut id="trackedDocumentControllerOperation" expression="execution(* omis.trackeddocument.web.controller.TrackedDocumentController.*(..))"/>
-      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="trackedDocumentControllerOperation"/>
-  </aop:config> -->
 </beans>

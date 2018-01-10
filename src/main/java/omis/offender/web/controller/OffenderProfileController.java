@@ -217,6 +217,10 @@ public class OffenderProfileController {
 	@Autowired
 	@Qualifier("relationshipsProfileItemRegistry")
 	private ProfileItemRegistry relationshipsProfileItemRegistry;
+	
+	@Autowired
+	@Qualifier("boardOfPardonsAndParoleProfileItemRegistry")
+	private ProfileItemRegistry boardOfPardonsAndParoleProfileItemRegistry;
 
 	/* Report runners. */
 	
@@ -477,6 +481,33 @@ public class OffenderProfileController {
 				offender, userAccount, currentDate);
 		map.addAttribute(PROFILE_ITEM_REGISTRY_MODEL_KEY,
 				this.relationshipsProfileItemRegistry);
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		
+		return new ModelAndView(PROFILE_ITEM_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Displays the view for Board of Pardons And Parole profile for the
+	 * specified Offender.
+	 * 
+	 * @param offender - Offender
+	 * @return ModelAndView - view for Board of Pardons And Parole profile for
+	 * the specified Offender
+	 */
+	@RequestMapping(value = "/boardOfPardonsAndParoleProfile.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayBoardPardonsParoleProfileItem(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender) {
+		ModelMap map = new ModelMap();
+		Date currentDate = new Date();
+		UserAccount userAccount = this.userAccountService.findByUsername(
+				SecurityContextHolder.getContext()
+					.getAuthentication().getName());
+		this.buildProfileItems(this.boardOfPardonsAndParoleProfileItemRegistry,
+				map, offender, userAccount, currentDate);
+		map.addAttribute(PROFILE_ITEM_REGISTRY_MODEL_KEY,
+				this.boardOfPardonsAndParoleProfileItemRegistry);
 		map.addAttribute(OFFENDER_MODEL_KEY, offender);
 		
 		return new ModelAndView(PROFILE_ITEM_VIEW_NAME, map);

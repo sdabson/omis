@@ -42,7 +42,7 @@
 			<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
 		</c:if>
 		<h1>
-			<a class="actionMenuItem" id="trackedDocumentEditActionMenuLink" href="${pageContext.request.contextPath}/trackedDocument/trackedDocumentEditScreenActionMenu.html?offender=${offenderSummary.id}"></a><span class="visibleLinkLabel"/>
+			<a class="actionMenuItem" id="trackedDocumentEditActionMenuLink" href="${pageContext.request.contextPath}/trackedDocumentManage/trackedDocumentEditScreenActionMenu.html?offender=${offenderSummary.id}"></a><span class="visibleLinkLabel"/>
 			<c:choose>
 				<c:when test="${createFlag}">
 					<fmt:message key="trackDocumentLabel" bundle="${trackedDocument}"></fmt:message>

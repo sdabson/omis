@@ -42,6 +42,9 @@
 			<div class="navBarItem accentDark" id="relationshipsProfile">
 				<fmt:message key="relationshipsLabel"/>
 			</div>
+			<div class="navBarItem accentDark" id="boardOfPardonsAndParoleProfile">
+				<fmt:message key="boardPardonsParoleLabel"/>
+			</div>
 		</div>
 	</div>
 	</div>
@@ -54,5 +57,6 @@
 		<div class="navContent accentDark" id="complianceProfileContent"></div>
 		<div class="navContent accentDark" id="healthProfileContent"></div>
 		<div class="navContent accentDark" id="relationshipsProfileContent"></div>
+		<div class="navContent accentDark" id="boardOfPardonsAndParoleProfileContent"></div>
 	</div>
 </fmt:bundle>

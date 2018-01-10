@@ -13,7 +13,7 @@
 	<c:forEach var="trackedDocumentSummaryItem" items="${docketDocumentReceivalSummaries}" varStatus="status">
 	<tr>
 		<td>
-			<a class="actionMenuItem trackedDocumentListRowActionMenuItem" id="trackedDocumentActionMenuLink${status.index}" href="${pageContext.request.contextPath}/trackedDocument/trackedDocumentListRowActionMenu.html?docket=${trackedDocumentSummaryItem.docketId}"></a>	
+			<a class="actionMenuItem trackedDocumentListRowActionMenuItem" id="trackedDocumentActionMenuLink${status.index}" href="${pageContext.request.contextPath}/trackedDocumentReport/trackedDocumentListRowActionMenu.html?docket=${trackedDocumentSummaryItem.docketId}"></a>	
 		</td>
 		<td>
 			<c:out value="${trackedDocumentSummaryItem.docketValue}"/> - <c:out value="${trackedDocumentSummaryItem.courtName}"/>

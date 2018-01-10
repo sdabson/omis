@@ -63,7 +63,7 @@ public class TrackedDocumentReceivalDaoHibernateImpl
 				.getNamedQuery(FIND_EXISTING_RECEIVAL_QUERY_NAME)
 				.setParameter(DOCKET_PARAM_NAME, docket)
 				.setParameter(CATEGORY_PARAM_NAME, category)
-				.setParameter(RECEIVED_DATE_PARAM_NAME, receivedDate)
+				.setTimestamp(RECEIVED_DATE_PARAM_NAME, receivedDate)
 				.uniqueResult();
 		return receival;
 	}

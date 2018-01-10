@@ -8,7 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
- * Validator for form for tracked document.
+ * Validator for submitted tracked document form.
  * 
  * @author Yidong
  * @version 0.1.0 (Jan 4, 2018)
@@ -44,31 +44,31 @@ public class TrackedDocumentFormValidator
 					if(form.getDocket()==null){
 						errors.rejectValue("docket","docket.empty");
 					}
+					if (item.getCategory() == null) {
+						errors.rejectValue("trackedDocumentReceivalItems[" 
+								+ index + "].category", "category.empty");
+					}
+					if (item.getReceivedByUserAccount() == null) {
+						errors.rejectValue("trackedDocumentReceivalItems[" 
+						+ index + "].receivedByUserAccount",
+						"receivedByUserAccount.empty");
+					}
 					
-//					if (TrackedDocumentReceivalItemOperation.CREATE.equals(
-//							item.getOperation())) {
-						if (item.getCategory() == null) {
-							errors.rejectValue("trackedDocumentReceivalItems[" 
-									+ index + "].category", "category.empty");
-						}
-						if (item.getReceivedByUserAccount() == null) {
-							errors.rejectValue("trackedDocumentReceivalItems[" 
-							+ index + "].receivedByUserAccount",
-							"receivedByUserAccount.empty");
-						}
-//					}
-				
 					for (int innerIndex = index+1;
 						innerIndex < form.getTrackedDocumentReceivalItems()
 						.size(); innerIndex++) {
 						if((form.getTrackedDocumentReceivalItems().get(index)
 							.getCategory().equals(
 							form.getTrackedDocumentReceivalItems()
-							.get(innerIndex).getCategory()))&&(
-							form.getTrackedDocumentReceivalItems().get(index)
+							.get(innerIndex).getCategory()))
+							&&((form.getTrackedDocumentReceivalItems()
+							.get(index).getReceivedDate()==null
+							&&form.getTrackedDocumentReceivalItems()
+							.get(innerIndex).getReceivedDate()==null)
+							||(form.getTrackedDocumentReceivalItems().get(index)
 							.getReceivedDate().equals(
 							form.getTrackedDocumentReceivalItems()
-							.get(innerIndex).getReceivedDate()))){
+							.get(innerIndex).getReceivedDate())))){
 							errors.rejectValue(
 							"trackedDocumentReceivalItems["	+ innerIndex
 								+ "].category", 

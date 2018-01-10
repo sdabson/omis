@@ -11,7 +11,7 @@
 	<ul>
 		<sec:authorize access="hasRole('TRACKED_DOCUMENT_CREATE') or hasRole('ADMIN')">
 			<li>
-				<a class="createLink" id="trackedDocumentListScreenActionMenuLink" href="${pageContext.request.contextPath}/trackedDocument/create.html?offender=${offender.id}">
+				<a class="createLink" id="trackedDocumentListScreenActionMenuLink" href="${pageContext.request.contextPath}/trackedDocumentManage/create.html?offender=${offender.id}">
 					<span class="visibleLinkLabel">
 						<fmt:message key="trackDocumentLabel"/>
 					</span>

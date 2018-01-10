@@ -36,8 +36,8 @@
 			omis.trackeddocument.domain.TrackedDocumentReceival receival
 		where
 			receival.docket = :docket
+			and ((receival.receivedDate is null and :receivedDate is null) or (receival.receivedDate is not null and :receivedDate is not null and receival.receivedDate = :receivedDate))
 			and receival.category = :category
-			and receival.receivedDate = :receivedDate
 		order by receival.receivedDate
 	]]></query>
 	

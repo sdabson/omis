@@ -25,7 +25,7 @@
  	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
  	</c:if>
  	<h1>
-		<a class="actionMenuItem" id="trackedDocumentListActionMenuLink" href="${pageContext.request.contextPath}/trackedDocument/trackedDocumentListScreenActionMenu.html?offender=${offender.id}"></a><span class="visibleLinkLabel"/>
+		<a class="actionMenuItem" id="trackedDocumentListActionMenuLink" href="${pageContext.request.contextPath}/trackedDocumentReport/trackedDocumentListScreenActionMenu.html?offender=${offender.id}"></a><span class="visibleLinkLabel"/>
 		<fmt:message key="documentTrackingListHeader"/>
 	</h1>
 	<jsp:include page="includes/listTable.jsp"/>
