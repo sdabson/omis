@@ -13,31 +13,85 @@ window.onload = function() {
 		applyDatePicker(document.getElementById("endDate"));
 		applyDatePicker(document.getElementById("marriageDateInput"));
 		applyDatePicker(document.getElementById("divorceDateInput"));
-		applyActionMenu(document.getElementById("telephoneNumbersActionMenuLink"),addFamilyAssociationTelephoneNumberItem);
-		applyActionMenu(document.getElementById("onlineAccountActionMenuLink"),addFamilyAssociationEmailItem);
-		applyActionMenu(document.getElementById("noteActionMenuLink"),addFamilyAssociationNoteItem);
+		
+		applyActionMenu(document.getElementById("telephoneNumbersActionMenuLink"), function() {
+			var createTelephoneNumberLink = document.getElementById("addFamilyAssociationTelephoneNumberItemLink");
+			createTelephoneNumberLink.onclick = function() {
+			var url = createTelephoneNumberLink.getAttribute("href") + "?" + "&telephoneNumberItemIndex=" + familyAssociationTelephoneNumberIndex;
+			var request = new XMLHttpRequest();
+			request.open("GET", url, false);
+			request.send();
+			if (request.status == 200) {
+				ui.appendHtml(document.getElementById("telephoneNumbersBody"), request.responseText);
+				applyTelephoneNumberRowBehavior(familyAssociationTelephoneNumberIndex);
+				familyAssociationTelephoneNumberIndex++;
+			} else {
+				alert("Error - status: " + request.status + "; URL: " + url);
+			}
+			return false;
+			};
+		});
+		
+		applyActionMenu(document.getElementById("onlineAccountActionMenuLink"), function() {
+			var createOnlineAccountLink = document.getElementById("addFamilyAssociationEmailItemLink");
+			createOnlineAccountLink.onclick = function() {
+			var url = createOnlineAccountLink.getAttribute("href") + "?" + "&emailItemIndex=" + familyAssociationOnlineAccountIndex;
+			var request = new XMLHttpRequest();
+			request.open("GET", url, false);
+			request.send();
+			if (request.status == 200) {
+				ui.appendHtml(document.getElementById("emailBody"), request.responseText);
+				applyOnlineAccountRowBehavior(familyAssociationOnlineAccountIndex);
+				familyAssociationOnlineAccountIndex++;
+			} else {
+				alert("Error - status: " + request.status + "; URL: " + url);
+			}
+			return false;
+			};
+		});
+		
+		applyActionMenu(document.getElementById("noteActionMenuLink"), function() {
+			var createNoteLink = document.getElementById("addFamilyAssociationNoteItemLink");
+			createNoteLink.onclick = function() {
+			var url = createNoteLink.getAttribute("href") + "?" + "&noteItemIndex=" + familyAssociationNoteIndex;
+			var request = new XMLHttpRequest();
+			request.open("GET", url, false);
+			request.send();
+			if (request.status == 200) {
+				ui.appendHtml(document.getElementById("noteBody"), request.responseText);
+				applyNoteRowBehavior(familyAssociationNoteIndex);
+				applyDatePicker(document.getElementById("noteDate"+familyAssociationNoteIndex));
+				familyAssociationNoteIndex++;
+			} else {
+				alert("Error - status: " + request.status + "; URL: " + url);
+			}
+			return false;
+			};
+		});
+		
 		applyValueLabelAutoComplete(queryInput, searchAddress, config.ServerConfig.getContextPath() + "/family/findOffenderRelationshipAddress.json");
 		var marriageDateContainer = document.getElementById("marriageDateContainer");
 		var divorceDateContainer = document.getElementById("divorceDateContainer");
 		var relationship = document.getElementById("relationship");
-		applyPoBoxFieldsOnClick("poBoxFields", "poBoxFieldsStateOptions.html", "poBoxFieldsCityOptions.html", "poBoxFieldsZipCodeOptions.html");
-		applyAddressFieldsOnClick("addressFields", "stateOptions.html", "cityOptions.html", "zipCodeOptions.html");
-		applyPersonFieldsOnClick("personFields", "personFieldsStateOptions.html", "personFieldsCityOptions.html");
+		applyPoBoxFieldsOnClick("poBoxFields", "poBoxFields/findStateOptions.html", "poBoxFields/findCityOptions.html", "poBoxFields/findZipCodeOptions.html");
+		applyAddressFieldsOnClick("addressFields", "addressFields/findStateOptions.html", "addressFields/findCityOptions.html", "addressFields/findZipCodeOptions.html");
+		applyPersonFieldsOnClick("personFields", "personFields/findStateOptions.html", "personFields/findCityOptions.html");
 		applyLocationSearch(
 			document.getElementById("existingAddress"),
 			document.getElementById("location"),
 			document.getElementById("addressDisplay"),
 			document.getElementById("clearAddress")
 		);
-		for (var x = 0; x <= familyAssociationNoteIndex; x++) {
-			applyNoteItemBehavior(x);
+		
+		for (var x = 0; x < familyAssociationNoteIndex; x++) {
+			applyNoteRowBehavior(x);
 			applyDatePicker(document.getElementById("noteDate"+x));
 		}
-		for (var x = 0; x <= familyAssociationTelephoneNumberIndex; x++) {
-			applyTelephoneNumberItemBehavior(x);
+		for (var x = 0; x < familyAssociationTelephoneNumberIndex; x++) {
+			applyTelephoneNumberRowBehavior(x);
 		}
-		for (var x = 0; x <= familyAssociationOnlineAccountIndex; x++) {
-			applyEmailItemBehavior(x);
+		for (var x = 0; x < familyAssociationOnlineAccountIndex; x++) {
+			applyOnlineAccountRowBehavior(x);
 		}
 
 		relationship.onchange = function() {
@@ -65,6 +119,7 @@ window.onload = function() {
 				}})
 			}	
 		}
+		
 		var createNewAddressRadioButton = document.getElementById("newAddressYes");
 		var useExistingAddressRadioButton = document.getElementById("newAddressNo");
 		var createNewAddressFields = document.getElementById("createAddressFields");
@@ -93,12 +148,6 @@ window.onload = function() {
 				addressContainer.hidden = true;
 			}
 		}
-		$(".date").each(function(index, elt) {
-			$(elt).datepicker({
-				changeMonth: true,
-				changeYear: true
-			});
-		});
 
 		var poBoxFieldsContainer = document.getElementById("familyPoBoxFieldsContainer");
 		var poBoxCheckBox = document.getElementById("familyCreateScreenEnterPoBox");
@@ -110,7 +159,6 @@ window.onload = function() {
 				poBoxFieldsContainer.hidden = true;
 			}
 		}
-
 		var existingAddressRadioButton = document.getElementById("newAddressNo");
 		var newAddressRadioButton = document.getElementById("newAddressYes");
 		var createScreenAddressContainer = document.getElementById("familyCreateScreenAddressContainer");
@@ -185,5 +233,32 @@ window.onload = function() {
 				}})
 			}
 		} 
+	}
+	
+	function applyTelephoneNumberRowBehavior(telephoneNumberItemIndex) {
+		var newTelephoneNumberItemRemoveLink = document.getElementById("removeTelephoneNumber[" + telephoneNumberItemIndex + "]");
+		newTelephoneNumberItemRemoveLink.onclick = function() {
+			telephoneNumberTableRow = document.getElementById(this.getAttribute("id").replace("removeTelephoneNumber", "telephoneNumberRow"));
+			telephoneNumberTableRow.parentNode.removeChild(telephoneNumberTableRow);
+			return false;
+		};
+	}
+	
+	function applyOnlineAccountRowBehavior(onlineAcccountItemIndex) {
+		var newOnlineAccountItemRemoveLink = document.getElementById("removeOnlineAccount[" + onlineAcccountItemIndex + "]");
+		newOnlineAccountItemRemoveLink.onclick = function() {
+			onlineAccountTableRow = document.getElementById(this.getAttribute("id").replace("removeOnlineAccount", "onlineAccountRow"));
+			onlineAccountTableRow.parentNode.removeChild(onlineAccountTableRow);
+			return false;
+		};
+	}
+	
+	function applyNoteRowBehavior(noteItemIndex) {
+		var newNoteItemRemoveLink = document.getElementById("removeNoteItem[" + noteItemIndex + "]");
+		newNoteItemRemoveLink.onclick = function() {
+			noteTableRow = document.getElementById(this.getAttribute("id").replace("removeNoteItem", "noteRow"));
+			noteTableRow.parentNode.removeChild(noteTableRow);
+			return false;
+		};
 	}
 };

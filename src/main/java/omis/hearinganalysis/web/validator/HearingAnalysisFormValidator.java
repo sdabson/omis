@@ -51,6 +51,9 @@ public class HearingAnalysisFormValidator implements Validator {
 	public void validate(Object target, Errors errors) {
 		HearingAnalysisForm form = (HearingAnalysisForm) target;
 		
+		if (form.getCategory() == null) {
+			errors.rejectValue("category", "hearingAnalysis.category.empty");
+		}
 		if (form.getHearingAnalysisNoteItems() != null && 
 				form.getHearingAnalysisNoteItems().size() > 0) {
 			for (int index = 0; index < 
@@ -61,13 +64,13 @@ public class HearingAnalysisFormValidator implements Validator {
 						!HearingAnalysisNoteItemOperation.REMOVE.equals(
 								noteItem.getOperation())) {
 					if (noteItem.getDate() == null) {
-						errors.rejectValue("noteItems[" + index + "].date",
-								"hearingAnalysis.hearingAnalysisNote.date.empty");
+						errors.rejectValue("hearingAnalysisNoteItems[" + index +
+								"].date", "hearingAnalysis.note.date.empty");
 					}
 					if (noteItem.getValue() == null || 
 							noteItem.getValue().isEmpty()) {
-						errors.rejectValue("noteItems[" + index + "].value",
-								"hearingAnalysis.hearingAnalysisNote.value.empty");
+						errors.rejectValue("hearingAnalysisNoteItems[" + index + 
+								"].value", "hearingAnalysis.note.value.empty");
 					}
 				}
 			}

@@ -22,8 +22,10 @@ import java.util.List;
 
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.hearinganalysis.domain.HearingAnalysisNote;
 import omis.hearinganalysis.service.HearingAnalysisService;
+import omis.hearinganalysis.service.delegate.HearingAnalysisCategoryDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisNoteDelegate;
 import omis.paroleboarditinerary.domain.BoardAttendee;
@@ -55,6 +57,9 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	
 	private final BoardAttendeeDelegate boardAttendeeDelegate;
 	
+	private final HearingAnalysisCategoryDelegate 
+			hearingAnalysisCategoryDelegate;
+	
 	/**
 	 * Instantiates a hearing analysis service implementation with the specified 
 	 * delegates.
@@ -70,12 +75,15 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 			final HearingAnalysisNoteDelegate hearingAnalysisNoteDelegate,
 			final ParoleBoardItineraryDelegate paroleBoardItineraryDelegate,
 			final BoardMeetingSiteDelegate boardMeetingSiteDelegate,
-			final BoardAttendeeDelegate boardAttendeeDelegate) {
+			final BoardAttendeeDelegate boardAttendeeDelegate,
+			final HearingAnalysisCategoryDelegate 
+					hearingAnalysisCategoryDelegate) {
 		this.hearingAnalysisDelegate = hearingAnalysisDelegate;
 		this.hearingAnalysisNoteDelegate = hearingAnalysisNoteDelegate;
 		this.paroleBoardItineraryDelegate = paroleBoardItineraryDelegate;
 		this.boardMeetingSiteDelegate = boardMeetingSiteDelegate;
 		this.boardAttendeeDelegate = boardAttendeeDelegate;
+		this.hearingAnalysisCategoryDelegate = hearingAnalysisCategoryDelegate;
 	}
 	
 	/** {@inheritDoc} */
@@ -83,9 +91,10 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	public HearingAnalysis createHearingAnalysis(
 			final ParoleEligibility eligibility, 
 			final BoardMeetingSite meetingSite,
-			final BoardAttendee analyst) throws DuplicateEntityFoundException {
+			final BoardAttendee analyst, final HearingAnalysisCategory category) 
+					throws DuplicateEntityFoundException {
 		return this.hearingAnalysisDelegate.create(eligibility, meetingSite, 
-				analyst);
+				category, analyst);
 	}
 
 	/** {@inheritDoc} */
@@ -93,9 +102,10 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	public HearingAnalysis updateHearingAnalysis(
 			final HearingAnalysis hearingAnalysis, 
 			final BoardMeetingSite meetingSite,
-			final BoardAttendee analyst) throws DuplicateEntityFoundException {
+			final BoardAttendee analyst, final HearingAnalysisCategory category) 
+					throws DuplicateEntityFoundException {
 		return this.hearingAnalysisDelegate.update(hearingAnalysis, meetingSite, 
-				analyst);
+				category, analyst);
 	}
 
 	/** {@inheritDoc} */
@@ -166,6 +176,12 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	public HearingAnalysis findHearingAnalysisByParoleEligibility(
 			final ParoleEligibility eligibility) {
 		return this.hearingAnalysisDelegate.findByParoleEligibility(eligibility);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<HearingAnalysisCategory> findHearingAnalysisCategories() {
+		return this.hearingAnalysisCategoryDelegate.findAll();
 	}
 
 }

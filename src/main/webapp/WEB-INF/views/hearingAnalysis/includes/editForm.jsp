@@ -46,6 +46,25 @@
 	<legend><fmt:message key="hearingAnalysisDetailsTitle"/></legend>
 	
 	<span class="fieldGroup">
+		<form:label path="category" class="fieldLabel">
+		<fmt:message key="categoryLabel"/></form:label>
+		<form:select path="category">
+			<option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></option>
+			<c:forEach var="category" items="${categories}">
+				<c:choose>
+					<c:when test="${hearingAnalysisForm.category eq category}">
+						<option value="${category.id}" selected="selected"><c:out value="${category.name}"/></option>
+					</c:when>
+					<c:otherwise>
+						<option value="${category.id}"><c:out value="${category.name}"/></option>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+		</form:select>
+		<form:errors path="category" cssClass="error"/>
+	</span>
+	
+	<span class="fieldGroup">
 		<form:label path="boardItinerary" class="fieldLabel">
 		<fmt:message key="boardItineraryLabel"/></form:label>
 		<form:select path="boardItinerary">
@@ -53,10 +72,10 @@
 			<c:forEach var="itinerary" items="${itineraries}">
 				<c:choose>
 					<c:when test="${hearingAnalysisForm.boardItinerary eq itinerary}">
-						<option value="${itinerary.id}" selected="selected"><c:out value="${itinerary.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
+						<option value="${itinerary.id}" selected="selected"><c:out value="${itinerary.paroleBoardLocation.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
 					</c:when>
 					<c:otherwise>
-						<option value="${itinerary.id}"><c:out value="${itinerary.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
+						<option value="${itinerary.id}"><c:out value="${itinerary.paroleBoardLocation.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
 					</c:otherwise>
 				</c:choose>
 			</c:forEach>

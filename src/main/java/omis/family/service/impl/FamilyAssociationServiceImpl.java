@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.impl;
 
 import java.util.Date;
@@ -8,6 +25,7 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
@@ -20,6 +38,8 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
 import omis.contact.service.delegate.OnlineAccountDelegate;
 import omis.contact.service.delegate.OnlineAccountHostDelegate;
@@ -29,11 +49,13 @@ import omis.country.service.delegate.CountryDelegate;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
 import omis.exception.DuplicateEntityFoundException;
-import omis.family.exception.FamilyAssociationConflictException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
+import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
+import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.family.service.FamilyAssociationService;
 import omis.family.service.delegate.FamilyAssociationCategoryDelegate;
 import omis.family.service.delegate.FamilyAssociationDelegate;
@@ -49,6 +71,7 @@ import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.person.service.delegate.SuffixDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.relationship.dao.RelationshipDao;
@@ -184,7 +207,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 		final DateRange dateRange, final FamilyAssociationCategory category,
 		final FamilyAssociationFlags flags, 
 		final Date marriageDate, final Date divorceDate)
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		throws FamilyAssociationExistsException, ReflexiveRelationshipException,
 		FamilyAssociationConflictException {
 		if (offender.equals(familyMember)) {
 			throw new ReflexiveRelationshipException("Second person "
@@ -202,7 +225,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 		final DateRange dateRange, final FamilyAssociationCategory category, 
 		final FamilyAssociationFlags flags, 
 		final Date marriageDate, final Date divorceDate) 
-			throws DuplicateEntityFoundException, 
+			throws FamilyAssociationExistsException, 
 			FamilyAssociationConflictException {
 		return this.familyAssociationDelegate.update(familyAssociation, 
 				dateRange, category, flags, marriageDate, divorceDate);
@@ -245,7 +268,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	@Override 
 	public Address createAddress(final String value, final String designator,
 		final BuildingCategory buildingCategory, final ZipCode zipCode)
-		throws DuplicateEntityFoundException {
+		throws AddressExistsException {
 		return this.addressDelegate.findOrCreate(value, designator, null, 
 			buildingCategory, zipCode);
 	}
@@ -302,7 +325,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	public TelephoneNumber addTelephoneNumber(final Contact contact, 
 		final Long value, final Integer extension, final Boolean primary, 
 		final Boolean active, final TelephoneNumberCategory category)
-			throws DuplicateEntityFoundException {
+			throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.create(contact, value, extension, 
 			primary, active, category);
 	}
@@ -313,7 +336,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 		final TelephoneNumber telephoneNumber, final Long value, 
 		final Integer extension, final Boolean primary, final Boolean active,
 		final TelephoneNumberCategory category) 
-		throws DuplicateEntityFoundException {
+		throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.update(telephoneNumber, value, 
 			extension, primary, active, category);
 	}
@@ -329,7 +352,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	public OnlineAccount addOnlineAccount(final Contact contact, 
 		final String name, final Boolean primary, final OnlineAccountHost host,
 		final Boolean active) 
-		throws DuplicateEntityFoundException {
+		throws OnlineAccountExistsException {
 		if (active == null) {
 			return this.onlineAccountDelegate.create(contact, name, false, 
 				primary, host);
@@ -344,7 +367,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	public OnlineAccount updateOnlineAccount(final OnlineAccount onlineAccount, 
 		final String name, final Boolean primary, final OnlineAccountHost host,
 		final Boolean active)	
-		throws DuplicateEntityFoundException {
+		throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.update(onlineAccount, name, active, 
 			primary, host);
 	}
@@ -365,7 +388,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	@Override
 	public FamilyAssociationNote addNote(final FamilyAssociation association, 
 		final Date date, final String value) 
-				throws DuplicateEntityFoundException {
+				throws FamilyAssociationNoteExistsException {
 		return this.familyAssociationNoteDelegate.create(association, 
 				date, value);
 	}
@@ -374,7 +397,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	@Override
 	public FamilyAssociationNote updateNote(final FamilyAssociationNote note, 
 		final Date date, final String value) 
-				throws DuplicateEntityFoundException {
+				throws FamilyAssociationNoteExistsException {
 		return this.familyAssociationNoteDelegate.update(note, date, value);
 	}
 	
@@ -465,7 +488,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	@Override
 	public City createCity(final String name, final State state, 
 		final Country country) 
-		throws DuplicateEntityFoundException {
+		throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 	

@@ -15,7 +15,7 @@
 			<th><fmt:message key="noteLabel"/></th>
 			</tr>
 		</thead>
-		<tbody id="emailBody">
+		<tbody id="noteBody">
 			<c:forEach var="noteItem" items="${familyAssociationNoteItems}" varStatus="status">
 				<c:set var="familyAssociationNoteItem" value="${noteItem}" scope="request"/>
 				<c:set var="familyAssociationNoteIndex" value="${status.index}" scope="request"/>

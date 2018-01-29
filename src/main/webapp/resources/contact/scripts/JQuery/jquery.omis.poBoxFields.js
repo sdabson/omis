@@ -34,8 +34,6 @@ function applyPoBoxFieldsCountryOnClick(poBoxFieldsPropertyName, stateOptionsUrl
 				 $("#" + poBoxFieldsPropertyName + "ZipCode").html("<option value=\"\">...</option>");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert("Error - status: " + textStatus + "; error: "
-						+ errorThrown);
 				$("#" + poBoxFieldsPropertyName + "State").html(jqXHR.responseText );
 			}
 		});

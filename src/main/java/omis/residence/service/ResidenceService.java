@@ -341,4 +341,15 @@ public interface ResidenceService {
 	 * @return list of non residence terms
 	 */
 	List<NonResidenceTerm> findNonResidenceTerms(Date date, Person person);
+
+	/**
+	 * Applies the specified date to the end date of the specified non residence term.
+	 * 
+	 * @param term non residence term
+	 * @param endDate end date
+	 * @return ended non residence term
+	 * @throws DuplicateEntityFoundException thrown when a duplicate non residence term is found
+	 */
+	NonResidenceTerm endNonResidenceTerm(NonResidenceTerm term, Date endDate)
+		throws DuplicateEntityFoundException;
 }

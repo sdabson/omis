@@ -3,7 +3,6 @@ package omis.paroleboarditinerary.web.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
@@ -28,6 +26,7 @@ import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.domain.ParoleBoardItineraryNote;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.web.form.BoardMeetingSiteItem;
 import omis.paroleboarditinerary.web.form.BoardMeetingSiteItemOperation;
@@ -44,7 +43,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Controller for managing parole board itineraries.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 29, 2017)
+ * @author Annie Wahl 
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -104,7 +104,8 @@ public class ManageParoleBoardItineraryController {
 	private static final String BOARD_MEETING_SITES_MODEL_KEY = 
 			"boardMeetingSites";
 
-	private static final String LOCATIONS_MODEL_KEY = "locations";
+	private static final String PAROLE_BOARD_LOCATIONS_MODEL_KEY =
+			"paroleBoardLocations";
 	
 	/* Message keys. */
 
@@ -149,6 +150,10 @@ public class ManageParoleBoardItineraryController {
 	@Qualifier("locationPropertyEditorFactory")
 	private PropertyEditorFactory locationPropertyEditorFactory;
 	
+	@Autowired
+	@Qualifier("paroleBoardLocationPropertyEditorFactory")
+	private PropertyEditorFactory paroleBoardLocationPropertyEditorFactory;
+	
 	/* Validators. */
 
 	@Autowired
@@ -175,7 +180,8 @@ public class ManageParoleBoardItineraryController {
 	 * 
 	 * @return screen to create parole board itinerary
 	 */
-	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_CREATE') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_CREATE') "
+			+ "or hasRole('ADMIN')")
 	@RequestMapping(value = "/create.html", method = RequestMethod.GET)
 	public ModelAndView create() {
 		ParoleBoardItineraryForm paroleBoardItineraryForm = 
@@ -202,7 +208,8 @@ public class ManageParoleBoardItineraryController {
 				paroleBoardItinerary.getDateRange()));
 		paroleBoardItineraryForm.setEndDate(DateRange.getEndDate(
 				paroleBoardItinerary.getDateRange()));
-		paroleBoardItineraryForm.setLocation(paroleBoardItinerary.getLocation());
+		paroleBoardItineraryForm.setParoleBoardLocation(
+				paroleBoardItinerary.getParoleBoardLocation());
 		List<BoardAttendee> attendees = this.paroleBoardItineraryService
 				.findBoardAttendeesByBoardItinerary(paroleBoardItinerary);
 		for (BoardAttendee attendee : attendees) {
@@ -266,7 +273,8 @@ public class ManageParoleBoardItineraryController {
 	 * @return redirect to parole board itinerary listing screen
 	 * @throws DuplicateEntityFoundException if duplicate entity exists 
 	 */
-	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_CREATE') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_CREATE') "
+			+ "or hasRole('ADMIN')")
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	public ModelAndView save(
 			final ParoleBoardItineraryForm paroleBoardItineraryForm,
@@ -278,9 +286,9 @@ public class ManageParoleBoardItineraryController {
 			ModelAndView mav = this.prepareRedisplay(paroleBoardItineraryForm, 
 					bindingResult);
 			return mav;
-			}
+		}
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryService
-				.create(paroleBoardItineraryForm.getLocation(), 
+				.create(paroleBoardItineraryForm.getParoleBoardLocation(), 
 				paroleBoardItineraryForm.getStartDate(),
 				paroleBoardItineraryForm.getEndDate());
 
@@ -329,11 +337,11 @@ public class ManageParoleBoardItineraryController {
 			ModelAndView mav = this.prepareRedisplay(paroleBoardItineraryForm, 
 					bindingResult);
 			return mav;
-			}
+		}
 		
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryService
 				.update(paroleBoardItinerary,
-				paroleBoardItineraryForm.getLocation(),
+				paroleBoardItineraryForm.getParoleBoardLocation(),
 				paroleBoardItineraryForm.getStartDate(), 
 				paroleBoardItineraryForm.getEndDate());
 		
@@ -381,7 +389,8 @@ public class ManageParoleBoardItineraryController {
 	 * @param paroleBoardItinerary parole board itinerary
 	 * @return redirect to parole board itinerary listing screen
 	 */
-	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_REMOVE') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('PAROLE_BOARD_ITINERARY_REMOVE') "
+			+ "or hasRole('ADMIN')")
 	@RequestMapping(value = "/remove.html", method = RequestMethod.GET)
 	public ModelAndView remove(
 			@RequestParam(value = "paroleBoardItinerary", required = true)
@@ -553,16 +562,20 @@ public class ManageParoleBoardItineraryController {
 				paroleBoardItineraryForm);
 		List<Location> locations = this.paroleBoardItineraryService
 				.findAllBoardItineraryLocations();
-		mav.addObject(LOCATIONS_MODEL_KEY, locations);
+		List<ParoleBoardLocation> paroleBoardLocations =
+				this.paroleBoardItineraryService.findParoleBoardLocations();
+		mav.addObject(PAROLE_BOARD_LOCATIONS_MODEL_KEY, paroleBoardLocations);
 		mav.addObject(BOARD_MEETING_SITES_MODEL_KEY, locations);
 		mav.addObject(BOARD_MEMBERS_MODEL_KEY, this.paroleBoardItineraryService
-				.findBoardMembersByDate(paroleBoardItineraryForm.getStartDate()));
+				.findBoardMembersByDate(
+						paroleBoardItineraryForm.getStartDate()));
 		int boardMeetingSiteIndex = 0;
 		if (paroleBoardItineraryForm.getBoardMeetingSiteItems() != null) {
 			boardMeetingSiteIndex = paroleBoardItineraryForm
 					.getBoardMeetingSiteItems().size();
 		}
-		mav.addObject(BOARD_MEETING_SITE_INDEX_MODEL_KEY, boardMeetingSiteIndex);
+		mav.addObject(BOARD_MEETING_SITE_INDEX_MODEL_KEY,
+				boardMeetingSiteIndex);
 		int boardItineraryNoteIndex = 0;
 		if (paroleBoardItineraryForm.getBoardItineraryNoteItems() != null) {
 			boardItineraryNoteIndex = paroleBoardItineraryForm
@@ -616,7 +629,8 @@ public class ManageParoleBoardItineraryController {
 			final List<ParoleBoardItineraryNoteItem> boardItineraryNoteItems) 
 					throws DuplicateEntityFoundException {
 		if (boardItineraryNoteItems != null) {
-			for (ParoleBoardItineraryNoteItem noteItem : boardItineraryNoteItems) {
+			for (ParoleBoardItineraryNoteItem noteItem
+					: boardItineraryNoteItems) {
 				if (ParoleBoardItineraryNoteItemOperation.CREATE.equals(
 						noteItem.getOperation())) {
 					this.paroleBoardItineraryService.createBoardIteneraryNote(
@@ -647,6 +661,9 @@ public class ManageParoleBoardItineraryController {
 	protected void registerCustomEditors(final WebDataBinder binder) {
 		binder.registerCustomEditor(ParoleBoardItinerary.class,
 				this.paroleBoardItineraryPropertyEditorFactory
+				.createPropertyEditor());
+		binder.registerCustomEditor(ParoleBoardLocation.class,
+				this.paroleBoardLocationPropertyEditorFactory
 				.createPropertyEditor());
 		binder.registerCustomEditor(Date.class,
 				this.customDateEditorFactory.createCustomDateOnlyEditor(true));

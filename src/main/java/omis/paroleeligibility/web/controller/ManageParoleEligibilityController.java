@@ -421,7 +421,7 @@ public class ManageParoleEligibilityController {
 	private ModelAndView prepareEditMav(final Offender offender, 
 			final ParoleEligibilityForm paroleEligibilityForm) {
 		ModelAndView mav = new ModelAndView(EDIT_VIEW_NAME);
-		if (paroleEligibilityForm != null) {
+		if (paroleEligibilityForm.getParoleEligibilityNoteItems() != null) {
 			mav.addObject(PAROLE_ELIGIBILITY_NOTE_ITEM_INDEX_MODEL_KEY, 
 					paroleEligibilityForm.getParoleEligibilityNoteItems()
 					.size());
@@ -443,7 +443,8 @@ public class ManageParoleEligibilityController {
 		mav.addObject(STATUS_REASONS_MODEL_KEY, 
 				this.paroleEligibilityService.findEligibilityStatusReasons());
 		mav.addObject(PAROLE_ELIGIBILITY_FORM_MODEL_KEY, paroleEligibilityForm);
-		mav.addObject(ELIGIBILITY_STATUSES_MODEL_KEY, EligibilityStatusCategory.values());
+		mav.addObject(ELIGIBILITY_STATUSES_MODEL_KEY, EligibilityStatusCategory
+				.values());
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
 		return mav;
 	}

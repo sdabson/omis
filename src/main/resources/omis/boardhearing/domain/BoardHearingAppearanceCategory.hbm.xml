@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.boardhearing.domain">
+	<class entity-name="omis.boardhearing.domain.BoardHearingAppearanceCategory"
+			proxy="omis.boardhearing.domain.BoardHearingAppearanceCategory"
+			name="omis.boardhearing.domain.impl.BoardHearingAppearanceCategoryImpl"
+			table="`BOARD_HRNG_APRNCE_CAT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`BOARD_HRNG_APRNCE_CAT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="boardHearingCategory" column="`BOARD_HEARING_CATEGORY_ID`" entity-name="omis.boardhearing.domain.BoardHearingCategory" not-null="true" />
+			<many-to-one name="appearanceCategory" column="`APPEARANCE_CATEGORY_ID`" entity-name="omis.paroleeligibility.domain.AppearanceCategory" not-null="true" />
+	</class>
+</hibernate-mapping>

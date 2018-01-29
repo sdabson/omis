@@ -166,12 +166,6 @@ public class ParoleEligibilityImpl implements ParoleEligibility {
 			return false;
 		}
 		ParoleEligibility that = (ParoleEligibility) obj;
-		if (this.getId() == null) {
-			throw new IllegalStateException("Id required");
-		}
-		if (!this.getId().equals(that.getId())) {
-			return false;
-		}
 		if (this.getOffender() == null) {
 			throw new IllegalStateException("Offender required");
 		}
@@ -185,34 +179,12 @@ public class ParoleEligibilityImpl implements ParoleEligibility {
 				that.getHearingEligibilityDate())) {
 			return false;
 		}
-		if (this.getReviewDate() == null) {
-			throw new IllegalStateException("Review date required");
-		}
-		if (!this.getReviewDate().equals(that.getReviewDate())) {
-			return false;
-		}
-		if (this.getStatus() == null) {
-			throw new IllegalStateException(
-				"Parole eligibility status required");
-		}
-		if (!this.getStatus().equals(that.getStatus())) {
-			return false;
-		}
-		if (this.getAppearanceCategory() == null) {
-			throw new IllegalStateException("Appearance category required");
-		}
-		if (!this.getAppearanceCategory().equals(that.getAppearanceCategory())) {
-			return false;
-		}
 		return true;
 	}
 	
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		if (this.getId() == null) {
-			throw new IllegalStateException("Id required.");
-		}
 		if (this.getOffender() == null) {
 			throw new IllegalStateException("Offender required.");
 		}
@@ -220,24 +192,10 @@ public class ParoleEligibilityImpl implements ParoleEligibility {
 			throw new IllegalStateException(
 				"Hearing eligibility date required.");
 		}
-		if (this.getReviewDate() == null) {
-			throw new IllegalStateException("Review date required.");
-		}
-		if (this.getStatus() == null) {
-			throw new IllegalStateException(
-				"Parole eligibility status required.");
-		}
-		if (this.getAppearanceCategory() == null) {
-			throw new IllegalStateException("Appearance category required.");
-		}
 		int hashCode = 14;
 		
-		hashCode = 29 * hashCode + this.getId().hashCode();
 		hashCode = 29 * hashCode + this.getOffender().hashCode();
 		hashCode = 29 * hashCode + this.getHearingEligibilityDate().hashCode();
-		hashCode = 29 * hashCode + this.getReviewDate().hashCode();
-		hashCode = 29 * hashCode + this.getStatus().hashCode();
-		hashCode = 29 * hashCode + this.getAppearanceCategory().hashCode();
 		return hashCode;
 	}
 	

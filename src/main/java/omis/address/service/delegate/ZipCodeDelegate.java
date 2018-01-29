@@ -4,7 +4,7 @@ import java.util.List;
 
 import omis.address.dao.ZipCodeDao;
 import omis.address.domain.ZipCode;
-import omis.exception.DuplicateEntityFoundException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.instance.factory.InstanceFactory;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -13,6 +13,7 @@ import omis.region.domain.State;
  * Delegate for ZIP codes.
  *
  * @author Stephen Abson
+ * @author Yidong Li
  * @version 0.0.1 (Sep 14, 2015)
  * @since OMIS 3.0
  */
@@ -51,16 +52,16 @@ public class ZipCodeDelegate {
 	 * @param extension extension
 	 * @param active active
 	 * @return new ZIP code
-	 * @throws DuplicateEntityFoundException if ZIP code exists
+	 * @throws ZipCodeExistsException if ZIP code exists
 	 */
 	public ZipCode create(
 			final City city,
 			final String value,
 			final String extension,
 			final Boolean active)
-					throws DuplicateEntityFoundException {
+					throws ZipCodeExistsException {
 		if (this.zipCodeDao.find(city, value, extension) != null) {
-			throw new DuplicateEntityFoundException("ZIP code exists");
+			throw new ZipCodeExistsException("ZIP code exists");
 		}
 		ZipCode zipCode = this.zipCodeInstanceFactory.createInstance();
 		zipCode.setCity(city);
@@ -79,7 +80,7 @@ public class ZipCodeDelegate {
 	 * @param extension extension
 	 * @param active active
 	 * @return updated ZIP code
-	 * @throws DuplicateEntityFoundExceptionif ZIP code exists
+	 * @throws ZipCodeExistsException ZIP code exists
 	 */
 	public ZipCode update(
 			final ZipCode zipCode,
@@ -87,10 +88,10 @@ public class ZipCodeDelegate {
 			final String value,
 			final String extension,
 			final Boolean active)
-					throws DuplicateEntityFoundException {
+					throws ZipCodeExistsException {
 		if (this.zipCodeDao.findExcluding(
 				city, value, extension, zipCode) != null) {
-			throw new DuplicateEntityFoundException("ZIP code exists");
+			throw new ZipCodeExistsException("ZIP code exists");
 		}
 		zipCode.setCity(city);
 		zipCode.setValue(value);

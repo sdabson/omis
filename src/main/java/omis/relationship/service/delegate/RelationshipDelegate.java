@@ -8,6 +8,7 @@ import omis.person.domain.Person;
 import omis.relationship.dao.RelationshipDao;
 import omis.relationship.domain.Relationship;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipExistsException;
 
 /**
  * Delegate for relationships.
@@ -48,17 +49,17 @@ public class RelationshipDelegate {
 	 * @param firstPerson first person
 	 * @param secondPerson second person
 	 * @return relationship
-	 * @throws DuplicateEntityFoundException if relationship exists
+	 * @throws RelationshipExistsException if relationship exists
 	 * @param ReflexiveRelationshipException if first and second person are
 	 * equal
 	 */
 	public Relationship create(
 			final Person firstPerson, final Person secondPerson)
-				throws DuplicateEntityFoundException,
+				throws RelationshipExistsException,
 					ReflexiveRelationshipException {
 		if (this.relationshipDao.findByPeople(
 				firstPerson, secondPerson) != null) {
-			throw new DuplicateEntityFoundException("Relationship exists");
+			throw new RelationshipExistsException("Relationship exists");
 		}
 		return this.createWithoutDuplicateCheck(firstPerson, secondPerson);
 	}

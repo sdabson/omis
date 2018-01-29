@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/ 
 /**
  * Offender relationships edit screen java script.
  * 
@@ -6,16 +23,140 @@
  * Since: OMIS 3.0
  */
 window.onload = function() {
+	function applyExistingTelephoneNumberItemBehavior(x){
+		var existingTelephoneNumberItemRemoveLink = document.getElementById("removeTelephoneNumber[" + x + "]");
+		existingTelephoneNumberItemRemoveLink.onclick = function() {
+			var existingTelephoneNumberItemOperation = document.getElementById(this.getAttribute("id").replace("removeTelephoneNumber", "telephoneNumberItemsOperation"));
+			var existingTelephoneNumberItemRow = document.getElementById("telephoneNumberRow[" + x + "]");
+			if(existingTelephoneNumberItemOperation.value == "UPDATE"){
+				if (!ui.hasClass(existingTelephoneNumberItemRow, "removeRow")) {
+					ui.addClass(existingTelephoneNumberItemRow, "removeRow");
+					existingTelephoneNumberItemOperation.value = "REMOVE";
+				} 
+			} else if (existingTelephoneNumberItemOperation.value == "REMOVE"){
+				if(ui.hasClass(existingTelephoneNumberItemRow, "removeRow")) {
+					ui.removeClass(existingTelephoneNumberItemRow, "removeRow");
+					existingTelephoneNumberItemOperation.value = "UPDATE";
+				}
+			}
+			return false;
+		}
+	}
+	
+	function applyExistingOnlineAccountItemBehavior(x){
+		var existingOnlineAccountItemRemoveLink = document.getElementById("removeOnlineAccount[" + x + "]");
+		existingOnlineAccountItemRemoveLink.onclick = function() {
+			var existingOnlineAccountItemOperation = document.getElementById(this.getAttribute("id").replace("removeOnlineAccount", "onlineAccountContactItemsOperation"));
+			var existingOnlineAccountItemRow = document.getElementById("onlineAccountRow[" + x + "]");
+			if(existingOnlineAccountItemOperation.value == "UPDATE"){
+				if (!ui.hasClass(existingOnlineAccountItemRow, "removeRow")) {
+					ui.addClass(existingOnlineAccountItemRow, "removeRow");
+					existingOnlineAccountItemOperation.value = "REMOVE";
+				} 
+			} else if (existingOnlineAccountItemOperation.value == "REMOVE"){
+				if(ui.hasClass(existingOnlineAccountItemRow, "removeRow")) {
+					ui.removeClass(existingOnlineAccountItemRow, "removeRow");
+					existingOnlineAccountItemOperation.value = "UPDATE";
+				}
+			}
+			return false;
+		}
+	}
+	
+	function applyTelephoneNumberRowBehavior(telephoneNumberItemIndex) {
+		var newTelephoneNumberItemRemoveLink = document.getElementById("removeTelephoneNumber[" + telephoneNumberItemIndex + "]");
+		newTelephoneNumberItemRemoveLink.onclick = function() {
+			telephoneNumberTableRow = document.getElementById(this.getAttribute("id").replace("removeTelephoneNumber", "telephoneNumberRow"));
+			telephoneNumberTableRow.parentNode.removeChild(telephoneNumberTableRow);
+			return false;
+		};
+	}
+	
+	function applyOnlineAccountRowBehavior(onlineAcccountItemIndex) {
+		var newOnlineAccountItemRemoveLink = document.getElementById("removeOnlineAccount[" + onlineAcccountItemIndex + "]");
+		newOnlineAccountItemRemoveLink.onclick = function() {
+			onlineAccountTableRow = document.getElementById(this.getAttribute("id").replace("removeOnlineAccount", "onlineAccountRow"));
+			onlineAccountTableRow.parentNode.removeChild(onlineAccountTableRow);
+			return false;
+		};
+	}
+	
+	for (var x = 0; x < offenderRelationshipTelephoneNumberIndex; x++) {
+		var telephoneNumberItemOperation = document.getElementById("telephoneNumberItemsOperation[" + x + "]");
+		var telephoneNumberItemRow = document.getElementById("telephoneNumberRow[" + x + "]");
+		if(telephoneNumberItemOperation.value == "REMOVE"){
+			if(!ui.hasClass(telephoneNumberItemRow, "removeRow")) {
+				ui.addClass(telephoneNumberItemRow, "removeRow");
+			}
+		}
+		if(telephoneNumberItemOperation.value == "REMOVE" || telephoneNumberItemOperation.value == "UPDATE"){
+			applyExistingTelephoneNumberItemBehavior(x);
+		}
+		if(telephoneNumberItemOperation.value == "CREATE"){
+			applyTelephoneNumberRowBehavior(x);
+		}
+	}
+	
+	for (var x = 0; x < offenderRelationshipOnlineAccountIndex; x++) {
+		var onlineAccountItemOperation = document.getElementById("onlineAccountContactItemsOperation[" + x + "]");
+		var onlineAccountItemRow = document.getElementById("onlineAccountRow[" + x + "]");
+		if(onlineAccountItemOperation.value == "REMOVE"){
+			if(!ui.hasClass(onlineAccountItemRow, "removeRow")) {
+				ui.addClass(onlineAccountItemRow, "removeRow");
+			}
+		}
+		if(onlineAccountItemOperation.value == "REMOVE" || onlineAccountItemOperation.value == "UPDATE"){
+			applyExistingOnlineAccountItemBehavior(x);
+		}
+		if(onlineAccountItemOperation.value == "CREATE"){
+			applyOnlineAccountRowBehavior(x);
+		}
+	}
+	
 	var personFields = "personFields";
 	var queryInput = document.getElementById("offenderRelationshipSearchAddressQuery");
 	var searchAddress = document.getElementById("searchAddress");
 	applyActionMenu(document.getElementById("offenderRelationshipListActionMenuLink"));
 	applyValueLabelAutoComplete(queryInput, searchAddress, config.ServerConfig.getContextPath() + "/offenderRelationship/update/findOffenderRelationshipAddress.json");
-	applyPoBoxFieldsOnClick("poBoxFields", "poBoxFieldsEditStateOptions.html", "poBoxFieldsEditCityOptions.html", "poBoxFieldsEditZipCodeOptions.html");
-	applyAddressFieldsOnClick("addressFields", "addressFieldsEditStateOptions.html", "addressFieldsEditCityOptions.html", "addressFieldsEditZipCodeOptions.html");
-	applyPersonFieldsOnClick("personFields", "personFieldsEditStateOptions.html", "personFieldsEditCityOptions.html");
-	applyActionMenu(document.getElementById("telephoneNumbersEditActionMenuLink"),addOffenderRelationshipEditTelephoneNumberItem);
-	applyActionMenu(document.getElementById("onlineAccountsEditActionMenuLink"),addOffenderRelationshipOnlineAccountItem);
+	applyPoBoxFieldsOnClick("poBoxFields", "poBoxFields/findStateOptions.html", "poBoxFields/findCityOptions.html", "poBoxFields/findZipCodeOptions.html");
+	applyAddressFieldsOnClick("addressFields", "addressFields/findStateOptions.html", "addressFields/findCityOptions.html", "addressFields/findZipCodeOptions.html");
+	applyPersonFieldsOnClick("personFields", "personFields/findStateOptions.html", "personFields/findCityOptions.html");
+	
+	applyActionMenu(document.getElementById("telephoneNumbersEditActionMenuLink"), function() {
+		var createTelephoneNumberLink = document.getElementById("addOffenderRelationTelephoneNumberItemLink");
+		createTelephoneNumberLink.onclick = function() {
+		var url = createTelephoneNumberLink.getAttribute("href") + "?" + "&telephoneNumberItemIndex=" + offenderRelationshipTelephoneNumberIndex;
+		var request = new XMLHttpRequest();
+		request.open("GET", url, false);
+		request.send();
+		if (request.status == 200) {
+			ui.appendHtml(document.getElementById("telephoneNumbersTable"), request.responseText);
+			applyTelephoneNumberRowBehavior(offenderRelationshipTelephoneNumberIndex);
+			offenderRelationshipTelephoneNumberIndex++;
+		} else {
+			alert("Error - status: " + request.status + "; URL: " + url);
+		}
+		return false;
+		};
+	});
+	
+	applyActionMenu(document.getElementById("onlineAccountsEditActionMenuLink"), function() {
+		var createOnlineAccountLink = document.getElementById("addOffenderRelationshipOnlineAccountItemLink");
+		createOnlineAccountLink.onclick = function() {
+		var url = createOnlineAccountLink.getAttribute("href") + "?" + "&onlineAccountItemIndex=" + offenderRelationshipOnlineAccountIndex;
+		var request = new XMLHttpRequest();
+		request.open("GET", url, false);
+		request.send();
+		if (request.status == 200) {
+			ui.appendHtml(document.getElementById("onlineAccountsTable"), request.responseText);
+			applyOnlineAccountRowBehavior(offenderRelationshipOnlineAccountIndex);
+			offenderRelationshipOnlineAccountIndex++;
+		} else {
+			alert("Error - status: " + request.status + "; URL: " + url);
+		}
+		return false;
+		};
+	});
 	
 	var currentAddressRadioButton = document.getElementById("currentAddress");
 	var existingAddressRadioButton = document.getElementById("existingAddress");
@@ -60,14 +201,6 @@ window.onload = function() {
 		}
 	}
 
-	for (var x = 0; x <= offenderRelationshipTelephoneNumberIndex; x++) {
-		applyTelephoneNumberItemBehavior(x);
-	}
-	
-	for (var x = 0; x <= offenderRelationshipOnlineAccountIndex; x++) {
-		applyOnlineAccountItemBehavior(x);
-	}
-	
 	var addressContainer = document.getElementById("addressContainer");
 	var addressCheckBox = document.getElementById("enterAddress");
 	

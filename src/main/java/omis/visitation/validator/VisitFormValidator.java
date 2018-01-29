@@ -35,7 +35,7 @@ public class VisitFormValidator implements Validator {
 		if (form.getStartTime() == null) {
 			errors.rejectValue("startTime", "visit.startTime.empty");
 		} else if (form.getEndTime() != null) {
-			if (form.getStartTime().getTime() > form.getEndTime().getTime()) {
+			if (form.getStartTime().getTime() >= form.getEndTime().getTime()) {
 				errors.rejectValue("startTime", "visit.startTime.afterEndTime");
 			}
 		}

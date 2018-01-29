@@ -13,6 +13,7 @@
 			<th><fmt:message key="docketValueLabel" bundle="${offenseTermBundle}"/></th>
 			<th><fmt:message key="courtNameLabel" bundle="${offenseTermBundle}"/></th>
 			<th><fmt:message key="judgeLabel" bundle="${offenseTermBundle}"/></th>
+			<th><fmt:message key="overturnedLabel" bundle="${courtCaseBundle}"/></th>
 			<th><fmt:message key="dismissedLabel" bundle="${courtCaseBundle}"/>
 		</tr>
 	</thead>

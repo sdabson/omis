@@ -32,9 +32,6 @@
 		<jsp:include page="/WEB-INF/views/contact/includes/poBoxFieldsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/personFieldsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/contactSummaryResources.jsp"/> 
- 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/family/scripts/JQuery/jquery.omis.createFamilyAssociationNotes.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/family/scripts/JQuery/jquery.omis.createFamilyAssociationTelephoneNumbers.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/family/scripts/JQuery/jquery.omis.createFamilyAssociationEmails.js"></script>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/family/scripts/family.js"></script>
   		<script type="text/javascript">
   			var familyAssociationNoteIndex= ${familyAssociationNoteIndex};

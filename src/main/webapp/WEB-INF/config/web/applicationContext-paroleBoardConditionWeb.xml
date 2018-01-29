@@ -25,6 +25,23 @@
 			class="omis.paroleboardcondition.web.validator.ParoleBoardAgreementConditionSelectFormValidator">
 		</bean>
 		
+		<!-- Profile Items -->
+		
+		<bean id="paroleBoardAgreementProfileItem"
+		  		class="omis.paroleboardcondition.web.profile.ParoleBoardAgreementProfileItem">
+		  	<constructor-arg name="requiredAuthorizations">
+		  		<set>
+		  			<value>PAROLE_BOARD_CONDITION_LIST</value>
+		  			<value>ADMIN</value>
+		  		</set>
+		  	</constructor-arg>
+		  	<constructor-arg name="includePage" value="/WEB-INF/views/paroleBoardCondition/profile/includes/profileItem.jsp"/>
+		  	<constructor-arg name="name" value="paroleBoardCondition"/>
+		    <constructor-arg name="profileItemRegistry" ref="boardOfPardonsAndParoleProfileItemRegistry"/>
+		  	<constructor-arg name="paroleBoardAgreementProfileItemService" ref="paroleBoardAgreementProfileItemService"/>
+		  	<constructor-arg name="enabled" value="${paroleBoardAgreementProfileItemEnabled}"/>
+	  	</bean>
+		
 		<aop:config>
 			<aop:pointcut id="paroleBoardAgreementControllerOperation"
 				expression="execution(* omis.paroleboardcondition.web.controller.ParoleBoardAgreementController.*(..))"/>

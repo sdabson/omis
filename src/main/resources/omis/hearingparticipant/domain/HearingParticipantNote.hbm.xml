@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearingparticipant.domain">
+	<class entity-name="omis.hearingparticipant.domain.HearingParticipantNote"
+			proxy="omis.hearingparticipant.domain.HearingParticipantNote"
+			name="omis.hearingparticipant.domain.impl.HearingParticipantNoteImpl"
+			table="`HEARING_PARTICIPANT_NOTE`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEARING_PARTICIPANT_NOTE_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="participant" column="`HEARING_PARTICIPANT_ID`" entity-name="omis.hearingparticipant.domain.HearingParticipant" not-null="true" />
+			<property name="description" column="`DESCRIPTION`" type="java.lang.String" not-null="true" />
+			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findHearingParticipantNote"><![CDATA[
+		select hearingParticipantNote
+		from
+			omis.hearingparticipant.domain.HearingParticipantNote hearingParticipantNote
+		where
+			hearingParticipantNote.description = :description
+		and
+			hearingParticipantNote.date = :date
+		and
+			hearingParticipantNote.participant = :hearingParticipant
+	]]></query>
+	<query name="findHearingParticipantNoteExcluding"><![CDATA[
+		select hearingParticipantNote
+		from
+			omis.hearingparticipant.domain.HearingParticipantNote hearingParticipantNote
+		where
+			hearingParticipantNote.description = :description
+		and
+			hearingParticipantNote.date = :date
+		and
+			hearingParticipantNote.participant = :hearingParticipant
+		and
+			hearingParticipantNote != :hearingParticipantNote
+	]]></query>
+	<query name="findHearingParticipantNotesByHearingParticipant"><![CDATA[
+		select hearingParticipantNote
+		from
+			omis.hearingparticipant.domain.HearingParticipantNote hearingParticipantNote
+		where
+			hearingParticipantNote.participant = :hearingParticipant
+	]]></query>
+</hibernate-mapping>

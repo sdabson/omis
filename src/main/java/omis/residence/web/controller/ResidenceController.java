@@ -64,7 +64,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * 
  * @author Sheronda Vaughn
  * @author Joel Norris
- * @version 0.1.1 (Aug 4, 2015)
+ * @version 0.1.2 (January 19, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -363,18 +363,8 @@ public class ResidenceController {
 			term = this.residenceService
 					.findPrimaryResidence(new Date(), offender);
 			residenceForm.setExistingPrimaryResidence(term);
-//			List<ResidenceTerm> residenceTerms
-//			= this.residenceService.findResidenceTermsByOffender(
-//					offender, new Date());
-//			for (ResidenceTerm residenceTerm : residenceTerms) {
-//				if (ResidenceCategory.PRIMARY.equals(
-//						residenceTerm.getCategory())) {					
-//					residenceForm.setExistingPrimaryResidence(
-//							residenceTerm);		
-//					term = residenceTerm;
-//					break;
-//				}			
-//			}
+			residenceForm.setNonResidenceTerms(this.residenceService.findNonResidenceTerms(
+					new Date(),  offender));
 		}
 		ModelAndView mav = this.prepareMav(residenceForm, offender,
 				residenceStatusOption);
@@ -450,6 +440,11 @@ public class ResidenceController {
 				primary = false;
 				fosterCare = false;
 				status = ResidenceStatus.RESIDENT;
+			}
+			if (primary && residenceForm.getEndConflictingNonResidenceTerms()) {
+				for(NonResidenceTerm term : residenceForm.getNonResidenceTerms()) {
+					this.residenceService.endNonResidenceTerm(term, residenceForm.getStartDate());
+				}
 			}
 			if (primary && residenceForm.getExistingPrimaryResidence() != null) {
 				ResidenceTerm primaryResidence = residenceForm

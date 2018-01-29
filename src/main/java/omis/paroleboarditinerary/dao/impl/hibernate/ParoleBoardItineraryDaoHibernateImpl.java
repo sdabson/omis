@@ -19,19 +19,18 @@ package omis.paroleboarditinerary.dao.impl.hibernate;
 
 import java.util.Date;
 import java.util.List;
-
 import org.hibernate.SessionFactory;
-
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
-import omis.location.domain.Location;
 import omis.paroleboarditinerary.dao.ParoleBoardItineraryDao;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 
 /**
  * Hibernate implementation of the parole board itinerary data access object.
  *
  * @author Josh Divine
- * @version 0.1.1 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryDaoHibernateImpl 
@@ -51,7 +50,8 @@ public class ParoleBoardItineraryDaoHibernateImpl
 	
 	/* Parameters. */
 	
-	private static final String LOCATION_PARAM_NAME = "location";
+	private static final String PAROLE_BOARD_LOCATION_PARAM_NAME =
+			"paroleBoardLocation";
 	
 	private static final String START_DATE_PARAM_NAME = "startDate";
 	
@@ -75,12 +75,14 @@ public class ParoleBoardItineraryDaoHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public ParoleBoardItinerary find(final Location location, 
+	public ParoleBoardItinerary find(
+			final ParoleBoardLocation paroleBoardLocation, 
 			final Date startDate, final Date endDate) {
 		ParoleBoardItinerary itinerary = (ParoleBoardItinerary) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_QUERY_NAME)
-				.setParameter(LOCATION_PARAM_NAME, location)
+				.setParameter(PAROLE_BOARD_LOCATION_PARAM_NAME,
+						paroleBoardLocation)
 				.setTimestamp(START_DATE_PARAM_NAME, startDate)
 				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.uniqueResult();
@@ -89,13 +91,15 @@ public class ParoleBoardItineraryDaoHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public ParoleBoardItinerary findExcluding(final Location location, 
+	public ParoleBoardItinerary findExcluding(
+			final ParoleBoardLocation paroleBoardLocation, 
 			final Date startDate, final Date endDate,
 			final ParoleBoardItinerary excludedItinerary) {
 		ParoleBoardItinerary itinerary = (ParoleBoardItinerary) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_EXCLUDING_QUERY_NAME)
-				.setParameter(LOCATION_PARAM_NAME, location)
+				.setParameter(PAROLE_BOARD_LOCATION_PARAM_NAME,
+						paroleBoardLocation)
 				.setTimestamp(START_DATE_PARAM_NAME, startDate)
 				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.setParameter(EXCLUDED_ITINERARY_PARAM_NAME, excludedItinerary)
@@ -105,7 +109,7 @@ public class ParoleBoardItineraryDaoHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public List<ParoleBoardItinerary> findAfterDate(Date effectiveDate) {
+	public List<ParoleBoardItinerary> findAfterDate(final Date effectiveDate) {
 		@SuppressWarnings("unchecked")
 		List<ParoleBoardItinerary> itineraries = (List<ParoleBoardItinerary>) 
 				this.getSessionFactory().getCurrentSession()

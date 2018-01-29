@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.web.controller;
 
 import java.io.IOException;
@@ -18,6 +35,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +60,8 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.report.ContactReportService;
+import omis.contact.report.ContactSummary;
 import omis.contact.web.controller.delegate.ContactSummaryModelDelegate;
 import omis.contact.web.controller.delegate.OnlineAccountFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
@@ -57,6 +77,8 @@ import omis.family.domain.FamilyAssociationCategoryClassification;
 import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
+import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.family.report.FamilyAssociationReportService;
 import omis.family.report.FamilyAssociationSummary;
 import omis.family.service.FamilyAssociationService;
@@ -186,10 +208,12 @@ public class FamilyAssociationController {
 		= "existingFamilyMember";
 	private static final String FAMILY_MEMBER_OFFENDER_MODEL_KEY 
 		= "familyMemberOffender";
-	private static final String DUPLICATE_ENTITY_FOUND_MESSAGE_KEY
+	private static final String FAMILY_ASSOCIATION_EXISTS_MESSAGE_KEY
 		= "familyAssociation.exists";
 	private static final String FAMILY_ASSOCIATION_CONFLICT_MESSAGE_KEY
 		= "familyAssociation.conflicts";
+	private static final String EXISTING_CONTACT_SUMMARY_MODEL_KEY
+		= "existingContactSummary";
 	
 	/* Message bundles. */
 	private static final String ERROR_BUNDLE_NAME = "omis.family.msgs.form";
@@ -226,6 +250,11 @@ public class FamilyAssociationController {
 
 	private static final String FAMILY_ASSOCIATION_DETAILS_ID_REPORT_PARAM_NAME 
 		= "FAMILY_ASSOC_ID";
+	
+	/* Fields names. */
+	private static final String PERSON_FIELDS_NAME = "personFields";
+	private static final String ADDRESS_FIELDS_NAME	= "addressFields";
+	private static final String PO_BOX_FIELDS_NAME = "poBoxFields";
 	
 	/* Property editor. */
 	@Autowired
@@ -301,6 +330,10 @@ public class FamilyAssociationController {
 	@Qualifier("sexPropertyEditorFactory")
 	private PropertyEditorFactory sexPropertyEditorFactory;
 	
+	@Autowired
+	@Qualifier("telephoneNumberPropertyEditorFactory")
+	private PropertyEditorFactory telephoneNumberPropertyEditorFactory;
+	
 	/* Services. */
 	@Autowired
 	@Qualifier("familyAssociationService")
@@ -313,6 +346,10 @@ public class FamilyAssociationController {
 	@Autowired
 	@Qualifier("offenderReportService")
 	private OffenderReportService offenderReportService;
+	
+	@Autowired
+	@Qualifier("contactReportService")
+	private ContactReportService contactReportService;
 	
 	/* Delegate */
 	@Autowired
@@ -495,7 +532,7 @@ public class FamilyAssociationController {
 			/* Set section Phone */
 			List<FamilyAssociationTelephoneNumberItem> 
 				familyAssociationTelephoneNumberItems = 
-			 new ArrayList<FamilyAssociationTelephoneNumberItem>();
+				new ArrayList<FamilyAssociationTelephoneNumberItem>();
 			for (TelephoneNumber telephoneNumber : this.familyAssociationService
 				.findTelephoneNumbersByContact(contact)) {
 				FamilyAssociationTelephoneNumberItem item 
@@ -600,6 +637,8 @@ public class FamilyAssociationController {
 	 * @throws ResidenceStatusConflictException 
 	 * @throws PrimaryResidenceExistsException 
 	 * @throws FamilyAssociationConflictException family association conflict
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationNoteExistsException 
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('FAMILY_ASSOCIATION_CREATE') or hasRole('ADMIN')")
@@ -612,7 +651,7 @@ public class FamilyAssociationController {
 		final BindingResult result) throws DuplicateEntityFoundException, 
 			ReflexiveRelationshipException, PrimaryResidenceExistsException, 
 			ResidenceStatusConflictException, 
-			FamilyAssociationConflictException {
+			FamilyAssociationConflictException, FamilyAssociationExistsException, FamilyAssociationNoteExistsException {
 		if (associatedPerson == null) {
 			// Create new
 			if (familyAssociationForm.getPoBoxFields() != null
@@ -633,8 +672,8 @@ public class FamilyAssociationController {
 				for (FamilyAssociationNoteItem noteItem 
 						: familyAssociationForm
 						 	.getFamilyAssociationNoteItems()) {
-					if (noteItem.getOperation() 
-							== FamilyAssociationNoteItemOperation.CREATE) {
+					if (FamilyAssociationNoteItemOperation.CREATE.equals(
+						noteItem.getOperation())) {
 						familyAssociationNoteItems.add(noteItem);
 					}
 				}
@@ -651,9 +690,8 @@ public class FamilyAssociationController {
 				for (FamilyAssociationTelephoneNumberItem telephoneNumberItem 
 						: familyAssociationForm
 						.getFamilyAssociationTelephoneNumberItems()) {
-					if (telephoneNumberItem.getOperation() 
-							== FamilyAssociationTelephoneNumberItemOperation
-							.CREATE) {
+					if (FamilyAssociationTelephoneNumberItemOperation.CREATE
+						.equals(telephoneNumberItem.getOperation())) {
 						telephoneNumberItems.add(telephoneNumberItem);
 					}
 				}
@@ -670,9 +708,8 @@ public class FamilyAssociationController {
 				for (FamilyAssociationOnlineAccountItem onlineAccountItem 
 						: familyAssociationForm
 						.getFamilyAssociationOnlineAccountItems()) {
-					if (onlineAccountItem.getOperation() 
-							== FamilyAssociationOnlineAccountItemOperation
-							.CREATE) {
+					if (FamilyAssociationOnlineAccountItemOperation.CREATE
+						.equals(onlineAccountItem.getOperation())) {
 						onlineAccountItems.add(onlineAccountItem);
 					}
 				}
@@ -733,8 +770,8 @@ public class FamilyAssociationController {
 			if (familyAssociationForm.getEnterAddress() != null       
 					// Enter address check box checked
 				&& familyAssociationForm.getEnterAddress()) {
-				if (familyAssociationForm.getAddressOperation().equals(
-					FamilyAddressOperation.NEW) && familyAssociationForm
+				if (FamilyAddressOperation.NEW.equals(familyAssociationForm
+					.getAddressOperation()) && familyAssociationForm
 					.getAddressFields().getNewCity()) {
 					addressFieldsNewCity = true;
 				}
@@ -862,8 +899,8 @@ public class FamilyAssociationController {
 			if (familyAssociationForm.getEnterAddress() != null   
 					// Enter address check box checked
 				&& familyAssociationForm.getEnterAddress()) {
-				if (familyAssociationForm.getAddressOperation().equals(
-					FamilyAddressOperation.NEW) && familyAssociationForm
+				if (FamilyAddressOperation.NEW.equals(familyAssociationForm
+					.getAddressOperation()) && familyAssociationForm
 					.getAddressFields().getNewZipCode()) {
 					addressFieldsNewZipCode = true;
 					addressFieldsZipCodeValue = familyAssociationForm
@@ -1515,8 +1552,8 @@ public class FamilyAssociationController {
 			if (familyAssociationForm.getEnterAddress() != null  
 					// Enter address check box checked
 				&& familyAssociationForm.getEnterAddress()) {
-				if (familyAssociationForm.getAddressOperation()
-					.equals(FamilyAddressOperation.NEW)) { 
+				if (FamilyAddressOperation.NEW.equals(familyAssociationForm
+					.getAddressOperation())) { 
 					// New address
 					if (familyAssociationForm.getAddressFields().getNewCity()) {
 						// New city in address fields
@@ -1835,8 +1872,8 @@ public class FamilyAssociationController {
 			familyAssociationForm.setEmergencyContact(familyAssociation
 				.getFlags().getEmergencyContact());
 		}
-		if (familyAssociation.getCategory().getClassification()
-			.equals(FamilyAssociationCategoryClassification.SPOUSE)) {
+		if (FamilyAssociationCategoryClassification.SPOUSE.equals(
+			familyAssociation.getCategory().getClassification())) {
 			familyAssociationForm.setDivorceDate(familyAssociation
 				.getDivorceDate());
 			familyAssociationForm.setMarriageDate(familyAssociation
@@ -1879,9 +1916,10 @@ public class FamilyAssociationController {
 	 * @param offender offender
 	 * @param result binding result
 	 * @return redirect to list of family associations
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
 	 * @throws FamilyAssociationConflictException 
 	 * family association conflict exception
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationNoteExistsException 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('FAMILY_ASSOCIATION_EDIT') or hasRole('ADMIN')")
@@ -1891,8 +1929,8 @@ public class FamilyAssociationController {
 		@RequestParam(value = "familyAssociation", required = true)
 		final FamilyAssociation familyAssociation,
 		final FamilyAssociationForm familyAssociationForm,
-		final BindingResult result) throws DuplicateEntityFoundException,
-		FamilyAssociationConflictException {	
+		final BindingResult result) throws 
+		FamilyAssociationConflictException, FamilyAssociationExistsException, FamilyAssociationNoteExistsException {	
 		this.familyAssociationFieldsEditValidator
 		 	.validate(familyAssociationForm,
 			result);
@@ -2114,7 +2152,7 @@ public class FamilyAssociationController {
 									 	ADDRESS_FIELDS_PROPERTY_NAME);
 							} else {
 								this.addressFieldsControllerDelegate
-								 .prepareEditAddressFields(map, countries, 
+								 	.prepareEditAddressFields(map, countries, 
 									 this.familyAssociationService
 									 	.findStatesByCountry(
 											 addressFields.getCountry()), 
@@ -2400,6 +2438,12 @@ public class FamilyAssociationController {
 			this.contactSummaryModelDelegate.add(map, 
 				familyAssociation.getRelationship().getSecondPerson());
 		}
+		if (familyMember != null) {
+			ContactSummary existingContactSummary = this.contactReportService
+				.summarizeByPerson(familyMember);
+			map.addAttribute(EXISTING_CONTACT_SUMMARY_MODEL_KEY,
+					existingContactSummary);
+		}
 		return new ModelAndView(EDIT_VIEW_NAME, map);
 	}	
 	
@@ -2492,8 +2536,9 @@ public class FamilyAssociationController {
 		@RequestParam(value = "category", required = true)
 			final FamilyAssociationCategory category) {
 		Boolean spouse;
-		if (category.getClassification() != null && category.getClassification()
-			.equals(FamilyAssociationCategoryClassification.SPOUSE)) {
+		if (category.getClassification() != null
+			&& FamilyAssociationCategoryClassification.SPOUSE.equals(
+			category.getClassification())) {
 			spouse = true;
 		} else {
 			spouse = false;
@@ -2513,8 +2558,8 @@ public class FamilyAssociationController {
 		@RequestParam(value = "category", required = true)
 			final FamilyAssociationCategory category) {
 		Boolean spouse;
-		if (category.getClassification()
-			.equals(FamilyAssociationCategoryClassification.SPOUSE)) {
+		if (FamilyAssociationCategoryClassification.SPOUSE.equals(
+			category.getClassification())) {
 			spouse = true;
 		} else {
 			spouse = false;
@@ -2547,209 +2592,142 @@ public class FamilyAssociationController {
 	
 	/**
 	 * Returns the state options view with a collections of state for the
-	 * specified country for address fields snippet.
+	 * specified country for person, address and po box fields snippet.
 	 * 
 	 * @param country country
-	 * @param addressFieldsPropertyName address fields property name
+	 * @param fieldsName fields name
 	 * @return model and view to show state options
 	 */
-	@RequestMapping(value = "stateOptions.html", method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsStateOptions(
+	@RequestMapping(value = "/{fieldsName}/findStateOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showStateOptions(
+		@PathVariable(value = "fieldsName")
+			final String fieldsName,
 		@RequestParam(value = "country", required = true)
-			final Country country,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName) {
+			final Country country) {
 		List<State> states 
 			= this.familyAssociationService.findStatesByCountry(country);
-		return this.addressFieldsControllerDelegate.showStateOptions(states, 
-			addressFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the state options view with a collections of state for the
-	 * specified country for po box fields snippet.
-	 * 
-	 * @param country country
-	 * @param poBoxFieldsPropertyName po box fields property name
-	 * @return model and view to show state options
-	 */
-	@RequestMapping(value = "poBoxFieldsStateOptions.html", 
-			method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsStateOptions(
-		@RequestParam(value = "country", required = true)
-			final Country country,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName) {
-		List<State> states 
-			= this.familyAssociationService.findStatesByCountry(country);
-		return this.poboxFieldsControllerDelegate.showStateOptions(states, 
-			poBoxFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the city options view with a collection of cities for the
-	 * specified state for address fields snippet.
-	 * 
-	 * @param state state
-	 * @param addressFieldsPropertyName address fields property name
-	 * @param country country
-	 * @return model and view to show city options
-	 */
-	@RequestMapping(value = "cityOptions.html", method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsCityOptions(
-		@RequestParam(value = "state", required = false)
-			final State state,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName,
-				@RequestParam(value = "country", required = false)
-		final Country country) {
-		if (state != null) {
-			return this.addressFieldsControllerDelegate.showCityOptions(
-				this.familyAssociationService.findCitiesByState(state),
-				addressFieldsPropertyName);
+		if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+			return this.personFieldsControllerDelegate
+			.showStateOptions(states, PERSON_FIELDS_NAME);
+		} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+			return this.addressFieldsControllerDelegate
+			.showStateOptions(states, ADDRESS_FIELDS_NAME);
+		} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+			return this.poboxFieldsControllerDelegate.showStateOptions(states,
+				PO_BOX_FIELDS_NAME);
 		} else {
-			if (this.familyAssociationService.hasStates(country)) {
-				return this.addressFieldsControllerDelegate.showCityOptions(
-					this.familyAssociationService
-					.findCitiesByCountryWithoutState(country), 
-					addressFieldsPropertyName);
-			} else {
-				return this.addressFieldsControllerDelegate.showCityOptions(
-					this.familyAssociationService.findCitiesByCountry(country), 
-					addressFieldsPropertyName);
-			}
+			throw new UnsupportedOperationException(
+				String.format("Fields name not supported %s", fieldsName));
 		}
 	}
-	
+
 	/**
 	 * Returns the city options view with a collection of cities for the
-	 * specified state for po box fields snippet.
+	 * specified state for person, address and po box fields snippet.
 	 * 
 	 * @param state state
-	 * @param poBoxFieldsPropertyName po box fields property name
 	 * @param country country
+	 * @param fieldsName fields name
 	 * @return model and view to show city options
 	 */
-	@RequestMapping(value = "poBoxFieldsCityOptions.html", 
+	@RequestMapping(value = "/{fieldsName}/findCityOptions.html", 
 		method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsCityOptions(
+	public ModelAndView showCityOptions(
+		@PathVariable(value = "fieldsName")
+			final String fieldsName,
 		@RequestParam(value = "state", required = false)
 			final State state,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName,
-			@RequestParam(value = "country", required = false)
-		final Country country) {
-		if (state != null) {
-			return this.poboxFieldsControllerDelegate.showCityOptions(
-				this.familyAssociationService.findCitiesByState(state),
-				poBoxFieldsPropertyName);
-		} else {
-			if (this.familyAssociationService.hasStates(country)) {
-				return this.poboxFieldsControllerDelegate.showCityOptions(
-					this.familyAssociationService
-					.findCitiesByCountryWithoutState(country), 
-					poBoxFieldsPropertyName);
-			} else {
-				return this.poboxFieldsControllerDelegate.showCityOptions(
-					this.familyAssociationService.findCitiesByCountry(country), 
-					poBoxFieldsPropertyName);
-			}
-		}
-	}
-	
-	/**
-	 * Returns the zip code options view with a collection of zip codes for the
-	 * specified city for address field snippet.
-	 * 
-	 * @param city city
-	 * @param addressFieldsPropertyName address fields property name
-	 * @return model and view to show zip code options
-	 */
-	@RequestMapping(value = "zipCodeOptions.html", method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsZipCodeOptions(
-		@RequestParam(value = "city", required = true)
-			final City city,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName) {
-		return this.addressFieldsControllerDelegate.showZipCodeOptions(
-			this.familyAssociationService.findZipCodesByCity(city), 
-			addressFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the zip code options view with a collection of zip codes for the
-	 * specified city for po box field snippet.
-	 * 
-	 * @param city city
-	 * @param poBoxFieldsPropertyName po box fields property name
-	 * @return model and view to show zip code options
-	 */
-	@RequestMapping(value = "poBoxFieldsZipCodeOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsZipCodeOptions(
-		@RequestParam(value = "city", required = true)
-			final City city,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName) {
-		return this.poboxFieldsControllerDelegate.showZipCodeOptions(
-			this.familyAssociationService.findZipCodesByCity(city), 
-			poBoxFieldsPropertyName);  
-	}
-	
-	/**
-	 * Returns the state options view with a collections of state for the
-	 * specified country for person ields snippet.
-	 * 
-	 * @param country country
-	 * @param personFieldsPropertyName person box fields property name
-	 * @return model and view to show state options
-	 */
-	@RequestMapping(value = "personFieldsStateOptions.html", 
-			method = RequestMethod.GET)
-	public ModelAndView showPersonFieldsStateOptions(
 		@RequestParam(value = "country", required = true)
-			final Country country,
-		@RequestParam(value = "personFieldsPropertyName", required = true)
-			final String personFieldsPropertyName) {
-		List<State> states 
-			= this.familyAssociationService.findStatesByCountry(country);
-		return this.personFieldsControllerDelegate.showStateOptions(states, 
-			personFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the city options view with a collection of cities for the
-	 * specified state for person fields snippet.
-	 * 
-	 * @param state state
-	 * @param personFieldsPropertyName person fields property name
-	 * @param country country
-	 * @return model and view to show city options
-	 */
-	@RequestMapping(value = "personFieldsCityOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPersonFieldsCityOptions(
-		@RequestParam(value = "state", required = false)
-			final State state,
-		@RequestParam(value = "personFieldsPropertyName", required = true)
-			final String personFieldsPropertyName,
-		@RequestParam(value = "country", required = false)
 		final Country country) {
 		if (state != null) {
-			return this.personFieldsControllerDelegate.showCityOptions(
+			if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+				return this.personFieldsControllerDelegate.showCityOptions(
 				this.familyAssociationService.findCitiesByState(state), 
-				personFieldsPropertyName);
+				PERSON_FIELDS_NAME);
+			} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+				return this.addressFieldsControllerDelegate.showCityOptions(
+				this.familyAssociationService.findCitiesByState(state),
+				ADDRESS_FIELDS_NAME);
+			} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+				return this.poboxFieldsControllerDelegate.showCityOptions(
+				this.familyAssociationService.findCitiesByState(state),
+				PO_BOX_FIELDS_NAME);
+			} else {
+				throw new UnsupportedOperationException(
+					String.format("Fields name not supported %s", fieldsName));
+			}
 		} else {
 			if (this.familyAssociationService.hasStates(country)) {
-				return this.personFieldsControllerDelegate.showCityOptions(
+				if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+					return this.personFieldsControllerDelegate.showCityOptions(
 					this.familyAssociationService
 					.findCitiesByCountryWithoutState(country), 
-					personFieldsPropertyName);
+					PERSON_FIELDS_NAME);
+				} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+					return this.addressFieldsControllerDelegate.showCityOptions(
+					this.familyAssociationService
+					.findCitiesByCountryWithoutState(country),
+					ADDRESS_FIELDS_NAME);
+				} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+					return this.poboxFieldsControllerDelegate.showCityOptions(
+					this.familyAssociationService
+					.findCitiesByCountryWithoutState(country),
+					PO_BOX_FIELDS_NAME);
+				} else {
+					throw new UnsupportedOperationException(
+						String.format("Fields name not supported %s",
+						fieldsName));
+				}
 			} else {
-				return this.personFieldsControllerDelegate.showCityOptions(
-					this.familyAssociationService.findCitiesByCountry(country), 
-					personFieldsPropertyName);
+				if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+					return this.personFieldsControllerDelegate.showCityOptions(
+					this.familyAssociationService.findCitiesByCountry(
+					country), PERSON_FIELDS_NAME);
+				} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+					return this.addressFieldsControllerDelegate.showCityOptions(
+					this.familyAssociationService.findCitiesByCountry(
+					country), ADDRESS_FIELDS_NAME);
+				} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+					return this.poboxFieldsControllerDelegate.showCityOptions(
+					this.familyAssociationService.findCitiesByCountry(
+					country), PO_BOX_FIELDS_NAME);
+				} else {
+					throw new UnsupportedOperationException(
+						String.format("Fields name not supported %s",
+						fieldsName));
+				}
 			}
+		}
+	}
+
+	/**
+	 * Returns the zip code options view with a collection of zip codes for the
+	 * specified city for address, poBox field snippet.
+	 * 
+	 * @param city city
+	 * @param fieldsName fields name
+	 * @return model and view to show zip code options
+	 */
+	@RequestMapping(value = "/{fieldsName}/findZipCodeOptions.html", 
+		method = RequestMethod.GET)
+	public ModelAndView showZipCodeOptions(
+		@PathVariable(value = "fieldsName")
+			final String fieldsName,
+		@RequestParam(value = "city", required = true)
+			final City city) {
+		if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+			return this.addressFieldsControllerDelegate.showZipCodeOptions(
+			this.familyAssociationService.findZipCodesByCity(city),
+			ADDRESS_FIELDS_NAME);
+		} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+			return this.poboxFieldsControllerDelegate.showZipCodeOptions(
+			this.familyAssociationService.findZipCodesByCity(city),
+			PO_BOX_FIELDS_NAME);
+		} else {
+			throw new UnsupportedOperationException(
+				String.format("Fields name not supported %s",
+				fieldsName));
 		}
 	}
 	
@@ -2881,7 +2859,6 @@ public class FamilyAssociationController {
 			final Offender offender, 
 			@RequestParam(value = "familyAssociation", 
 			required = true) final FamilyAssociation familyAssociation) {
-		
 		ModelMap map = new ModelMap();
 		if (familyMemberOffender != null) {
 			map.addAttribute(FAMILY_MEMBER_OFFENDER_MODEL_KEY, 
@@ -3049,6 +3026,8 @@ public class FamilyAssociationController {
 			this.sexPropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(Address.class,
 			this.addressPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(TelephoneNumber.class,
+			this.telephoneNumberPropertyEditorFactory.createPropertyEditor());
 	}
 	
 	// Returns true if value is true; false otherwise
@@ -3056,18 +3035,33 @@ public class FamilyAssociationController {
 		return value != null && value;
 	}
 	
-	/**
+/*	*//**
 	 * Handles {@code DuplicateEntityFoundException}.
 	 * 
 	 * @param duplicateEntityFoundException exception thrown
 	 * @return screen to handle {@code DuplicateEntityFoundException}
-	 */
+	 *//*
 	@ExceptionHandler(DuplicateEntityFoundException.class)
 	public ModelAndView handleDuplicateEntityFoundException(
 			final DuplicateEntityFoundException duplicateEntityFoundException) {
 		return this.businessExceptionHandlerDelegate
 				.prepareModelAndView(DUPLICATE_ENTITY_FOUND_MESSAGE_KEY,
 						ERROR_BUNDLE_NAME, duplicateEntityFoundException);
+	}*/
+	
+	/**
+	 * Handles FamilyAssociationExistsException}.
+	 * 
+	 * @param familyAssociationExistsException exception thrown
+	 * @return screen to handle FamilyAssociationExistsException
+	 */
+	@ExceptionHandler(FamilyAssociationExistsException.class)
+	public ModelAndView handleFamilyAssociationExistsException(
+			final FamilyAssociationExistsException 
+				familyAssociationExistsException) {
+		return this.businessExceptionHandlerDelegate
+				.prepareModelAndView(FAMILY_ASSOCIATION_EXISTS_MESSAGE_KEY,
+						ERROR_BUNDLE_NAME, familyAssociationExistsException);
 	}
 	
 	/**

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearinganalysis.domain">
+	<class	entity-name="omis.hearinganalysis.domain.HearingAnalysisTaskAssociation"
+			proxy="omis.hearinganalysis.domain.HearingAnalysisTaskAssociation"
+			name="omis.hearinganalysis.domain.impl.HearingAnalysisTaskAssociationImpl"
+			table="`HEARING_ANLYS_TSK_ASSCTN`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`HEARING_ANLYS_TSK_ASSCTN_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="task" entity-name="omis.task.domain.Task" not-null="true" column="`TASK_ID`"/>
+		<many-to-one name="taskSource" entity-name="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource" not-null="true" column="`PARLE_HRING_ANLYS_TSK_SRC_ID`"/>
+		<many-to-one name="hearingAnalysis" entity-name="omis.hearinganalysis.domain.HearingAnalysis" not-null="true" column="`HEARING_ANALYSIS_ID`"/>
+	</class>
+	<query name="findHearingAnalysisTaskAssociation"><![CDATA[
+		select hearingAnalysisTaskAssociation
+		from omis.hearinganalysis.domain.HearingAnalysisTaskAssociation hearingAnalysisTaskAssociation
+		where
+			hearingAnalysisTaskAssociation.task = :task
+		and
+			hearingAnalysisTaskAssociation.taskSource = :taskSource
+		and
+			hearingAnalysisTaskAssociation.hearingAnalysis = :hearingAnalysis
+	]]></query>
+	<query name="findHearingAnalysisTaskAssociationExcluding"><![CDATA[
+		select hearingAnalysisTaskAssociation
+		from omis.hearinganalysis.domain.HearingAnalysisTaskAssociation hearingAnalysisTaskAssociation
+		where
+			hearingAnalysisTaskAssociation.task = :task
+		and
+			hearingAnalysisTaskAssociation.taskSource = :taskSource
+		and
+			hearingAnalysisTaskAssociation.hearingAnalysis = :hearingAnalysis
+		and
+			hearingAnalysisTaskAssociation <> :excludedHearingAnalysisTaskAssociation
+	]]></query>
+	<query name="findHearingAnalysisTaskAssociationByHearingAnalysis"><![CDATA[
+		select hearingAnalysisTaskAssociation
+		from omis.hearinganalysis.domain.HearingAnalysisTaskAssociation hearingAnalysisTaskAssociation
+		where
+			hearingAnalysisTaskAssociation.hearingAnalysis = :hearingAnalysis
+	]]></query>
+	<query name="findTaskByTaskTemplateAndHearingAnalysis"><![CDATA[
+		select task
+		from omis.hearinganalysis.domain.HearingAnalysisTaskAssociation hearingAnalysisTaskAssociation
+		inner join hearingAnalysisTaskAssociation.task task
+		inner join hearingAnalysisTaskAssociation.taskSource taskSource
+		where
+			taskSource.taskTemplate = :taskTemplate
+		and
+			hearingAnalysisTaskAssociation.hearingAnalysis = :hearingAnalysis
+	]]></query>
+</hibernate-mapping>

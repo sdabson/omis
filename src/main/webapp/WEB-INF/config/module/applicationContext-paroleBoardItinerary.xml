@@ -18,6 +18,7 @@
         	<constructor-arg name="boardMeetingSiteDelegate" ref="boardMeetingSiteDelegate"/>
         	<constructor-arg name="locationDelegate" ref="locationDelegate"/>
         	<constructor-arg name="paroleBoardMemberDelegate" ref="paroleBoardMemberDelegate"/>
+        	<constructor-arg name="paroleBoardLocationDelegate" ref="paroleBoardLocationDelegate" />
         </bean>        
         
         <!-- Report services -->
@@ -57,6 +58,11 @@
         	<constructor-arg name="boardMeetingSiteInstanceFactory" ref="boardMeetingSiteInstanceFactory"/>
         </bean>
         
+        <bean id="paroleBoardLocationDelegate" class="omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate">
+			<constructor-arg name="paroleBoardLocationDao" ref="paroleBoardLocationDao" />
+			<constructor-arg name="paroleBoardLocationInstanceFactory" ref="paroleBoardLocationInstanceFactory" />
+		</bean>
+        
         <!-- Data access objects -->
         
         <bean id="paroleBoardItineraryDao"
@@ -83,6 +89,11 @@
     		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   		</bean>
   		
+  		<bean id="paroleBoardLocationDao" class="omis.paroleboarditinerary.dao.impl.hibernate.ParoleBoardLocationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardLocation" />
+		</bean>
+  		
   		<!-- Instance factories -->
   		 
 		<bean id="paroleBoardItineraryInstanceFactory"
@@ -108,7 +119,12 @@
 			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
 			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardMeetingSite"/>
 		</bean>
-
+		
+		<bean id="paroleBoardLocationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.ParoleBoardLocation" />
+		</bean>
+	
   		 <!--Property editor factories -->
  		 
  		 <bean id="paroleBoardItineraryPropertyEditorFactory"
@@ -137,6 +153,14 @@
  			<constructor-arg name="entityName" value="omis.paroleboarditinerary.domain.BoardMeetingSite"/>
  			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
   			<constructor-arg name="dao" ref="boardMeetingSiteDao"/>
+		</bean>
+		
+		<bean id="paroleBoardLocationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="paroleBoardLocationDao" />
+			<constructor-arg name="entityName"
+				value="omis.paroleboarditinerary.domain.ParoleBoardLocation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
 		</bean>
 		
 </beans>

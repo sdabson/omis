@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.testng;
 
 import java.util.Date;
@@ -15,6 +32,7 @@ import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
+import omis.visitation.exception.VisitationExistsException;
 import omis.visitation.service.delegate.VisitationAssociationCategoryDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,11 +73,13 @@ public class OffenderRelationshipAssociateVisitorTests
 	 * @throws DuplicateEntityFoundException DuplicateEntityFoundException
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
 	 * @throws DateConflictException DateConflictException
+	 * @throws VisitationExistsException VisitationExistsException
 	 */
 	@Test
 	public void testAssociateVisitor() 
 		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		DateConflictException {
+		DateConflictException, VisitationExistsException,
+		VisitationExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Wang",
 			"Kevin", "Johns", "Mr.");
@@ -146,20 +166,28 @@ public class OffenderRelationshipAssociateVisitorTests
 	 * associations exist
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
 	 * @throws DateConflictException DateConflictException
+	 * @throws VisitationExistsException VisitationExistsException
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class, 
-		ReflexiveRelationshipException.class, DateConflictException.class })
+	@Test(expectedExceptions = {VisitationExistsException.class})
 	public void testDuplicateAssociateVisitor() 
 		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		DateConflictException {
+		DateConflictException, VisitationExistsException {
 		// Assignment
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Wang",
 			"Kevin", "Johns", "Mr.");
 		Person visitor = this.personDelegate.create("lastName", "firstName", 
 			"middleName", "Mr.");
-		Date startDate = new Date(1);
-		final int endDateInt = 1000000;
-		Date endDate = new Date(endDateInt);
+		/*Date startDate = new Date(1);
+		final int endDateInt = 1000000000;
+		Date endDate = new Date(endDateInt);*/
+		
+		
+		final long startDateNumber = 111111;
+		final long endDateNumber = 999999;
+		
+		Date startDate = new Date(startDateNumber);
+		Date endDate = new Date(endDateNumber);
+		
 		VisitationAssociationFlags flags = new VisitationAssociationFlags(true, 
 			true, true, true);
 		String notes = new String("This a test for notes");

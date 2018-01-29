@@ -1,0 +1,79 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Styles hearing analysis task screens.
+ *
+ * @author: Josh Divine
+ * Version: 0.1.0 (Jan 17, 2018)
+ * Since: OMIS 3.0
+ */
+.detailsLabel{
+	font-weight: bold;
+}
+
+#taskLinks li.taskLink {
+	display: inline-block;
+	margin-bottom: 10px;
+	vertical-align: top;
+}
+
+li.taskLink a.button {
+    display: inline-block;
+    
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    margin: 1px;   
+    text-align: center;
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 3px;
+    min-height:10px;
+}
+
+li.taskLink input {
+	vertical-align: text-top;
+}
+
+@media screen and (min-width: 1001px) {
+	a.button {
+		max-width: 100px;
+		min-width: 200px;
+	}
+	#taskLinks li.taskLink {
+		width: 33%;
+		
+	}
+}
+
+@media screen and (max-width: 1000px) {
+	a.button {
+		width: 80px;
+		max-height: 85px;
+	}
+	#taskLinks li.taskLink {
+		width: 23%;
+		margin-right: 5px;
+	}
+}
+.moduleCheckBox {
+	/* Might not need this class. */
+}
+

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="hearingParticipantService" class="omis.hearingparticipant.service.impl.HearingParticipantServiceImpl">
+			<constructor-arg name="hearingParticipantDelegate" ref="hearingParticipantDelegate" />
+			<constructor-arg name="hearingParticipantNoteDelegate" ref="hearingParticipantNoteDelegate" />
+			<constructor-arg name="hearingParticipantIntentCategoryDelegate" ref="hearingParticipantIntentCategoryDelegate" />
+		</bean>
+		
+		<!-- HearingParticipant Beans -->
+		
+		<bean id="hearingParticipantDao" class="omis.hearingparticipant.dao.impl.hibernate.HearingParticipantDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipant" />
+		</bean>
+		
+		<bean id="hearingParticipantDelegate" class="omis.hearingparticipant.service.delegate.HearingParticipantDelegate">
+			<constructor-arg name="hearingParticipantDao" ref="hearingParticipantDao" />
+			<constructor-arg name="hearingParticipantInstanceFactory" ref="hearingParticipantInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="hearingParticipantInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipant" />
+		</bean>
+		
+		<bean id="hearingParticipantPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingParticipantDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearingparticipant.domain.HearingParticipant" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- HearingParticipantNote Beans -->
+		
+		<bean id="hearingParticipantNoteDao" class="omis.hearingparticipant.dao.impl.hibernate.HearingParticipantNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipantNote" />
+		</bean>
+		
+		<bean id="hearingParticipantNoteDelegate" class="omis.hearingparticipant.service.delegate.HearingParticipantNoteDelegate">
+			<constructor-arg name="hearingParticipantNoteDao" ref="hearingParticipantNoteDao" />
+			<constructor-arg name="hearingParticipantNoteInstanceFactory" ref="hearingParticipantNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="hearingParticipantNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipantNote" />
+		</bean>
+		
+		<bean id="hearingParticipantNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingParticipantNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearingparticipant.domain.HearingParticipantNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- HearingParticipantIntentCategory Beans -->
+		
+		<bean id="hearingParticipantIntentCategoryDao" class="omis.hearingparticipant.dao.impl.hibernate.HearingParticipantIntentCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipantIntentCategory" />
+		</bean>
+		
+		<bean id="hearingParticipantIntentCategoryDelegate" class="omis.hearingparticipant.service.delegate.HearingParticipantIntentCategoryDelegate">
+			<constructor-arg name="hearingParticipantIntentCategoryDao" ref="hearingParticipantIntentCategoryDao" />
+		</bean>
+		
+		<bean id="hearingParticipantIntentCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearingparticipant.domain.HearingParticipantIntentCategory" />
+		</bean>
+		
+		<bean id="hearingParticipantIntentCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="hearingParticipantIntentCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearingparticipant.domain.HearingParticipantIntentCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+</beans>

@@ -3,11 +3,9 @@ package omis.paroleboarditinerary.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
-
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.address.service.delegate.AddressDelegate;
@@ -22,9 +20,11 @@ import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
 import omis.region.domain.City;
 import omis.region.service.delegate.CityDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
@@ -74,6 +74,10 @@ public class ParoleBoardItineraryServiceUpdateBoardMeetingSiteTests
 	@Qualifier("boardMeetingSiteDelegate")
 	private BoardMeetingSiteDelegate boardMeetingSiteDelegate;
 	
+	@Autowired
+	@Qualifier("paroleBoardLocationDelegate")
+	private ParoleBoardLocationDelegate paroleBoardLocationDelegate;
+	
 	/* Services. */
 
 	@Autowired
@@ -101,10 +105,12 @@ public class ParoleBoardItineraryServiceUpdateBoardMeetingSiteTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(
@@ -152,10 +158,12 @@ public class ParoleBoardItineraryServiceUpdateBoardMeetingSiteTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(
@@ -200,10 +208,12 @@ public class ParoleBoardItineraryServiceUpdateBoardMeetingSiteTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(
@@ -248,10 +258,12 @@ public class ParoleBoardItineraryServiceUpdateBoardMeetingSiteTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(

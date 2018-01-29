@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.criminalassociation.service;
 
 import java.util.List;
@@ -5,9 +22,11 @@ import java.util.List;
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.contact.domain.Contact;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.criminalassociation.domain.CriminalAssociation;
 import omis.criminalassociation.domain.CriminalAssociationCategory;
 import omis.criminalassociation.domain.component.CriminalAssociationFlags;
+import omis.criminalassociation.exception.CriminalAssociationExistsException;
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
@@ -22,6 +41,7 @@ import omis.residence.exception.ResidenceStatusConflictException;
  * 
  * @author Joel Norris 
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.1.1 (Apr, 15 2015)
  * @since OMIS 3.0
  *
@@ -40,13 +60,15 @@ public interface CriminalAssociationService {
 	 * @param category criminal association category
 	 * @param criminalAssociationFlags criminal association flags
 	 * @return CriminalAssociation criminal association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws CriminalAssociationExistsException criminal association 
+	 * exists exception
 	 * @throws ReflexiveRelationshipException reflexive relationship exception
 	 */
 	CriminalAssociation associate(Offender offender, Person associate, 
 		DateRange dateRange, CriminalAssociationCategory category, 
 		CriminalAssociationFlags criminalAssociationFlags) 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException;
+		throws CriminalAssociationExistsException, 
+		ReflexiveRelationshipException;
 	
 	/**
 	 * Updates an existing criminal association.
@@ -123,7 +145,8 @@ public interface CriminalAssociationService {
 	 * primary residence exists exception
 	 */
 	ResidenceTerm createResidenceTerm(Person person, Address address) 
-		throws DuplicateEntityFoundException, PrimaryResidenceExistsException, 
+		throws DuplicateEntityFoundException, 
+		PrimaryResidenceExistsException, 
 		ResidenceStatusConflictException;
 	
 	/**
@@ -132,10 +155,10 @@ public interface CriminalAssociationService {
 	 * @param person person
 	 * @param telephoneNumber telephone number
 	 * @return contact contact
-	 * @throws DuplicateEntityFoundException 
+	 * @throws TelephoneNumberExistsException telephone number 
 	 */
 	Contact addTelephoneNumber(Person person, Long telephoneNumber) 
-		throws DuplicateEntityFoundException;
+		throws TelephoneNumberExistsException;
 	
 	/**
 	 * Returns a list of all criminal associations for the specified offender

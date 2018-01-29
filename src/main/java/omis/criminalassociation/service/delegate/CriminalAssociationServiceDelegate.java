@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.criminalassociation.service.delegate;
 
 import omis.audit.AuditComponentRetriever;
@@ -8,8 +25,8 @@ import omis.criminalassociation.dao.CriminalAssociationDao;
 import omis.criminalassociation.domain.CriminalAssociation;
 import omis.criminalassociation.domain.CriminalAssociationCategory;
 import omis.criminalassociation.domain.component.CriminalAssociationFlags;
+import omis.criminalassociation.exception.CriminalAssociationExistsException;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
@@ -21,6 +38,7 @@ import omis.relationship.exception.ReflexiveRelationshipException;
  * Criminal association service delegate.
  * 
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.1.0 (April 14, 2015)
  * @since OMIS 3.0
  */
@@ -71,14 +89,15 @@ public class CriminalAssociationServiceDelegate {
 	 * @param category criminal association category
 	 * @param criminalAssociationFlags witness - if there is witness or not 
 	 * @return criminal association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws CriminalAssociationExistsException criminal association exists 
+	 * exception
 	 * @throws ReflexiveRelationshipException reflexive relation ship exception
 	 */
 	public CriminalAssociation associateCriminally(final Offender offender, 
 		final Person associate, final DateRange dateRange, 
 		final CriminalAssociationCategory category, 
 		final CriminalAssociationFlags criminalAssociationFlags) 
-			throws DuplicateEntityFoundException, 
+			throws CriminalAssociationExistsException, 
 			ReflexiveRelationshipException {
 		if (offender.equals(associate)) {
 			throw new ReflexiveRelationshipException(
@@ -98,7 +117,8 @@ public class CriminalAssociationServiceDelegate {
 
 		if (this.criminalAssociationDao.findCriminalAssociation(
 			relationship, dateRange) != null) {
-		    throw new DuplicateEntityFoundException("Duplicate Entity Found");
+		    throw new CriminalAssociationExistsException(
+		    		"Duplicate criminal association exists");
 		}
 		
 		CriminalAssociation criminalAssociation 

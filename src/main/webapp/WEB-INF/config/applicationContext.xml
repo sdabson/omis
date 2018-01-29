@@ -100,6 +100,8 @@
     			<value>/WEB-INF/classes/omis/audit/msgs/form</value>
     			<value>/WEB-INF/classes/omis/biographicandcontactsection/msgs/form</value>
     			<value>/WEB-INF/classes/omis/bedplacement/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/boardhearing/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/boardhearingdecision/msgs/form</value>
     			<value>/WEB-INF/classes/omis/caseload/msgs/form</value>
     			<value>/WEB-INF/classes/omis/caution/msgs/form</value>
     			<value>/WEB-INF/classes/omis/citation/msgs/form</value>
@@ -123,7 +125,8 @@
     			<value>/WEB-INF/classes/omis/financial/msgs/form</value>
     			<value>/WEB-INF/classes/omis/health/msgs/form</value>
     			<value>/WEB-INF/classes/omis/hearing/msgs/form</value>
-    			<value>/WEB-INF/classes/omis/hearingAnalysis/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/hearinganalysis/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/hearingparticipant/msgs/form</value>
     			<value>/WEB-INF/classes/omis/identificationnumber/msgs/form</value>
     			<value>/WEB-INF/classes/omis/incident/msgs/form</value>
     			<value>/WEB-INF/classes/omis/grievance/msgs/form</value>

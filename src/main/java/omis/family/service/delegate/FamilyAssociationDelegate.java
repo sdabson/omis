@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.family.service.delegate;
 
 import java.util.Date;
@@ -7,12 +24,12 @@ import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
-import omis.family.exception.FamilyAssociationConflictException;
 import omis.family.dao.FamilyAssociationDao;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.component.FamilyAssociationFlags;
+import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.relationship.domain.Relationship;
@@ -74,7 +91,8 @@ public class FamilyAssociationDelegate {
 	 * @param relationship relationship
 	 * @param dateRange date range
 	 * @return created family association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 * @throws FamilyAssociationConflictException 
 	 * family association conflict exception
 	 */
@@ -84,10 +102,10 @@ public class FamilyAssociationDelegate {
 		final Date marriageDate, 
 		final Date divorceDate, 
 		final Relationship relationship)
-		throws DuplicateEntityFoundException, 
+		throws FamilyAssociationExistsException, 
 		FamilyAssociationConflictException {
 		if (this.familyAssociationDao.find(relationship, dateRange) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new FamilyAssociationExistsException(
 					"Duplicate family association found");
 		}
 		
@@ -118,18 +136,18 @@ public class FamilyAssociationDelegate {
 	 * @param marriageDate marriage date
 	 * @param divorceDate divorce date
 	 * @return update family association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists exception
 	 * @throws FamilyAssociationConflictException 
 	 * family association conflict exception
 	 */
 	public FamilyAssociation update(final FamilyAssociation association, 
 		final DateRange dateRange, final FamilyAssociationCategory category, 
 		final FamilyAssociationFlags flags, final Date marriageDate, 
-		final Date divorceDate) throws DuplicateEntityFoundException,
+		final Date divorceDate) throws FamilyAssociationExistsException,
 		FamilyAssociationConflictException {
 		if (this.familyAssociationDao.findExcluding(association,
 			association.getRelationship(), dateRange) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new FamilyAssociationExistsException(
 					"Duplicate family association found");
 		}
 		

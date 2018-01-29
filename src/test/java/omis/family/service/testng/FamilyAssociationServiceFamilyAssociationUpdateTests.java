@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.testng;
 
 import java.util.Date;
@@ -8,7 +25,9 @@ import org.testng.annotations.Test;
 
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
+import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
@@ -26,6 +45,7 @@ import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
  * Tests "update" of family association
  *
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -52,10 +72,12 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 	
 	/**
 	 * Family association update.
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
 	@Test
-	public void testFamilyAssociationUpdate() throws DuplicateEntityFoundException, 
-		ReflexiveRelationshipException, FamilyAssociationConflictException{
+	public void testFamilyAssociationUpdate() 
+			throws FamilyAssociationExistsException, 
+		ReflexiveRelationshipException, FamilyAssociationConflictException, FamilyAssociationCategoryExistsException{
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
 			"Obama", "Kevin", "Johns", "Mr.");
@@ -85,9 +107,9 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 		Date newMarriageDate = new Date(105120000);
 		Date newDivorceDate = new Date(205120000);
 		FamilyAssociationCategory newCategory 
-		= this.familyAssociationCategoryDelegate.create("newCategory", 
-		(Boolean)true, new Short((short) 57), 
-		FamilyAssociationCategoryClassification.SIBLING);
+			= this.familyAssociationCategoryDelegate.create("newCategory", 
+			(Boolean)true, new Short((short) 57), 
+			FamilyAssociationCategoryClassification.SIBLING);
 		FamilyAssociationFlags newFlags = new FamilyAssociationFlags();
 		newFlags.setCohabitant(false);
 		newFlags.setDependent(false);
@@ -140,12 +162,14 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate term exists
 	 * @throws ReflexiveRelationshipException 
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class, 
+	@Test(expectedExceptions = {FamilyAssociationExistsException.class, 
 		ReflexiveRelationshipException.class})
 	public void testDuplicateFamilyAssociationUpdate() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException, 
-		FamilyAssociationConflictException {
+		throws FamilyAssociationExistsException, ReflexiveRelationshipException, 
+		FamilyAssociationConflictException, 
+		FamilyAssociationCategoryExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
 			"Obama", "Kevin", "Johns", "Mr.");
@@ -166,7 +190,7 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 		flags1.setCohabitant(true);
 		flags1.setDependent(true);
 		flags1.setEmergencyContact(true);
-		FamilyAssociation familyAssociation1 = this.familyAssociationService
+		this.familyAssociationService
 			.associate(offender, familyMember1, dateRange1, category1, flags1, 
 			marriageDate1, divorceDate1);
 		
@@ -178,19 +202,19 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 		Date marriageDate2 = new Date(175120000); 
 		Date divorceDate2 = new Date(275120000);
 		FamilyAssociationCategory category2 
-		= this.familyAssociationCategoryDelegate.create("category", 
+		= this.familyAssociationCategoryDelegate.create("newCategory", 
 		(Boolean)true, new Short((short) 23), 
 		FamilyAssociationCategoryClassification.PARENT);
 		FamilyAssociationFlags flags2 = new FamilyAssociationFlags();
 		flags2.setCohabitant(false);
 		flags2.setDependent(false);
 		flags2.setEmergencyContact(false);
-		this.familyAssociationService.associate(offender, familyMember1, 
+		FamilyAssociation familyAssociation1 = this.familyAssociationService.associate(offender, familyMember1, 
 			dateRange2, category2, flags2, marriageDate2, divorceDate2);
 		
 		// Action
-		this.familyAssociationService.update(familyAssociation1, dateRange2, 
-			category2, flags2, marriageDate2, divorceDate2);
+		this.familyAssociationService.update(familyAssociation1, dateRange2, category1, flags2, 
+				marriageDate2, divorceDate2);
 	}	
 	
 	/**
@@ -198,11 +222,12 @@ public class FamilyAssociationServiceFamilyAssociationUpdateTests
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate term exists
 	 * @throws ReflexiveRelationshipException 
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
 	@Test(expectedExceptions = {FamilyAssociationConflictException.class})
 	public void testOverlappedFamilyAssociationUpdate() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException, 
-		FamilyAssociationConflictException {
+		throws FamilyAssociationExistsException, ReflexiveRelationshipException, 
+		FamilyAssociationConflictException, FamilyAssociationCategoryExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
 			"Obama", "Kevin", "Johns", "Mr.");

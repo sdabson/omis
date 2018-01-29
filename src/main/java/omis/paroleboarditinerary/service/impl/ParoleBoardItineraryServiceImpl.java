@@ -2,7 +2,6 @@ package omis.paroleboarditinerary.service.impl;
 
 import java.util.Date;
 import java.util.List;
-
 import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
@@ -11,11 +10,13 @@ import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.domain.ParoleBoardItineraryNote;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
 import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryNoteDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 
@@ -23,7 +24,8 @@ import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
  * Implementation of service for parole board itinerary.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Nov 20, 2017)
+ * @author Annie Wahl 
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryServiceImpl 
@@ -44,6 +46,8 @@ public class ParoleBoardItineraryServiceImpl
 	
 	private final ParoleBoardMemberDelegate paroleBoardMemberDelegate;
 	
+	private final ParoleBoardLocationDelegate paroleBoardLocationDelegate;
+	
 	/**
 	 * Instantiates a parole board itinerary service implementation with the 
 	 * specified delegates.
@@ -55,6 +59,7 @@ public class ParoleBoardItineraryServiceImpl
 	 * @param boardMeetingSiteDelegate board meeting site delegate
 	 * @param locationDelegate location delegate
 	 * @param paroleBoardMemberDelegate parole board member delegate
+	 * @param paroleBoardLocationDelegate parole board location delegate
 	 */
 	public ParoleBoardItineraryServiceImpl(
 			final ParoleBoardItineraryDelegate paroleBoardItineraryDelegate,
@@ -63,7 +68,8 @@ public class ParoleBoardItineraryServiceImpl
 			final BoardAttendeeDelegate boardAttendeeDelegate,
 			final BoardMeetingSiteDelegate boardMeetingSiteDelegate,
 			final LocationDelegate locationDelegate,
-			final ParoleBoardMemberDelegate paroleBoardMemberDelegate) {
+			final ParoleBoardMemberDelegate paroleBoardMemberDelegate,
+			final ParoleBoardLocationDelegate paroleBoardLocationDelegate) {
 		this.paroleBoardItineraryDelegate = paroleBoardItineraryDelegate;
 		this.paroleBoardItineraryNoteDelegate = 
 				paroleBoardItineraryNoteDelegate;
@@ -71,32 +77,36 @@ public class ParoleBoardItineraryServiceImpl
 		this.boardMeetingSiteDelegate = boardMeetingSiteDelegate;
 		this.locationDelegate = locationDelegate;
 		this.paroleBoardMemberDelegate = paroleBoardMemberDelegate;
+		this.paroleBoardLocationDelegate = paroleBoardLocationDelegate;
 	}
 	
 	/** {@inheritDoc} */
 	@Override
-	public ParoleBoardItinerary create(final Location location, 
+	public ParoleBoardItinerary create(
+			final ParoleBoardLocation paroleBoardLocation, 
 			final Date startDate, final Date endDate) 
 					throws DuplicateEntityFoundException {
-		return this.paroleBoardItineraryDelegate.create(location, startDate, 
-				endDate);
+		return this.paroleBoardItineraryDelegate.create(
+				paroleBoardLocation, startDate, endDate);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ParoleBoardItinerary update(
 			final ParoleBoardItinerary paroleBoardItinerary, 
-			final Location location, final Date startDate, final Date endDate) 
+			final ParoleBoardLocation paroleBoardLocation,
+			final Date startDate, final Date endDate) 
 					throws DuplicateEntityFoundException {
 		return this.paroleBoardItineraryDelegate.update(paroleBoardItinerary, 
-				location, startDate, endDate);
+				paroleBoardLocation, startDate, endDate);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void remove(final ParoleBoardItinerary paroleBoardItinerary) {
-		for (BoardAttendee boardAttendee : 
-			this.findBoardAttendeesByBoardItinerary(paroleBoardItinerary)) {
+		for (BoardAttendee boardAttendee
+				: this.findBoardAttendeesByBoardItinerary(
+						paroleBoardItinerary)) {
 			this.removeAttendee(boardAttendee);
 		}
 		if (this.findBoardAlternateAttendeeByBoardItinerary(
@@ -104,8 +114,9 @@ public class ParoleBoardItineraryServiceImpl
 			this.removeAttendee(this.findBoardAlternateAttendeeByBoardItinerary(
 					paroleBoardItinerary));
 		}
-		for (BoardMeetingSite boardMeetingSite : 
-			this.findBoardMeetingSitesByBoardItinerary(paroleBoardItinerary)) {
+		for (BoardMeetingSite boardMeetingSite
+				: this.findBoardMeetingSitesByBoardItinerary(
+						paroleBoardItinerary)) {
 			this.removeBoardMeetingSite(boardMeetingSite);
 		}
 		this.paroleBoardItineraryDelegate.remove(paroleBoardItinerary);
@@ -267,5 +278,10 @@ public class ParoleBoardItineraryServiceImpl
 		return this.paroleBoardMemberDelegate
 				.findBoardMembersByDate(effectiveDate);
 	}
-
+	
+	/**{@inheritDoc} */
+	@Override
+	public List<ParoleBoardLocation> findParoleBoardLocations() {
+		return this.paroleBoardLocationDelegate.findAll();
+	}
 }

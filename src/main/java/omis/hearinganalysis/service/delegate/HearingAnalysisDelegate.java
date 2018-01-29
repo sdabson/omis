@@ -23,6 +23,7 @@ import omis.audit.domain.UpdateSignature;
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.dao.HearingAnalysisDao;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.instance.factory.InstanceFactory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
@@ -51,7 +52,7 @@ public class HearingAnalysisDelegate {
 	private final AuditComponentRetriever auditComponentRetriever;
 	
 	/** Instantiates an implementation of hearing analysis delegate with the 
-	 * specified date access object and instance factory.
+	 * specified data access object and instance factory.
 	 * 
 	 * @param hearingAnalysisDao hearing analysis data access object
 	 * @param hearingAnalysisInstanceFactory hearing analysis instance factory
@@ -76,10 +77,11 @@ public class HearingAnalysisDelegate {
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	public HearingAnalysis create(final ParoleEligibility eligibility, 
-			final BoardMeetingSite meetingSite, final BoardAttendee analyst) 
+			final BoardMeetingSite meetingSite, 
+			final HearingAnalysisCategory category, final BoardAttendee analyst) 
 					throws DuplicateEntityFoundException {
-		if (this.hearingAnalysisDao.find(eligibility, meetingSite, analyst) 
-				!= null) {
+		if (this.hearingAnalysisDao.find(eligibility, meetingSite, category,
+				analyst) != null) {
 			throw new DuplicateEntityFoundException(
 					"Hearing analyis already exists");
 		}
@@ -89,7 +91,8 @@ public class HearingAnalysisDelegate {
 		hearingAnalysis.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));
-		populateHearingAnalysis(hearingAnalysis, meetingSite, analyst);
+		populateHearingAnalysis(hearingAnalysis, meetingSite, category,
+				analyst);
 		return this.hearingAnalysisDao.makePersistent(hearingAnalysis);
 	}
 
@@ -103,15 +106,17 @@ public class HearingAnalysisDelegate {
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	public HearingAnalysis update(final HearingAnalysis hearingAnalysis, 
-			final BoardMeetingSite meetingSite, final BoardAttendee analyst) 
+			final BoardMeetingSite meetingSite, 
+			final HearingAnalysisCategory category, final BoardAttendee analyst) 
 					throws DuplicateEntityFoundException {
 		if (this.hearingAnalysisDao.findExcluding(
-				hearingAnalysis.getEligibility(), meetingSite, analyst, 
-				hearingAnalysis) != null) {
+				hearingAnalysis.getEligibility(), meetingSite, category, 
+				analyst, hearingAnalysis) != null) {
 			throw new DuplicateEntityFoundException(
 					"Hearing analyis already exists");
 		}
-		populateHearingAnalysis(hearingAnalysis, meetingSite, analyst);
+		populateHearingAnalysis(hearingAnalysis, meetingSite, category,
+				analyst);
 		return this.hearingAnalysisDao.makePersistent(hearingAnalysis);
 	}
 
@@ -137,9 +142,11 @@ public class HearingAnalysisDelegate {
 
 	// Populates a hearing analysis
 	private void populateHearingAnalysis(final HearingAnalysis hearingAnalysis, 
-			final BoardMeetingSite meetingSite, final BoardAttendee analyst) {
+			final BoardMeetingSite meetingSite, 
+			final HearingAnalysisCategory category, final BoardAttendee analyst) {
 		hearingAnalysis.setBoardMeetingSite(meetingSite);
 		hearingAnalysis.setAnalyst(analyst);
+		hearingAnalysis.setCategory(category);
 		hearingAnalysis.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));

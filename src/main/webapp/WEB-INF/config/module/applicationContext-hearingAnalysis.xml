@@ -17,9 +17,27 @@
         	<constructor-arg name="paroleBoardItineraryDelegate" ref="paroleBoardItineraryDelegate"/>
         	<constructor-arg name="boardMeetingSiteDelegate" ref="boardMeetingSiteDelegate"/>
         	<constructor-arg name="boardAttendeeDelegate" ref="boardAttendeeDelegate"/>
-        </bean>        
+        	<constructor-arg name="hearingAnalysisCategoryDelegate" ref="hearingAnalysisCategoryDelegate"/>
+        </bean>
+        
+        <bean id="hearingAnalysisTaskService"
+        	class="omis.hearinganalysis.service.impl.HearingAnalysisTaskServiceImpl">
+        	<constructor-arg name="taskDelegate" ref="taskDelegate"/>
+        	<constructor-arg name="taskParameterValueDelegate" ref="taskParameterValueDelegate"/>
+        	<constructor-arg name="taskAssignmentDelegate" ref="taskAssignmentDelegate"/>
+        	<constructor-arg name="taskTemplateParameterValueDelegate" ref="taskTemplateParameterValueDelegate"/>
+        	<constructor-arg name="hearingAnalysisTaskAssociationDelegate" ref="hearingAnalysisTaskAssociationDelegate"/>
+        	<constructor-arg name="paroleHearingAnalysisTaskSourceDelegate" ref="paroleHearingAnalysisTaskSourceDelegate"/>
+        	<constructor-arg name="paroleHearingTaskGroupDelegate" ref="paroleHearingTaskGroupDelegate"/>
+        	<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+        </bean>
         
         <!-- Report services -->
+        
+        <bean id="hearingAnalysisSummaryService"
+        	class="omis.hearinganalysis.report.impl.hibernate.HearingAnalysisSummaryServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
         
         <!-- Delegates -->
         
@@ -37,6 +55,30 @@
         	<constructor-arg name="hearingAnalysisNoteInstanceFactory" ref="hearingAnalysisNoteInstanceFactory"/>
         </bean>
         
+        <bean id="hearingAnalysisCategoryDelegate"
+        	class="omis.hearinganalysis.service.delegate.HearingAnalysisCategoryDelegate">
+        	<constructor-arg name="hearingAnalysisCategoryDao" ref="hearingAnalysisCategoryDao"/>
+        	<constructor-arg name="hearingAnalysisCategoryInstanceFactory" ref="hearingAnalysisCategoryInstanceFactory"/>
+        </bean>
+        
+        <bean id="hearingAnalysisTaskAssociationDelegate"
+        	class="omis.hearinganalysis.service.delegate.HearingAnalysisTaskAssociationDelegate">
+        	<constructor-arg name="hearingAnalysisTaskAssociationDao" ref="hearingAnalysisTaskAssociationDao"/>
+        	<constructor-arg name="hearingAnalysisTaskAssociationInstanceFactory" ref="hearingAnalysisTaskAssociationInstanceFactory"/>
+        </bean>
+        
+        <bean id="paroleHearingAnalysisTaskSourceDelegate"
+        	class="omis.hearinganalysis.service.delegate.ParoleHearingAnalysisTaskSourceDelegate">
+        	<constructor-arg name="paroleHearingAnalysisTaskSourceDao" ref="paroleHearingAnalysisTaskSourceDao"/>
+        	<constructor-arg name="paroleHearingAnalysisTaskSourceInstanceFactory" ref="paroleHearingAnalysisTaskSourceInstanceFactory"/>
+        </bean>
+        
+        <bean id="paroleHearingTaskGroupDelegate"
+        	class="omis.hearinganalysis.service.delegate.ParoleHearingTaskGroupDelegate">
+        	<constructor-arg name="paroleHearingTaskGroupDao" ref="paroleHearingTaskGroupDao"/>
+        	<constructor-arg name="paroleHearingTaskGroupInstanceFactory" ref="paroleHearingTaskGroupInstanceFactory"/>
+        </bean>
+        
         <!-- Data access objects -->
         
         <bean id="hearingAnalysisDao"
@@ -48,6 +90,30 @@
   		<bean id="hearingAnalysisNoteDao"
         	class="omis.hearinganalysis.dao.impl.hibernate.HearingAnalysisNoteDaoHibernateImpl">
     		<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="hearingAnalysisCategoryDao"
+        	class="omis.hearinganalysis.dao.impl.hibernate.HearingAnalysisCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="hearingAnalysisTaskAssociationDao"
+        	class="omis.hearinganalysis.dao.impl.hibernate.HearingAnalysisTaskAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisTaskAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="paroleHearingAnalysisTaskSourceDao"
+        	class="omis.hearinganalysis.dao.impl.hibernate.ParoleHearingAnalysisTaskSourceDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="paroleHearingTaskGroupDao"
+        	class="omis.hearinganalysis.dao.impl.hibernate.ParoleHearingTaskGroupDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingTaskGroup"/>
     		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   		</bean>
   		
@@ -63,6 +129,30 @@
 			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
 			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
 			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisNote"/>
+		</bean>
+		
+		<bean id="hearingAnalysisCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisCategory"/>
+		</bean>
+		
+		<bean id="hearingAnalysisTaskAssociationInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisTaskAssociation"/>
+		</bean>
+		
+		<bean id="paroleHearingAnalysisTaskSourceInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource"/>
+		</bean>
+		
+		<bean id="paroleHearingTaskGroupInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingTaskGroup"/>
 		</bean>
 		
   		 <!--Property editor factories -->
@@ -81,5 +171,32 @@
   			<constructor-arg name="dao" ref="hearingAnalysisNoteDao"/>
 		</bean>
 		
+		<bean id="hearingAnalysisCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="hearingAnalysisCategoryDao"/>
+		</bean>
+		
+		<bean id="hearingAnalysisTaskAssociationPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.HearingAnalysisTaskAssociation"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="hearingAnalysisTaskAssociationDao"/>
+		</bean>
+		
+		<bean id="paroleHearingAnalysisTaskSourcePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="paroleHearingAnalysisTaskSourceDao"/>
+		</bean>
+		
+		<bean id="paroleHearingTaskGroupPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.hearinganalysis.domain.ParoleHearingTaskGroup"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="paroleHearingTaskGroupDao"/>
+		</bean>
 		
 </beans>

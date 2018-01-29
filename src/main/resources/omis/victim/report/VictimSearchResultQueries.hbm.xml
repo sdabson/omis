@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.victim.report">
+<query name="findVictimSearchResultByFirstLast"><![CDATA[
+	select new omis.victim.report.VictimSearchResult(
+		victimAssociation.id,
+		name.id,
+		person.id,
+		name.firstName,
+		name.middleName,
+		name.lastName,
+		name.suffix
+	)
+	from
+		omis.victim.domain.VictimAssociation victimAssociation
+	inner join
+		victimAssociation.relationship relationship
+	inner join
+		relationship.secondPerson person
+	inner join
+		person.name name
+	where
+		(utl_match.JARO_WINKLER_SIMILARITY(upper(name.lastName), upper(:name2)) >= 90
+		AND
+		utl_match.JARO_WINKLER_SIMILARITY(upper(name.firstName), upper(:name1)) >= 85)
+	and
+		relationship.firstPerson = :offender
+	]]></query>
+<query name="findVictimSearchResultByFirstMiddleLast"><![CDATA[
+	select new omis.victim.report.VictimSearchResult(
+		victimAssociation.id,
+		name.id,
+		person.id,
+		name.firstName,
+		name.middleName,
+		name.lastName,
+		name.suffix
+	)
+	from
+		omis.victim.domain.VictimAssociation victimAssociation
+	inner join
+		victimAssociation.relationship relationship
+	inner join
+		relationship.secondPerson person
+	inner join
+		person.name name
+	where
+		utl_match.JARO_WINKLER_SIMILARITY(upper(name.lastName), upper(:last)) >= 90 
+		AND (utl_match.JARO_WINKLER_SIMILARITY(upper(name.middleName), upper(:middle)) >= 90
+		OR upper(name.middleName) like upper(:middle) || '%' 
+		OR name.middleName is null 
+		OR name.middleName like '') 
+		AND utl_match.JARO_WINKLER_SIMILARITY(upper(name.firstName),upper(:first)) > 85
+	and
+		relationship.firstPerson = :offender
+	order by
+		name.lastName, name.firstName
+]]></query>
+<query name="findVictimSearchResultByLast"><![CDATA[
+	select new omis.victim.report.VictimSearchResult(
+		victimAssociation.id,
+		name.id,
+		person.id,
+		name.firstName,
+		name.middleName,
+		name.lastName,
+		name.suffix
+	)
+	from
+		omis.victim.domain.VictimAssociation victimAssociation
+	inner join
+		victimAssociation.relationship relationship
+	inner join
+		relationship.secondPerson person
+	inner join
+		person.name name
+	where
+		upper(name.lastName) like upper(:last || '%' )
+	and
+		relationship.firstPerson = :offender
+]]></query>
+</hibernate-mapping>

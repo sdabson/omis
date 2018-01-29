@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.criminalassociation.service.impl;
 
 
@@ -13,11 +30,13 @@ import omis.contact.dao.ContactDao;
 import omis.contact.dao.TelephoneNumberDao;
 import omis.contact.domain.Contact;
 import omis.contact.domain.TelephoneNumber;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.criminalassociation.dao.CriminalAssociationCategoryDao;
 import omis.criminalassociation.dao.CriminalAssociationDao;
 import omis.criminalassociation.domain.CriminalAssociation;
 import omis.criminalassociation.domain.CriminalAssociationCategory;
 import omis.criminalassociation.domain.component.CriminalAssociationFlags;
+import omis.criminalassociation.exception.CriminalAssociationExistsException;
 import omis.criminalassociation.service.CriminalAssociationService;
 import omis.criminalassociation.service.delegate.CriminalAssociationServiceDelegate;
 import omis.datatype.DateRange;
@@ -40,6 +59,7 @@ import omis.residence.service.delegate.ResidenceTermDelegate;
  * 
  * @author Joel Norris
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.1.1 (Apr 14, 2015)
  * @since OMIS 3.0
  */
@@ -134,14 +154,14 @@ public class CriminalAssociationServiceImpl
 		this.auditComponentRetriever = auditComponentRetriever;
 	}
 	
-	/**{@inheritDoc}*/
+	/**{@inheritDoc} */
 	@Override
 	public CriminalAssociation associate(final Offender offender, 
 			final Person associate, final DateRange dateRange, 
 			final CriminalAssociationCategory category, 
 		final CriminalAssociationFlags criminalAssociationFlags) 
-			throws DuplicateEntityFoundException, 
-			ReflexiveRelationshipException {
+			throws ReflexiveRelationshipException, 
+			CriminalAssociationExistsException {
 		CriminalAssociation criminalAssociation 
 			= this.criminalAssociationServiceDelegate
 			.associateCriminally(offender, associate, dateRange, category,
@@ -221,15 +241,13 @@ public class CriminalAssociationServiceImpl
 		return address;
 	}
 	
-	/**{@inheritDoc}
-	 * @throws ResidenceStatusConflictException 
-	 * @throws PrimaryResidenceExistsException */
+	/**{@inheritDoc} */
 	@Override
 	public ResidenceTerm createResidenceTerm(final Person person, 
 			final Address address) 
-					throws DuplicateEntityFoundException, 
-					PrimaryResidenceExistsException, 
-					ResidenceStatusConflictException {
+					throws PrimaryResidenceExistsException, 
+					ResidenceStatusConflictException, 
+					DuplicateEntityFoundException {
 		ResidenceTerm residenceTerm = this.residenceTermDelegate
 				.createResidenceTerm(person, null, ResidenceCategory.PRIMARY, 
 				address, ResidenceStatus.FOSTER_CARE, null, null, null);
@@ -237,11 +255,11 @@ public class CriminalAssociationServiceImpl
 		 
 	}
 	
-	/**{@inheritDoc}*/
+	/**{@inheritDoc} */
 	@Override
 	public Contact addTelephoneNumber(final Person person, 
 			final Long telephoneNumber) 
-		throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 		Contact contact;
 		if (this.contactDao.find(person) == null) {
 			contact = this.contactInstanceFactory.createInstance();
@@ -251,7 +269,7 @@ public class CriminalAssociationServiceImpl
 			contact = this.contactDao.find(person);
 			if (this.telephoneNumberDao
 					.find(contact, telephoneNumber) != null) {
-				throw new DuplicateEntityFoundException(
+				throw new TelephoneNumberExistsException(
 						"Telephone number exists");
 			}
 		}

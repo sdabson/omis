@@ -3,15 +3,15 @@ package omis.paroleboarditinerary.web.form;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import omis.location.domain.Location;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 
 /**
  * Parole board itinerary form.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 28, 2017)
+ * @author Annie Wahl 
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryForm implements Serializable {
@@ -22,7 +22,7 @@ public class ParoleBoardItineraryForm implements Serializable {
 	
 	private Date endDate;
 	
-	private Location location;
+	private ParoleBoardLocation paroleBoardLocation;
 	
 	private ParoleBoardMember boardMember1;
 
@@ -80,21 +80,22 @@ public class ParoleBoardItineraryForm implements Serializable {
 	}
 
 	/**
-	 * Returns the location.
+	 * Returns the parole board location.
 	 * 
-	 * @return location
+	 * @return paroleBoardLocation - Parole Board Location
 	 */
-	public Location getLocation() {
-		return location;
+	public ParoleBoardLocation getParoleBoardLocation() {
+		return this.paroleBoardLocation;
 	}
 
 	/**
-	 * Sets the location.
+	 * Sets the parole board location.
 	 * 
-	 * @param location location
+	 * @param paroleBoardLocation - Parole Board Location
 	 */
-	public void setLocation(final Location location) {
-		this.location = location;
+	public void setParoleBoardLocation(
+			final ParoleBoardLocation paroleBoardLocation) {
+		this.paroleBoardLocation = paroleBoardLocation;
 	}
 
 	/**

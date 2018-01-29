@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.boardhearing.domain">
+	<class entity-name="omis.boardhearing.domain.BoardHearingParticipant"
+			proxy="omis.boardhearing.domain.BoardHearingParticipant"
+			name="omis.boardhearing.domain.impl.BoardHearingParticipantImpl"
+			table="`BOARD_HEARING_PARTICIPANT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`BOARD_HEARING_PARTICIPANT_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="hearing" column="`BOARD_HEARING_ID`" entity-name="omis.boardhearing.domain.BoardHearing" not-null="true" />
+			<many-to-one name="boardMember" column="`BOARD_MEMBER_ID`" entity-name="omis.paroleboardmember.domain.ParoleBoardMember" not-null="true" />
+			<property name="number" column="`NUMBER`" type="java.lang.Long" not-null="false" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findBoardHearingParticipant"><![CDATA[
+		select boardHearingParticipant
+		from
+			omis.boardhearing.domain.BoardHearingParticipant boardHearingParticipant
+		where
+			boardHearingParticipant.hearing = :hearing
+		and
+			boardHearingParticipant.boardMember = :boardMember
+	]]></query>
+	<query name="findBoardHearingParticipantExcluding"><![CDATA[
+		select boardHearingParticipant
+		from
+			omis.boardhearing.domain.BoardHearingParticipant boardHearingParticipant
+		where
+			boardHearingParticipant.hearing = :hearing
+		and
+			boardHearingParticipant.boardMember = :boardMember
+		and
+			boardHearingParticipant != :boardHearingParticipant
+	]]></query>
+	<query name="findBoardHearingParticipantsByHearing"><![CDATA[
+		select boardHearingParticipant
+		from
+			omis.boardhearing.domain.BoardHearingParticipant boardHearingParticipant
+		where
+			boardHearingParticipant.hearing = :hearing
+	]]></query>
+</hibernate-mapping>

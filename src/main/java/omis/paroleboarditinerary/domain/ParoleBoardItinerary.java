@@ -3,13 +3,13 @@ package omis.paroleboarditinerary.domain;
 import omis.audit.domain.Creatable;
 import omis.audit.domain.Updatable;
 import omis.datatype.DateRange;
-import omis.location.domain.Location;
 
 /**
  * Parole board itinerary.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 15, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public interface ParoleBoardItinerary extends Creatable, Updatable {
@@ -29,20 +29,6 @@ public interface ParoleBoardItinerary extends Creatable, Updatable {
 	Long getId();
 	
 	/**
-	 * Sets the location.
-	 * 
-	 * @param location location
-	 */
-	void setLocation(Location location);
-	
-	/**
-	 * Returns the location.
-	 * 
-	 * @return location
-	 */
-	Location getLocation();
-	
-	/**
 	 * Sets the date range.
 	 * 
 	 * @param dateRange date range
@@ -55,6 +41,18 @@ public interface ParoleBoardItinerary extends Creatable, Updatable {
 	 * @return date range
 	 */
 	DateRange getDateRange();
+	
+	/**
+	 * Returns the ParoleBoardLocation for the Parole Board Itinerary.
+	 * @return paroleBoardLocation - ParoleBoardLocation
+	 */
+	ParoleBoardLocation getParoleBoardLocation();
+	
+	/**
+	 * Sets the ParoleBoardLocation for the Parole Board Itinerary.
+	 * @param paroleBoardLocation - ParoleBoardLocation
+	 */
+	void setParoleBoardLocation(ParoleBoardLocation paroleBoardLocation);
 	
 	/**
 	 * Compares {@code this} and {@code obj} for equality.

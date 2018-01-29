@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+  - Web configuration for offender relationships.
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -37,16 +41,20 @@
 	</bean> 
 	<bean id="offenderRelationshipSearchFormValidator" class="omis.offenderrelationship.web.validator.OffenderRelationshipSearchFormValidator"/>
 	
-  <!--  Controller Delegate -->
+  <!-- Validator delegates. -->
+
+  <bean id="offenderRelationshipNoteFieldsValidatorDelegate" class="omis.offenderrelationship.web.validator.OffenderRelationshipNoteFieldsValidatorDelegate"/>
   
-  <!-- Helpers -->
+  <!-- Helpers. -->
   
-   <bean id="offenderRelationshipSummaryModelDelegate" 
+  <bean id="offenderRelationshipSummaryModelDelegate" 
 		class="omis.offenderrelationship.web.controller.delegate.OffenderRelationshipSummaryModelDelegate">
 		<constructor-arg name="offenderRelationshipSummaryReportService" ref="offenderRelationshipSummaryReportService"/>
-	</bean>      
+  </bean>      
 	
-	<bean id="offenderRelationshipProfileItem"
+  <!-- Profile items. -->
+  
+  <bean id="offenderRelationshipProfileItem"
 		class="omis.offenderrelationship.web.profile.OffenderRelationshipsProfileItem">
 		<constructor-arg name="relationshipProfileItemReportService" ref="relationshipProfileItemReportService"/>
 		<constructor-arg name="requiredAuthorizations">
@@ -59,11 +67,11 @@
 		<constructor-arg name="name" value="relationships"/>
 		<constructor-arg name="profileItemRegistry" ref="relationshipsProfileItemRegistry"/>
 		<constructor-arg name="enabled" value="${offenderRelationshipProfileItemEnabled}"/>
-	</bean>
+  </bean>
         
   <!-- Web configuration -->
  		 
- <context:component-scan base-package="omis.offenderrelationship.web.controller"/>
+  <context:component-scan base-package="omis.offenderrelationship.web.controller"/>
   	      
   <!-- Use controller transactions -->
   

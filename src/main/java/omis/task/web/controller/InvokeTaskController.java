@@ -113,8 +113,7 @@ public class InvokeTaskController {
 	 */
 	@RequestMapping(value = "/invoke.html", method = RequestMethod.GET)
 	public ModelAndView invokeTask(
-			@RequestParam(value = "task", required = true)
-				final Task task) throws ClassNotFoundException {
+			@RequestParam(value = "task", required = true) final Task task) {
 		// Iterates through parameter values adding type and value to arrays
 		List<TaskParameterValue> parameterValues
 			= this.taskInvocationService.findParameterValues(task);
@@ -135,7 +134,11 @@ public class InvokeTaskController {
 									parameterValue.getInstanceValue());
 				proxyClass = persistentClass.getProxyInterface();
 			} else {
-				proxyClass = Class.forName(parameterValue.getTypeName());
+				try {
+					proxyClass = Class.forName(parameterValue.getTypeName());
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException("Class not found exception", e);
+				}
 				if (proxyClass.equals(Date.class)) {
 					entityInstance = convertStringToDate(parameterValue
 							.getInstanceValue());
@@ -216,8 +219,7 @@ public class InvokeTaskController {
 	@RequestMapping(
 			value = "/invokeAndRedirect.html", method = RequestMethod.GET)
 	public ModelAndView invokeTaskAndRedirect(
-			@RequestParam(value = "task", required = true)
-				final Task task) throws ClassNotFoundException {
+			@RequestParam(value = "task", required = true) final Task task) {
 		
 		// Iterates through parameter values adding type and value to arrays
 		List<TaskParameterValue> parameterValues
@@ -234,7 +236,11 @@ public class InvokeTaskController {
 			if (persistentClass != null) {
 				proxyClass = persistentClass.getProxyInterface();
 			} else {
-				proxyClass = Class.forName(parameterValue.getTypeName()); 
+				try {
+					proxyClass = Class.forName(parameterValue.getTypeName());
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException("Class not found exception", e);
+				}
 			}
 				
 			// Adds parameter type and instance to arrays

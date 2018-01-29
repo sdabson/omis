@@ -43,4 +43,11 @@
 		and
 			paroleBoardAgreement != :paroleBoardAgreement
 	]]></query>
+	<query name="findParoleBoardAgreementCountByOffender"><![CDATA[
+		select count(paroleBoardAgreement.id)
+		from
+			omis.paroleboardcondition.domain.ParoleBoardAgreement paroleBoardAgreement
+		where
+			paroleBoardAgreement.agreement.offender = :offender
+	]]></query>
 </hibernate-mapping>

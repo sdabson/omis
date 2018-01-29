@@ -22,6 +22,7 @@ import java.util.List;
 
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.hearinganalysis.domain.HearingAnalysisNote;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
@@ -43,11 +44,13 @@ public interface HearingAnalysisService {
 	 * @param eligibility parole eligibility
 	 * @param meetingSite board meeting site
 	 * @param analyst board attendee
+	 * @param category hearing analysis category
 	 * @return hearing analysis
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	HearingAnalysis createHearingAnalysis(ParoleEligibility eligibility, 
-			BoardMeetingSite meetingSite, BoardAttendee analyst) 
+			BoardMeetingSite meetingSite, BoardAttendee analyst, 
+			HearingAnalysisCategory category) 
 					throws DuplicateEntityFoundException;
 	
 	/**
@@ -56,11 +59,13 @@ public interface HearingAnalysisService {
 	 * @param hearingAnalysis hearing analysis
 	 * @param meetingSite board meeting site
 	 * @param analyst board attendee
+	 * @param category hearing analysis category
 	 * @return hearing analysis
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	HearingAnalysis updateHearingAnalysis(HearingAnalysis hearingAnalysis, 
-			BoardMeetingSite meetingSite, BoardAttendee analyst) 
+			BoardMeetingSite meetingSite, BoardAttendee analyst, 
+			HearingAnalysisCategory category) 
 					throws DuplicateEntityFoundException;
 	
 	/**
@@ -149,4 +154,11 @@ public interface HearingAnalysisService {
 	 */
 	HearingAnalysis findHearingAnalysisByParoleEligibility(
 			ParoleEligibility eligibility);
+	
+	/**
+	 * Returns a list of hearing analysis categories.
+	 * 
+	 * @return list of hearing analysis categories
+	 */
+	List<HearingAnalysisCategory> findHearingAnalysisCategories();
 }

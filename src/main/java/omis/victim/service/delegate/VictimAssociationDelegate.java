@@ -1,3 +1,21 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
+
 package omis.victim.service.delegate;
 
 import java.util.Date;
@@ -15,11 +33,13 @@ import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.victim.dao.VictimAssociationDao;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
 
 /**
  * Delegate for victim associations.
  *
  * @author Stephen Abson
+ * @author Yidong Li
  * @version 0.0.1 (May 20, 2015)
  * @since OMIS 3.0
  */
@@ -66,16 +86,16 @@ public class VictimAssociationDelegate {
 	 * @param packetSendDate date packet is sent
 	 * @param flags flags
 	 * @return new victim association
-	 * @throws DuplicateEntityFoundException if victim association exists
+	 * @throws VictimExistsException if victim association exists
 	 * @throws ReflexiveRelationshipException if offender equals victim
 	 */
 	public VictimAssociation create(final Relationship relationship,
 			final Date registeredDate, final Boolean packetSent,
 			final Date packetSendDate,
 			final VictimAssociationFlags flags)
-					throws DuplicateEntityFoundException {
+					throws VictimExistsException {
 		if (this.victimAssociationDao.find(relationship) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new VictimExistsException(
 					"Victim association exists");
 		}
 		VictimAssociation victimAssociation

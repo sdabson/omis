@@ -127,7 +127,7 @@ function applyDeceasedOnClick(personFieldsPropertyName) {
  * @param elementId dom element id
  * @param yearRange range of years to use for the date picker
  */
-function assignDatePicker(elementId, yearRange) {
+function assignPersonFieldsDatePicker(elementId, yearRange) {
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true,

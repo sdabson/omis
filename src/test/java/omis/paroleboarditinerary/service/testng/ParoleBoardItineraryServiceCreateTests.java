@@ -3,11 +3,9 @@ package omis.paroleboarditinerary.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
-
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.address.service.delegate.AddressDelegate;
@@ -21,8 +19,10 @@ import omis.location.service.delegate.LocationDelegate;
 import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
 import omis.region.domain.City;
 import omis.region.service.delegate.CityDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
@@ -68,6 +68,10 @@ public class ParoleBoardItineraryServiceCreateTests
 	@Qualifier("paroleBoardItineraryDelegate")
 	private ParoleBoardItineraryDelegate paroleBoardItineraryDelegate;
 	
+	@Autowired
+	@Qualifier("paroleBoardLocationDelegate")
+	private ParoleBoardLocationDelegate paroleBoardLocationDelegate;
+	
 	/* Services. */
 
 	@Autowired
@@ -94,17 +98,19 @@ public class ParoleBoardItineraryServiceCreateTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 
 		// Action
 		ParoleBoardItinerary paroleBoardItinerary = this
-				.paroleBoardItineraryService.create(location, startDate, 
-						endDate);
+				.paroleBoardItineraryService.create(paroleBoardLocation,
+						startDate, endDate);
 
 		// Assertions
 		PropertyValueAsserter.create()
-			.addExpectedValue("location", location)
+			.addExpectedValue("paroleBoardLocation", paroleBoardLocation)
 			.addExpectedValue("dateRange.startDate", startDate)
 			.addExpectedValue("dateRange.endDate", endDate)
 			.performAssertions(paroleBoardItinerary);
@@ -129,12 +135,16 @@ public class ParoleBoardItineraryServiceCreateTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
-		this.paroleBoardItineraryDelegate.create(location, startDate, endDate);
+		this.paroleBoardItineraryDelegate.create(paroleBoardLocation,
+				startDate, endDate);
 
 		// Action
-		this.paroleBoardItineraryService.create(location, startDate, endDate);
+		this.paroleBoardItineraryService.create(paroleBoardLocation,
+				startDate, endDate);
 	}
 
 	// Parses date text

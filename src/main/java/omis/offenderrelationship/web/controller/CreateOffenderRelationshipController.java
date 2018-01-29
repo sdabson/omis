@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.offenderrelationship.web.controller;
 
 import java.io.IOException;
@@ -66,6 +83,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -159,6 +177,12 @@ public class CreateOffenderRelationshipController {
 	private static final String ADDRESS_FIELDS_PROPERTY_NAME = "addressFields";
 	private static final String PO_BOX_FIELDS_PROPERTY_NAME = "poBoxFields";
 	private static final String PERSON_FIELDS_PROPERTY_NAME = "personFields";
+	
+	/* Fields names. */
+	private static final String PERSON_FIELDS_NAME = "personFields";
+	private static final String ADDRESS_FIELDS_NAME
+		= "addressFields";
+	private static final String PO_BOX_FIELDS_NAME = "poBoxFields";
 
 	/* Property Editors. */
 	@Autowired
@@ -348,8 +372,8 @@ public class CreateOffenderRelationshipController {
 				= new ArrayList<TelephoneNumberItem>();
 			for (TelephoneNumberItem telephoneNumberItem
 				: createRelationshipsForm.getTelephoneNumberItems()) {
-				if (telephoneNumberItem.getOperation() 
-					== TelephoneNumberItemOperation.CREATE) {
+				if (TelephoneNumberItemOperation.CREATE.equals(
+					telephoneNumberItem.getOperation())) {
 					validationTelephoneNumberItems.add(telephoneNumberItem);
 				}
 			}
@@ -360,8 +384,8 @@ public class CreateOffenderRelationshipController {
 				= new ArrayList<OnlineAccountContactItem>();
 			for (OnlineAccountContactItem onlineAccountContactItem 
 				: createRelationshipsForm.getOnlineAccountContactItems()) {
-				if (onlineAccountContactItem.getOperation()
-					== OnlineAccountContactItemOperation.CREATE) {
+				if (OnlineAccountContactItemOperation.CREATE.equals(
+					onlineAccountContactItem.getOperation())) {
 					validationOnlineAccountContactItems.add(
 						onlineAccountContactItem);
 				}
@@ -386,8 +410,8 @@ public class CreateOffenderRelationshipController {
 			if (createRelationshipsForm.getEnterAddress() != null 
 				&& createRelationshipsForm.getEnterAddress()) {
 				// If checkbox checked
-				if (createRelationshipsForm.getAddressOperation().equals(
-					OffenderRelationshipAddressOperation.NEW)
+				if (OffenderRelationshipAddressOperation.NEW.equals(
+					createRelationshipsForm.getAddressOperation())
 					&& createRelationshipsForm.getAddressFields()
 					.getNewCity()) {
 					addressFieldsNewCity = true;
@@ -461,8 +485,8 @@ public class CreateOffenderRelationshipController {
 				// checked, existing
 				if (createRelationshipsForm.getEnterAddress() != null
 					&& createRelationshipsForm.getEnterAddress()
-					&& (!createRelationshipsForm.getAddressOperation().equals(
-						OffenderRelationshipAddressOperation.NEW))) {
+					&& (!OffenderRelationshipAddressOperation.NEW.equals(
+						createRelationshipsForm.getAddressOperation()))) {
 					if (createRelationshipsForm.getAddressFields().getCountry()
 						!= null) {
 						addressFieldsCountryName = createRelationshipsForm
@@ -535,8 +559,8 @@ public class CreateOffenderRelationshipController {
 			if (createRelationshipsForm.getEnterAddress() != null
 				&& createRelationshipsForm.getEnterAddress()) {
 				// Checked
-				if (createRelationshipsForm.getAddressOperation().equals(
-					OffenderRelationshipAddressOperation.NEW)
+				if (OffenderRelationshipAddressOperation.NEW.equals(
+					createRelationshipsForm.getAddressOperation())
 					&& createRelationshipsForm
 					.getAddressFields().getNewZipCode()) {
 					addressFieldsNewZipCode = true;
@@ -1163,8 +1187,8 @@ public class CreateOffenderRelationshipController {
 			Address address;
 			if (createRelationshipsForm.getEnterAddress() != null
 				&& createRelationshipsForm.getEnterAddress()) {
-				if (createRelationshipsForm.getAddressOperation()
-					.equals(OffenderRelationshipAddressOperation.NEW)) {
+				if (OffenderRelationshipAddressOperation.NEW.equals(
+					createRelationshipsForm.getAddressOperation())) {
 					// New address
 					if (createRelationshipsForm.getAddressFields()
 						.getNewCity()) {
@@ -1315,8 +1339,8 @@ public class CreateOffenderRelationshipController {
 				List<TelephoneNumberItem> telephoneNumberItems 
 					= createRelationshipsForm.getTelephoneNumberItems();
 				for (TelephoneNumberItem item : telephoneNumberItems) {
-					if (item.getOperation().equals(
-							TelephoneNumberItemOperation.CREATE)) {
+					if (TelephoneNumberItemOperation.CREATE.equals(
+						item.getOperation())) {
 						this.createRelationshipsService.createTelephoneNumber(
 							newCreatedAssociated, 
 							item.getTelephoneNumberFields().getValue(), 
@@ -1333,8 +1357,8 @@ public class CreateOffenderRelationshipController {
 					= createRelationshipsForm.getOnlineAccountContactItems();
 				for (OnlineAccountContactItem onlineAccountContactItem
 						: onlineAccountItems) {
-					if (onlineAccountContactItem.getOperation().equals(
-						OnlineAccountContactItemOperation.CREATE)) {
+					if (OnlineAccountContactItemOperation.CREATE.equals(
+						onlineAccountContactItem.getOperation())) {
 						this.createRelationshipsService.createOnlineAccount(
 							newCreatedAssociated, 
 							onlineAccountContactItem.getOnlineAccountFields()
@@ -1478,8 +1502,8 @@ public class CreateOffenderRelationshipController {
 				List<TelephoneNumberItem> telephoneNumberItems 
 					= createRelationshipsForm.getTelephoneNumberItems();
 				for (TelephoneNumberItem item : telephoneNumberItems) {
-					if (item.getOperation().equals(
-						TelephoneNumberItemOperation.CREATE)) {
+					if (TelephoneNumberItemOperation.CREATE.equals(
+						item.getOperation())) {
 						this.createRelationshipsService.changeContact(
 							newCreatedAssociated, poBox, address);
 						this.createRelationshipsService.createTelephoneNumber(
@@ -1498,8 +1522,8 @@ public class CreateOffenderRelationshipController {
 					= createRelationshipsForm.getOnlineAccountContactItems();
 				for (OnlineAccountContactItem onlineAccountContactItem
 						: onlineAccountItems) {
-					if (onlineAccountContactItem.getOperation().equals(
-						OnlineAccountContactItemOperation.CREATE)) {
+					if (OnlineAccountContactItemOperation.CREATE.equals(
+						onlineAccountContactItem.getOperation())) {
 						this.createRelationshipsService.createOnlineAccount(
 								newCreatedAssociated, 
 								onlineAccountContactItem
@@ -2024,215 +2048,143 @@ public class CreateOffenderRelationshipController {
 	
 	/**
 	 * Returns the state options view with a collections of state for the
-	 * specified country for person fields snippet.
+	 * specified country for person, address and po box fields snippet.
 	 * 
 	 * @param country country
-	 * @param personFieldsPropertyName person fields property name
+	 * @param fieldsName fields name
 	 * @return model and view to show state options
 	 */
-	@RequestMapping(value = "personFieldsCreateStateOptions.html", 
+	@RequestMapping(value = "/{fieldsName}/findStateOptions.html", 
 		method = RequestMethod.GET)
-	public ModelAndView showPersonFieldsStateOptions(
+	public ModelAndView showStateOptions(
+			@PathVariable(value = "fieldsName")
+				final String fieldsName,
 			@RequestParam(value = "country", required = true)
-				final Country country,
-			@RequestParam(value = "personFieldsPropertyName", required = true)
-				final String personFieldsPropertyName) {
+				final Country country) {
 		List<State> states 
 			= this.createRelationshipsService.findStates(country);
-		return this.personFieldsControllerDelegate.showStateOptions(states, 
-			personFieldsPropertyName);
-	}
-
-	/**
-	 * Returns the city options view with a collection of cities for the
-	 * specified state for person fields snippet.
-	 * 
-	 * @param state state
-	 * @param country country
-	 * @param personFieldsPropertyName person fields property name
-	 * @return model and view to show city options
-	 */
-	@RequestMapping(value = "personFieldsCreateCityOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPersonFieldsCityOptions(
-		@RequestParam(value = "state", required = false)
-			final State state,
-		@RequestParam(value = "personFieldsPropertyName", required = true)
-			final String personFieldsPropertyName,
-			@RequestParam(value = "country", required = false)
-		final Country country) {
-		if (state != null) {
-			return this.personFieldsControllerDelegate.showCityOptions(
-				this.createRelationshipsService.findCitiesByState(state), 
-				personFieldsPropertyName);
+		if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+			return this.personFieldsControllerDelegate
+			.showStateOptions(states, PERSON_FIELDS_NAME);
+		} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+			return this.addressFieldsControllerDelegate
+			.showStateOptions(states, ADDRESS_FIELDS_NAME);
+		} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+			return this.poBoxFieldsControllerDelegate
+			.showStateOptions(states, PO_BOX_FIELDS_NAME);
 		} else {
-			if (this.createRelationshipsService.hasStates(country)) {
-				return this.personFieldsControllerDelegate.showCityOptions(
-					this.createRelationshipsService
-					.findCitiesByCountryWithoutState(country), 
-					personFieldsPropertyName);
-			} else {
-				return this.personFieldsControllerDelegate.showCityOptions(
-					this.createRelationshipsService
-					.findCitiesByCountry(country), personFieldsPropertyName);
-			}
+			throw new UnsupportedOperationException(
+				String.format("Fields name not supported %s", fieldsName));
 		}
 	}
 
 	/**
-	 * Returns the state options view with a collections of state for the
-	 * specified country for address fields snippet.
-	 * 
-	 * @param country country
-	 * @param addressFieldsPropertyName address fields property name
-	 * @return model and view to show state options
-	 */
-	@RequestMapping(value = "addressFieldsCreateStateOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsStateOptions(
-		@RequestParam(value = "country", required = true)
-			final Country country,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName) {
-		List<State> states 
-			= this.createRelationshipsService.findStates(country);
-		return this.addressFieldsControllerDelegate.showStateOptions(states, 
-			addressFieldsPropertyName);
-	}
-	
-	/**
 	 * Returns the city options view with a collection of cities for the
-	 * specified state for address fields snippet.
+	 * specified state for person, address and po box fields snippet.
 	 * 
 	 * @param state state
 	 * @param country country
-	 * @param addressFieldsPropertyName address fields property name
+	 * @param fieldsName fields name
 	 * @return model and view to show city options
 	 */
-	@RequestMapping(value = "addressFieldsCreateCityOptions.html", 
+	@RequestMapping(value = "/{fieldsName}/findCityOptions.html", 
 		method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsCityOptions(
+	public ModelAndView showCityOptions(
+		@PathVariable(value = "fieldsName")
+			final String fieldsName,
 		@RequestParam(value = "state", required = false)
 			final State state,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName,
-				@RequestParam(value = "country", required = false)
+		@RequestParam(value = "country", required = true)
 		final Country country) {
 		if (state != null) {
-			return this.addressFieldsControllerDelegate.showCityOptions(
+			if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+				return this.personFieldsControllerDelegate.showCityOptions(
+				this.createRelationshipsService.findCitiesByState(state), 
+				PERSON_FIELDS_NAME);
+			} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+				return this.addressFieldsControllerDelegate.showCityOptions(
 				this.createRelationshipsService.findCitiesByState(state),
-				addressFieldsPropertyName);
+				ADDRESS_FIELDS_NAME);
+			} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+				return this.poBoxFieldsControllerDelegate.showCityOptions(
+				this.createRelationshipsService.findCitiesByState(state),
+				PO_BOX_FIELDS_NAME);
+			} else {
+				throw new UnsupportedOperationException(
+					String.format("Fields name not supported %s", fieldsName));
+			}
 		} else {
 			if (this.createRelationshipsService.hasStates(country)) {
-				return this.addressFieldsControllerDelegate.showCityOptions(
+				if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+					return this.personFieldsControllerDelegate.showCityOptions(
 					this.createRelationshipsService
 					.findCitiesByCountryWithoutState(country), 
-					addressFieldsPropertyName);
-			} else {
-				return this.addressFieldsControllerDelegate.showCityOptions(
+					PERSON_FIELDS_NAME);
+				} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+					return this.addressFieldsControllerDelegate.showCityOptions(
 					this.createRelationshipsService
-					.findCitiesByCountry(country), 
-					addressFieldsPropertyName);
+					.findCitiesByCountryWithoutState(country),
+					ADDRESS_FIELDS_NAME);
+				} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+					return this.poBoxFieldsControllerDelegate.showCityOptions(
+					this.createRelationshipsService
+					.findCitiesByCountryWithoutState(country),
+					PO_BOX_FIELDS_NAME);
+				} else {
+					throw new UnsupportedOperationException(
+						String.format("Fields name not supported %s",
+						fieldsName));
+				}
+			} else {
+				if (PERSON_FIELDS_NAME.equals(fieldsName)) {
+					return this.personFieldsControllerDelegate.showCityOptions(
+					this.createRelationshipsService.findCitiesByCountry(
+					country), PERSON_FIELDS_NAME);
+				} else if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+					return this.addressFieldsControllerDelegate.showCityOptions(
+					this.createRelationshipsService.findCitiesByCountry(
+					country), ADDRESS_FIELDS_NAME);
+				} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+					return this.poBoxFieldsControllerDelegate.showCityOptions(
+					this.createRelationshipsService.findCitiesByCountry(
+					country), PO_BOX_FIELDS_NAME);
+				} else {
+					throw new UnsupportedOperationException(
+						String.format("Fields name not supported %s",
+						fieldsName));
+				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the zip code options view with a collection of zip codes for the
-	 * specified city for address field snippet.
+	 * specified city for address, poBox field snippet.
 	 * 
 	 * @param city city
-	 * @param addressFieldsPropertyName address fields property name
+	 * @param fieldsName fields name
 	 * @return model and view to show zip code options
 	 */
-	@RequestMapping(value = "addressFieldsCreateZipCodeOptions.html", 
+	@RequestMapping(value = "/{fieldsName}/findZipCodeOptions.html", 
 		method = RequestMethod.GET)
-	public ModelAndView showAddressFieldsZipCodeOptions(
+	public ModelAndView showZipCodeOptions(
+		@PathVariable(value = "fieldsName")
+			final String fieldsName,
 		@RequestParam(value = "city", required = true)
-			final City city,
-		@RequestParam(value = "addressFieldsPropertyName", required = true)
-			final String addressFieldsPropertyName) {
-		return this.addressFieldsControllerDelegate.showZipCodeOptions(
-			this.createRelationshipsService.findZipCodes(city), 
-			addressFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the state options view with a collections of state for the
-	 * specified country for po box fields snippet.
-	 * 
-	 * @param country country
-	 * @param poBoxFieldsPropertyName po box fields property name
-	 * @return model and view to show state options
-	 */
-	@RequestMapping(value = "poBoxFieldsCreateStateOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsStateOptions(
-		@RequestParam(value = "country", required = true)
-			final Country country,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName) {
-		List<State> states 
-			= this.createRelationshipsService.findStates(country);
-		return this.poBoxFieldsControllerDelegate.showStateOptions(states, 
-			poBoxFieldsPropertyName);
-	}
-	
-	/**
-	 * Returns the city options view with a collection of cities for the
-	 * specified state for po box fields snippet.
-	 * 
-	 * @param state state
-	 * @param poBoxFieldsPropertyName po box fields property name
-	 * @param country country
-	 * @return model and view to show city options
-	 */
-	@RequestMapping(value = "poBoxFieldsCreateCityOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsCityOptions(
-		@RequestParam(value = "state", required = false)
-			final State state,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName,
-			@RequestParam(value = "country", required = false)
-		final Country country) {
-		if (state != null) {
-			return this.poBoxFieldsControllerDelegate.showCityOptions(
-				this.createRelationshipsService.findCitiesByState(state), 
-				poBoxFieldsPropertyName);
+			final City city) {
+		if (ADDRESS_FIELDS_NAME.equals(fieldsName)) {
+			return this.addressFieldsControllerDelegate.showZipCodeOptions(
+			this.createRelationshipsService.findZipCodes(city),
+			ADDRESS_FIELDS_NAME);
+		} else if (PO_BOX_FIELDS_NAME.equals(fieldsName)) {
+			return this.poBoxFieldsControllerDelegate.showZipCodeOptions(
+			this.createRelationshipsService.findZipCodes(city),
+			PO_BOX_FIELDS_NAME);
 		} else {
-			if (this.createRelationshipsService.hasStates(country)) {
-				return this.poBoxFieldsControllerDelegate.showCityOptions(
-					this.createRelationshipsService
-					.findCitiesByCountryWithoutState(country), 
-					poBoxFieldsPropertyName);
-			} else {
-				return this.poBoxFieldsControllerDelegate.showCityOptions(
-					this.createRelationshipsService
-					.findCitiesByCountry(country), 
-					poBoxFieldsPropertyName);
-			}
+			throw new UnsupportedOperationException(
+				String.format("Fields name not supported %s",
+				fieldsName));
 		}
-	}
-	
-	/**
-	 * Returns the zip code options view with a collection of zip codes for the
-	 * specified city for po box field snippet.
-	 * 
-	 * @param city city
-	 * @param poBoxFieldsPropertyName po box fields property name
-	 * @return model and view to show zip code options
-	 */
-	@RequestMapping(value = "poBoxFieldsCreateZipCodeOptions.html", 
-		method = RequestMethod.GET)
-	public ModelAndView showPoBoxFieldsZipCodeOptions(
-		@RequestParam(value = "city", required = true)
-			final City city,
-		@RequestParam(value = "poBoxFieldsPropertyName", required = true)
-			final String poBoxFieldsPropertyName) {
-		return this.addressFieldsControllerDelegate.showZipCodeOptions(
-			this.createRelationshipsService.findZipCodes(city), 
-			poBoxFieldsPropertyName);
 	}
 	
 	/**

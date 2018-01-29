@@ -22,6 +22,7 @@ import org.hibernate.SessionFactory;
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.hearinganalysis.dao.HearingAnalysisDao;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleeligibility.domain.ParoleEligibility;
@@ -53,6 +54,8 @@ public class HearingAnalysisDaoHibernateImpl
 	
 	private static final String MEETING_SITE_PARAM_NAME = "meetingSite";
 	
+	private static final String CATEGORY_PARAM_NAME = "category";
+	
 	private static final String ANALYST_PARAM_NAME = "analyst";
 	
 	private static final String EXCLUDED_HEARING_ANALYSIS_PARAM_NAME = 
@@ -73,12 +76,14 @@ public class HearingAnalysisDaoHibernateImpl
 	@Override
 	public HearingAnalysis find(final ParoleEligibility eligibility, 
 			final BoardMeetingSite boardMeetingSite, 
+			final HearingAnalysisCategory category,
 			final BoardAttendee analyst) {
 		HearingAnalysis hearingAnalysis = (HearingAnalysis) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_QUERY_NAME)
 				.setParameter(ELIGIBILITY_PARAM_NAME, eligibility)
 				.setParameter(MEETING_SITE_PARAM_NAME, boardMeetingSite)
+				.setParameter(CATEGORY_PARAM_NAME, category)
 				.setParameter(ANALYST_PARAM_NAME, analyst)
 				.uniqueResult();
 		return hearingAnalysis;
@@ -88,13 +93,14 @@ public class HearingAnalysisDaoHibernateImpl
 	@Override
 	public HearingAnalysis findExcluding(final ParoleEligibility eligibility, 
 			final BoardMeetingSite boardMeetingSite,
-			final BoardAttendee analyst, 
+			final HearingAnalysisCategory category, final BoardAttendee analyst, 
 			final HearingAnalysis excludedHearingAnalysis) {
 		HearingAnalysis hearingAnalysis = (HearingAnalysis) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_EXCLUDING_QUERY_NAME)
 				.setParameter(ELIGIBILITY_PARAM_NAME, eligibility)
 				.setParameter(MEETING_SITE_PARAM_NAME, boardMeetingSite)
+				.setParameter(CATEGORY_PARAM_NAME, category)
 				.setParameter(ANALYST_PARAM_NAME, analyst)
 				.setParameter(EXCLUDED_HEARING_ANALYSIS_PARAM_NAME, 
 						excludedHearingAnalysis)
@@ -102,8 +108,10 @@ public class HearingAnalysisDaoHibernateImpl
 		return hearingAnalysis;
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public HearingAnalysis findByParoleEligibility(ParoleEligibility eligibility) {
+	public HearingAnalysis findByParoleEligibility(
+			final ParoleEligibility eligibility) {
 		HearingAnalysis hearingAnalysis = (HearingAnalysis) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_BY_PAROLE_ELIGIBILITY_QUERY_NAME)

@@ -20,11 +20,9 @@ package omis.hearinganalysis.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
-
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.address.service.delegate.AddressDelegate;
@@ -35,7 +33,9 @@ import omis.datatype.DateRange;
 import omis.exception.DateConflictException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.hearinganalysis.service.HearingAnalysisService;
+import omis.hearinganalysis.service.delegate.HearingAnalysisCategoryDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisDelegate;
 import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
@@ -47,9 +47,11 @@ import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
 import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
+import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 import omis.paroleeligibility.domain.AppearanceCategory;
@@ -162,6 +164,14 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 	@Qualifier("hearingAnalysisDelegate")
 	private HearingAnalysisDelegate hearingAnalysisDelegate;
 	
+	@Autowired
+	@Qualifier("hearingAnalysisCategoryDelegate")
+	private HearingAnalysisCategoryDelegate hearingAnalysisCategoryDelegate;
+	
+	@Autowired
+	@Qualifier("paroleBoardLocationDelegate")
+	private ParoleBoardLocationDelegate paroleBoardLocationDelegate;
+	
 	/* Services. */
 
 	@Autowired
@@ -181,7 +191,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 	public void testCreateHearingAnalysis() 
 			throws DuplicateEntityFoundException, DateConflictException {
 		// Arrangements
-		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith", 
+		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
 				"John", "Jay", null);
 		Date hearingEligibilityDate = this.parseDateText("01/01/2017");
 		Date reviewDate = this.parseDateText("01/01/2017");
@@ -195,7 +205,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 				new ParoleEligibilityStatus(statusDate, statusComment, 
 						statusCategory, statusReason);
 		AppearanceCategory appearanceCategory = this.appearanceCategoryDelegate
-				.create("Category", true);;
+				.create("Category", true);
 		ParoleEligibility eligibility = this.paroleEligibilityDelegate.create(
 				offender, hearingEligibilityDate, reviewDate, 
 				paroleEligibilityStatus, appearanceCategory);
@@ -209,10 +219,12 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(
@@ -240,15 +252,19 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
 		BoardAttendee analyst = this.boardAttendeeDelegate.create(
 				boardItinerary, boardMember, number, role);
+		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
+				.create("Category", true);
 
 		// Action
 		HearingAnalysis hearingAnalysis = this.hearingAnalysisService
-				.createHearingAnalysis(eligibility, meetingSite, analyst);
+				.createHearingAnalysis(eligibility, meetingSite, analyst, 
+						category);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("eligibility", eligibility)
 			.addExpectedValue("boardMeetingSite", meetingSite)
+			.addExpectedValue("category", category)
 			.addExpectedValue("analyst", analyst)
 			.performAssertions(hearingAnalysis);
 	}
@@ -264,7 +280,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 	public void testDuplicateEntityFoundException() 
 			throws DuplicateEntityFoundException, DateConflictException {
 		// Arrangements
-		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith", 
+		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
 				"John", "Jay", null);
 		Date hearingEligibilityDate = this.parseDateText("01/01/2017");
 		Date reviewDate = this.parseDateText("01/01/2017");
@@ -278,7 +294,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 				new ParoleEligibilityStatus(statusDate, statusComment, 
 						statusCategory, statusReason);
 		AppearanceCategory appearanceCategory = this.appearanceCategoryDelegate
-				.create("Category", true);;
+				.create("Category", true);
 		ParoleEligibility eligibility = this.paroleEligibilityDelegate.create(
 				offender, hearingEligibilityDate, reviewDate, 
 				paroleEligibilityStatus, appearanceCategory);
@@ -292,10 +308,12 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 				null, null, null, zipCode);
 		Location location = this.locationDelegate.create(organization, 
 				new DateRange(this.parseDateText("01/01/2000"), null), address);
+		ParoleBoardLocation paroleBoardLocation = this
+				.paroleBoardLocationDelegate.create(location, true);
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(location, startDate, endDate);
+				.create(paroleBoardLocation, startDate, endDate);
 		Organization secondOrganization = this.organizationDelegate.create(
 				"Org2", "O2", null);
 		Location secondLocation = this.locationDelegate.create(
@@ -323,11 +341,14 @@ public class HearingAnalysisServiceCreateHearingAnalysisTests
 		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
 		BoardAttendee analyst = this.boardAttendeeDelegate.create(
 				boardItinerary, boardMember, number, role);
-		this.hearingAnalysisDelegate.create(eligibility, meetingSite, analyst);
+		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
+				.create("Category", true);
+		this.hearingAnalysisDelegate.create(eligibility, meetingSite, category, 
+				analyst);
 		
 		// Action
 		this.hearingAnalysisService.createHearingAnalysis(eligibility, 
-				meetingSite, analyst);
+				meetingSite, analyst, category);
 	}
 
 	// Parses date text

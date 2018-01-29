@@ -40,7 +40,8 @@ import omis.residence.service.delegate.ResidenceTermDelegate;
  * 
  * @author Sheronda Vaughn
  * @author Josh Divine
- * @version 0.1.1 (Sept 19, 2017)
+ * @author Joel Norris
+ * @version 0.1.2 (January 11, 2017)
  * @since  OMIS 3.0
  *
  */
@@ -455,5 +456,21 @@ public class ResidenceServiceImpl implements ResidenceService {
 	@Override
 	public List<NonResidenceTerm> findNonResidenceTerms(final Date date, final Person person) {
 		return this.nonResidenceTermDelegate.findNonResidenceTermsByPersonAndDate(person, date);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public NonResidenceTerm endNonResidenceTerm(NonResidenceTerm term, Date endDate)
+			throws DuplicateEntityFoundException {
+		final DateRange dateRange;
+		if(term.getDateRange() == null) {
+			dateRange = new DateRange(null, endDate);
+		} else {
+			dateRange = new DateRange(term.getDateRange().getStartDate(), endDate);
+		}
+		
+		return this.nonResidenceTermDelegate.updateNonResidenceTerm(term,
+				dateRange, term.getStatus(), term.getLocation(),
+				term.getConfirmed(), term.getNotes(), term.getVerificationSignature());
 	}
 }

@@ -11,7 +11,7 @@
 		<jsp:include page="../../../contact/includes/telephoneNumberFieldsHeader.jsp"/>
 	</tr>
 </thead>
-<tbody id="telephoneNumbersTable">
+<tbody id="telephoneNumbersTableBody">
 	<c:forEach var="telephoneNumberItem" items="${telephoneNumberItems}" varStatus="status">	
 		<c:set var="telephoneNumberIndex" value="${status.index}" scope="request"/>		
 		<c:set var="telephoneNumberItem" value="${telephoneNumberItem}" scope="request"/>

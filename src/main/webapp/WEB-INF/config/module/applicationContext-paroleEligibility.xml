@@ -49,6 +49,11 @@
   	  <constructor-arg name="sessionFactory" ref="sessionFactory"/>		
   </bean>
   
+  <bean id="paroleEligibilityProfileItemReportService"
+  	class="omis.paroleeligibility.report.impl.hibernate.ParoleEligibilityProfileItemReportServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
   <!-- Data access objects -->
   
   <bean id="appearanceCategoryDao"

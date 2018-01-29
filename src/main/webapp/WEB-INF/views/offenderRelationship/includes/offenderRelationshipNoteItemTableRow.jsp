@@ -22,6 +22,8 @@
   - Expects these attributes:
   -  - offenderRelationshipNoteItemIndex - item index
   -  - offenderRelationshipNoteItem - note item
+  -  - offenderRelationshipNoteItemsFieldName - field name of offender
+  -    relationship note items
   -
   - Author: Stephen Abson
   --%>
@@ -36,11 +38,11 @@
 		<c:set var="offenderRelationshipNoteItemRowClass" value=""/>
 	</c:otherwise>
 </c:choose>
-<tr id="noteItems[${offenderRelationshipNoteItemIndex}].row" class="${offenderRelationshipNoteItemRowClass}">
+<tr id="${offenderRelationshipNoteItemsFieldName}[${offenderRelationshipNoteItemIndex}].row" class="${offenderRelationshipNoteItemRowClass}">
 	<td>
-		<a id="noteItems[${offenderRelationshipNoteItemIndex}].removeLink" class="removeLink" href="${pageContext.request.contextPath}/offenderRelationship/removeNote.html?itemIndex=${offenderRelationshipNoteItemIndex}"></a>
+		<a id="${offenderRelationshipNoteItemsFieldName}[${offenderRelationshipNoteItemIndex}].removeLink" class="removeLink" href="${pageContext.request.contextPath}/offenderRelationship/removeNote.html?itemIndex=${offenderRelationshipNoteItemIndex}"></a>
 	</td>
-	<c:set var="offenderRelationshipNoteFieldsPropertyName" value="noteItems[${offenderRelationshipNoteItemIndex}].fields" scope="request"/>
+	<c:set var="offenderRelationshipNoteFieldsPropertyName" value="${offenderRelationshipNoteItemsFieldName}[${offenderRelationshipNoteItemIndex}].fields" scope="request"/>
 	<jsp:include page="offenderRelationshipNoteFieldsTableCells.jsp"/>
 	<td>
 		<c:if test="${not empty offenderRelationshipNoteItem.note}">

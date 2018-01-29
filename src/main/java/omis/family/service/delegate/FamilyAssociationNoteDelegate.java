@@ -6,10 +6,10 @@ import java.util.List;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.family.dao.FamilyAssociationNoteDao;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationNote;
+import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -62,13 +62,14 @@ public class FamilyAssociationNoteDelegate {
 	 * @param date date
 	 * @param value note content
 	 * @return a new family association note
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationNoteExistsException  
+	 * family association not exists exception
 	 */
 	public FamilyAssociationNote create(final FamilyAssociation association, 
 		final Date date, final String value) 
-		throws DuplicateEntityFoundException {
+		throws FamilyAssociationNoteExistsException {
 		if (this.familyAssociationNoteDao.find(association, date) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new FamilyAssociationNoteExistsException(
 				"Duplicate family association note found");
 		}
 		FamilyAssociationNote familyAssociationNote 
@@ -97,14 +98,15 @@ public class FamilyAssociationNoteDelegate {
 	 * @param date date
 	 * @param value note content
 	 * @return an updated family association note
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationNoteExistsException 
+	 * family association exists exception
 	 */
 	public FamilyAssociationNote update(final FamilyAssociationNote note, 
 		final Date date, final String value)
-				throws DuplicateEntityFoundException {
+				throws FamilyAssociationNoteExistsException {
 		if (familyAssociationNoteDao.findExcluding(note.getAssociation(), date, 
 			note) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new FamilyAssociationNoteExistsException(
 				"Family association note already exist");
 		}
 		UpdateSignature updateSignature = new UpdateSignature();

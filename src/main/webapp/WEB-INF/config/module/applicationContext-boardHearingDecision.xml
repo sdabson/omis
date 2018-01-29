@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="boardHearingDecisionService"
+        	class="omis.boardhearingdecision.service.impl.BoardHearingDecisionServiceImpl">
+        	<constructor-arg name="boardHearingDecisionDelegate" ref="boardHearingDecisionDelegate"/>
+        	<constructor-arg name="boardMemberDecisionDelegate" ref="boardMemberDecisionDelegate"/>
+        	<constructor-arg name="hearingDecisionNoteDelegate" ref="hearingDecisionNoteDelegate"/>
+        	<constructor-arg name="boardHearingParticipantDelegate" ref="boardHearingParticipantDelegate"/>
+        	<constructor-arg name="boardHearingDecisionCategoryDelegate" ref="boardHearingDecisionCategoryDelegate"/>
+        	<constructor-arg name="hearingDecisionReasonDelegate" ref="hearingDecisionReasonDelegate"/>
+        </bean>
+        
+        <!-- Delegates -->
+        
+        <bean id="boardHearingDecisionDelegate"
+        	class="omis.boardhearingdecision.service.delegate.BoardHearingDecisionDelegate">
+        	<constructor-arg name="boardHearingDecisionDao" ref="boardHearingDecisionDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="boardHearingDecisionInstanceFactory" ref="boardHearingDecisionInstanceFactory"/>
+        </bean>
+        
+        <bean id="boardHearingDecisionCategoryDelegate"
+        	class="omis.boardhearingdecision.service.delegate.BoardHearingDecisionCategoryDelegate">
+        	<constructor-arg name="boardHearingDecisionCategoryDao" ref="boardHearingDecisionCategoryDao"/>
+        	<constructor-arg name="boardHearingDecisionCategoryInstanceFactory" ref="boardHearingDecisionCategoryInstanceFactory"/>
+        </bean>
+        
+        <bean id="boardMemberDecisionDelegate"
+        	class="omis.boardhearingdecision.service.delegate.BoardMemberDecisionDelegate">
+        	<constructor-arg name="boardMemberDecisionDao" ref="boardMemberDecisionDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="boardMemberDecisionInstanceFactory" ref="boardMemberDecisionInstanceFactory"/>
+        </bean>
+        
+        <bean id="hearingDecisionNoteDelegate"
+        	class="omis.boardhearingdecision.service.delegate.HearingDecisionNoteDelegate">
+        	<constructor-arg name="hearingDecisionNoteDao" ref="hearingDecisionNoteDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="hearingDecisionNoteInstanceFactory" ref="hearingDecisionNoteInstanceFactory"/>
+        </bean>
+        
+        <bean id="hearingDecisionReasonDelegate"
+        	class="omis.boardhearingdecision.service.delegate.HearingDecisionReasonDelegate">
+        	<constructor-arg name="hearingDecisionReasonDao" ref="hearingDecisionReasonDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="hearingDecisionReasonInstanceFactory" ref="hearingDecisionReasonInstanceFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="boardHearingDecisionDao"
+        	class="omis.boardhearingdecision.dao.impl.hibernate.BoardHearingDecisionDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecision"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="boardHearingDecisionCategoryDao"
+        	class="omis.boardhearingdecision.dao.impl.hibernate.BoardHearingDecisionCategoryDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecisionCategory"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="boardMemberDecisionDao"
+        	class="omis.boardhearingdecision.dao.impl.hibernate.BoardMemberDecisionDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardMemberDecision"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="hearingDecisionNoteDao"
+        	class="omis.boardhearingdecision.dao.impl.hibernate.HearingDecisionNoteDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionNote"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="hearingDecisionReasonDao"
+        	class="omis.boardhearingdecision.dao.impl.hibernate.HearingDecisionReasonDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionReason"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="boardHearingDecisionInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecision"/>
+		</bean>
+		
+		<bean id="boardHearingDecisionCategoryInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecisionCategory"/>
+		</bean>
+		
+		<bean id="boardMemberDecisionInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardMemberDecision"/>
+		</bean>
+		
+		<bean id="hearingDecisionNoteInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionNote"/>
+		</bean>
+		
+		<bean id="hearingDecisionReasonInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionReason"/>
+		</bean>
+		
+  		 <!--Property editor factories -->
+ 		 
+ 		 <bean id="boardHearingDecisionPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecision"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="boardHearingDecisionDao"/>
+		</bean>
+		
+		<bean id="boardHearingDecisionCategoryPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardHearingDecisionCategory"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="boardHearingDecisionCategoryDao"/>
+		</bean>
+		
+		<bean id="boardMemberDecisionPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.BoardMemberDecision"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="boardMemberDecisionDao"/>
+		</bean>
+		
+		<bean id="hearingDecisionNotePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionNote"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="hearingDecisionNoteDao"/>
+		</bean>
+		
+		<bean id="hearingDecisionReasonPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.boardhearingdecision.domain.HearingDecisionReason"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="hearingDecisionReasonDao"/>
+		</bean>
+		
+</beans>

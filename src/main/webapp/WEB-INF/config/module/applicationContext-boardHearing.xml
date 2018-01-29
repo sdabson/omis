@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="boardHearingService" class="omis.boardhearing.service.impl.BoardHearingServiceImpl">
+			<constructor-arg name="boardHearingDelegate" ref="boardHearingDelegate" />
+			<constructor-arg name="boardHearingNoteDelegate" ref="boardHearingNoteDelegate" />
+			<constructor-arg name="boardHearingParticipantDelegate" ref="boardHearingParticipantDelegate" />
+			<constructor-arg name="boardHearingCategoryDelegate" ref="boardHearingCategoryDelegate" />
+			<constructor-arg name="boardAttendeeDelegate" ref="boardAttendeeDelegate" />
+			<constructor-arg name="boardMeetingSiteDelegate" ref="boardMeetingSiteDelegate" />
+			<constructor-arg name="hearingAnalysisDelegate" ref="hearingAnalysisDelegate" />
+			<constructor-arg name="paroleBoardItineraryDelegate" ref="paroleBoardItineraryDelegate" />
+		</bean>
+		
+		<!-- BoardHearing Beans -->
+		
+		<bean id="boardHearingDao" class="omis.boardhearing.dao.impl.hibernate.BoardHearingDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearing" />
+		</bean>
+		
+		<bean id="boardHearingDelegate" class="omis.boardhearing.service.delegate.BoardHearingDelegate">
+			<constructor-arg name="boardHearingDao" ref="boardHearingDao" />
+			<constructor-arg name="boardHearingInstanceFactory" ref="boardHearingInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="boardHearingInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearing" />
+		</bean>
+		
+		<bean id="boardHearingPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="boardHearingDao" />
+			<constructor-arg name="entityName"
+				value="omis.boardhearing.domain.BoardHearing" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- BoardHearingNote Beans -->
+		
+		<bean id="boardHearingNoteDao" class="omis.boardhearing.dao.impl.hibernate.BoardHearingNoteDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingNote" />
+		</bean>
+		
+		<bean id="boardHearingNoteDelegate" class="omis.boardhearing.service.delegate.BoardHearingNoteDelegate">
+			<constructor-arg name="boardHearingNoteDao" ref="boardHearingNoteDao" />
+			<constructor-arg name="boardHearingNoteInstanceFactory" ref="boardHearingNoteInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="boardHearingNoteInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingNote" />
+		</bean>
+		
+		<bean id="boardHearingNotePropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="boardHearingNoteDao" />
+			<constructor-arg name="entityName"
+				value="omis.boardhearing.domain.BoardHearingNote" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- BoardHearingParticipant Beans -->
+		
+		<bean id="boardHearingParticipantDao" class="omis.boardhearing.dao.impl.hibernate.BoardHearingParticipantDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingParticipant" />
+		</bean>
+		
+		<bean id="boardHearingParticipantDelegate" class="omis.boardhearing.service.delegate.BoardHearingParticipantDelegate">
+			<constructor-arg name="boardHearingParticipantDao" ref="boardHearingParticipantDao" />
+			<constructor-arg name="boardHearingParticipantInstanceFactory" ref="boardHearingParticipantInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="boardHearingParticipantInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingParticipant" />
+		</bean>
+		
+		<bean id="boardHearingParticipantPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="boardHearingParticipantDao" />
+			<constructor-arg name="entityName"
+				value="omis.boardhearing.domain.BoardHearingParticipant" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- BoardHearingCategory Beans -->
+		
+		<bean id="boardHearingCategoryDao" class="omis.boardhearing.dao.impl.hibernate.BoardHearingCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingCategory" />
+		</bean>
+		
+		<bean id="boardHearingCategoryDelegate" class="omis.boardhearing.service.delegate.BoardHearingCategoryDelegate">
+			<constructor-arg name="boardHearingCategoryDao" ref="boardHearingCategoryDao" />
+			<constructor-arg name="boardHearingCategoryInstanceFactory" ref="boardHearingCategoryInstanceFactory" />
+		</bean>
+		
+		<bean id="boardHearingCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.boardhearing.domain.BoardHearingCategory" />
+		</bean>
+		
+		<bean id="boardHearingCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="boardHearingCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.boardhearing.domain.BoardHearingCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		
+		
+</beans>

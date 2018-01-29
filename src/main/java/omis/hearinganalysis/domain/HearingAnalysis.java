@@ -30,6 +30,10 @@ import omis.paroleeligibility.domain.ParoleEligibility;
  * @version 0.1.0 (Dec 18, 2017)
  * @since OMIS 3.0
  */
+/**
+ * @author CID017
+ *
+ */
 public interface HearingAnalysis extends Creatable, Updatable {
 
 	/**
@@ -73,6 +77,21 @@ public interface HearingAnalysis extends Creatable, Updatable {
 	 * @return board meeting site
 	 */
 	BoardMeetingSite getBoardMeetingSite();
+	
+	
+	/**
+	 * Sets the hearing analysis category.
+	 * 
+	 * @param category hearing analysis category
+	 */
+	void setCategory(HearingAnalysisCategory category);
+	
+	/**
+	 * Returns the hearing analysis category.
+	 * 
+	 * @return hearing analysis category
+	 */
+	HearingAnalysisCategory getCategory();
 	
 	/**
 	 * Sets the analyst.

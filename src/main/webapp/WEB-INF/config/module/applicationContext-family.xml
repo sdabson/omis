@@ -47,6 +47,10 @@
  		<bean id="familyProfileItemReportService" class="omis.family.report.impl.hibernate.FamilyProfileItemReportServiceHibernateImpl">
  			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
  		</bean>
+ 		
+ 		<bean id="familySearchResultService" class="omis.family.report.impl.hibernate.FamilySearchResultServiceHibernateImpl">
+ 			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ 		</bean>
         
     <!--  Delegates -->
     	<bean id="familyAssociationDelegate"

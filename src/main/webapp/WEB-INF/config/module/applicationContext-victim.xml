@@ -85,6 +85,11 @@
   <bean id="victimProfileItemReportService" class="omis.victim.report.impl.hibernate.VictimProfileItemReportServiceHibernateImpl">
   	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   </bean>
+  
+  <bean id="victimSearchResultService" class="omis.victim.report.impl.hibernate.VictimSearchResultServiceHibernateImpl">
+  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  
   <!-- Service Delegates -->
   
   <bean id="victimAssociationDelegate"

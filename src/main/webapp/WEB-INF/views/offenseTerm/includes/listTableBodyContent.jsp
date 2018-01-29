@@ -14,6 +14,16 @@
 		<td><c:if test="${courtCaseSummary.judge}"><c:out value="${courtCaseSummary.judgeLastName}"/>, <c:out value="${courtCaseSummary.judgeFirstName}"/></c:if></td>
 		<td>
 			<c:choose>
+				<c:when test="${courtCaseSummary.convictionOverturned}">
+					<fmt:message key="yesLabel" bundle="${commonBundle}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="noLabel" bundle="${commonBundle}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+		<td>
+			<c:choose>
 				<c:when test="${courtCaseSummary.dismissed}">
 					<fmt:message key="yesLabel" bundle="${commonBundle}"/>
 				</c:when>

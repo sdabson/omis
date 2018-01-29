@@ -2,7 +2,6 @@ package omis.paroleboarditinerary.service;
 
 import java.util.Date;
 import java.util.List;
-
 import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
@@ -10,13 +9,15 @@ import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.domain.ParoleBoardItineraryNote;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 
 /**
  * Service for parole board itinerary.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Nov 20, 2017)
+ * @author Annie Wahl 
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public interface ParoleBoardItineraryService {
@@ -24,27 +25,29 @@ public interface ParoleBoardItineraryService {
 	/**
 	 * Creates a new parole board itinerary.
 	 * 
-	 * @param location location
+	 * @param paroleBoardLocation parole Board Location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return parole board itinerary
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
-	ParoleBoardItinerary create(Location location, Date startDate, Date endDate) 
-			throws DuplicateEntityFoundException;
+	ParoleBoardItinerary create(ParoleBoardLocation paroleBoardLocation,
+			Date startDate, Date endDate) 
+					throws DuplicateEntityFoundException;
 	
 	/**
 	 * Updates an existing parole board itinerary.
 	 * 
 	 * @param paroleBoardItinerary parole board itinerary
-	 * @param location location
+	 * @param paroleBoardLocation parole Board Location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return parole board itinerary
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	ParoleBoardItinerary update(ParoleBoardItinerary paroleBoardItinerary, 
-			Location location, Date startDate, Date endDate) 
+			ParoleBoardLocation paroleBoardLocation,
+			Date startDate, Date endDate) 
 					throws DuplicateEntityFoundException;
 	
 	/**
@@ -245,4 +248,11 @@ public interface ParoleBoardItineraryService {
 	 * @return list of all parole board members
 	 */
 	List<ParoleBoardMember> findBoardMembersByDate(Date effectiveDate);
+	
+	/**
+	 * Returns a list of all Parole Board Locations.
+	 * 
+	 * @return List of all Parole Board Locations.
+	 */
+	List<ParoleBoardLocation> findParoleBoardLocations();
 }

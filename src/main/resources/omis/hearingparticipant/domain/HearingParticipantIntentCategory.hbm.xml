@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearingparticipant.domain">
+	<class entity-name="omis.hearingparticipant.domain.HearingParticipantIntentCategory"
+			proxy="omis.hearingparticipant.domain.HearingParticipantIntentCategory"
+			name="omis.hearingparticipant.domain.impl.HearingParticipantIntentCategoryImpl"
+			table="`HEARING_PRTCPNT_INT_CAT`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`HEARING_PRTCPNT_INT_CAT_SEQ`</param>
+				</generator>
+			</id>
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true" />
+	</class>
+	<query name="findAllHearingParticipantIntentCategories"><![CDATA[
+		select hearingParticipantIntentCategory
+		from
+			omis.hearingparticipant.domain.HearingParticipantIntentCategory hearingParticipantIntentCategory
+		where
+			hearingParticipantIntentCategory.valid = true
+		order by
+			hearingParticipantIntentCategory.name asc
+	]]></query>
+</hibernate-mapping>

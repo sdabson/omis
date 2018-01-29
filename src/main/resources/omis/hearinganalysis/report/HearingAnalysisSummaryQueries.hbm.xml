@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ - Queries for reporting hearing analysis.
+ -
+ - Author: Josh Divine
+ - Version: 0.1.0 (Jan 10, 2018)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="omis.hearinganalysis.report">
+	<query name="summarizeHearingAnalysis"><![CDATA[
+	 	SELECT new omis.hearinganalysis.report.HearingAnalysisSummary(
+	 			eligibility.hearingEligibilityDate,
+	 			eligibility.reviewDate,
+	 			organization.name,
+	 			boardMeetingSite.date,
+	 			analystName.lastName,
+	 			analystName.middleName,
+	 			analystName.firstName,
+	 			title.name)
+		FROM omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+		INNER JOIN hearingAnalysis.eligibility eligibility
+		LEFT JOIN hearingAnalysis.boardMeetingSite boardMeetingSite
+		LEFT JOIN boardMeetingSite.location location
+		LEFT JOIN location.organization organization
+		LEFT JOIN hearingAnalysis.analyst analyst
+		LEFT JOIN analyst.boardMember boardMember
+		LEFT JOIN boardMember.staffAssignment staffAssignment
+		LEFT JOIN staffAssignment.staffMember staffMember
+		LEFT JOIN staffMember.name analystName
+		LEFT JOIN staffAssignment.title title
+        WHERE
+        	hearingAnalysis = :hearingAnalysis
+	]]></query>
+</hibernate-mapping>

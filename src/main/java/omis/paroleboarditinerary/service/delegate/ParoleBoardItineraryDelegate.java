@@ -19,22 +19,22 @@ package omis.paroleboarditinerary.service.delegate;
 
 import java.util.Date;
 import java.util.List;
-
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
-import omis.location.domain.Location;
 import omis.paroleboarditinerary.dao.ParoleBoardItineraryDao;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 
 /**
  * Parole board itinerary delegate.
  *
  * @author Josh Divine
- * @version 0.1.1 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryDelegate {
@@ -74,17 +74,18 @@ public class ParoleBoardItineraryDelegate {
 	/**
 	 * Creates a new parole board itinerary.
 	 * 
-	 * @param location location
+	 * @param paroleBoardLocation parole board location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return parole board itinerary
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
-	public ParoleBoardItinerary create(final Location location, 
+	public ParoleBoardItinerary create(
+			final ParoleBoardLocation paroleBoardLocation, 
 			final Date startDate, final Date endDate) 
 					throws DuplicateEntityFoundException {
-		if (this.paroleBoardItineraryDao.find(location, startDate, endDate) 
-				!= null) {
+		if (this.paroleBoardItineraryDao.find(paroleBoardLocation,
+				startDate, endDate)  != null) {
 			throw new DuplicateEntityFoundException(
 					"Parole board itinerary already exists.");
 		}
@@ -93,7 +94,8 @@ public class ParoleBoardItineraryDelegate {
 		boardItinerary.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));
-		populateBoardItinerary(boardItinerary, location, startDate, endDate);
+		populateBoardItinerary(boardItinerary, paroleBoardLocation,
+				startDate, endDate);
 		return this.paroleBoardItineraryDao.makePersistent(boardItinerary);
 	}
 
@@ -101,22 +103,24 @@ public class ParoleBoardItineraryDelegate {
 	 * Updates an existing parole board itinerary.
 	 * 
 	 * @param boardItinerary parole board itinerary
-	 * @param location location
+	 * @param paroleBoardLocation parole board location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return parole board itinerary
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	public ParoleBoardItinerary update(
-			final ParoleBoardItinerary boardItinerary, final Location location, 
+			final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardLocation paroleBoardLocation, 
 			final Date startDate, final Date endDate) 
 					throws DuplicateEntityFoundException {
-		if (this.paroleBoardItineraryDao.findExcluding(location, startDate, 
-				endDate, boardItinerary) != null) {
+		if (this.paroleBoardItineraryDao.findExcluding(paroleBoardLocation,
+				startDate, endDate, boardItinerary) != null) {
 			throw new DuplicateEntityFoundException(
 					"Parole board itinerary already exists.");
 		}
-		populateBoardItinerary(boardItinerary, location, startDate, endDate);
+		populateBoardItinerary(boardItinerary, paroleBoardLocation,
+				startDate, endDate);
 		return this.paroleBoardItineraryDao.makePersistent(boardItinerary);
 	}
 	
@@ -135,15 +139,16 @@ public class ParoleBoardItineraryDelegate {
 	 * @param effectiveDate effective date
 	 * @return list of parole board itineraries
 	 */
-	public List<ParoleBoardItinerary> findAfterDate(Date effectiveDate) {
+	public List<ParoleBoardItinerary> findAfterDate(final Date effectiveDate) {
 		return this.paroleBoardItineraryDao.findAfterDate(effectiveDate);
 	}
 	
 	// Populates a parole board itinerary
 	private void populateBoardItinerary(
-			final ParoleBoardItinerary boardItinerary, final Location location,
+			final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardLocation paroleBoardLocation,
 			final Date startDate, final Date endDate) {
-		boardItinerary.setLocation(location);
+		boardItinerary.setParoleBoardLocation(paroleBoardLocation);
 		boardItinerary.setDateRange(new DateRange(startDate, endDate));
 		boardItinerary.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 

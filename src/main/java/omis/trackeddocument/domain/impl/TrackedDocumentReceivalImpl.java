@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/ 
 package omis.trackeddocument.domain.impl;
 
 import java.util.Date;
@@ -137,16 +154,18 @@ public class TrackedDocumentReceivalImpl implements TrackedDocumentReceival {
 			that.getCategory())) {
 			return false;
 		}
-		if(that.getReceivedDate()!=null&&this.getReceivedDate()!=null){
+		if (that.getReceivedDate() != null && this.getReceivedDate() != null) {
 			if (!this.getReceivedDate().equals(that.getReceivedDate())) {
 				return false;
 			} 
-		} else if (that.getReceivedDate()!=null&&this.getReceivedDate()==null){
+		}
+		if (that.getReceivedDate() != null && this.getReceivedDate()
+			== null) {
 			return false;
-		} else if (that.getReceivedDate()==null&&this.getReceivedDate()!=null){
+		}
+		if (that.getReceivedDate() == null && this.getReceivedDate()
+			!= null) {
 			return false;
-		} else {
-			;
 		}
 		return true;
 	}
@@ -166,7 +185,7 @@ public class TrackedDocumentReceivalImpl implements TrackedDocumentReceival {
 		
 		hashCode += 29 * this.getDocket().hashCode();
 		hashCode += 29 * this.getCategory().hashCode();
-		if(this.getReceivedDate()!=null){
+		if (this.getReceivedDate() != null) {
 			hashCode += 29 * this.getReceivedDate().hashCode();
 		}
 		return hashCode;

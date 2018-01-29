@@ -27,13 +27,13 @@
 	</span>
 	
 	<span class="fieldGroup">
-		<form:label path="location" class="fieldLabel">
+		<form:label path="paroleBoardLocation" class="fieldLabel">
 			<fmt:message key="locationLabel"/></form:label>
-		<form:select path="location">
+		<form:select path="paroleBoardLocation">
 			<form:option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></form:option>
-			<form:options items="${locations}" itemLabel="organization.name" itemValue="id"/>
+			<form:options items="${paroleBoardLocations}" itemLabel="location.organization.name" itemValue="id"/>
 		</form:select>
-		<form:errors path="location" cssClass="error"/>
+		<form:errors path="paroleBoardLocation" cssClass="error"/>
 	</span>
 	
 	<span class="fieldGroup">

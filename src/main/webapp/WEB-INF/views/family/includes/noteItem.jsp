@@ -6,10 +6,10 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:bundle basename="omis.family.msgs.family">
-	<tr id="familyAssociationNoteItems${familyAssociationNoteIndex}" class="${cssClass}">
+	<tr id="noteRow[${familyAssociationNoteIndex}]" class="${cssClass}">
 		<td class="operations">
   			<input type="hidden" name="familyAssociationNoteItems[${familyAssociationNoteIndex}].operation" id="familyAssociationNoteItemsOperation${familyAssociationNoteIndex}" value="${familyAssociationNoteItem.operation}"/> 
-			<a href="#" id="deleteNoteItem${familyAssociationNoteIndex}" class="removeLink"><span class="linkLabel"><fmt:message key="deletefamilyAssociationNoteLink"/></span></a>
+			<a href="#" id="removeNoteItem[${familyAssociationNoteIndex}]" class="removeLink"><span class="linkLabel"><fmt:message key="deletefamilyAssociationNoteLink"/></span></a>
 		</td>
 		<td class="twoColumn">
 			<fmt:formatDate value="${familyAssociationNoteItems[familyAssociationNoteIndex].date}" type="date" pattern="MM/dd/yyyy" var="formattedResultsDate"/>

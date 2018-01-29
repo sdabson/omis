@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.testng;
 
 import java.text.ParseException;
@@ -14,7 +31,9 @@ import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
 import omis.family.domain.component.FamilyAssociationFlags;
+import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.family.service.FamilyAssociationService;
 import omis.family.service.delegate.FamilyAssociationCategoryDelegate;
 import omis.family.service.delegate.FamilyAssociationDelegate;
@@ -24,6 +43,7 @@ import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
 import omis.relationship.domain.Relationship;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipExistsException;
 import omis.relationship.service.delegate.RelationshipDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 
@@ -50,7 +70,7 @@ public class FamilyAssociationServiceAssociateTests
 	
 	@Autowired
 	@Qualifier("familyAssociationCategoryDelegate")
-	private FamilyAssociationCategoryDelegate familyAssociationCategoryDelegate;	
+	private FamilyAssociationCategoryDelegate familyAssociationCategoryDelegate;
 	
 	@Autowired
 	@Qualifier("familyAssociationDelegate")
@@ -73,13 +93,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllowedExistingEndDateNewStartDateSame() 
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingEndDate = this.parseDateText("11/01/2017");
 		Date newStartDate = this.parseDateText("11/01/2017");
@@ -96,13 +117,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllowedExistingEndDateNewStartDateDifferent() 
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingEndDate = this.parseDateText("11/01/2017");
 		Date newStartDate = this.parseDateText("11/15/2017");
@@ -119,13 +141,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllowedExistingStartDateNewEndDateSame() 
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingStartDate = this.parseDateText("11/01/2017");
 		Date newEndDate = this.parseDateText("11/01/2017");
@@ -142,13 +165,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllowedExistingStartDateAfterNewEndDateDifferent() 
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date newEndDate = this.parseDateText("11/01/2017");
 		Date existingStartDate = this.parseDateText("11/15/2017");
@@ -165,13 +189,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllDateRangesAllowedExistingEndOnNewStart()
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingStartDate = this.parseDateText("11/01/2017");
 		Date existingEndDate = this.parseDateText("11/15/2017");
@@ -190,13 +215,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllDateRangesAllowedExistingEndBeforeNewStart()
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingStartDate = this.parseDateText("11/01/2017");
 		Date existingEndDate = this.parseDateText("11/15/2017");
@@ -215,13 +241,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllDateRangesAllowedExistingAfterNewDateRanges()
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingStartDate = this.parseDateText("11/15/2017");
 		Date existingEndDate = this.parseDateText("11/30/2017");
@@ -240,13 +267,14 @@ public class FamilyAssociationServiceAssociateTests
 	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test()
+	@Test
 	public void 
 	familyAssociationServiceAssociateTestsAllDateRangesAllowedExistingAfterNewDifferentDates()
 			throws DuplicateEntityFoundException, 
 			FamilyAssociationConflictException, 
-			ReflexiveRelationshipException {
+			ReflexiveRelationshipException, FamilyAssociationExistsException {
 		//Arrangements
 		Date existingStartDate = this.parseDateText("11/20/2017");
 		Date existingEndDate = this.parseDateText("11/30/2017");
@@ -266,15 +294,19 @@ public class FamilyAssociationServiceAssociateTests
 	 * @param newStartDate new start date
 	 * @param newEndDate new end date
 	 * @return family association
-	 * @throws DuplicateEntityFoundException
 	 * @throws FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationCategoryExistsException 
+	 * @throws RelationshipExistsException 
 	 */
 	private FamilyAssociation testAllowedDatesOnAssociateImpl(
 			Date existingStartDate, Date existingEndDate, Date newStartDate, 
-			Date newEndDate) throws DuplicateEntityFoundException, 
-				FamilyAssociationConflictException,
-				ReflexiveRelationshipException {
+			Date newEndDate) throws FamilyAssociationConflictException,
+				ReflexiveRelationshipException, 
+				FamilyAssociationExistsException, 
+				FamilyAssociationCategoryExistsException, 
+				RelationshipExistsException {
 		//Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
 				"OLastName", "OFirstName", "OMiddleName", null);

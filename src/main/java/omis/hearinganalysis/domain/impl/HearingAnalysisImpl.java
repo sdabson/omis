@@ -20,6 +20,7 @@ package omis.hearinganalysis.domain.impl;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleeligibility.domain.ParoleEligibility;
@@ -44,6 +45,8 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 	private ParoleEligibility eligibility;
 	
 	private BoardMeetingSite boardMeetingSite;
+	
+	private HearingAnalysisCategory category;
 	
 	private BoardAttendee analyst;
 	
@@ -90,6 +93,18 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		return boardMeetingSite;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public void setCategory(HearingAnalysisCategory category) {
+		this.category = category;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public HearingAnalysisCategory getCategory() {
+		return category;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public void setAnalyst(BoardAttendee analyst) {
@@ -142,6 +157,12 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		if (!this.getEligibility().equals(that.getEligibility())) {
 			return false;
 		}
+		if (this.getCategory() == null) {
+			throw new IllegalStateException("Catetgory required");
+		}
+		if (!this.getCategory().equals(that.getCategory())) {
+			return false;
+		}
 		if (this.getBoardMeetingSite() == null) { 
 			if (that.getBoardMeetingSite() != null) {
 				return false;
@@ -169,8 +190,12 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		if (this.getEligibility() == null) {
 			throw new IllegalStateException("Parole eligibility required");
 		}
+		if (this.getCategory() == null) {
+			throw new IllegalStateException("Catetgory required");
+		}
 		int hashCode = 14;
 		hashCode = 29 * hashCode + this.getEligibility().hashCode();
+		hashCode = 29 * hashCode + this.getCategory().hashCode();
 		if (this.getBoardMeetingSite() != null) {
 			hashCode = 29 * hashCode + this.getBoardMeetingSite().hashCode();
 		}

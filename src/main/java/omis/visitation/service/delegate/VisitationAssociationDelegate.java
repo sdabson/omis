@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.visitation.service.delegate;
 
 import java.util.Date;
@@ -17,6 +34,7 @@ import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
+import omis.visitation.exception.VisitationExistsException;
 
 /**
  * Visitation association delegate.
@@ -73,7 +91,7 @@ public class VisitationAssociationDelegate {
 	 * @param notes notes
 	 * @param guardianship guardianship
 	 * @return newly created visitation association
-	 * @throws DuplicateEntityFoundException thrown when a duplicate visitation
+	 * @throws VisitationExistsException thrown when a duplicate visitation
 	 * association is found
 	 * @throws DateConflictException thrown when a visitation association with
 	 * the specified relationship overlaps the specified start or end date.
@@ -83,10 +101,10 @@ public class VisitationAssociationDelegate {
 			final VisitationApproval approval, final Date startDate,
 			final Date endDate, final VisitationAssociationFlags flags,
 			final String notes, final String guardianship)
-		throws DuplicateEntityFoundException, DateConflictException {
+		throws VisitationExistsException, DateConflictException {
 		if (this.visitationAssociationDao.find(relationship, startDate)
 				!= null) {
-			throw new DuplicateEntityFoundException(
+			throw new VisitationExistsException(
 					"Duplicate visitation association found.");
 		}
 		if (this.visitationAssociationDao.findDateRangeOverLap(

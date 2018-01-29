@@ -14,6 +14,6 @@
 	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
 	<c:if test="${empty personFieldsLIB}">
 		<c:set var="personFieldsLIB" value="true" scope="request"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/person/scripts/JQuery/jquery.omis.personFields.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/person/scripts/personFields.js"> </script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/person/scripts/JQuery/jquery.omis.personFields.js?VERSION=2"> </script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/person/scripts/personFields.js?VERSION=2"> </script>
 	</c:if>

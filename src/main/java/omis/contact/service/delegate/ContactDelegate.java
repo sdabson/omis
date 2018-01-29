@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.contact.service.delegate;
 
 import omis.address.domain.Address;
@@ -6,9 +23,9 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.contact.dao.ContactDao;
 import omis.contact.domain.Contact;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
 import omis.person.domain.Person;
 
 /**
@@ -56,11 +73,13 @@ public class ContactDelegate {
 	 * @param mailingAddress mailing address 
 	 * @param poBox P.O.Box
 	 * @return newly created contact	
+	 * @throws ContactExistsException exception thrown if duplicate contact
+	 * found
 	 */
 	public Contact create(final Person person, final Address mailingAddress, 
-		final PoBox poBox)throws DuplicateEntityFoundException{
+		final PoBox poBox)throws ContactExistsException{
 		if (this.contactDao.find(person)!=null){
-			throw new DuplicateEntityFoundException("Contact Already Exist.");
+			throw new ContactExistsException("Contact Already Exist.");
 		}
 		Contact contact;
 		contact = this.contactInstanceFactory.createInstance();
@@ -85,12 +104,14 @@ public class ContactDelegate {
 	 * @param mailingAddress mailing address 
 	 * @param poBox P.O.Box
 	 * @return newly created contact	
+	 * @throws ContactExistsException exception thrown if duplicate contact is 
+	 * found
 	 */
 	public Contact update(final Contact contact, final Address mailingAddress, 
-		final PoBox poBox)throws DuplicateEntityFoundException{
+		final PoBox poBox)throws ContactExistsException{
 		if(this.contactDao.findContactExcluding(contact, contact.getPerson())
 			!=null){
-			throw new DuplicateEntityFoundException("Same Contact Already Exist.");
+			throw new ContactExistsException("Same Contact Already Exist.");
 		} 
 		contact.setPoBox(poBox);
 		contact.setMailingAddress(mailingAddress);

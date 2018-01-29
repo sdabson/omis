@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.delegate;
 
 import java.util.List;
@@ -6,6 +23,7 @@ import omis.exception.DuplicateEntityFoundException;
 import omis.family.dao.FamilyAssociationCategoryDao;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
+import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -61,16 +79,17 @@ public class FamilyAssociationCategoryDelegate {
 	 * @param name name
 	 * @param valid valid
 	 * @param sortOrder sort order
-	 * @param classification famil association classification
+	 * @param classification family association classification
 	 * @return created family association category
-	 * @throws DuplicateEntityFoundException  
+	 * @throws FamilyAssociationCategoryExistsException  
+	 * family association category exists exception.
 	 */
 	public FamilyAssociationCategory create(final String name, 
 		final Boolean valid, final Short sortOrder, 
 		final FamilyAssociationCategoryClassification classification) 
-		throws DuplicateEntityFoundException {
+		throws FamilyAssociationCategoryExistsException {
 		if (this.familyAssociationCategoryDao.find(name) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new FamilyAssociationCategoryExistsException(
 					"Duplicate family association category found");
 		}
 		FamilyAssociationCategory category 
@@ -85,11 +104,12 @@ public class FamilyAssociationCategoryDelegate {
 	/**
 	 * Remove a family association category.
 	 * @param category family association category
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationCategoryExistsException family association 
+	 * category exists exception
 	 */
 	public void remove(
 		final FamilyAssociationCategory category) 
-		throws DuplicateEntityFoundException {
+		throws FamilyAssociationCategoryExistsException {
 		this.familyAssociationCategoryDao.makeTransient(category);
 	}
 }

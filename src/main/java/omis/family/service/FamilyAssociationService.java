@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service;
 
 import java.util.Date;
@@ -8,6 +25,7 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
 import omis.audit.domain.VerificationSignature;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
@@ -15,20 +33,25 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.country.domain.Country;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
 import omis.exception.DuplicateEntityFoundException;
-import omis.family.exception.FamilyAssociationConflictException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
+import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
+import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.residence.domain.ResidenceTerm;
 import omis.residence.exception.PrimaryResidenceExistsException;
@@ -57,7 +80,8 @@ public interface FamilyAssociationService {
 	 * @param marriageDate marriage date
 	 * @param divorceDate divorce date
 	 * @return newly created family association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 * @throws ReflexiveRelationshipException reflexive relationship exception
 	 * @throws FamilyAssociationConflictException 
 	 * family association conflict exception
@@ -66,7 +90,7 @@ public interface FamilyAssociationService {
 	FamilyAssociation associate(Offender offender, Person familyMember, 
 		DateRange dateRange, FamilyAssociationCategory category,
 		FamilyAssociationFlags flags, Date marriageDate, Date divorceDate)
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		throws FamilyAssociationExistsException, ReflexiveRelationshipException,
 		FamilyAssociationConflictException, 
 		omis.family.exception.FamilyAssociationConflictException;
 	
@@ -80,14 +104,15 @@ public interface FamilyAssociationService {
 	 * @param marriageDate marriage date
 	 * @param divorceDate divorce date
 	 * @return newly updated family association
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 * @throws FamilyAssociationConflictException 
 	 * family association conflict exception
 	 */
 	FamilyAssociation update(FamilyAssociation familyAssociation, 
 			DateRange dateRange, FamilyAssociationCategory category, 
 			FamilyAssociationFlags flags, Date marriageDate, Date divorceDate) 
-				 throws DuplicateEntityFoundException,
+				 throws FamilyAssociationExistsException,
 		 FamilyAssociationConflictException;
 
 	/**
@@ -138,28 +163,30 @@ public interface FamilyAssociationService {
 	 * @param buiildingCategory building category
 	 * @param zipCode zip code
 	 * @return address
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists exception
+	 * @throws AddressExistsException 
 	 */
 	Address createAddress(String value, String designator, 
 		BuildingCategory buiildingCategory,	ZipCode zipCode)
-				throws DuplicateEntityFoundException;
+				throws AddressExistsException;
 	
 	/**
 	 * Create residence term.
 	 * @param person person
 	 * @param address address
 	 * @param verificationSignature verification signature	 
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists exception
 	 * @throws PrimaryResidenceExistsException 
 	 * primary residence exists exception
 	 * @throws ResidenceStatusConflictException 
 	 * residence status conflict exception
 	 * @return residence term
+	 * @throws DuplicateEntityFoundException 
 	 */
 	ResidenceTerm createResidenceTerm(Person person, Address address, 
 		VerificationSignature verificationSignature)
-		throws DuplicateEntityFoundException, PrimaryResidenceExistsException, 
-		ResidenceStatusConflictException;
+		throws PrimaryResidenceExistsException, 
+		ResidenceStatusConflictException, DuplicateEntityFoundException;
 	
 	/**
 	 * Add contact.
@@ -167,7 +194,8 @@ public interface FamilyAssociationService {
 	 * @param mailingAddress mailing address
 	 * @param poBox P.O. box
 	 * @return contact
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException faamily association exists exception
+	 * @throws DuplicateEntityFoundException 
 	 */
 	Contact addContact(Person person, Address mailingAddress, PoBox poBox)
 		throws DuplicateEntityFoundException;
@@ -200,7 +228,8 @@ public interface FamilyAssociationService {
 	 * @param mailingAddress mailing address
 	 * @param poBox P.O. box
 	 * @return contact
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists exception
+	 * @throws DuplicateEntityFoundException 
 	 */
 	Contact updateContact(Contact contact, Address mailingAddress, PoBox poBox)
 			throws DuplicateEntityFoundException;
@@ -214,12 +243,12 @@ public interface FamilyAssociationService {
 	 * @param active active phone
 	 * @param category telephone number category
 	 * @return telephone number
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws TelephoneNumberExistsException telephone number exists exception
 	 */
 	TelephoneNumber addTelephoneNumber(Contact contact, Long value, 
 		Integer extension, Boolean primary, Boolean active, 
 		TelephoneNumberCategory category)
-				throws DuplicateEntityFoundException;
+				throws TelephoneNumberExistsException;
 	
 	/**
 	 * Update a telephone number.
@@ -230,12 +259,12 @@ public interface FamilyAssociationService {
 	 * @param primary primary phone or not
 	 * @param category telephone number category
 	 * @return updated telephone number
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws TelephoneNumberExistsException telephone number exists exception
 	 */
 	TelephoneNumber updateTelephoneNumber(TelephoneNumber telephoneNumber, 
 		Long value, Integer extension, Boolean primary, Boolean active,
 		TelephoneNumberCategory category) 
-				throws DuplicateEntityFoundException;
+				throws TelephoneNumberExistsException;
 	
 	/**
 	 * Remove a telephone number.
@@ -251,11 +280,11 @@ public interface FamilyAssociationService {
 	 * @param host online account host
 	 * @param active active account or not
 	 * @return online account
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws OnlineAccountExistsException online account exists exception
 	 */
 	OnlineAccount addOnlineAccount(Contact contact, String name, 
 			Boolean primary, OnlineAccountHost host, Boolean active)	
-				throws DuplicateEntityFoundException;
+				throws OnlineAccountExistsException;
 	
 	/**
 	 * Update an online account.
@@ -265,11 +294,11 @@ public interface FamilyAssociationService {
 	 * @param host online account host
 	 * @param active active account or not
 	 * @return updated online account
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws OnlineAccountExistsException online account exists exception
 	 */
 	OnlineAccount updateOnlineAccount(OnlineAccount onlineAccount, String name, 
 		Boolean primary, OnlineAccountHost host, Boolean active)
-				throws DuplicateEntityFoundException;
+				throws OnlineAccountExistsException;
 	
 	/**
 	 * Remove an online account.
@@ -290,10 +319,11 @@ public interface FamilyAssociationService {
 	 * @param date date
 	 * @param value text
 	 * @return family association note
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationNoteExistsException family association
+	 * exists exception
 	 */
 	FamilyAssociationNote addNote(FamilyAssociation association, Date date, 
-		String value) throws DuplicateEntityFoundException;
+		String value) throws FamilyAssociationNoteExistsException;
 	
 	/**
 	 * Update note.
@@ -301,10 +331,11 @@ public interface FamilyAssociationService {
 	 * @param date date
 	 * @param value text
 	 * @return family association note
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationNoteExistsException family association
+	 * exists exception
 	 */
 	FamilyAssociationNote updateNote(FamilyAssociationNote note, Date date, 
-		String value) throws DuplicateEntityFoundException;
+		String value) throws FamilyAssociationNoteExistsException;
 	
 	/**
 	 * Find notes by association.
@@ -361,7 +392,8 @@ public interface FamilyAssociationService {
 	 * @param extension zip code extension
 	 * @param city city
 	 * @return zip code
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws FamilyAssociationExistsException family association exists exception
+	 * @throws DuplicateEntityFoundException 
 	 */
 	ZipCode createZipCode(String value, String extension, City city) 
 		throws DuplicateEntityFoundException;
@@ -405,10 +437,10 @@ public interface FamilyAssociationService {
 	 * @param state state
 	 * @param country country
 	 * @return Created city
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws CityExistsException city exists exception
 	 */
 	City createCity(String name, State state, Country country) 
-		throws DuplicateEntityFoundException;
+		throws CityExistsException;
 	
 	/**
 	 * Find addresses.

@@ -19,6 +19,6 @@ function applyPersonFieldsOnClick(personFieldsPropertyName, stateOptionsUrl, cit
 	applyPersonFieldsBirthStateOnClick(personFieldsPropertyName, cityOptionsUrl);
 	applyPersonFieldsNewBirthCityOnClick(personFieldsPropertyName);
 	applyDeceasedOnClick(personFieldsPropertyName);
-	assignDatePicker(personFieldsPropertyName + "BirthDate", "1900:"  + new Date().getFullYear());
-	assignDatePicker(personFieldsPropertyName + "DeathDate", "1900:"  + new Date().getFullYear());
+	assignPersonFieldsDatePicker(personFieldsPropertyName + "BirthDate", "1900:"  + new Date().getFullYear());
+	assignPersonFieldsDatePicker(personFieldsPropertyName + "DeathDate", "1900:"  + new Date().getFullYear());
 }

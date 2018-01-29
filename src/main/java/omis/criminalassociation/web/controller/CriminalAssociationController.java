@@ -1,31 +1,26 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.criminalassociation.web.controller;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import omis.beans.factory.PropertyEditorFactory;
-import omis.beans.factory.spring.CustomDateEditorFactory;
-import omis.criminalassociation.domain.CriminalAssociation;
-import omis.criminalassociation.domain.CriminalAssociationCategory;
-import omis.criminalassociation.domain.component.CriminalAssociationFlags;
-import omis.criminalassociation.service.CriminalAssociationService;
-import omis.criminalassociation.validator.CriminalAssociationFormValidator;
-import omis.criminalassociation.web.form.CriminalAssociationForm;
-import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
-import omis.instance.factory.InstanceFactory;
-import omis.offender.beans.factory.OffenderPropertyEditorFactory;
-import omis.offender.domain.Offender;
-import omis.offender.report.OffenderReportService;
-import omis.offender.report.OffenderSummary;
-import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
-import omis.relationship.exception.ReflexiveRelationshipException;
-import omis.report.ReportFormat;
-import omis.report.ReportRunner;
-import omis.report.web.controller.delegate.ReportControllerDelegate;
-import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,7 +37,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-
+import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.criminalassociation.domain.CriminalAssociation;
+import omis.criminalassociation.domain.CriminalAssociationCategory;
+import omis.criminalassociation.domain.component.CriminalAssociationFlags;
+import omis.criminalassociation.exception.CriminalAssociationExistsException;
+import omis.criminalassociation.service.CriminalAssociationService;
+import omis.criminalassociation.validator.CriminalAssociationFormValidator;
+import omis.criminalassociation.web.form.CriminalAssociationForm;
+import omis.datatype.DateRange;
+import omis.instance.factory.InstanceFactory;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
+import omis.offender.report.OffenderReportService;
+import omis.offender.report.OffenderSummary;
+import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.report.ReportFormat;
+import omis.report.ReportRunner;
+import omis.report.web.controller.delegate.ReportControllerDelegate;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
  * Controller for criminal association.
@@ -113,6 +128,24 @@ public class CriminalAssociationController {
   
 	private static final String ERROR_BUNDLE_NAME
 		= "omis.criminalassociation.msgs.form";
+	
+	/* Report names. */
+	
+	private static final String CRIMINAL_ASSOCIATION_LISTING_REPORT_NAME 
+		= "/Relationships/CriminalAssociates/Criminal_Associates_Listing";
+
+	private static final String CRIMINAL_ASSOCIATION_DETAILS_REPORT_NAME 
+		= "/Relationships/CriminalAssociates/Criminal_Associates_Details";
+
+	/* Report parameter names. */
+	
+	private static final String 
+		CRIMINAL_ASSOCIATION_LISTING_ID_REPORT_PARAM_NAME 
+		= "DOC_ID";
+
+	private static final String 
+		CRIMINAL_ASSOCIATION_DETAILS_ID_REPORT_PARAM_NAME 
+		= "CRIMINAL_ASSOC_ID";
 
 	@Autowired
 	@Qualifier("criminalAssociationService")
@@ -178,22 +211,6 @@ public class CriminalAssociationController {
 	@Autowired
 	@Qualifier("businessExceptionHandlerDelegate")
 	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
-
-	/* Report names. */
-	
-	private static final String CRIMINAL_ASSOCIATION_LISTING_REPORT_NAME 
-		= "/Relationships/CriminalAssociates/Criminal_Associates_Listing";
-
-	private static final String CRIMINAL_ASSOCIATION_DETAILS_REPORT_NAME 
-		= "/Relationships/CriminalAssociates/Criminal_Associates_Details";
-
-	/* Report parameter names. */
-	
-	private static final String CRIMINAL_ASSOCIATION_LISTING_ID_REPORT_PARAM_NAME 
-		= "DOC_ID";
-
-	private static final String CRIMINAL_ASSOCIATION_DETAILS_ID_REPORT_PARAM_NAME 
-		= "CRIMINAL_ASSOC_ID";
 	
 	/* Report runners. */
 	
@@ -271,7 +288,8 @@ public class CriminalAssociationController {
    * @param sourceOffender source offender
    * @param result binding result
    * @return model and view
-   * @throws DuplicateEntityFoundException duplicate entity found exception
+   * @throws CriminalAssociationExistsException criminal association exists
+   * exception
    */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('CRIMINAL_ASSOCIATION_EDIT') or hasRole('ADMIN')")
@@ -281,7 +299,7 @@ public class CriminalAssociationController {
 	      @RequestParam(value = "sourceOffender", required = true)
 	      final Offender sourceOffender, final CriminalAssociationForm form,
 	      final BindingResult result) 
-	      throws DuplicateEntityFoundException {
+	      throws CriminalAssociationExistsException {
 	    this.criminalAssociationFormValidator.validate(form, result);
 	    if (result.hasErrors()) {
 	    	ModelMap map = new ModelMap();
@@ -327,7 +345,8 @@ public class CriminalAssociationController {
    * @param offender offender
    * @param result binding result
    * @return model and view
-   * @throws DuplicateEntityFoundException duplicate entity found exception
+   * @throws CriminalAssociationExistsException criminal association exists
+   * exception
    * @throws ReflexiveRelationshipException reflexive relationship exception
    */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
@@ -337,7 +356,7 @@ public class CriminalAssociationController {
       final Offender offender, 
       final CriminalAssociationForm form,
       final BindingResult result) 
-    		  throws DuplicateEntityFoundException, 
+    		  throws CriminalAssociationExistsException, 
     		  ReflexiveRelationshipException {
 	    this.criminalAssociationFormValidator.validate(form, result);
 	    if (result.hasErrors()) {
@@ -436,8 +455,8 @@ public class CriminalAssociationController {
 	@RequestMapping(value = "/criminalAssociationListingReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('CRIMINAL_ASSOCIATION_LIST') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportCriminalAssociatonListing(@RequestParam(
-			value = "offender", required = true)
+	public ResponseEntity<byte []> reportCriminalAssociatonListing(
+			@RequestParam(value = "offender", required = true)
 			final Offender offender,
 			@RequestParam(value = "reportFormat", required = true)
 			final ReportFormat reportFormat) {
@@ -461,8 +480,8 @@ public class CriminalAssociationController {
 	@RequestMapping(value = "/criminalAssociationDetailsReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('CRIMINAL_ASSOCIATION_VIEW') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportCriminalAssociatonDetails(@RequestParam(
-			value = "criminalAssociation", required = true)
+	public ResponseEntity<byte []> reportCriminalAssociatonDetails(
+			@RequestParam(value = "criminalAssociation", required = true)
 			final CriminalAssociation criminalAssociation,
 			@RequestParam(value = "reportFormat", required = true)
 			final ReportFormat reportFormat) {
@@ -494,7 +513,7 @@ public class CriminalAssociationController {
 				.findCategories());
 		map.addAttribute(CRIMINAL_ASSOCIATION_FORM_MODEL_KEY, form);
 		map.addAttribute(OFFENDER_SUMMARY_MODEL_KEY, this.offenderReportService
-        .summarizeOffender(offender));
+				.summarizeOffender(offender));
 		this.offenderSummaryModelDelegate.add(map, offender);
 		map.addAttribute(OFFENDER_MODEL_KEY, offender);
 		return new ModelAndView(EDIT_VIEW_NAME, map);
@@ -508,7 +527,7 @@ public class CriminalAssociationController {
       final CriminalAssociationForm criminalAssociationForm,
       final CriminalAssociation criminalAssociation) {
 		criminalAssociationForm.setCriminalAssociationCategory(
-        criminalAssociation.getCriminalAssociationCategory());
+				criminalAssociation.getCriminalAssociationCategory());
 		if (criminalAssociation.getDateRange() != null) {
 			if (criminalAssociation.getDateRange().getStartDate() == null) {
 				criminalAssociationForm.setStartDate(null);
@@ -520,14 +539,14 @@ public class CriminalAssociationController {
 				criminalAssociationForm.setEndDate(null);
 			} else {
 				criminalAssociationForm.setEndDate(criminalAssociation
-         	  .getDateRange().getEndDate());
+						.getDateRange().getEndDate());
 			} 
 		} else {
 			criminalAssociationForm.setStartDate(null);
 			criminalAssociationForm.setEndDate(null);
 		}
 		criminalAssociationForm.setOtherOffender(((Offender)
-        criminalAssociation.getRelationship().getSecondPerson()));
+				criminalAssociation.getRelationship().getSecondPerson()));
 		if (criminalAssociation.getCriminalAssociationFlags() != null) {
 			criminalAssociationForm.setWitness(criminalAssociation
 					.getCriminalAssociationFlags().getWitness());
@@ -537,14 +556,14 @@ public class CriminalAssociationController {
 	}
   
 	/**
-	 * Duplicate entity found exception.
+	 * Handles criminal association exists exception.
 	 * 
 	 * @param exception exception
 	 * @return business exception error
 	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException exception) {
+	@ExceptionHandler(CriminalAssociationExistsException.class)
+	public ModelAndView handleCriminalAssociationExistsException(
+			final CriminalAssociationExistsException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				ASSOCIATION_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
 				exception); 

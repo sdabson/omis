@@ -28,7 +28,7 @@
 	<ul>
 		<sec:authorize access="hasRole('PAROLE_ELIGIBILITY_LIST') or hasRole('ADMIN')">
 			<li>
-				<a class="listLink" href="${pageContext.request.contextPath}/paroleEligibility/list.html?offender=${eligibility.offender.id}">
+				<a class="listLink" href="${pageContext.request.contextPath}/paroleEligibility/list.html?offender=${offender.id}">
 				<span class="visibleLinkLabel"><fmt:message key="listParoleEligibilitiesLink"/></span></a>
 			</li>
 		</sec:authorize>

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.trackeddocument.service.testng;
 
 import java.text.ParseException;
@@ -122,7 +139,7 @@ public class DocumentTrackingServiceTrackReceivalTests
 	@Test
 	public void testTrackReceival() 
 		  throws DuplicateEntityFoundException, DocketExistsException {
-	  //Arrangements
+		//Arrangements
 		final Person person = this.personDelegate.create("LName", "FName", 
 		  "MName", null);
 		final CourtCategory courtCategory = CourtCategory.COUNTY;
@@ -136,12 +153,12 @@ public class DocumentTrackingServiceTrackReceivalTests
 		final UserAccount receivedByUserAccount = this.userAccountDelegate
 				  .findByUsername("UserName");
 	  
-	  //Action
+		//Action
 		TrackedDocumentReceival trackedDocumentReceival 
 			= this.documentTrackingService.trackReceival(
 					docket, category, receivedDate, receivedByUserAccount);
 		  
-		  //Assertions
+		//Assertions
 		PropertyValueAsserter.create()
 		  	.addExpectedValue("docket", docket)
 		  	.addExpectedValue("category", category)
@@ -161,7 +178,7 @@ public class DocumentTrackingServiceTrackReceivalTests
 	@Test(expectedExceptions = {TrackedDocumentReceivalExistsException.class})
 	public void testTrackedDocumentReceivalExistsException() 
 			  throws DuplicateEntityFoundException, DocketExistsException {
-		 //Arrangements
+		//Arrangements
 		final Person person = this.personDelegate.create("LName", "FName", 
 				"MName", null);
 		final CourtCategory courtCategory = CourtCategory.COUNTY;
@@ -193,7 +210,7 @@ public class DocumentTrackingServiceTrackReceivalTests
 		this.trackedDocumentReceivalDelegate.trackReceival(
 			  docket, category, receivedDate, receivedByUserAccount);
 			  
-				  //Action
+		//Action
 		this.documentTrackingService.trackReceival(
   			docket, category, receivedDate, receivedByUserAccount);
 	}

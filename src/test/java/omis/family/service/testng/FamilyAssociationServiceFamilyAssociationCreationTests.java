@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.testng;
 
 import java.text.ParseException;
@@ -10,7 +27,9 @@ import org.testng.annotations.Test;
 
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
+import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
@@ -33,6 +52,7 @@ import omis.util.PropertyValueAsserter;
  *
  * @author Yidong Li
  * @author Josh Divine
+ * @author Sheronda Vaughn
  * @version 0.0.2
  * @since OMIS 3.0
  */
@@ -68,15 +88,17 @@ public class FamilyAssociationServiceFamilyAssociationCreationTests
 	/**
 	 * Tests the creation of family association.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate asset exists
 	 * @throws ReflexiveRelationshipException if relationship is between same 
 	 * person
 	 * @throws FamilyAssociationConflictException if association overlaps 
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
 	@Test
 	public void testAssociate() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		FamilyAssociationConflictException {
+		throws ReflexiveRelationshipException, 
+		FamilyAssociationConflictException, FamilyAssociationExistsException, 
+		FamilyAssociationCategoryExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");
@@ -113,15 +135,17 @@ public class FamilyAssociationServiceFamilyAssociationCreationTests
 	/**
 	 * Tests {@code DuplicateEntityFoundException} is thrown.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate asset exists
 	 * @throws ReflexiveRelationshipException if relationship is between same 
 	 * person
 	 * @throws FamilyAssociationConflictException if association overlaps
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
 	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
 	public void testDuplicateEntityFoundException() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		FamilyAssociationConflictException {
+		throws ReflexiveRelationshipException,
+		FamilyAssociationConflictException, FamilyAssociationExistsException, 
+		FamilyAssociationCategoryExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");
@@ -150,15 +174,17 @@ public class FamilyAssociationServiceFamilyAssociationCreationTests
 	/**
 	 * Tests {@code FamilyAssociationConflictException} is thrown.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate asset exists
 	 * @throws ReflexiveRelationshipException if relationship is between same 
 	 * person
 	 * @throws FamilyAssociationConflictException if association overlaps
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationCategoryExistsException 
 	 */
 	@Test(expectedExceptions = {FamilyAssociationConflictException.class})
 	public void testFamilyAssociationConflictException() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		FamilyAssociationConflictException {
+		throws ReflexiveRelationshipException, 
+		FamilyAssociationConflictException, FamilyAssociationExistsException, 
+		FamilyAssociationCategoryExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");

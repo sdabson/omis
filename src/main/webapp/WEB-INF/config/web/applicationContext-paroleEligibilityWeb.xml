@@ -25,6 +25,21 @@
   		
   <!-- Profile Items -->
   
+  <bean id="paroleEligibilityProfileItem"
+  		class="omis.paroleeligibility.web.profile.ParoleEligibilityProfileItem">
+  	<constructor-arg name="requiredAuthorizations">
+  		<set>
+  			<value>PAROLE_ELIGIBILITY_LIST</value>
+  			<value>ADMIN</value>
+  		</set>
+  	</constructor-arg>
+  	<constructor-arg name="includePage" value="/WEB-INF/views/paroleEligibility/profile/includes/profileItem.jsp"/>
+  	<constructor-arg name="name" value="paroleEligibility"/>
+    <constructor-arg name="profileItemRegistry" ref="boardOfPardonsAndParoleProfileItemRegistry"/>
+  	<constructor-arg name="paroleEligibilityProfileItemReportService" ref="paroleEligibilityProfileItemReportService"/>
+  	<constructor-arg name="enabled" value="${paroleEligibilityProfileItemEnabled}"/>
+  </bean>
+  
   <!-- Web Configuration -->
   
   <context:component-scan base-package="omis.paroleeligibility.web.controller"/>

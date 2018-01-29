@@ -3,14 +3,15 @@ package omis.paroleboarditinerary.domain.impl;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 
 /**
  * Implementation of parole board itinerary.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Nov 16, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
@@ -23,9 +24,9 @@ public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
 	
 	private UpdateSignature updateSignature;
 	
-	private Location location;
-	
 	private DateRange dateRange;
+	
+	private ParoleBoardLocation paroleBoardLocation;
 	
 	/** 
 	 * Instantiates an implementation of parole board itinerary. 
@@ -73,18 +74,6 @@ public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setLocation(final Location location) {
-		this.location = location;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Location getLocation() {
-		return location;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public void setDateRange(final DateRange dateRange) {
 		this.dateRange = dateRange;
 	}
@@ -93,6 +82,19 @@ public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
 	@Override
 	public DateRange getDateRange() {
 		return dateRange;
+	}
+	
+	/**{@inheritDoc} */
+	@Override
+	public ParoleBoardLocation getParoleBoardLocation() {
+		return this.paroleBoardLocation;
+	}
+	
+	/**{@inheritDoc} */
+	@Override
+	public void setParoleBoardLocation(
+			final ParoleBoardLocation paroleBoardLocation) {
+		this.paroleBoardLocation = paroleBoardLocation;
 	}
 
 	/** {@inheritDoc} */
@@ -105,10 +107,11 @@ public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
 			return false;
 		}
 		ParoleBoardItinerary that = (ParoleBoardItinerary) obj;
-		if (this.getLocation() == null) {
-			throw new IllegalStateException("Location required");
+		if (this.getParoleBoardLocation() == null) {
+			throw new IllegalStateException("Parole Board Location required");
 		}
-		if (!this.getLocation().equals(that.getLocation())) {
+		if (!this.getParoleBoardLocation().equals(
+				that.getParoleBoardLocation())) {
 			return false;
 		}
 		if (DateRange.getStartDate(this.getDateRange()) == null) {
@@ -134,14 +137,14 @@ public class ParoleBoardItineraryImpl implements ParoleBoardItinerary {
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		if (this.getLocation() == null) {
-			throw new IllegalStateException("Location required");
+		if (this.getParoleBoardLocation() == null) {
+			throw new IllegalStateException("Parole Board Location required");
 		}
 		if (DateRange.getStartDate(this.dateRange) == null) {
 			throw new IllegalStateException("Start date required");
 		}
 		int hashCode = 14;
-		hashCode = 29 * hashCode + this.getLocation().hashCode();
+		hashCode = 29 * hashCode + this.getParoleBoardLocation().hashCode();
 		hashCode = 29 * hashCode + DateRange.getStartDate(this.dateRange)
 				.hashCode();
 		if (DateRange.getEndDate(this.dateRange) != null) {

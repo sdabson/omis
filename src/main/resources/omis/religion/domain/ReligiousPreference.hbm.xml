@@ -19,7 +19,7 @@
 	    <many-to-one name="religion" entity-name="omis.religion.domain.Religion" not-null="true" column="`RELIGION_ID`"/>
 	    <many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
         <component name="dateRange" class="omis.datatype.DateRange">
-          <property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+          <property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
           <property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
         </component>
       </properties>

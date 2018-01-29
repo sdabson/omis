@@ -1,3 +1,20 @@
+/*
+ *  OMIS - Offender Management Information System
+ *  Copyright (C) 2011 - 2017 State of Montana
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.warrant.dao.impl.hibernate;
 
 import java.util.Date;
@@ -13,8 +30,9 @@ import omis.warrant.domain.Warrant;
 /**
  * WarrantDaoHibernateImpl.java
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (May 8, 2017)
+ *@author Annie Jacques
+ *@author Joel Norris 
+ *@version 0.1.1 (January 25, 2018)
  *@since OMIS 3.0
  *
  */
@@ -36,10 +54,13 @@ public class WarrantDaoHibernateImpl
 	private static final String WARRANT_PARAM_NAME = "warrant";
 	
 	/**
-	 * @param sessionFactory
-	 * @param entityName
+	 * Instantiates a warrant data access object with the specified session factory
+	 * and entity name.
+	 * 
+	 * @param sessionFactory session factory
+	 * @param entityName entity name
 	 */
-	protected WarrantDaoHibernateImpl(
+	public WarrantDaoHibernateImpl(
 			final SessionFactory sessionFactory,
 			final String entityName) {
 		super(sessionFactory, entityName);
@@ -85,5 +106,4 @@ public class WarrantDaoHibernateImpl
 		
 		return warrants;
 	}
-
 }

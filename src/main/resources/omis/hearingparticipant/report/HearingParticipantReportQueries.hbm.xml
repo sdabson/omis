@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearingparticipant.report">
+	<query name="findHearingParticipantSummariesByHearing"><![CDATA[
+	select new omis.hearingparticipant.report.HearingParticipantSummary(
+		hearingParticipant.id,
+		name.lastName,
+		name.firstName,
+		name.middleName,
+		hearingParticipant.category,
+		hearingParticipant.facilityApproved,
+		hearingParticipant.boardApproved)
+	from
+		omis.hearingparticipant.domain.HearingParticipant hearingParticipant
+	inner join
+		hearingParticipant.person person
+	inner join
+		person.name name
+	where
+		hearingParticipant.boardHearing = :boardHearing
+	]]></query>
+</hibernate-mapping>

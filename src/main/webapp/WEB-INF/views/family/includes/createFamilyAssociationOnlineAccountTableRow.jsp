@@ -3,9 +3,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle var="commonBundle" basename="omis.msgs.common"/>
 <fmt:bundle basename="omis.contact.msgs.form">
-<tr id="onlineAccountItems${familyAssociationOnlineAccountIndex}" class="onlineAccount">	
+<tr id="onlineAccountRow[${familyAssociationOnlineAccountIndex}]" class="onlineAccount">	
 	<td>
-		<a class="removeLink"  id="removeOnlineAccount${familyAssociationOnlineAccountIndex}" >
+		<a class="removeLink"  id="removeOnlineAccount[${familyAssociationOnlineAccountIndex}]" >
 		<span class="linkLabel"><fmt:message key="removeOnlineAccountLink"/></span></a>
 		<input type="hidden" name="familyAssociationOnlineAccountItems[${familyAssociationOnlineAccountIndex}].id" id="familyAssociationOnlineAccountItems${familyAssociationOnlineAccountIndex}Id" value="${familyAssociationOnlineAccountItem.id}"/>
 		<input type="hidden" name="familyAssociationOnlineAccountItems[${familyAssociationOnlineAccountIndex}].operation" id="familyAssociationOnlineAccountItemsOperation${familyAssociationOnlineAccountIndex}" value="${familyAssociationOnlineAccountItem.operation}"/>

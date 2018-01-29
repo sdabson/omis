@@ -20,6 +20,7 @@ package omis.hearinganalysis.web.form;
 import java.io.Serializable;
 import java.util.List;
 
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
@@ -38,6 +39,8 @@ public class HearingAnalysisForm implements Serializable {
 	private ParoleBoardItinerary boardItinerary;
 	
 	private BoardMeetingSite boardMeetingSite;
+	
+	private HearingAnalysisCategory category;
 	
 	private BoardAttendee analyst;
 	
@@ -84,6 +87,24 @@ public class HearingAnalysisForm implements Serializable {
 	 */
 	public void setBoardMeetingSite(final BoardMeetingSite boardMeetingSite) {
 		this.boardMeetingSite = boardMeetingSite;
+	}
+
+	/**
+	 * Returns the hearing analysis category.
+	 * 
+	 * @return hearing analysis category
+	 */
+	public HearingAnalysisCategory getCategory() {
+		return category;
+	}
+
+	/**
+	 * Sets the hearing analysis category.
+	 * 
+	 * @param category hearing analysis category
+	 */
+	public void setCategory(HearingAnalysisCategory category) {
+		this.category = category;
 	}
 
 	/**

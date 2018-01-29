@@ -21,6 +21,10 @@
   
   <import resource="applicationContext-biographicAndContactSection.xml"/>
   
+  <import resource="applicationContext-boardHearing.xml"/>
+  
+  <import resource="applicationContext-boardHearingDecision.xml"/>
+  
   <import resource="applicationContext-caution.xml"/>
   
   <import resource="applicationContext-caseload.xml"/>
@@ -86,6 +90,8 @@
   <import resource="applicationContext-hearing.xml"/>
   
   <import resource="applicationContext-hearingAnalysis.xml"/>
+  
+  <import resource="applicationContext-hearingParticipant.xml"/>
   
   <import resource="applicationContext-identificationNumber.xml"/>
   

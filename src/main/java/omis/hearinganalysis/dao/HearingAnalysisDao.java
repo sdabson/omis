@@ -19,6 +19,7 @@ package omis.hearinganalysis.dao;
 
 import omis.dao.GenericDao;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleeligibility.domain.ParoleEligibility;
@@ -38,11 +39,13 @@ public interface HearingAnalysisDao extends GenericDao<HearingAnalysis> {
 	 * 
 	 * @param eligibility parole eligibility
 	 * @param boardMeetingSite board meeting site
+	 * @param category hearing analysis category
 	 * @param analyst board attendee
 	 * @return hearing analysis
 	 */
 	HearingAnalysis find(ParoleEligibility eligibility, 
-			BoardMeetingSite boardMeetingSite, BoardAttendee analyst);
+			BoardMeetingSite boardMeetingSite, HearingAnalysisCategory category,
+			BoardAttendee analyst);
 	
 	/**
 	 * Returns the hearing analysis matching the specified parole eligibility, 
@@ -50,13 +53,14 @@ public interface HearingAnalysisDao extends GenericDao<HearingAnalysis> {
 	 * 
 	 * @param eligibility parole eligibility
 	 * @param boardMeetingSite board meeting site
+	 * @param category hearing analysis category
 	 * @param analyst board attendee
 	 * @param excludedHearingAnalysis excluded hearing analysis
 	 * @return hearing analysis
 	 */
 	HearingAnalysis findExcluding(ParoleEligibility eligibility, 
-			BoardMeetingSite boardMeetingSite, BoardAttendee analyst, 
-			HearingAnalysis excludedHearingAnalysis);
+			BoardMeetingSite boardMeetingSite, HearingAnalysisCategory category,
+			BoardAttendee analyst, HearingAnalysis excludedHearingAnalysis);
 
 	/**
 	 * Returns the hearing analysis for the specified parole eligibility.

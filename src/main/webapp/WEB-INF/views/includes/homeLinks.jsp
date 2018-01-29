@@ -132,6 +132,14 @@
 				</a>
 			</li>
 			<li>
+				<a href="${pageContext.request.contextPath}/paroleBoardItinerary/list.html">
+					<span class="banner">
+						<!-- <img src="${pageContext.request.contextPath}/resources/common/images/??.png" height="90" width="90"/> -->
+						<span class="label"><fmt:message key="boardOfPardonsAndParole"/></span>
+					</span>
+				</a>
+			</li>
+			<li>
 				<a href="${pageContext.request.contextPath}/presentenceInvestigation/request/list.html">
 					<span class="banner">
 						<!-- <img src="${pageContext.request.contextPath}/resources/common/images/??.png" height="90" width="90"/>-->

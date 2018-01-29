@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.contact.service.delegate;
 
 import java.util.List;
@@ -9,6 +26,7 @@ import omis.contact.dao.OnlineAccountDao;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
+import omis.contact.exception.OnlineAccountExistsException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 
@@ -16,6 +34,7 @@ import omis.instance.factory.InstanceFactory;
  * Online account delegate.
  * 
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.1.1 (July 27, 2015)
  * @since OMIS 3.0
  */
@@ -85,9 +104,9 @@ public class OnlineAccountDelegate {
 	public OnlineAccount create(final Contact contact, final String name, 
 		final Boolean active, final Boolean primary, 
 		final OnlineAccountHost host)
-			throws DuplicateEntityFoundException{
+			throws OnlineAccountExistsException{
 		if (this.onlineAccountDao.find(contact, name, host)!=null){
-			throw new DuplicateEntityFoundException("Online Account Already "
+			throw new OnlineAccountExistsException("Online Account Already "
 					+ "Exist.");
 		}
 		OnlineAccount onlineAccount 
@@ -150,11 +169,11 @@ public class OnlineAccountDelegate {
 	public OnlineAccount update(final OnlineAccount onlineAccount,
 		final String name, final Boolean active, final Boolean primary,
 		final OnlineAccountHost host)
-			throws DuplicateEntityFoundException{
+			throws OnlineAccountExistsException{
 		if(this.onlineAccountDao.findOnlineAccountExcluding(onlineAccount, name, 
 			host)!=null){
 			throw new 
-				DuplicateEntityFoundException("Online Account Already Exist.");
+			OnlineAccountExistsException("Online Account Already Exist.");
 		}
 
 		onlineAccount.setName(name);

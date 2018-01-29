@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.service.testng;
 
 import java.util.Date;
@@ -9,7 +26,10 @@ import org.testng.annotations.Test;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
+import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
+import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
@@ -59,10 +79,14 @@ public class FamilyAssociationServiceFamilyAssociationNoteUpdateTests
 	
 	/**
 	 * Family association note update.
+	 * @throws FamilyAssociationCategoryExistsException 
+	 * @throws FamilyAssociationExistsException 
+	 * @throws FamilyAssociationNoteExistsException 
 	 */
 	@Test
-	public void testFamilyAssociationNoteUpdate() throws DuplicateEntityFoundException, 
-		ReflexiveRelationshipException, FamilyAssociationConflictException{
+	public void testFamilyAssociationNoteUpdate() 
+			throws ReflexiveRelationshipException, 
+			FamilyAssociationConflictException, FamilyAssociationCategoryExistsException, FamilyAssociationExistsException, FamilyAssociationNoteExistsException{
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");
@@ -122,14 +146,17 @@ public class FamilyAssociationServiceFamilyAssociationNoteUpdateTests
 	/**
 	 * Tests duplicate family association note on update.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate term exists
-	 * @throws ReflexiveRelationshipException, FamilyAssociationConflictException 
+	  * @throws ReflexiveRelationshipException, FamilyAssociationConflictException 
+	 * @throws FamilyAssociationCategoryExistsException 
+	 * @throws FamilyAssociationExistsException 
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class, 
+	@Test(expectedExceptions = {FamilyAssociationNoteExistsException.class, 
 			ReflexiveRelationshipException.class})
 	public void testDuplicateFamilyAssociationNoteUpdate() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		FamilyAssociationConflictException {
+		throws FamilyAssociationNoteExistsException, 
+		ReflexiveRelationshipException, FamilyAssociationConflictException, 
+		FamilyAssociationCategoryExistsException, 
+		FamilyAssociationExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");

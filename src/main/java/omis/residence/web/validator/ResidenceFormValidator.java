@@ -12,7 +12,8 @@ import org.springframework.validation.Validator;
  * Residence form validator.
  * 
  * @author Sheronda Vaughn
- * @version 0.1.0 (Mar 2, 2015)
+ * @author Joel Norris
+ * @version 0.1.1 (January 19, 2018)
  * @since OMIS 3.0
  */
 public class ResidenceFormValidator implements Validator {
@@ -111,6 +112,14 @@ public class ResidenceFormValidator implements Validator {
 							"residenceTerm.primaryExistsDate.priorToStartDate");
 					}
 				}
+			}
+		}
+		if (residenceForm.getCreateNewLocation()) {
+			if (residenceForm.getValue() == null || residenceForm.getValue().isEmpty()) {
+				errors.rejectValue("value", "residenceTerm.address.value.empty");
+			}
+			if (residenceForm.getZipCode() == null) {
+				errors.rejectValue("zipCode", "residenceTerm.address.zipCode.empty");
 			}
 		}
 	}

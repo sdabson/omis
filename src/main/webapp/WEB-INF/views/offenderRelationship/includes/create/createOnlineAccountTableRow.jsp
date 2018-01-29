@@ -3,9 +3,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle var="commonBundle" basename="omis.msgs.common"/>
 <fmt:bundle basename="omis.offenderrelationship.msgs.createOffenderRelationship">
-<tr id="onlineAccountItems${onlineAccountIndex}" class="onlineAccount">	
+<tr id="onlineAccountRow[${onlineAccountIndex}]" class="onlineAccount">	
 	<td>
-		<a class="removeLink"  id="removeOnlineAccount${onlineAccountIndex}" href="${pageContext.request.contextPath}/create/offenderRelationship/removeOnlineAccount.html?">
+		<a class="removeLink"  id="removeOnlineAccount[${onlineAccountIndex}]" href="${pageContext.request.contextPath}/create/offenderRelationship/removeOnlineAccount.html?">
 		<span class="linkLabel"><fmt:message key="removeOnlineAccountLink"/></span></a>
 		<input type="hidden" name="onlineAccountContactItems[${onlineAccountIndex}].id" id="onlineAccountContactItems${onlineAccountIndex}Id" value="${onlineAccountContactItem.id}"/>
 		<input type="hidden" name="onlineAccountContactItems[${onlineAccountIndex}].operation" id="onlineAccountContactItemsOperation${onlineAccountIndex}" value="${onlineAccountContactItem.operation}"/>	

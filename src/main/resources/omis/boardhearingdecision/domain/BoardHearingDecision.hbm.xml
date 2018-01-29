@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.boardhearingdecision.domain">
+	<class	entity-name="omis.boardhearingdecision.domain.BoardHearingDecision"
+			proxy="omis.boardhearingdecision.domain.BoardHearingDecision"
+			name="omis.boardhearingdecision.domain.impl.BoardHearingDecisionImpl"
+			table="`BOARD_HEARING_DECISION`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`BOARD_HEARING_DECISION_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="hearing" entity-name="omis.boardhearing.domain.BoardHearing" not-null="true" column="`BOARD_HEARING_ID`"/>
+		<many-to-one name="category" entity-name="omis.boardhearingdecision.domain.BoardHearingDecisionCategory" not-null="true" column="`BOARD_HEARING_DECISN_CATGY_ID`"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`"
+			             not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>
+	</class>
+	<query name="findBoardHearingDecision"><![CDATA[
+		select boardHearingDecision
+		from omis.boardhearingdecision.domain.BoardHearingDecision boardHearingDecision
+		where
+			boardHearingDecision.hearing = :hearing
+	]]></query>
+	<query name="findBoardHearingDecisionExcluding"><![CDATA[
+		select boardHearingDecision
+		from omis.boardhearingdecision.domain.BoardHearingDecision boardHearingDecision
+		where
+			boardHearingDecision.hearing = :hearing
+		and
+			boardHearingDecision <> :excludedBoardDecision
+	]]></query>
+</hibernate-mapping>

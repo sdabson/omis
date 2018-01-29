@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.hearinganalysis.domain">
+	<class	entity-name="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource"
+			proxy="omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource"
+			name="omis.hearinganalysis.domain.impl.ParoleHearingAnalysisTaskSourceImpl"
+			table="`PARLE_HRING_ANLYS_TSK_SRC`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`PARLE_HRING_ANLYS_TSK_SRC_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="taskTemplate" entity-name="omis.task.domain.TaskTemplate" not-null="true" column="`TASK_TEMPLATE_ID`"/>
+		<property name="category" column="`PAROLE_HEARING_TASK_CATEGORY`" not-null="true">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.hearinganalysis.domain.ParoleHearingTaskCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findParoleHearingAnalysisTaskSource"><![CDATA[
+		select paroleHearingAnalysisTaskSource
+		from omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource paroleHearingAnalysisTaskSource
+		where
+			paroleHearingAnalysisTaskSource.taskTemplate = :taskTemplate
+	]]></query>
+	<query name="findParoleHearingAnalysisTaskSourceExcluding"><![CDATA[
+		select paroleHearingAnalysisTaskSource
+		from omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource paroleHearingAnalysisTaskSource
+		where
+			paroleHearingAnalysisTaskSource.taskTemplate = :taskTemplate
+		and
+			hearinparoleHearingAnalysisTaskSourcegAnalysisCategory <> :excludedParoleHearingAnalysisTaskSource
+	]]></query>
+	<query name="findParoleHearingAnalysisTaskSourceByTaskTemplateGroup"><![CDATA[
+		select paroleHearingAnalysisTaskSource
+		from omis.hearinganalysis.domain.ParoleHearingAnalysisTaskSource paroleHearingAnalysisTaskSource
+		inner join paroleHearingAnalysisTaskSource.taskTemplate taskTemplate
+		where
+			taskTemplate.group = :taskTemplateGroup
+	]]></query>
+</hibernate-mapping>

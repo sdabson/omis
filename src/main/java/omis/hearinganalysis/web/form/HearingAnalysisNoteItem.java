@@ -23,7 +23,7 @@ import java.util.Date;
 import omis.hearinganalysis.domain.HearingAnalysisNote;
 
 /**
- * Parole board itinerary note item.
+ * Hearing analysis note item.
  *
  * @author Josh Divine
  * @version 0.1.0 (Dec 19, 2017)

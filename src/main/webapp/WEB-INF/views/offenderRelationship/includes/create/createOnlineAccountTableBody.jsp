@@ -11,7 +11,7 @@
 		<jsp:include page="../../../contact/includes/onlineAccountFieldsHeader.jsp"/>
 	</tr>	
 </thead>
-	<tbody id="onlineAccountsTable">
+	<tbody id="onlineAccountsTableBody">
 	<c:forEach var="onlineAccountContactItem" items="${onlineAccountContactItems}" varStatus="status">
 		<c:set var="onlineAccountIndex" value="${status.index}" scope="request"/>	
 		<c:set var="onlineAccountContactItem" value="${onlineAccountContactItem}" scope="request"/>	

@@ -3,7 +3,8 @@
  - Queries for reporting parole board itineraries.
  -
  - Author: Josh Divine
- - Version: 0.1.0 (Dec 5, 2017)
+ - Author: Annie Jacques
+ - Version: 0.1.1 (Jan 24, 2018)
  - Since: OMIS 3.0
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
@@ -52,7 +53,8 @@
 	 			paroleBoardItinerary.dateRange.endDate,
 	 			organization.name)
 		FROM omis.paroleboarditinerary.domain.ParoleBoardItinerary as paroleBoardItinerary
-		INNER JOIN paroleBoardItinerary.location location
+		INNER JOIN paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		INNER JOIN paroleBoardLocation.location location
 		INNER JOIN location.organization organization
         WHERE
         		paroleBoardItinerary = :boardItinerary

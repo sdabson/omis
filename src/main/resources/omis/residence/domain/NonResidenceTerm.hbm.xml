@@ -170,7 +170,7 @@
 		where
 			term.person = :person
 		and 
-				(term.dateRange.startDate < :date
+				((term.dateRange.startDate is null or term.dateRange.startDate < :date)
 			and
 				(term.dateRange.endDate is null or term.dateRange.endDate > :date))
 	]]></query>

@@ -39,6 +39,11 @@
   <bean id="hearingAnalysisFormValidator"
         class="omis.hearinganalysis.web.validator.HearingAnalysisFormValidator"/>
         
+  <bean id="hearingAnalysisTaskFormValidator"
+  	class="omis.hearinganalysis.web.validator.HearingAnalysisTaskFormValidator">
+	<constructor-arg name="taskFieldsValidatorDelegate" ref="taskFieldsValidatorDelegate" />
+  </bean>
+  
   <!-- Profile Items -->
 
   <!-- Web configuration -->
@@ -51,5 +56,14 @@
       <aop:pointcut id="manageHearingAnalysisControllerOperation" expression="execution(* omis.hearinganalysis.web.controller.ManageHearingAnalysisController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageHearingAnalysisControllerOperation"/>
   </aop:config>
-      
+  
+  <aop:config>
+	<aop:pointcut id="hearingAnalysisHomeControllerOperation" expression="execution(* omis.hearinganalysis.web.controller.HearingAnalysisHomeController.*(..))"/>
+	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="hearingAnalysisHomeControllerOperation"/>	
+  </aop:config>
+
+  <aop:config>
+	<aop:pointcut id="hearingAnalysisTaskControllerOperation" expression="execution(* omis.hearinganalysis.web.controller.HearingAnalysisTaskController.*(..))"/>
+	<aop:advisor advice-ref="transactionAdvice" pointcut-ref="hearingAnalysisTaskControllerOperation"/>	
+  </aop:config>
 </beans>

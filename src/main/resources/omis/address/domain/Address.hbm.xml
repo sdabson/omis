@@ -26,7 +26,7 @@
 			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
 		</component>
 		<properties name="unqiueAddress">
-			<property name="value" type="java.lang.String" not-null="false" column="`VALUE`"/>
+			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
 			<many-to-one name="zipCode" entity-name="omis.address.domain.ZipCode" not-null="true" column="`ZIPCODE_ID`"/>
 		</properties>
 		<property name="designator" type="java.lang.String" not-null="false" column="`DESIGNATOR`"/>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.boardhearingdecision.domain">
+	<class	entity-name="omis.boardhearingdecision.domain.HearingDecisionReason"
+			proxy="omis.boardhearingdecision.domain.HearingDecisionReason"
+			name="omis.boardhearingdecision.domain.impl.HearingDecisionReasonImpl"
+			table="`HEARING_DECISION_REASON`">
+		<id name="id" type="java.lang.Long" column="`ID`">
+			<generator class="sequence">
+				<param name="sequence">`HEARING_DECISION_REASON_SEQ`</param>
+			</generator>
+		</id>
+		<property name="reasonName" column="`REASON_NAME`" not-null="true" type="java.lang.String"/>
+		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
+		<property name="category" column="`DECISION_CATEGORY`" not-null="true">
+		<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">omis.boardhearingdecision.domain.DecisionCategory</param>
+				<param name="useNamed">true</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+	</class>
+	<query name="findHearingDecisionReason"><![CDATA[
+		select hearingDecisionReason
+		from omis.boardhearingdecision.domain.HearingDecisionReason hearingDecisionReason
+		where
+			hearingDecisionReason.reasonName = :reasonName
+	]]></query>
+	<query name="findHearingDecisionReasonExcluding"><![CDATA[
+		select hearingDecisionReason
+		from omis.boardhearingdecision.domain.HearingDecisionReason hearingDecisionReason
+		where
+			hearingDecisionReason.reasonName = :reasonName
+		and
+			hearingDecisionReason <> :excludedHearingDecisionReason
+	]]></query>
+	<query name="findHearingDecisionReasonByDecisionCategory"><![CDATA[
+		select hearingDecisionReason
+		from omis.boardhearingdecision.domain.HearingDecisionReason hearingDecisionReason
+		where
+			hearingDecisionReason.category = :decisionCategory
+	]]></query>
+</hibernate-mapping>

@@ -19,44 +19,47 @@ package omis.paroleboarditinerary.dao;
 
 import java.util.Date;
 import java.util.List;
-
 import omis.dao.GenericDao;
-import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 
 /**
  * Data access object for parole board itinerary.
  * 
  * @author Josh Divine
- * @version 0.1.1 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.0 (Jan 23, 2018)
  * @since OMIS 3.0
  */
 public interface ParoleBoardItineraryDao 
 		extends GenericDao<ParoleBoardItinerary> {
 	
 	/**
-	 * Returns the parole board itinerary that matches the specified location, 
-	 * start date and end date.
+	 * Returns the parole board itinerary that matches the specified
+	 * parole board location, start date and end date.
 	 * 
-	 * @param location location
+	 * @param paroleBoardlocation parole board location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return parole board itinerary
 	 */
-	ParoleBoardItinerary find(Location location, Date startDate, Date endDate);
+	ParoleBoardItinerary find(ParoleBoardLocation paroleBoardlocation,
+			Date startDate, Date endDate);
 	
 	/**
-	 * Returns the parole board itinerary that matches the specified location, 
-	 * start date and end date excluding the specified itinerary.
+	 * Returns the parole board itinerary that matches the specified
+	 * parole board location, start date and end date excluding the
+	 * specified itinerary.
 	 * 
-	 * @param location location
+	 * @param paroleBoardlocation parole board location
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @param excludedItinerary excluded parole board itinerary
 	 * @return parole board itinerary
 	 */
-	ParoleBoardItinerary findExcluding(Location location, Date startDate, 
-			Date endDate, ParoleBoardItinerary excludedItinerary);
+	ParoleBoardItinerary findExcluding(ParoleBoardLocation paroleBoardlocation,
+			Date startDate, Date endDate,
+			ParoleBoardItinerary excludedItinerary);
 
 	/**
 	 * Returns a list of parole board itineraries after the specified date.

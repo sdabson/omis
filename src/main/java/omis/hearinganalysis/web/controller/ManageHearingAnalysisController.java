@@ -18,6 +18,7 @@
 package omis.hearinganalysis.web.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.hearinganalysis.domain.HearingAnalysisNote;
 import omis.hearinganalysis.service.HearingAnalysisService;
 import omis.hearinganalysis.web.form.HearingAnalysisForm;
 import omis.hearinganalysis.web.form.HearingAnalysisNoteItem;
 import omis.hearinganalysis.web.form.HearingAnalysisNoteItemOperation;
 import omis.hearinganalysis.web.validator.HearingAnalysisFormValidator;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
@@ -114,6 +119,11 @@ public class ManageHearingAnalysisController {
 	
 	private static final String ITINERARIES_MODEL_KEY = "itineraries";
 	
+	private static final String HEARING_ANALYSIS_CATEGORIES_MODEL_KEY = 
+			"categories";
+	
+	private static final String OFFENDER_MODEL_KEY = "offender";
+
 	/* Message keys. */
 
 
@@ -157,6 +167,18 @@ public class ManageHearingAnalysisController {
 	@Qualifier("paroleBoardItineraryPropertyEditorFactory")
 	private PropertyEditorFactory paroleBoardItineraryPropertyEditorFactory;
 	
+	@Autowired
+	@Qualifier("hearingAnalysisCategoryPropertyEditorFactory")
+	private PropertyEditorFactory hearingAnalysisCategoryPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("datePropertyEditorFactory")
+	private CustomDateEditorFactory customDateEditorFactory;
+	
+	@Autowired
+	@Qualifier("offenderPropertyEditorFactory")
+	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+	
 	/* Validators. */
 
 	@Autowired
@@ -199,6 +221,7 @@ public class ManageHearingAnalysisController {
 		if (hearingAnalysis != null) {
 			hearingAnalysisForm.setBoardMeetingSite(hearingAnalysis
 					.getBoardMeetingSite());
+			hearingAnalysisForm.setCategory(hearingAnalysis.getCategory());
 			hearingAnalysisForm.setAnalyst(hearingAnalysis.getAnalyst());
 			if (hearingAnalysis.getBoardMeetingSite() != null) {
 				hearingAnalysisForm.setBoardItinerary(hearingAnalysis
@@ -255,11 +278,13 @@ public class ManageHearingAnalysisController {
 		if (hearingAnalysis == null) {
 			hearingAnalysis = this.hearingAnalysisService.createHearingAnalysis(
 					eligibility, hearingAnalysisForm.getBoardMeetingSite(), 
-					hearingAnalysisForm.getAnalyst());
+					hearingAnalysisForm.getAnalyst(), 
+					hearingAnalysisForm.getCategory());
 		} else {
 			hearingAnalysis = this.hearingAnalysisService.updateHearingAnalysis(
 					hearingAnalysis, hearingAnalysisForm.getBoardMeetingSite(), 
-					hearingAnalysisForm.getAnalyst());
+					hearingAnalysisForm.getAnalyst(), 
+					hearingAnalysisForm.getCategory());
 		}
 		processHearingAnalysisNoteItems(hearingAnalysis,
 				hearingAnalysisForm.getHearingAnalysisNoteItems());
@@ -355,8 +380,11 @@ public class ManageHearingAnalysisController {
 	 */
 	@RequestMapping(value = "/hearingAnalysisActionMenu.html", 
 			method = RequestMethod.GET)
-	public ModelAndView showActionMenu() {
+	public ModelAndView showActionMenu(
+			@RequestParam(value = "offender", required = true)
+				final Offender offender) {
 		ModelAndView mav = new ModelAndView(ACTION_MENU_VIEW_NAME);
+		mav.addObject(OFFENDER_MODEL_KEY, offender);
 		return mav;
 	}
 
@@ -424,6 +452,8 @@ public class ManageHearingAnalysisController {
 				boardHearingAnalysisNoteIndex);
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), 
 				eligibility.getOffender());
+		mav.addObject(HEARING_ANALYSIS_CATEGORIES_MODEL_KEY, 
+				this.hearingAnalysisService.findHearingAnalysisCategories());
 		return mav;
 	}
 	
@@ -490,5 +520,13 @@ public class ManageHearingAnalysisController {
 		binder.registerCustomEditor(ParoleBoardItinerary.class,
 				this.paroleBoardItineraryPropertyEditorFactory
 				.createPropertyEditor());
+		binder.registerCustomEditor(HearingAnalysisCategory.class,
+				this.hearingAnalysisCategoryPropertyEditorFactory
+				.createPropertyEditor());
+		binder.registerCustomEditor(Date.class,
+				this.customDateEditorFactory.createCustomDateOnlyEditor(true));
+		binder.registerCustomEditor(Offender.class, 
+				this.offenderPropertyEditorFactory
+				.createOffenderPropertyEditor());
 	}
 }

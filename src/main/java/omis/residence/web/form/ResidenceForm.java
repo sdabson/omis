@@ -3,13 +3,16 @@
  */
 package omis.residence.web.form;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import omis.address.domain.ZipCode;
 import omis.audit.domain.VerificationMethod;
 import omis.location.domain.Location;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.residence.domain.NonResidenceTerm;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
 import omis.residence.report.ResidenceType;
@@ -65,6 +68,11 @@ public class ResidenceForm {
 	private ExistingResidenceOperation existingResidenceOperation;
 	
 	private Date existingHistoricalEndDate;
+	
+	private List<NonResidenceTerm> nonResidenceTerms
+	= new ArrayList<NonResidenceTerm>();
+	
+	private Boolean endConflictingNonResidenceTerms; 
 	
 	/**
 	 * Instantiates a default instance of residence form.
@@ -454,5 +462,41 @@ public class ResidenceForm {
 	public void setExistingHistoricalEndDate(
 			final Date existingHistoricalEndDate) {
 		this.existingHistoricalEndDate = existingHistoricalEndDate;
+	}
+
+	/**
+	 * Returns non residence terms.
+	 * 
+	 * @return non residence terms
+	 */
+	public List<NonResidenceTerm> getNonResidenceTerms() {
+		return this.nonResidenceTerms;
+	}
+
+	/**
+	 * Sets non residence terms.
+	 * 
+	 * @param nonResidenceTerms non residence terms
+	 */
+	public void setNonResidenceTerms(final List<NonResidenceTerm> nonResidenceTerms) {
+		this.nonResidenceTerms = nonResidenceTerms;
+	}
+
+	/**
+	 * Returns whether end conflicting non residence terms applies.
+	 * 
+	 * @return end conflicting non residence terms
+	 */
+	public Boolean getEndConflictingNonResidenceTerms() {
+		return this.endConflictingNonResidenceTerms;
+	}
+
+	/**
+	 * Sets whether end conflicting non residence terms applies.
+	 * 
+	 * @param endConflictingNonResidenceTerms end conflicting non residence terms
+	 */
+	public void setEndConflictingNonResidenceTerms(final Boolean endConflictingNonResidenceTerms) {
+		this.endConflictingNonResidenceTerms = endConflictingNonResidenceTerms;
 	}
 }

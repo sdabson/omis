@@ -170,6 +170,23 @@
 		<c:set var="displayClass" value="fieldGroup"/>
 	</c:otherwise>
 </c:choose>
+<c:choose>
+	<c:when test="${not empty residenceForm.nonResidenceTerms}">
+		<c:set var="existingNonResidenceTermFieldsetDisplayClass" value=""/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="existingNonResidenceTermFieldsetDisplayClass" value="hidden"/>
+	</c:otherwise>
+</c:choose>
+<fieldset class="${existingNonResidenceTermFieldsetDisplayClass}">
+	<legend><fmt:message key="existingNonResidenceTermFieldsetLegendLabel"/></legend>
+	<span class="fieldGroup">
+		<form:label class="fieldLabel" path="endConflictingNonResidenceTerms"><fmt:message key="endConflictingNonResidenceTermsLabel"/></form:label>
+		<form:checkbox path="endConflictingNonResidenceTerms"/>
+	</span>
+	<c:set value="${residenceForm.nonResidenceTerms}" var="nonResidenceTerms" scope="request"/>
+	<jsp:include page="nonResidenceTermItemsTable.jsp"/>
+</fieldset>
 <div id="verificationFieldSet" class="${displayClass}">
 <fieldset>
 	<legend>

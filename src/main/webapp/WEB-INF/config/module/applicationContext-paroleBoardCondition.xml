@@ -21,6 +21,13 @@
 			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
 		</bean>
 		
+		<!-- Profile Item Service -->
+		
+		<bean id="paroleBoardAgreementProfileItemService"
+			class="omis.paroleboardcondition.report.impl.hibernate.ParoleBoardAgreementProfileItemServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
 		<!-- ParoleBoardAgreement Beans -->
 		
 		<bean id="paroleBoardAgreementDao" class="omis.paroleboardcondition.dao.impl.hibernate.ParoleBoardAgreementDaoHibernateImpl">

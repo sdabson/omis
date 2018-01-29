@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.trackeddocument.web.validator;
 
 import omis.trackeddocument.web.form.TrackedDocumentForm;
@@ -33,16 +50,16 @@ public class TrackedDocumentFormValidator
 	public void validate(final Object target, final Errors errors) {
 		TrackedDocumentForm form = (TrackedDocumentForm) target;
 		
-		if (form.getTrackedDocumentReceivalItems()!= null) {
+		if (form.getTrackedDocumentReceivalItems() != null) {
 			for (int index = 0; index < form.getTrackedDocumentReceivalItems()
 				.size(); index++) {
-				if(TrackedDocumentReceivalItemOperation.CREATE.equals(
+				if (TrackedDocumentReceivalItemOperation.CREATE.equals(
 					form.getTrackedDocumentReceivalItems().get(index)
-					.getOperation())){
+					.getOperation())) {
 					TrackedDocumentReceivalItem item
-					= form.getTrackedDocumentReceivalItems().get(index);
-					if(form.getDocket()==null){
-						errors.rejectValue("docket","docket.empty");
+						= form.getTrackedDocumentReceivalItems().get(index);
+					if (form.getDocket() == null) {
+						errors.rejectValue("docket", "docket.empty");
 					}
 					if (item.getCategory() == null) {
 						errors.rejectValue("trackedDocumentReceivalItems[" 
@@ -50,27 +67,27 @@ public class TrackedDocumentFormValidator
 					}
 					if (item.getReceivedByUserAccount() == null) {
 						errors.rejectValue("trackedDocumentReceivalItems[" 
-						+ index + "].receivedByUserAccount",
-						"receivedByUserAccount.empty");
+							+ index + "].receivedByUserAccount",
+							"receivedByUserAccount.empty");
 					}
 					
-					for (int innerIndex = index+1;
+					for (int innerIndex = index + 1;
 						innerIndex < form.getTrackedDocumentReceivalItems()
 						.size(); innerIndex++) {
-						if((form.getTrackedDocumentReceivalItems().get(index)
+						if ((form.getTrackedDocumentReceivalItems().get(index)
 							.getCategory().equals(
 							form.getTrackedDocumentReceivalItems()
 							.get(innerIndex).getCategory()))
-							&&((form.getTrackedDocumentReceivalItems()
-							.get(index).getReceivedDate()==null
-							&&form.getTrackedDocumentReceivalItems()
-							.get(innerIndex).getReceivedDate()==null)
-							||(form.getTrackedDocumentReceivalItems().get(index)
-							.getReceivedDate().equals(
+							&& ((form.getTrackedDocumentReceivalItems()
+							.get(index).getReceivedDate() == null
+							&& form.getTrackedDocumentReceivalItems()
+							.get(innerIndex).getReceivedDate() == null)
+							|| (form.getTrackedDocumentReceivalItems()
+							.get(index).getReceivedDate().equals(
 							form.getTrackedDocumentReceivalItems()
-							.get(innerIndex).getReceivedDate())))){
+							.get(innerIndex).getReceivedDate())))) {
 							errors.rejectValue(
-							"trackedDocumentReceivalItems["	+ innerIndex
+								"trackedDocumentReceivalItems["	+ innerIndex
 								+ "].category", 
 								"trackedDocumentReceivalItem.duplicate");
 							break;
