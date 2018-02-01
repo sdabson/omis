@@ -24,7 +24,6 @@ import java.util.List;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
@@ -40,6 +39,7 @@ import omis.victim.exception.VictimExistsException;
  *
  * @author Stephen Abson
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1 (May 20, 2015)
  * @since OMIS 3.0
  */
@@ -118,15 +118,15 @@ public class VictimAssociationDelegate {
 	 * @param packetSendDate date packet is sent
 	 * @param flags flags
 	 * @return updated victim association
-	 * @throws DuplicateEntityFoundException if victim association exists
+	 * @throws VictimExistsException if victim association exists
 	 */
 	public VictimAssociation update(final VictimAssociation association,
 			final Date registeredDate, final Boolean packetSent,
 			final Date packetSendDate, final VictimAssociationFlags flags)
-				throws DuplicateEntityFoundException {
+				throws VictimExistsException {
 		if (this.victimAssociationDao.findExcluding(
 				association.getRelationship(), association) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new VictimExistsException(
 					"Victim association exists");
 		}
 		this.populateVictimAssociation(association,

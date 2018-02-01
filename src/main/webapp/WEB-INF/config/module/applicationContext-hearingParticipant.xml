@@ -75,6 +75,7 @@
 		
 		<bean id="hearingParticipantIntentCategoryDelegate" class="omis.hearingparticipant.service.delegate.HearingParticipantIntentCategoryDelegate">
 			<constructor-arg name="hearingParticipantIntentCategoryDao" ref="hearingParticipantIntentCategoryDao" />
+			<constructor-arg name="hearingParticipantIntentCategoryInstanceFactory" ref="hearingParticipantIntentCategoryInstanceFactory" />
 		</bean>
 		
 		<bean id="hearingParticipantIntentCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">

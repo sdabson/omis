@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenseterm.service;
 
 import java.util.Date;
@@ -14,6 +31,8 @@ import omis.courtcase.domain.JurisdictionAuthority;
 import omis.courtcase.domain.OffenderDangerDesignator;
 import omis.courtcase.domain.component.CourtCaseFlags;
 import omis.courtcase.domain.component.CourtCasePersonnel;
+import omis.courtcase.exception.CourtCaseExistsException;
+import omis.docket.domain.Docket;
 import omis.docket.exception.DocketExistsException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.offense.domain.Offense;
@@ -44,9 +63,7 @@ public interface OffenseTermService {
 	/**
 	 * Creates a court case.
 	 * 
-	 * @param person person
-	 * @param court court
-	 * @param docketValue value of docket
+	 * @param docket docket
 	 * @param interStateNumber inter State number
 	 * @param interState inter State
 	 * @param pronouncementDate pronouncement date
@@ -56,15 +73,26 @@ public interface OffenseTermService {
 	 * @param personnel personnel
 	 * @param comments comments
 	 * @return created court case
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws CourtCaseExistsException if court case exists
 	 */
-	CourtCase create(Person person, Court court, String docketValue,
-			String interStateNumber, State interState, Date pronouncementDate,
-			Date sentenceReviewDate,
+	CourtCase create(Docket docket, String interStateNumber, State interState,
+			Date pronouncementDate, Date sentenceReviewDate,
 			JurisdictionAuthority jurisdictionAuthority,
 			OffenderDangerDesignator dangerDesignator,
 			CourtCasePersonnel personnel, CourtCaseFlags flags, String comments)
-					throws DocketExistsException;
+					throws CourtCaseExistsException;
+	
+	/**
+	 * Creates docket.
+	 * 
+	 * @param person person
+	 * @param court court
+	 * @param value value
+	 * @return created docket
+	 * @throws DocketExistsException if docket exists
+	 */
+	Docket createDocket(Person person, Court court, String value)
+			throws DocketExistsException;
 	
 	/**
 	 * Updates a court case.
@@ -200,6 +228,13 @@ public interface OffenseTermService {
 	 */
 	List<Court> findCourts();
 
+	/**
+	 * Returns dockets without court case.
+	 * 
+	 * @return dockets without court case
+	 */
+	List<Docket> findDocketsWithoutCourtCase(Person person);
+	
 	/**
 	 * Returns States.
 	 * 

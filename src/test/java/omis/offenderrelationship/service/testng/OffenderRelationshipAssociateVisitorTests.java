@@ -17,6 +17,8 @@
  */
 package omis.offenderrelationship.service.testng;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import omis.exception.DateConflictException;
@@ -26,7 +28,9 @@ import omis.offender.service.delegate.OffenderDelegate;
 import omis.offenderrelationship.service.CreateRelationshipsService;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
+import omis.relationship.domain.Relationship;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.service.delegate.RelationshipDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
@@ -34,6 +38,7 @@ import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
 import omis.visitation.exception.VisitationExistsException;
 import omis.visitation.service.delegate.VisitationAssociationCategoryDelegate;
+import omis.visitation.service.delegate.VisitationAssociationDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -62,6 +67,14 @@ public class OffenderRelationshipAssociateVisitorTests
 	@Autowired
 	@Qualifier("personDelegate")
 	private PersonDelegate personDelegate;
+	
+	@Autowired
+	@Qualifier("relationshipDelegate")
+	private RelationshipDelegate relationshipDelegate;
+	
+	@Autowired
+	@Qualifier("visitationAssociationDelegate")
+	private VisitationAssociationDelegate visitationAssociationDelegate;
 	
 	/* Services */
 	@Autowired
@@ -178,15 +191,16 @@ public class OffenderRelationshipAssociateVisitorTests
 		Person visitor = this.personDelegate.create("lastName", "firstName", 
 			"middleName", "Mr.");
 		/*Date startDate = new Date(1);
-		final int endDateInt = 1000000000;
-		Date endDate = new Date(endDateInt);*/
+		Date endDate = new Date(1000000000);*/
 		
+		/*final long startDateNumber = 111111;
+		final long endDateNumber = 999999;*/
 		
-		final long startDateNumber = 111111;
-		final long endDateNumber = 999999;
+		/*Date startDate = new Date(startDate);
+		Date endDate = new Date(endDate);*/
 		
-		Date startDate = new Date(startDateNumber);
-		Date endDate = new Date(endDateNumber);
+		Date startDate = this.parseDateText("01/01/2017");
+		Date endDate = this.parseDateText("11/01/2017");
 		
 		VisitationAssociationFlags flags = new VisitationAssociationFlags(true, 
 			true, true, true);
@@ -200,11 +214,22 @@ public class OffenderRelationshipAssociateVisitorTests
 			new Short((short) shortInt), true);
 		String guardianship = new String("This a test for guardianship");
 		// Action
-		this.createRelationshipsService.associateVisitor(offender, visitor, 
+		Relationship existingRelationship = this.relationshipDelegate
+			.create(offender, visitor);
+		this.visitationAssociationDelegate.create(existingRelationship,
 			category, visitationApproval, startDate, endDate, flags, notes,
 			guardianship);	
 		this.createRelationshipsService.associateVisitor(offender, visitor, 
 			category, visitationApproval, startDate, endDate, flags, notes,
 			guardianship);
+	}
+	
+	// Parses date text
+	private Date parseDateText(final String text) {
+		try {
+			return new SimpleDateFormat("MM/dd/yyyy").parse(text);
+		} catch (ParseException e) {
+			throw new RuntimeException("Parse error", e);
+		}
 	}
 }

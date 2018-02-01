@@ -3,6 +3,7 @@ package omis.offender.web.controller;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,6 +80,12 @@ public class OffenderProfileController {
 	
 	private static final String REPORTS_LIST_VIEW_NAME_MODEL_KEY =
 			"reportsListView";
+	
+	// TODO - Pass this to action menu for module groups and remove "unused"
+	// warning suppression - SA
+	@SuppressWarnings("unused")
+	private static final String OFFENDER_PROFILE_ITEMS_PROPERTIES_MODEL_KEY
+			= "offenderProfileItemsProperties";
 	
 	private static final String OFFENDER_MODEL_KEY = "offender";
 	
@@ -169,6 +176,12 @@ public class OffenderProfileController {
 	private static final String DOC_ID_REPORT_PARAM_NAME = "DOC_ID";
 	
 	private static final String USER_ID_REPORT_PARAM_NAME = "USER_ID";
+	
+	/* Properties. */
+	
+	@Autowired
+	@Qualifier("offenderProfileItemsProperties")
+	private Properties offenderProfileItemsProperties;
 	
 	/* Services. */
 	

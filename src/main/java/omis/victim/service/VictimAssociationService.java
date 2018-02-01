@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.victim.service;
 
 import java.util.Date;
@@ -7,29 +24,36 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.country.domain.Country;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
 import omis.victim.domain.VictimNoteCategory;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
+import omis.victim.exception.VictimNoteExistsException;
 
 /**
  * Service for victim associations.
  *
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.0.1 (May 26, 2015)
  * @since OMIS 3.0
  */
@@ -45,14 +69,14 @@ public interface VictimAssociationService {
 	 * @param packetSendDate date packet is sent
 	 * @param flags flags
 	 * @return victim association
-	 * @throws DuplicateEntityFoundException if association exists
+	 * @throws VictimExistsException if association exists
 	 * @throws ReflexiveRelationshipException if offender and victim are the
 	 * same person
 	 */
 	VictimAssociation associate(Offender offender, Person victim,
 			Date registeredDate, Boolean packetSent,
 			Date packetSendDate, VictimAssociationFlags flags)
-				throws DuplicateEntityFoundException,
+				throws VictimExistsException,
 					ReflexiveRelationshipException;
 	
 	/**
@@ -64,12 +88,12 @@ public interface VictimAssociationService {
 	 * @param packetSendDate date packet is sent
 	 * @param flags flags
 	 * @return updated victim association
-	 * @throws DuplicateEntityFoundException if association exists
+	 * @throws VictimExistsException if association exists
 	 */
 	VictimAssociation update(VictimAssociation association,
 			Date registeredDate, Boolean packetSent, Date packetSendDate,
 			VictimAssociationFlags flags)
-				throws DuplicateEntityFoundException;
+				throws VictimExistsException;
 	
 	/**
 	 * Removes association.
@@ -120,11 +144,11 @@ public interface VictimAssociationService {
 	 * @param date date
 	 * @param value value
 	 * @return created association note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	VictimNote addNote(VictimAssociation association,
 			VictimNoteCategory category, Date date, String value)
-				throws DuplicateEntityFoundException;
+				throws VictimNoteExistsException;
 	
 	/**
 	 * Updates association note.
@@ -134,11 +158,11 @@ public interface VictimAssociationService {
 	 * @param date date
 	 * @param value value
 	 * @return updated association note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	VictimNote updateNote(VictimNote victimNote, VictimNoteCategory category,
 			Date date, String value)
-				throws DuplicateEntityFoundException;
+				throws VictimNoteExistsException;
 	
 	/**
 	 * Returns victim note categories.
@@ -190,10 +214,10 @@ public interface VictimAssociationService {
 	 * @param number number
 	 * @param zipCode ZIP code
 	 * @return created address
-	 * @throws DuplicateEntityFoundException if address exists
+	 * @throws AddressExistsException if address exists
 	 */
 	Address createAddress(String number, ZipCode zipCode)
-					throws DuplicateEntityFoundException;
+					throws AddressExistsException;
 	
 	/**
 	 * Returns street suffixes.
@@ -323,12 +347,12 @@ public interface VictimAssociationService {
 	 * @param primary whether primary
 	 * @param category category
 	 * @return created telephone number
-	 * @throws DuplicateEntityFoundException if telephone number exists
+	 * @throws TelephoneNumberExistsException if telephone number exists
 	 */
 	TelephoneNumber createTelephoneNumber(
 			Person relation, Long value, Integer extension, Boolean primary,
 			Boolean active, TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException;
+					throws TelephoneNumberExistsException;
 	
 	/**
 	 * Updates telephone number.
@@ -339,12 +363,12 @@ public interface VictimAssociationService {
 	 * @param primary whether primary
 	 * @param category category
 	 * @return updated telephone number
-	 * @throws DuplicateEntityFoundException if telephone number exists
+	 * @throws TelephoneNumberExistsException if telephone number exists
 	 */
 	TelephoneNumber updateTelephoneNumber(
 			TelephoneNumber telephoneNumber, Long value, Integer extension,
 			Boolean primary, Boolean active, TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException;
+					throws TelephoneNumberExistsException;
 	
 	/**
 	 * Removes telephone number.
@@ -363,12 +387,12 @@ public interface VictimAssociationService {
 	 * @param host host
 	 * @param primary whether primary
 	 * @return created online account
-	 * @throws DuplicateEntityFoundException if online account exists
+	 * @throws OnlineAccountExistsException if online account exists
 	 */
 	OnlineAccount createOnlineAccount(
 			Person relation, String name, OnlineAccountHost host,
 			Boolean primary, Boolean active)
-					throws DuplicateEntityFoundException;
+					throws OnlineAccountExistsException;
 	
 	/**
 	 * Updates online account.
@@ -378,12 +402,12 @@ public interface VictimAssociationService {
 	 * @param host host
 	 * @param primary whether primary
 	 * @return updated online account
-	 * @throws DuplicateEntityFoundException if online account exists
+	 * @throws OnlineAccountExistsException if online account exists
 	 */
 	OnlineAccount updateOnlineAccount(
 			OnlineAccount onlineAccount, String name, OnlineAccountHost host,
 			Boolean primary, Boolean active) 
-					throws DuplicateEntityFoundException;
+					throws OnlineAccountExistsException;
 	
 	/**
 	 * Removes online account.
@@ -406,10 +430,10 @@ public interface VictimAssociationService {
 	 * @param state State
 	 * @param country country
 	 * @return created city
-	 * @throws DuplicateEntityFoundException if city exists
+	 * @throws CityExistsException if city exists
 	 */
 	City createCity(String name, State state, Country country)
-			throws DuplicateEntityFoundException;
+			throws CityExistsException;
 
 	/**
 	 * Creates ZIP code.
@@ -418,10 +442,10 @@ public interface VictimAssociationService {
 	 * @param extension extension
 	 * @param city city
 	 * @return created ZIP code
-	 * @throws DuplicateEntityFoundException if ZIP code exists
+	 * @throws ZipCodeExistsException if ZIP code exists
 	 */
 	ZipCode createZipCode(String value, String extension, City city)
-			throws DuplicateEntityFoundException;
+			throws ZipCodeExistsException;
 
 	/**
 	 * Returns ZIP codes by city.

@@ -1,3 +1,20 @@
+/*
+ *  OMIS - Offender Management Information System
+ *  Copyright (C) 2011 - 2017 State of Montana
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.victim.web.controller;
 
 import java.io.IOException;
@@ -29,44 +46,28 @@ import omis.content.RequestContentType;
 import omis.docket.domain.Docket;
 import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
+import omis.document.exception.DocumentExistsException;
+import omis.document.exception.DocumentTagExistsException;
 import omis.document.io.DocumentPersister;
 import omis.document.io.DocumentRetriever;
 import omis.document.io.impl.DocumentFilenameGenerator;
 import omis.document.web.form.DocumentTagItem;
 import omis.document.web.form.DocumentTagOperation;
-import omis.exception.DuplicateEntityFoundException;
 import omis.io.FileRemover;
 import omis.person.domain.Person;
 import omis.victim.domain.VictimDocumentAssociation;
+import omis.victim.exception.VictimDocumentAssociationExistsException;
 import omis.victim.service.VictimDocumentAssociationService;
 import omis.victim.web.controller.delegate.VictimSummaryModelDelegate;
 import omis.victim.web.form.VictimDocumentItem;
 import omis.victim.web.form.VictimDocumentItemOperation;
 import omis.victim.web.form.VictimDocumentsForm;
 import omis.victim.web.validator.VictimDocumentsFormValidator;
-
-/*
- *  OMIS - Offender Management Information System
- *  Copyright (C) 2011 - 2017 State of Montana
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * Victim document controller
+ * Victim document controller.
  * 
  * @author Joel Norris
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Aug 22, 2017)
  * @since OMIS 3.0
  */
@@ -79,25 +80,31 @@ public class VictimDocumentController {
 	
 	private static final String EDIT_VIEW_NAME = "victim/document/edit";
 	private static final String VICTIM_DOCUMENTS_ACTION_MENU_VIEW_NAME
-	= "victim/document/includes/victimDocumentsActionMenu";
-	private static final String DOCUMENT_TAG_ITEM_VIEW_NAME = "victim/document/includes/documentTagItem";
-	private static final String VICTIM_DOCUMENT_ITEM_VIEW_NAME = "victim/document/includes/victimDocumentItem";
+		= "victim/document/includes/victimDocumentsActionMenu";
+	private static final String DOCUMENT_TAG_ITEM_VIEW_NAME 
+		= "victim/document/includes/documentTagItem";
+	private static final String VICTIM_DOCUMENT_ITEM_VIEW_NAME 
+		= "victim/document/includes/victimDocumentItem";
 	
 	/* Redirects. */
 	
 	private static final String VICTIM_PROFILE_VIEW_REDIRECT_URL_FORMAT
-	= "redirect:../profile.html?victim=%d";
+		= "redirect:../profile.html?victim=%d";
 	
 	/* Model keys. */
 	
 	private static final String VICTIM_MODEL_KEY = "victim";
 	private static final String DOCKET_MODEL_KEY = "docket";
 	private static final String FORM_MODEL_KEY = "victimDocumentsForm";
-	private static final String VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY = "victimDocumentItemIndex";
+	private static final String VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY 
+		= "victimDocumentItemIndex";
 	private static final String DOCUMENT_TAG_ITEM_MODEL_KEY = "documentTagItem";
-	private static final String DOCUMENT_TAG_ITEM_INDEX_MODEL_KEY = "documentTagItemIndex";
-	private static final String VICTIM_DOCUMENT_ITEM_MODEL_KEY = "victimDocumentItem";
-	private static final String DOCUMENT_TAG_ITEM_INDEXES_MODEL_KEY = "documentTagItemIndexes";
+	private static final String DOCUMENT_TAG_ITEM_INDEX_MODEL_KEY 
+		= "documentTagItemIndex";
+	private static final String VICTIM_DOCUMENT_ITEM_MODEL_KEY 
+		= "victimDocumentItem";
+	private static final String DOCUMENT_TAG_ITEM_INDEXES_MODEL_KEY 
+		= "documentTagItemIndexes";
 	private static final String DOCKETS_MODEL_KEY = "dockets";
 	
 	/* Services. */
@@ -135,7 +142,8 @@ public class VictimDocumentController {
 	
 	@Autowired
 	@Qualifier("victimDocumentAssociationPropertyEditorFactory")
-	private PropertyEditorFactory victimDocumentAssociationPropertyEditorFactory;
+	private PropertyEditorFactory 
+		victimDocumentAssociationPropertyEditorFactory;
 	
 	/* Helpers. */
 	
@@ -171,7 +179,8 @@ public class VictimDocumentController {
 	/* URL mapped methods. */
 	
 	/**
-	 * Presents a view, with appropriate model attributes, for editing victim documents.
+	 * Presents a view, with appropriate model attributes, for editing 
+	 * victim documents.
 	 * 
 	 * @param victim person
 	 * @param docket docket
@@ -191,23 +200,28 @@ public class VictimDocumentController {
 		VictimDocumentsForm form = new VictimDocumentsForm();
 		final List<VictimDocumentAssociation> associations;
 		if (docket != null) {
-			associations = this.victimDocumentService.findByDocketAndVictim(docket, victim);
+			associations = this.victimDocumentService
+					.findByDocketAndVictim(docket, victim);
 			map.addAttribute(DOCKET_MODEL_KEY, docket);
 		} else {
 			associations = this.victimDocumentService.findByVictim(victim);
 		}
 		List<VictimDocumentItem> items = new ArrayList<VictimDocumentItem>();
 		for (VictimDocumentAssociation assoc : associations) {
-			List<DocumentTag> tags = this.victimDocumentService.findTagsByDocument(
+			List<DocumentTag> tags = this.victimDocumentService
+					.findTagsByDocument(
 					assoc.getDocument());
 			List<DocumentTagItem> tagItems = new ArrayList<DocumentTagItem>();
 			for (DocumentTag tag : tags) {
-				DocumentTagItem item = new DocumentTagItem(tag.getName(), DocumentTagOperation.UPDATE, tag);
+				DocumentTagItem item = new DocumentTagItem(tag.getName(), 
+						DocumentTagOperation.UPDATE, tag);
 				tagItems.add(item);
 			}
 			VictimDocumentItem item = new VictimDocumentItem(assoc,
-					assoc.getDocument().getTitle(), assoc.getDocument().getDate(),
-					assoc.getDocket(), tagItems, VictimDocumentItemOperation.UPDATE);
+					assoc.getDocument().getTitle(), assoc.getDocument()
+					.getDate(),
+					assoc.getDocket(), tagItems, VictimDocumentItemOperation
+					.UPDATE);
 			items.add(item);
 		}
 		form.setDocumentItems(items);
@@ -219,15 +233,24 @@ public class VictimDocumentController {
 	 * Saves victim documents and redirects to the victim profile.
 	 * 
 	 * @param victim person
+	 * @param form form
+	 * @param result binding result
 	 * @return model and view to redirect to victim profile
-	 * @throws DuplicateEntityFoundException thrown when a duplicate victim document association, or document is found 
+	 * @throws VictimDocumentAssociationExistsException thrown when a duplicate 
+	 * victim document association, or document is found 
+	 * @throws UnsupportedOperationException 
+	 * @throws DocumentTagExistsException 
+	 * @throws DocumentExistsException 
 	 */
 	@RequestMapping(value = "/edit.html",
 			method = RequestMethod.POST)
 	@PreAuthorize("hasRole('ADMIN') or hasRole('VICTIM_DOCUMENT_EDIT')")
-	public ModelAndView update(@RequestParam(value = "victim", required = true) final Person victim,
+	public ModelAndView update(@RequestParam(value = "victim", required = true) 
+		final Person victim,
 			final VictimDocumentsForm form, final BindingResult result)
-		throws DuplicateEntityFoundException {
+		throws VictimDocumentAssociationExistsException, 
+		DocumentExistsException, DocumentTagExistsException, 
+		UnsupportedOperationException {
 		this.victimDocumentsFormValidator.validate(form, result);
 		if (result.hasErrors()) {
 			ModelMap map = new ModelMap();
@@ -237,7 +260,8 @@ public class VictimDocumentController {
 			return this.prepareEditMav(form, victim, map);
 		}
 		this.processVictimDocumentItems(form.getDocumentItems(), victim);
-		return new ModelAndView(String.format(VICTIM_PROFILE_VIEW_REDIRECT_URL_FORMAT, victim.getId()));
+		return new ModelAndView(String.format(
+				VICTIM_PROFILE_VIEW_REDIRECT_URL_FORMAT, victim.getId()));
 	}
 	
 	/**
@@ -247,8 +271,10 @@ public class VictimDocumentController {
 	 * @param docket docket
 	 * @return model and view to display victim documents action menu
 	 */
-	@RequestMapping(value = "/displayVictimDocumentsActionMenu.html", method = RequestMethod.GET)
-	public ModelAndView displayVictimDocumentsActionMenu(@RequestParam(value = "victim", required = true)
+	@RequestMapping(value = "/displayVictimDocumentsActionMenu.html", 
+			method = RequestMethod.GET)
+	public ModelAndView displayVictimDocumentsActionMenu(@RequestParam(
+			value = "victim", required = true)
 			final Person victim,
 			@RequestParam(value = "docket", required = false)
 			final Docket docket) {
@@ -261,7 +287,7 @@ public class VictimDocumentController {
 	/**
 	 * Displays a document tag item.
 	 * 
-	 * @param financialDocumentItemIndex financial document item index 
+	 * @param victimDocumentItemIndex victim document item index 
 	 * @param documentTagItemIndex  document tag item index
 	 * @return ModelAndView model and view for creating a document tag
 	 */
@@ -287,22 +313,25 @@ public class VictimDocumentController {
 	 * displays a new document tag item for creation.
 	 * 
 	 * @param victimDocumentItemIndex victim document item index
-	 * @param documentTagItemIndex document tag item index
+	 * @param victim victim
+	 * @param docket docket
 	 * @return model and view for new document tag item
 	 */
 	@RequestMapping(value = "/createDocumentItem.html",
 			method = RequestMethod.GET)
-	public ModelAndView displayDocumentItem
-		(@RequestParam(value = "victimDocumentItemIndex", required = true)
+	public ModelAndView displayDocumentItem(@RequestParam(
+			value = "victimDocumentItemIndex", required = true)
 				final Integer victimDocumentItemIndex,
 				@RequestParam(value = "victim", required = true)
 				final Person victim,
-				@RequestParam(value = "docket", required = false)final Docket docket) {
+				@RequestParam(value = "docket", 
+				required = false)final Docket docket) {
 		ModelMap map = new ModelMap();
 		VictimDocumentItem item = new VictimDocumentItem();
 		item.setOperation(VictimDocumentItemOperation.CREATE);
 		map.addAttribute(VICTIM_DOCUMENT_ITEM_MODEL_KEY, item);
-		map.addAttribute(VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY, victimDocumentItemIndex);
+		map.addAttribute(VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY, 
+				victimDocumentItemIndex);
 		if (docket != null) {
 			map.addAttribute(DOCKET_MODEL_KEY, docket);
 		}
@@ -346,14 +375,16 @@ public class VictimDocumentController {
 	 * @param map model map
 	 * @return model and view for editing victim documents
 	 */
-	private ModelAndView prepareEditMav(final VictimDocumentsForm form, final Person victim,
+	private ModelAndView prepareEditMav(final VictimDocumentsForm form, 
+			final Person victim,
 			final ModelMap map) {
 		this.victimSummaryModelDelegate.add(map, victim);
-		map.addAttribute(VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY, form.getDocumentItems().size());
+		map.addAttribute(VICTIM_DOCUMENT_ITEM_INDEX_MODEL_KEY, 
+				form.getDocumentItems().size());
 		
 		int documentItemIndex = 0;
 		List<Integer> tagItemIndexes = new ArrayList<Integer>();
-		tagItemIndexes.add(0,0);
+		tagItemIndexes.add(0, 0);
 		for (VictimDocumentItem item : form.getDocumentItems()) {
 			final int tagItemIndex;
 			if (item.getTagItems() != null) {
@@ -371,35 +402,52 @@ public class VictimDocumentController {
 		return new ModelAndView(EDIT_VIEW_NAME, map);
 	}
 	
-	/*
-	 * Processes the specified list of victim document items according to their option value
+	/**
+	 * Processes the specified list of victim document items according to 
+	 * their option value
 	 * 
 	 * @param items victim document items
-	 * @throws UnsupportedOperationException thrown when an operation other than CREATE, UPDATE, or REMOVE is specified
-	 * @throws DuplicateEntityFoundException thrown when a duplicate document, document tag, or victim document
-	 * association is found.
+	 * @throws UnsupportedOperationException thrown when an operation other 
+	 * than CREATE, UPDATE, or REMOVE is specified
+	 * @throws VictimDocumentAssociationExistsException thrown when a duplicate 
+	 * victim document association is found.
+	 * @throws DocumentExistsException document exists exception
+	 * @throws DocumentTagExistsException document tag exists exception
 	 */
-	private void processVictimDocumentItems(final List<VictimDocumentItem> items, final Person victim)
-		throws UnsupportedOperationException, DuplicateEntityFoundException {
+	private void processVictimDocumentItems(
+			final List<VictimDocumentItem> items, final Person victim)
+		throws UnsupportedOperationException, DocumentExistsException, 
+			DocumentTagExistsException, 
+			VictimDocumentAssociationExistsException {
 		if (items != null) {
 			for (VictimDocumentItem item : items) {
-				if (VictimDocumentItemOperation.CREATE.equals(item.getOperation())) {
+				if (VictimDocumentItemOperation.CREATE.equals(
+						item.getOperation())) {
 					final String extension = item.getFileExtension();
-						this.documentFilenameGenerator.setExtension(extension);
-					final String filename = this.documentFilenameGenerator.generate();
-					Document doc = this.victimDocumentService.createDocument(item.getDate(),
+					this.documentFilenameGenerator.setExtension(extension);
+					final String filename = this.documentFilenameGenerator
+							.generate();
+					Document doc = this.victimDocumentService.createDocument(
+							item.getDate(),
 							filename, extension, item.getTitle());
-					this.victimDocumentPersister.persist(doc, item.getDocumentData());
+					this.victimDocumentPersister.persist(doc, 
+							item.getDocumentData());
 					this.processDocumentTagItems(item.getTagItems(), doc);
-					this.victimDocumentService.create(victim, doc, item.getDocket());
-				} else if (VictimDocumentItemOperation.UPDATE.equals(item.getOperation())) {
-					this.victimDocumentService.update(item.getAssociation(), item.getTitle(), item.getDate(),
+					this.victimDocumentService.create(victim, doc, 
 							item.getDocket());
-					this.processDocumentTagItems(item.getTagItems(), item.getAssociation().getDocument());
-				} else if (VictimDocumentItemOperation.REMOVE.equals(item.getOperation())) {
+				} else if (VictimDocumentItemOperation.UPDATE.equals(
+						item.getOperation())) {
+					this.victimDocumentService.update(item.getAssociation(), 
+							item.getTitle(), item.getDate(),
+							item.getDocket());
+					this.processDocumentTagItems(item.getTagItems(), 
+							item.getAssociation().getDocument());
+				} else if (VictimDocumentItemOperation.REMOVE.equals(
+						item.getOperation())) {
 					for (DocumentTagItem tagItem : item.getTagItems()) {
 						if (tagItem.getDocumentTag() != null) {
-							this.victimDocumentService.removeDocumentTag(tagItem.getDocumentTag());
+							this.victimDocumentService.removeDocumentTag(
+									tagItem.getDocumentTag());
 						}
 					}
 					Document doc = item.getAssociation().getDocument();
@@ -416,17 +464,25 @@ public class VictimDocumentController {
 	 * 
 	 * @param items document tag items
 	 * @param document document
-	 * @throws DuplicateEntityFoundException thrown when a duplicate document tag item is found
+	 * @throws VictimDocumentAssociationExistsException thrown when a duplicate document 
+	 * tag item is found
 	 */
-	private void processDocumentTagItems(final List<DocumentTagItem> items, final Document document)
-			throws DuplicateEntityFoundException {
+	private void processDocumentTagItems(final List<DocumentTagItem> items, 
+			final Document document)
+			throws DocumentTagExistsException {
 		for (DocumentTagItem tagItem : items) {
-			if (DocumentTagOperation.CREATE.equals(tagItem.getDocumentTagOperation())) {
-				this.victimDocumentService.createDocumentTag(document, tagItem.getName());
-			} else  if (DocumentTagOperation.UPDATE.equals(tagItem.getDocumentTagOperation())) {
-				this.victimDocumentService.updateDocumentTag(tagItem.getDocumentTag(), tagItem.getName());
-			} else if (DocumentTagOperation.REMOVE.equals(tagItem.getDocumentTagOperation())) {
-				this.victimDocumentService.removeDocumentTag(tagItem.getDocumentTag());
+			if (DocumentTagOperation.CREATE.equals(
+					tagItem.getDocumentTagOperation())) {
+				this.victimDocumentService.createDocumentTag(document, 
+						tagItem.getName());
+			} else  if (DocumentTagOperation.UPDATE.equals(
+					tagItem.getDocumentTagOperation())) {
+				this.victimDocumentService.updateDocumentTag(
+						tagItem.getDocumentTag(), tagItem.getName());
+			} else if (DocumentTagOperation.REMOVE.equals(
+					tagItem.getDocumentTagOperation())) {
+				this.victimDocumentService.removeDocumentTag(
+						tagItem.getDocumentTag());
 			}
 		}
 	}

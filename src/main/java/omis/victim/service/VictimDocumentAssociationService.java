@@ -6,9 +6,11 @@ import java.util.List;
 import omis.docket.domain.Docket;
 import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
-import omis.exception.DuplicateEntityFoundException;
+import omis.document.exception.DocumentExistsException;
+import omis.document.exception.DocumentTagExistsException;
 import omis.person.domain.Person;
 import omis.victim.domain.VictimDocumentAssociation;
+import omis.victim.exception.VictimDocumentAssociationExistsException;
 
 /*
  *  OMIS - Offender Management Information System
@@ -32,22 +34,27 @@ import omis.victim.domain.VictimDocumentAssociation;
  * Victim document service.
  * 
  * @author Joel Norris
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Aug 22, 2017)
  * @since OMIS 3.0
  */
 public interface VictimDocumentAssociationService {
 
 	/**
-	 * Creates a victim document association for the specified victim and document.
+	 * Creates a victim document association for the specified victim and 
+	 * document.
 	 * 
 	 * @param victim victim
 	 * @param document document
 	 * @param docket docket
 	 * @return newly created victim document association
-	 * @throws DuplicateEntityFoundException thrown when a duplicate victim document association is found
+	 * @throws VictimDocumentAssociationExistsException thrown when a 
+	 * duplicate victim 
+	 * document association is found
 	 */
-	VictimDocumentAssociation create(Person victim, Document document, Docket docket)
-			throws DuplicateEntityFoundException;
+	VictimDocumentAssociation create(Person victim, Document document, 
+			Docket docket)
+			throws VictimDocumentAssociationExistsException;
 	
 	/**
 	 * Creates a document tag for the specified document.
@@ -55,9 +62,11 @@ public interface VictimDocumentAssociationService {
 	 * @param document document
 	 * @param name name
 	 * @return newly created document tag
-	 * @throws DuplicateEntityFoundException thrown when a duplicate document tag is found
+	 * @throws DocumentTagExistsException thrown when a duplicate 
+	 * document tag is found
 	 */
-	DocumentTag createDocumentTag(Document document, String name) throws DuplicateEntityFoundException;
+	DocumentTag createDocumentTag(Document document, String name) 
+			throws DocumentTagExistsException;
 	
 	/**
 	 * Updates the specified document tag.
@@ -65,9 +74,11 @@ public interface VictimDocumentAssociationService {
 	 * @param documentTag document tag
 	 * @param name name
 	 * @return updated document tag
-	 * @throws DuplicateEntityFoundException thrown when a duplicate document tag is found
+	 * @throws DocumentTagExistsException thrown when a duplicate document 
+	 * tag is found
 	 */
-	DocumentTag updateDocumentTag(DocumentTag documentTag, String name) throws DuplicateEntityFoundException;
+	DocumentTag updateDocumentTag(DocumentTag documentTag, String name) 
+			throws DocumentTagExistsException;
 	
 	/**
 	 * Removes the specified document tag.
@@ -93,17 +104,20 @@ public interface VictimDocumentAssociationService {
 	List<VictimDocumentAssociation> findByDocket(Docket docket);
 	
 	/**
-	 * Creates a document with the specified date, file name, file extension, and title.
+	 * Creates a document with the specified date, file name, file extension, 
+	 * and title.
 	 * 
 	 * @param date date
 	 * @param fileName file name
 	 * @param fileExtension file extension
 	 * @param title title
 	 * @return newly created document
-	 * @throws DuplicateEntityFoundException Thrown when a duplicate document is found. 
+	 * @throws DocumentExistsException Thrown when a duplicate 
+	 * document is found. 
 	 */
-	Document createDocument(Date date, String fileName, String fileExtension, String title)
-			throws DuplicateEntityFoundException;
+	Document createDocument(Date date, String fileName, String fileExtension, 
+			String title)
+			throws DocumentExistsException;
 	
 	/**
 	 * Removes the specified document.
@@ -113,13 +127,15 @@ public interface VictimDocumentAssociationService {
 	void removeDocument(Document document);
 
 	/**
-	 * Returns all victim document associations for the specified victim and docket.
+	 * Returns all victim document associations for the specified victim and 
+	 * docket.
 	 * 
 	 * @param docket docket
 	 * @param victim victim
 	 * @return victim document associations
 	 */
-	List<VictimDocumentAssociation> findByDocketAndVictim(Docket docket, Person victim);
+	List<VictimDocumentAssociation> findByDocketAndVictim(
+			Docket docket, Person victim);
 
 	/**
 	 * Returns all document tags for the specified document.
@@ -152,8 +168,11 @@ public interface VictimDocumentAssociationService {
 	 * @param date date
 	 * @param docket docket
 	 * @return updated victim document association
-	 * @throws DuplicateEntityFoundException throwqn when a duplicate victim document association is found
+	 * @throws VictimDocumentAssociationExistsException thrown when a 
+	 * duplicate victim document association is found
 	 */
-	VictimDocumentAssociation update(VictimDocumentAssociation victimDocumentAssociation, String title,
-			Date date, Docket docket) throws DuplicateEntityFoundException;
+	VictimDocumentAssociation update(
+			VictimDocumentAssociation victimDocumentAssociation, String title,
+			Date date, Docket docket) 
+					throws VictimDocumentAssociationExistsException;
 }

@@ -27,7 +27,6 @@ import omis.contact.domain.Contact;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.exception.TelephoneNumberExistsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 
 /**

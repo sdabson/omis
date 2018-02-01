@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenseterm.web.validator;
 
 import java.beans.PropertyEditor;
@@ -8,6 +25,7 @@ import org.springframework.validation.Validator;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.conviction.web.validator.delegate.ConvictionFieldsValidatorDelegate;
 import omis.courtcase.web.validator.delegate.CourtCaseFieldsValidatorDelegate;
+import omis.docket.web.validator.delegate.DocketFieldsValidatorDelegate;
 import omis.offenseterm.web.form.OffenseItem;
 import omis.offenseterm.web.form.OffenseItemConnection;
 import omis.offenseterm.web.form.OffenseItemConnectionClassification;
@@ -26,6 +44,8 @@ import omis.sentence.web.validator.delegate.SentenceFieldsValidatorDelegate;
  */
 public class OffenseTermFormValidator
 		implements Validator {
+
+	private static final String DOCKET_FIELDS_PROPERTY_NAME = "docketFields";
 	
 	private static final String COURT_CASE_FIELDS_PROPERTY_NAME = "fields";
 	
@@ -34,6 +54,8 @@ public class OffenseTermFormValidator
 	
 	private static final String SENTENCE_FIELDS_PROPERTY_NAME
 		= "offenseItems[%d].sentenceFields";
+
+	private final DocketFieldsValidatorDelegate docketFieldsValidatorDelegate;
 	
 	private final CourtCaseFieldsValidatorDelegate 
 	courtCaseFieldsValidatorDelegate;
@@ -49,6 +71,7 @@ public class OffenseTermFormValidator
 	/**
 	 * Instantiates validator for form for offense terms.
 	 * 
+	 * @param docketFieldsValidatorDelegate delegate to validate docket fields
 	 * @param courtCaseFieldsValidatorDelegate delegate to validate court case
 	 * fields
 	 * @param convictionFieldsValidatorDelegate delegate to validate
@@ -64,6 +87,8 @@ public class OffenseTermFormValidator
 	 * cannot be used to resolve it to a single type.  
 	 */
 	public OffenseTermFormValidator(
+			final DocketFieldsValidatorDelegate
+				docketFieldsValidatorDelegate,
 			final CourtCaseFieldsValidatorDelegate 
 				courtCaseFieldsValidatorDelegate,
 			final ConvictionFieldsValidatorDelegate
@@ -72,6 +97,8 @@ public class OffenseTermFormValidator
 				sentenceFieldsValidatorDelegate,
 			final PropertyEditorFactory
 				sentencePropertyEditorFactory) {
+		this.docketFieldsValidatorDelegate
+			= docketFieldsValidatorDelegate;
 		this.courtCaseFieldsValidatorDelegate
 			= courtCaseFieldsValidatorDelegate;
 		this.convictionFieldsValidatorDelegate
@@ -92,9 +119,24 @@ public class OffenseTermFormValidator
 	@Override
 	public void validate(final Object target, final Errors errors) {
 		OffenseTermForm form = (OffenseTermForm) target;
+		
+		// Validates docket fields only when allowed and when existing docket
+		// is not specified
+		if (form.getAllowDocketFields() != null
+				&& form.getAllowDocketFields()
+				&& form.getExistingDocket() == null) {
+			this.docketFieldsValidatorDelegate.validate(
+					form.getDocketFields(),
+					DOCKET_FIELDS_PROPERTY_NAME,
+					errors);
+		}
+		
+		// Validates rest of court case fields
 		this.courtCaseFieldsValidatorDelegate
 			.validate(form.getFields(),
 					COURT_CASE_FIELDS_PROPERTY_NAME, errors);
+		
+		// Validates offense terms
 		int index = 0;
 		for (OffenseItem offenseTermItem : form.getOffenseItems()) {
 			

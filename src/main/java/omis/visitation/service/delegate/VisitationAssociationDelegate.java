@@ -105,7 +105,7 @@ public class VisitationAssociationDelegate {
 		if (this.visitationAssociationDao.find(relationship, startDate)
 				!= null) {
 			throw new VisitationExistsException(
-					"Duplicate visitation association found.");
+					"Visitation already exists");
 		}
 		if (this.visitationAssociationDao.findDateRangeOverLap(
 				relationship, new DateRange(startDate, endDate)) > 0) {

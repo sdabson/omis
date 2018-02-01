@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.impl;
 
 import java.util.Date;
@@ -7,6 +24,8 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
@@ -17,6 +36,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
 import omis.contact.service.delegate.OnlineAccountDelegate;
 import omis.contact.service.delegate.OnlineAccountHostDelegate;
@@ -30,11 +52,14 @@ import omis.offenderrelationship.service.UpdateOffenderRelationService;
 import omis.person.domain.Person;
 import omis.person.domain.PersonIdentity;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonIdentityExistsException;
+import omis.person.exception.PersonNameExistsException;
 import omis.person.service.delegate.PersonDelegate;
 import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.person.service.delegate.SuffixDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.relationship.domain.Relationship;
@@ -146,7 +171,8 @@ public class UpdateOffenderRelationServiceImpl
 		final State birthState, final City birthCity, 
 		final Integer socialSecurityNumber,	final String stateId, 
 		final Boolean deceased, final Date deathDate) 
-		throws DuplicateEntityFoundException {
+		throws PersonNameExistsException,
+		PersonIdentityExistsException {
 		Person updatedPerson = this.personDelegate.update(
 				person, lastName, firstName, middleName, suffix);
 		if(person.getIdentity()!=null){
@@ -177,7 +203,7 @@ public class UpdateOffenderRelationServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public Address createAddress(final String number, final ZipCode zipCode)
-		throws DuplicateEntityFoundException {
+		throws AddressExistsException {
 		return this.addressDelegate.findOrCreate(number, null, null, 
 			null, zipCode);
 	}
@@ -239,21 +265,21 @@ public class UpdateOffenderRelationServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public City createCity(final String name, final State state, final Country country) 
-		throws DuplicateEntityFoundException{
+		throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ZipCode createZipCode(final String value, final String extension, 
-		final City city) throws DuplicateEntityFoundException{
+		final City city) throws ZipCodeExistsException{
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 	
 	/** {@inheritDoc} */
 	@Override
 	public Contact changeContact(final Person relation, final PoBox poBox,
-		final Address mailingAddress) throws DuplicateEntityFoundException {
+		final Address mailingAddress) throws ContactExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		if (contact != null) {			
 			this.contactDelegate.update(contact, mailingAddress, 
@@ -308,7 +334,7 @@ public class UpdateOffenderRelationServiceImpl
 	public TelephoneNumber createTelephoneNumber(final Person relation, 
 		final Long value, final Integer extension, final Boolean primary,
 		final Boolean active, final TelephoneNumberCategory category)	
-		throws DuplicateEntityFoundException {
+		throws TelephoneNumberExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		return this.telephoneNumberDelegate.create(contact, value, extension, 
 			primary, active, category);
@@ -320,7 +346,7 @@ public class UpdateOffenderRelationServiceImpl
 		final TelephoneNumber telephoneNumber, final Long value, 
 		final Integer extension, final Boolean primary, Boolean active, 
 		final TelephoneNumberCategory category)
-		throws DuplicateEntityFoundException {
+		throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.update(telephoneNumber, value, 
 			extension, primary, active, category);
 	}
@@ -336,7 +362,7 @@ public class UpdateOffenderRelationServiceImpl
 	public OnlineAccount createOnlineAccount(final Person relation, 
 		final String name, final OnlineAccountHost host, final Boolean primary,
 		final Boolean active) 
-		throws DuplicateEntityFoundException {
+		throws OnlineAccountExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		return this.onlineAccountDelegate.create(contact, name, active, primary, 
 			host); 
@@ -347,7 +373,7 @@ public class UpdateOffenderRelationServiceImpl
 	public OnlineAccount updateOnlineAccount(final OnlineAccount onlineAccount,
 		final String name, final OnlineAccountHost host, final Boolean primary,
 		final Boolean active)
-		throws DuplicateEntityFoundException {
+		throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.update(onlineAccount, name, active, 
 			primary, host);
 	}

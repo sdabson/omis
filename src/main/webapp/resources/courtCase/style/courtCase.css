@@ -13,3 +13,7 @@ a.sentenceLink:before {
 a.offenseDetailsLink {
 	display: inline-block;
 }
+
+a.dismissDocketLink:before {
+	content: url('../../common/images/remove.png');
+}

@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.victim.service.impl;
 
 import java.util.Date;
@@ -8,6 +25,8 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
@@ -18,6 +37,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
 import omis.contact.service.delegate.OnlineAccountDelegate;
 import omis.contact.service.delegate.OnlineAccountHostDelegate;
@@ -25,13 +47,13 @@ import omis.contact.service.delegate.TelephoneNumberDelegate;
 import omis.country.domain.Country;
 import omis.country.service.delegate.CountryDelegate;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
 import omis.person.service.delegate.SuffixDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.relationship.domain.Relationship;
@@ -41,6 +63,8 @@ import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
 import omis.victim.domain.VictimNoteCategory;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
+import omis.victim.exception.VictimNoteExistsException;
 import omis.victim.service.VictimAssociationService;
 import omis.victim.service.delegate.VictimAssociationDelegate;
 import omis.victim.service.delegate.VictimNoteCategoryDelegate;
@@ -50,6 +74,7 @@ import omis.victim.service.delegate.VictimNoteDelegate;
  * Implementation of service for victim associations.
  *
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.0.1 (May 26, 2015)
  * @since OMIS 3.0
  */
@@ -100,7 +125,7 @@ public class VictimAssociationServiceImpl
 	 * @param personDelegate delegate for persons
 	 * @param addressDelegate delegate for addresses
 	 * @param streetSuffixDelegate delegate for street suffixes
-	 * @param addressUnitDesignatorDelefate delegate for address unit
+	 * @param addressUnitDesignatorDelegate delegate for address unit
 	 * designators
 	 * @param countryDelegate delegate for countries
 	 * @param stateDelegate delegate for States
@@ -155,7 +180,7 @@ public class VictimAssociationServiceImpl
 			final Person victim, final Date registeredDate,
 			final Boolean packetSent, final Date packetSendDate,
 			final VictimAssociationFlags flags)
-					throws DuplicateEntityFoundException,
+					throws VictimExistsException,
 						ReflexiveRelationshipException {
 		Relationship relationship = relationshipDelegate.findOrCreate(
 				offender, victim);
@@ -168,14 +193,14 @@ public class VictimAssociationServiceImpl
 	public VictimAssociation update(final VictimAssociation association,
 			final Date registeredDate, final Boolean packetSent,
 			final Date packetSendDate, final VictimAssociationFlags flags)
-					throws DuplicateEntityFoundException {
+					throws VictimExistsException {
 		return this.victimAssociationDelegate.update(association,
 				registeredDate, packetSent, packetSendDate, flags);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void remove(VictimAssociation association) {
+	public void remove(final VictimAssociation association) {
 		this.victimAssociationDelegate.remove(association);
 	}
 
@@ -213,7 +238,7 @@ public class VictimAssociationServiceImpl
 	public VictimNote addNote(final VictimAssociation association,
 			final VictimNoteCategory category, final Date date,
 			final String value)
-					throws DuplicateEntityFoundException {
+					throws VictimNoteExistsException {
 		return this.victimNoteDelegate.create(
 				association.getRelationship().getSecondPerson(), category,
 				association, date, value);
@@ -224,7 +249,7 @@ public class VictimAssociationServiceImpl
 	public VictimNote updateNote(final VictimNote victimNote,
 			final VictimNoteCategory category, final Date date,
 			final String value)
-					throws DuplicateEntityFoundException {
+					throws VictimNoteExistsException {
 		return this.victimNoteDelegate.update(victimNote, category,
 				victimNote.getAssociation(), date, value);
 	}
@@ -272,7 +297,7 @@ public class VictimAssociationServiceImpl
 	@Override
 	public Address createAddress(
 			final String number, final ZipCode zipCode)
-					throws DuplicateEntityFoundException {
+					throws AddressExistsException {
 		return this.addressDelegate.findOrCreate(number, null, null,
 				BuildingCategory.HOUSE, zipCode);
 	}
@@ -354,14 +379,14 @@ public class VictimAssociationServiceImpl
 			try {
 				return this.contactDelegate.update(
 						contact, mailingAddress, poBox);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (ContactExistsException e) {
 				throw new AssertionError("Duplicate contact exists", e);
 			}
 		} else {
 			try {
 				return this.contactDelegate.create(
 						relation, mailingAddress, poBox);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (ContactExistsException e) {
 				throw new AssertionError("Duplicate contact exists", e);
 			}
 		}
@@ -409,12 +434,12 @@ public class VictimAssociationServiceImpl
 			final Person relation, final Long value, final Integer extension,
 			final Boolean primary, final Boolean active, 
 			final TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		if (contact == null) {
 			try {
 				contact = this.contactDelegate.create(relation, null, null);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (ContactExistsException e) {
 				throw new AssertionError("Contact exists", e);
 			}
 		}
@@ -428,7 +453,7 @@ public class VictimAssociationServiceImpl
 			final TelephoneNumber telephoneNumber, final Long value,
 			final Integer extension, final Boolean primary, 
 			final Boolean active, final TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.update(
 				telephoneNumber, value, extension, primary, active, category);
 	}
@@ -445,12 +470,12 @@ public class VictimAssociationServiceImpl
 			final Person relation, final String name,
 			final OnlineAccountHost host, final Boolean primary, 
 			final Boolean active)
-					throws DuplicateEntityFoundException {
+					throws OnlineAccountExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		if (contact == null) {
 			try {
 				contact = this.contactDelegate.create(relation, null, null);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (ContactExistsException e) {
 				throw new AssertionError("Contact exists", e);
 			}
 		}
@@ -464,7 +489,7 @@ public class VictimAssociationServiceImpl
 			final OnlineAccount onlineAccount, final String name,
 			final OnlineAccountHost host, final Boolean primary, 
 			final Boolean active)
-					throws DuplicateEntityFoundException {
+					throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.update(
 				onlineAccount, name, active, primary, host);
 	}
@@ -485,7 +510,7 @@ public class VictimAssociationServiceImpl
 	@Override
 	public City createCity(
 			final String name, final State state, final Country country)
-					throws DuplicateEntityFoundException {
+					throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 
@@ -493,7 +518,7 @@ public class VictimAssociationServiceImpl
 	@Override
 	public ZipCode createZipCode(
 			final String value, final String extension, final City city)
-					throws DuplicateEntityFoundException {
+					throws ZipCodeExistsException {
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 

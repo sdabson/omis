@@ -13,6 +13,6 @@ public interface BedPlacementProfileItemReportService {
 	 * @param offender - offender.
 	 * @param effectiveDate - effective date.
 	 * @return true if exists. */
-	Boolean findBedPlacementExistenceByOffenderAndDate(Offender offender, 
+	String findBedPlacementExistenceByOffenderAndDate(Offender offender, 
 			Date effectiveDate);
 }

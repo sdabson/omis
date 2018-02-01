@@ -1,10 +1,27 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /**
  * Jquery implementation of functions for courtCase.js
  * 
  * @author: Joel Norris
  * @author: Ryan Johns
  * @author: Josh Divine
- * @version: 0.1.2 (Sept 15, 2017)
+ * @version: 0.1.3 (Jan 31, 2018)
  * @since: OMIS 3.0
  */
 function applyCourtCaseBehavior() {
@@ -112,6 +129,9 @@ function chargeRowOnClick(chargeIndex) {
 		}
 		return false;
 	});
+	if($("#chargeOperation" + chargeIndex).val() == "REMOVE") {
+		$("#chargeRow" + chargeIndex).addClass("removeRow");
+	}
 	applyValueLabelAutoComplete(document.getElementById("charges[" + chargeIndex + "].offenseQuery"), document.getElementById("charges[" + chargeIndex + "].offense"), config.ServerConfig.getContextPath() + "/offenseTerm/searchOffenses.json");
 	applyClear(document.getElementById("charges[" + chargeIndex + "].clearOffenseLink"), document.getElementById("charges[" + chargeIndex + "].offenseQuery"), document.getElementById("charges[" + chargeIndex + "].offense"));
 	document.getElementById("charges[" + chargeIndex + "].offenseUrlLink").onclick = function() {
@@ -158,4 +178,7 @@ function courtCaseNoteRowOnClick(courtCaseNoteIndex) {
 		}
 		return false;
 	});
+	if($("#courtCaseNoteOperation" + courtCaseNoteIndex).val() == "REMOVE") {
+		$("#courtCaseNoteRow" + courtCaseNoteIndex).addClass("removeRow");
+	}
 }

@@ -203,6 +203,8 @@
   
   <import resource="applicationContext-trackeddocument.xml"/>
   
+  <import resource="applicationContext-unitManagerReview.xml"/>
+  
   <import resource="applicationContext-user.xml"/>
   
   <import resource="applicationContext-userService.xml"/>

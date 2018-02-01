@@ -1,5 +1,23 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenseterm.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -133,8 +151,7 @@ public class OffenseTermServiceImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public CourtCase create(final Person person, final Court court,
-			final String docketValue, final String interStateNumber,
+	public CourtCase create(final Docket docket, final String interStateNumber,
 			final State interState, final Date pronouncementDate,
 			final Date sentenceReviewDate,
 			final JurisdictionAuthority jurisdictionAuthority,
@@ -142,17 +159,18 @@ public class OffenseTermServiceImpl
 			final CourtCasePersonnel personnel,
 			final CourtCaseFlags flags,
 			final String comments)
-					throws DocketExistsException {
-		
-		Docket docket = this.docketDelegate.create(person, court, docketValue);
-		try {
-			return this.courtCaseDelegate.create(docket, interStateNumber, 
+					throws CourtCaseExistsException {
+		return this.courtCaseDelegate.create(docket, interStateNumber, 
 					interState, pronouncementDate, jurisdictionAuthority, 
 					sentenceReviewDate, dangerDesignator, personnel, flags, 
 					comments);
-		} catch (CourtCaseExistsException ccee) {
-			throw new RuntimeException("Court case already exists");
-		}
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Docket createDocket(final Person person, final Court court,
+			final String value) throws DocketExistsException {
+		return this.docketDelegate.create(person, court, value);
 	}
 
 	/** {@inheritDoc} */
@@ -256,6 +274,19 @@ public class OffenseTermServiceImpl
 		return this.courtDelegate.findAllCourts();
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public List<Docket> findDocketsWithoutCourtCase(final Person person) {
+		List<Docket> dockets = this.docketDelegate.findByPerson(person);
+		List<Docket> docketsWithoutCourtCase = new ArrayList<Docket>();
+		for (Docket docket : dockets) {
+			if (this.courtCaseDelegate.findByDocket(docket) == null) {
+				docketsWithoutCourtCase.add(docket);
+			}
+		}
+		return docketsWithoutCourtCase;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public List<State> findHomeStates() {

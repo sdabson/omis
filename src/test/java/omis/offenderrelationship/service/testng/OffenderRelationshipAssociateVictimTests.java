@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.testng;
 
 import java.util.Date;
@@ -13,6 +30,7 @@ import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,10 +68,12 @@ public class OffenderRelationshipAssociateVictimTests
 	 * Tests associate victim.
 	 * @throws DuplicateEntityFoundException  DuplicateEntityFoundException
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
+	 * @throws VictimExistsException VictimExistsException
 	 */
 	@Test
 	public void testAssociateVictim() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException {
+		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		VictimExistsException {
 		// Arrangement
 		Date registerDate = new Date(1);
 		Boolean packetSent = true;
@@ -115,11 +135,13 @@ public class OffenderRelationshipAssociateVictimTests
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate relationships exist
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
+	 * @throws VictimExistsException VictimExistsException
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class, 
+	@Test(expectedExceptions = {VictimExistsException.class,
 		ReflexiveRelationshipException.class })
 	public void testDuplicateAssociateFamilyMember() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException {
+		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		VictimExistsException {
 		// Assignment
 		Date registerDate = new Date(1);
 		Boolean packetSent = true;

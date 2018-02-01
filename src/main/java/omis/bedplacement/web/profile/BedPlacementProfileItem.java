@@ -21,7 +21,7 @@ public class BedPlacementProfileItem
 	implements ProfileItem {
 	private final static long serialVersionUID = 1L;
 	private final static String BED_PLACEMENT_EXISTS_MODEL_KEY 
-		= "bedPlacementExists";
+		= "bedPlacement";
 	
 	private final BedPlacementProfileItemReportService 
 		bedPlacementProfileItemReportService;

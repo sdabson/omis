@@ -1,3 +1,21 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Behavior for offense term edit screen.
  * 
@@ -547,6 +565,22 @@ window.onload = function() {
 	}
 	
 	// Applies form behavior
+	var allowExistingDocket = document.getElementById("allowExistingDocket");
+	var allowDocketFields = document.getElementById("allowDocketFields");
+	if (allowExistingDocket.value && allowDocketFields.value) {
+		document.getElementById("existingDocket").onchange = function() {
+			var existingDocketValue = this.options[this.selectedIndex].value;
+			var docketValue = document.getElementById("docketFields.value");
+			var court = document.getElementById("docketFields.court");
+			if (existingDocketValue != null && existingDocketValue != "") {
+				docketValue.disabled = true;
+				court.disabled = true;
+			} else {
+				docketValue.disabled = false;
+				court.disabled = false;
+			}
+		};
+	}
 	applyDatePicker(document.getElementById("fields.pronouncementDate"));
 	applyDatePicker(document.getElementById("fields.sentenceReviewDate"));
 	applyValueLabelAutoComplete(document.getElementById("fields.judgeQuery"), document.getElementById("fields.judge"), config.ServerConfig.getContextPath() + "/offenseTerm/searchJudges.json");

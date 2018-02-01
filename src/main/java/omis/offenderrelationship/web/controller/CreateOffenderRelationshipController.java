@@ -28,6 +28,8 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.web.controller.delegate.AddressFieldsControllerDelegate;
 import omis.address.web.form.AddressFields;
 import omis.beans.factory.PropertyEditorFactory;
@@ -37,6 +39,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.web.controller.delegate.OnlineAccountFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.TelephoneNumberFieldsControllerDelegate;
@@ -51,6 +56,7 @@ import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.report.OffenderReportService;
@@ -63,17 +69,23 @@ import omis.offenderrelationship.web.validator.CreateRelationshipsFormValidator;
 import omis.offenderrelationship.web.validator.CreateRelationshipsFromSearchFormValidator;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonExistsException;
 import omis.person.web.delegate.PersonFieldsControllerDelegate;
 import omis.person.web.form.PersonFields;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.util.StringUtility;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
 import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
+import omis.visitation.exception.VisitationExistsException;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,6 +94,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -172,6 +185,29 @@ public class CreateOffenderRelationshipController {
 	private static final String BIRTH_COUNTRIES_MODEL_KEY = "birthCountries";
 	private static final String PO_BOX_COUNTRIES_MODEL_KEY = "poBoxCountries";
 	private static final String NEW_RELATION_MODEL_KEY = "newRelation";
+	private static final String ADDRESS_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "address.Conflicts";
+	private static final String VICTIM_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "victim.Conflicts";
+	private static final String VISITATION_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "visitation.Conflicts";
+	private static final String ZIPCODE_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "zipcode.Conflicts";
+	private static final String CONTACT_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "contact.Conflicts";
+	private static final String PERSON_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "person.Conflicts";
+	private static final String TELEPHONE_NUMBER_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "telephoneNumber.Conflicts";
+	private static final String ONLINE_ACCOUNT_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "onlineAccount.Conflicts";
+	private static final String
+		FAMILY_ASSOCIATION_CONFLICT_EXCEPTION_MESSAGE_KEY
+		= "familyAssociation.Conflicts";
+	private static final String CITY_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "city.Conflicts";
+	private static final String NOTE_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "note.Conflicts";
 	
 	/* Property names. */
 	private static final String ADDRESS_FIELDS_PROPERTY_NAME = "addressFields";
@@ -287,10 +323,18 @@ public class CreateOffenderRelationshipController {
 	@Qualifier("onlineAccountFieldsControllerDelegate")
 	private OnlineAccountFieldsControllerDelegate 
 		onlineAccountFieldsControllerDelegate;
+	
+	@Autowired
+	@Qualifier("businessExceptionHandlerDelegate")
+	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
 
 	/* Helpers. */
 	@Autowired
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
+	
+	/* Message bundles. */
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.offenderrelationship.msgs.form";
 
 	/* Constructor. */
 	/**
@@ -338,6 +382,18 @@ public class CreateOffenderRelationshipController {
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
 	 * @throws DateConflictException DateConflictException
 	 * @throws FamilyAssociationConflictException Family Association Conflict 
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
+	 * @throws PersonExistsException person exists exception
+	 * @throws AddressExistsException address exists exception
+	 * @throws ZipCodeExistsException zip code exists exception
+	 * @throws CityExistsException city exists exception
+	 * @throws ContactExistsException contact exists exception
+	 * @throws TelephoneNumberExistsException telephone number exists exception
+	 * @throws VictimExistsException victim exists exception
+	 * @throws VisitationExistsException visitation exists exception
+	 * @throws OnlineAccountExistsException online account exists exception
+	 * 
 	 * Exception
 	 * @param result result
 	 * @return model and view to display the "list"
@@ -352,7 +408,11 @@ public class CreateOffenderRelationshipController {
 		final CreateRelationshipsForm createRelationshipsForm,
 		final BindingResult result) throws DuplicateEntityFoundException,
 			ReflexiveRelationshipException, DateConflictException,
-			FamilyAssociationConflictException {
+			FamilyAssociationConflictException, PersonExistsException,
+			AddressExistsException, ZipCodeExistsException, CityExistsException,
+			ContactExistsException, TelephoneNumberExistsException,
+			FamilyAssociationExistsException, VictimExistsException,
+			VisitationExistsException, OnlineAccountExistsException {
 		if (associatedPerson == null) {
 			// Create new
 			if (createRelationshipsForm.getPoBoxFields().getCountry()
@@ -2348,7 +2408,165 @@ public class CreateOffenderRelationshipController {
 		}
 		return spouse;
 	}
-
+	
+	/**
+	 * Handles {@code AddressExistsException}.
+	 * 
+	 * @param addressExistsException address exists exception thrown
+	 * @return screen to handle {@code AddressExistsException}
+	 */
+	@ExceptionHandler(AddressExistsException.class)
+	public ModelAndView handleAddressExistsException(
+		final AddressExistsException addressExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ADDRESS_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, addressExistsException);
+	}
+	
+	/**
+	 * Handles {@code VictimExistsException}.
+	 * 
+	 * @param victimExistsException victim exists exception thrown
+	 * @return screen to handle {@code VictimExistsException}
+	 */
+	@ExceptionHandler(VictimExistsException.class)
+	public ModelAndView handleVictimExistsException(
+		final VictimExistsException victimExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			VICTIM_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, victimExistsException);
+	}
+	
+	/**
+	 * Handles {@code VisitationExistsException}.
+	 * 
+	 * @param visitationExistsException visitation exists exception thrown
+	 * @return screen to handle {@code VisitationExistsException}
+	 */
+	@ExceptionHandler(VisitationExistsException.class)
+	public ModelAndView handleVisitationExistsException(
+		final VisitationExistsException visitationExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			VISITATION_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, visitationExistsException);
+	}
+	
+	/**
+	 * Handles {@code TelephoneNumberExistsException}.
+	 * 
+	 * @param telephoneNumberExistsException telephone number exists exception
+	 * thrown
+	 * @return screen to handle {@code TelephoneNumberExistsException}
+	 */
+	@ExceptionHandler(TelephoneNumberExistsException.class)
+	public ModelAndView handleTelephoneNumberExistsException(
+		final TelephoneNumberExistsException telephoneNumberExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			TELEPHONE_NUMBER_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, telephoneNumberExistsException);
+	}
+	
+	/**
+	 * Handles {@code OnlineAccountExistsException}.
+	 * 
+	 * @param onlineAccountExistsException online account exists exception
+	 * thrown
+	 * @return screen to handle {@code OnlineAccountExistsException}
+	 */
+	@ExceptionHandler(OnlineAccountExistsException.class)
+	public ModelAndView handleOnlineAccountExistsException(
+		final OnlineAccountExistsException onlineAccountExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ONLINE_ACCOUNT_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, onlineAccountExistsException);
+	}
+	
+	/**
+	 * Handles {@code FamilyAssociationConflictException}.
+	 * 
+	 * @param familyAssociationConflictException family association Conflict
+	 * exception thrown
+	 * @return screen to handle {@code FamilyAssociationConflictException}
+	 */
+	@ExceptionHandler(FamilyAssociationConflictException.class)
+	public ModelAndView handleFamilyAssociationConflictException(
+		final FamilyAssociationConflictException
+		familyAssociationConflictException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			FAMILY_ASSOCIATION_CONFLICT_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, familyAssociationConflictException);
+	}
+	
+	/**
+	 * Handles {@code ZipCodeExistsException}.
+	 * 
+	 * @param zipCodeExistsException Zip code exists exception thrown
+	 * @return screen to handle {@code ZipCodeExistsException}
+	 */
+	@ExceptionHandler(ZipCodeExistsException.class)
+	public ModelAndView handleZipCodeExistsException(
+		final ZipCodeExistsException zipCodeExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ZIPCODE_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, zipCodeExistsException);
+	}
+	
+	/**
+	 * Handles {@code ContactExistsException}.
+	 * 
+	 * @param contactExistsException contact exists exception thrown
+	 * @return screen to handle {@code ContactExistsException}
+	 */
+	@ExceptionHandler(ContactExistsException.class)
+	public ModelAndView handleContactExistsException(
+		final ContactExistsException contactExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			CONTACT_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, 	contactExistsException);
+	}
+	
+	/**
+	 * Handles {@code PersonExistsException}.
+	 * 
+	 * @param personExistsException person exists exception thrown
+	 * @return screen to handle {@code PersonExistsException}
+	 */
+	@ExceptionHandler(PersonExistsException.class)
+	public ModelAndView handlePersonExistsException(
+		final PersonExistsException personExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			PERSON_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, 	personExistsException);
+	}
+	
+	/**
+	 * Handles {@code CityExistsException}.
+	 * 
+	 * @param cityExistsException city exists exception
+	 * @return screen to handle {@code AddressExistsException}
+	 */
+	@ExceptionHandler(CityExistsException.class)
+	public ModelAndView handleCityExistsException(
+		final CityExistsException cityExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			CITY_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, cityExistsException);
+	}
+	
+	/**
+	 * Handles {@code RelationshipNoteExistsException}.
+	 * 
+	 * @param relationshipNoteExistsException relationship note exists exception
+	 * @return screen to handle {@code RelationshipNoteExistsException}
+	 */
+	@ExceptionHandler(RelationshipNoteExistsException.class)
+	public ModelAndView handleRelationshipNoteExistsException(
+		final RelationshipNoteExistsException relationshipNoteExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			NOTE_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, relationshipNoteExistsException);
+	}
+	
 	/**
 	 * Sets up and registers property editors.
 	 * 
@@ -2394,11 +2612,6 @@ public class CreateOffenderRelationshipController {
 	
 	// Returns true if value is true; false otherwise
 	private Boolean resolveCheckBoxValue(final Boolean value) {
-		/*if (value != null && value) {
-			return true;
-		} else {
-			return false;
-		}*/
 		if (value != null) {
 			return value;
 		} else {

@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.victim.service.impl;
 
 import java.util.List;
@@ -7,6 +24,8 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
@@ -17,6 +36,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
 import omis.contact.service.delegate.OnlineAccountDelegate;
 import omis.contact.service.delegate.OnlineAccountHostDelegate;
@@ -27,6 +49,7 @@ import omis.exception.DuplicateEntityFoundException;
 import omis.person.domain.Person;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.residence.domain.ResidenceCategory;
@@ -40,6 +63,7 @@ import omis.victim.service.VictimContactService;
  *
  * @author Stephen Abson
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Jan 5, 2016)
  * @since OMIS 3.0
  */
@@ -119,7 +143,7 @@ public class VictimContactServiceImpl
 	public Address createAddress(
 			final String houseNumber, final BuildingCategory buildingCategory,
 			final ZipCode zipCode)
-				throws DuplicateEntityFoundException {
+				throws AddressExistsException {
 		return this.addressDelegate.findOrCreate(houseNumber, null, null,
 				buildingCategory, zipCode);
 	}
@@ -140,14 +164,14 @@ public class VictimContactServiceImpl
 			try {
 				contact = this.contactDelegate.update(
 						contact, mailingAddress, poBox);
-			} catch (DuplicateEntityFoundException exception) {
+			} catch (ContactExistsException exception) {
 				throw new AssertionError(exception.getMessage());
 			}
 		} else {
 			try {
 				contact = this.contactDelegate.create(
 						victim, mailingAddress, poBox);
-			} catch (DuplicateEntityFoundException exception) {
+			} catch (ContactExistsException exception) {
 				throw new AssertionError(exception.getMessage());
 			}
 		}
@@ -157,7 +181,8 @@ public class VictimContactServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public ResidenceTerm updateResidenceTerm(
-			final Person victim, final Address address) {
+			final Person victim, final Address address) 
+					throws DuplicateEntityFoundException {
 		
 		// Assumes on primary residence address per person
 		// Do nothing if a residence term reflecting this exists
@@ -170,7 +195,7 @@ public class VictimContactServiceImpl
 					.createResidenceTerm(victim, null,
 							ResidenceCategory.PRIMARY, address,
 							ResidenceStatus.RESIDENT, null, null, null);
-			} catch (DuplicateEntityFoundException exception) {
+			} catch (ContactExistsException exception) {
 				throw new AssertionError(exception.getMessage());
 			}
 		}
@@ -183,7 +208,7 @@ public class VictimContactServiceImpl
 			final Contact contact, final Long value,
 			final Integer extension, final Boolean primary,
 			final TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.create(contact, value, extension,
 				primary, true, category);
 	}
@@ -193,7 +218,7 @@ public class VictimContactServiceImpl
 	public OnlineAccount addOnlineAccount(final Contact contact,
 			final String name, final Boolean primary,
 			final OnlineAccountHost host)
-					throws DuplicateEntityFoundException {
+					throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.create(
 				contact, name, true, primary, host);
 	}
@@ -204,7 +229,7 @@ public class VictimContactServiceImpl
 			final TelephoneNumber telephoneNumber, final Long value,
 			final Integer extension, final Boolean primary,
 			final TelephoneNumberCategory category)
-					throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.update(telephoneNumber, value,
 				extension, primary, true, category);
 	}
@@ -214,7 +239,7 @@ public class VictimContactServiceImpl
 	public OnlineAccount updateOnlineAccount(
 			final OnlineAccount onlineAccount, final String name,
 			final Boolean primary, final OnlineAccountHost host)
-					throws DuplicateEntityFoundException {
+					throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.update(
 				onlineAccount, name, true, primary, host);
 	}
@@ -302,7 +327,7 @@ public class VictimContactServiceImpl
 	@Override
 	public City createCity(
 			final String name, final State state, final Country country)
-				throws DuplicateEntityFoundException {
+				throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 
@@ -310,7 +335,7 @@ public class VictimContactServiceImpl
 	@Override
 	public ZipCode createZipCode(
 			final String value, final String extension, final City city)
-				throws DuplicateEntityFoundException{
+				throws ZipCodeExistsException {
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 }

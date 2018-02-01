@@ -7,6 +7,21 @@
 	anchors[0].className += " currentItem";
 	scrollDots[0].className += " activeScrollDot";
 	
+	$("#itemWrapper").scroll(function() {
+		for(var i = 0; i < scrollDots.length; i++) {
+			if(parent["scrollLeft"] >= anchors[i].offsetLeft - parent.offsetLeft - padding) {
+				for(var j = 0, scrollDot; scrollDot = scrollDots[j]; j++) {
+					scrollDot.classList.remove("activeScrollDot");
+				}
+				for(var j = 0, anchor; anchor = anchors[j]; j++) {
+					anchor.classList.remove("currentItem");
+				}
+				scrollDots[i].className += " activeScrollDot";
+				anchors[i].className += " currentItem";
+			}
+		}
+	});
+	
 	for(var i = 0, scrollButton; scrollButton = scrollDots[i]; i++) {
 		scrollButton.onclick = function(event) {
 			event.preventDefault();
@@ -37,14 +52,14 @@
 			}, 25);
 		parent["scrollLeft"] = from;
 		
-		for(var i = 0, scrollDot; scrollDot = scrollDots[i]; i++) {
+		/*for(var i = 0, scrollDot; scrollDot = scrollDots[i]; i++) {
 			scrollDot.classList.remove("activeScrollDot");
 		}
 		for(var i = 0, anchor; anchor = anchors[i]; i++) {
 			anchor.classList.remove("currentItem");
 		}
 		scrollDots[[].indexOf.call(anchors, target)].className += " activeScrollDot";
-		target.className += " currentItem";
+		target.className += " currentItem";*/
 	}
 	
 	function arrowScroll(direction){
@@ -145,5 +160,10 @@
 	}
 	document.getElementById("offenderProfileHeader").onmouseenter = function(event) {
 		clearTimeout(timeout);
+	}
+	
+	var fieldValues = document.getElementsByClassName("offenderHeaderFieldValue");
+	for(var i = 0, fieldValue; fieldValue = fieldValues[i]; i++) {
+		fieldValue.setAttribute('title', fieldValue.innerHTML.trim());
 	}
 });

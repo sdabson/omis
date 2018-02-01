@@ -3,7 +3,6 @@ package omis.courtcase.web.form;
 import java.io.Serializable;
 import java.util.Date;
 
-import omis.court.domain.Court;
 import omis.courtcase.domain.JurisdictionAuthority;
 import omis.courtcase.domain.OffenderDangerDesignator;
 import omis.person.domain.Person;
@@ -20,14 +19,6 @@ public class CourtCaseFields
 		implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private Boolean allowCourt;
-	
-	private Court court;
-	
-	private Boolean allowDocket;
-	
-	private String docketValue;
 	
 	private String interStateNumber;
 	
@@ -61,79 +52,7 @@ public class CourtCaseFields
 	public CourtCaseFields() {
 		// Default instantiation
 	}
-	
-	/**
-	 * Sets whether to allow court.
-	 * 
-	 * @param allowCourt whether to allow court
-	 */
-	public void setAllowCourt(final Boolean allowCourt) {
-		this.allowCourt = allowCourt;
-	}
-	
-	/**
-	 * Returns whether to allow court.
-	 * 
-	 * @return whether to allow court
-	 */
-	public Boolean getAllowCourt() {
-		return this.allowCourt;
-	}
-	
-	/**
-	 * Sets court.
-	 * 
-	 * @param court court
-	 */
-	public void setCourt(final Court court) {
-		this.court = court;
-	}
-	
-	/**
-	 * Returns court.
-	 * 
-	 * @return court
-	 */
-	public Court getCourt() {
-		return this.court;
-	}
-	
-	/**
-	 * Sets whether to allow docket.
-	 * 
-	 * @param allowDocket whether to allow docket
-	 */
-	public void setAllowDocket(final Boolean allowDocket) {
-		this.allowDocket = allowDocket;
-	}
-	
-	/**
-	 * Returns whether to allow docket.
-	 * 
-	 * @return whether to allow docket
-	 */
-	public Boolean getAllowDocket() {
-		return this.allowDocket;
-	}
-	
-	/**
-	 * Sets docket value.
-	 * 
-	 * @param docketValue docket value
-	 */
-	public void setDocketValue(final String docketValue) {
-		this.docketValue = docketValue;
-	}
-	
-	/**
-	 * Returns docket value.
-	 * 
-	 * @return docket value
-	 */
-	public String getDocketValue() {
-		return this.docketValue;
-	}
-	
+		
 	/**
 	 * Sets inter State number.
 	 * 

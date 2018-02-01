@@ -8,6 +8,7 @@ import omis.person.domain.Person;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
 import omis.victim.domain.VictimNoteCategory;
+import omis.victim.exception.VictimNoteExistsException;
 import omis.victim.service.VictimNoteService;
 import omis.victim.service.delegate.VictimAssociationDelegate;
 import omis.victim.service.delegate.VictimNoteCategoryDelegate;
@@ -58,7 +59,7 @@ public class VictimNoteServiceImpl
 			final VictimNoteCategory category,
 			final VictimAssociation association,
 			final Date date, final String value)
-					throws DuplicateEntityFoundException {
+					throws VictimNoteExistsException {
 		return this.victimNoteDelegate.create(
 				victim, category, association, date, value);
 	}
@@ -69,7 +70,7 @@ public class VictimNoteServiceImpl
 			final VictimNoteCategory category,
 			final VictimAssociation association,
 			final Date date, final String value)
-					throws DuplicateEntityFoundException {
+					throws VictimNoteExistsException {
 		return this.victimNoteDelegate.update(
 				victimNote, category, association, date, value);
 	}

@@ -31,12 +31,12 @@ public class BedPlacementProfileItemReportServiceHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public Boolean findBedPlacementExistenceByOffenderAndDate(
+	public String findBedPlacementExistenceByOffenderAndDate(
 			final Offender offender, final Date effectiveDate) {
 		Query q = this.sessionFactory.getCurrentSession().getNamedQuery(
 				FIND_BED_PLACEMENT_COUNT_BY_OFFENDER_AND_DATE_QUERY_NAME);
 		q.setEntity(OFFENDER_PARAM_NAME, offender);
 		q.setDate(EFFECTIVE_DATE_PARAM_NAME, effectiveDate);
-		return ((Long)q.uniqueResult() > 0);
+		return ((String)q.uniqueResult());
 	}
 }

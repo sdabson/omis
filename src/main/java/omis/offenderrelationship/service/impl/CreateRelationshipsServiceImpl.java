@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.impl;
 
 import java.util.Date;
@@ -7,6 +24,8 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
@@ -17,6 +36,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
 import omis.contact.service.delegate.OnlineAccountDelegate;
 import omis.contact.service.delegate.OnlineAccountHostDelegate;
@@ -26,21 +48,23 @@ import omis.country.service.delegate.CountryDelegate;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
 import omis.exception.DateConflictException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.family.service.delegate.FamilyAssociationCategoryDelegate;
 import omis.family.service.delegate.FamilyAssociationDelegate;
 import omis.offender.domain.Offender;
 import omis.offenderrelationship.service.CreateRelationshipsService;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonExistsException;
 import omis.person.service.delegate.PersonDelegate;
 import omis.person.service.delegate.SuffixDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.relationship.domain.Relationship;
@@ -53,11 +77,13 @@ import omis.relationship.service.delegate.RelationshipNoteCategoryDesignatorDele
 import omis.relationship.service.delegate.RelationshipNoteDelegate;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
 import omis.victim.service.delegate.VictimAssociationDelegate;
 import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
+import omis.visitation.exception.VisitationExistsException;
 import omis.visitation.service.delegate.VisitationAssociationCategoryDelegate;
 import omis.visitation.service.delegate.VisitationAssociationDelegate;
 
@@ -209,26 +235,11 @@ public class CreateRelationshipsServiceImpl
 			final State birthState, final City birthCity, 
 			final Integer socialSecurityNumber, final String stateId,
 			final Boolean deceased, final Date deathDate) 
-					throws DuplicateEntityFoundException {
+					throws PersonExistsException {
 		return this.personDelegate.createWithIdentity(lastName, firstName, 
 				middleName, suffix, sex, birthDate, birthCountry, 
 				birthState, birthCity, socialSecurityNumber, stateId, 
 				deceased, deathDate);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public Person updateRelation(final Person relation, final String lastName, 
-			final String firstName, final String middleName, 
-			final String suffix, final Sex sex, final Date birthDate, 
-			final State birthState, final City birthCity, 
-			final Integer socialSecurityNumber, final String stateId,
-			final Boolean deceased, final Date deathDate) 
-					throws DuplicateEntityFoundException {
-		return	this.personDelegate.updateWithIdentity(relation, lastName, 
-				firstName, middleName, suffix, sex, birthDate, 
-				birthState.getCountry(), birthState, birthCity, 
-				socialSecurityNumber, stateId, deceased, deathDate);
 	}
 
 	/** {@inheritDoc} */
@@ -240,7 +251,7 @@ public class CreateRelationshipsServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public Address createAddress(final String number, final ZipCode zipCode)
-			throws DuplicateEntityFoundException {
+			throws AddressExistsException {
 		return this.addressDelegate.findOrCreate(
 				number, null, null, null, zipCode);
 	}
@@ -315,14 +326,14 @@ public class CreateRelationshipsServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public City createCity(final State state, final String name, final Country country) 
-			throws DuplicateEntityFoundException {
+			throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public ZipCode createZipCode(final City city, final String value, 
-			final String extension) throws DuplicateEntityFoundException {
+			final String extension) throws ZipCodeExistsException {
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 
@@ -330,7 +341,7 @@ public class CreateRelationshipsServiceImpl
 	@Override
 	public Contact changeContact(final Person relation, final PoBox poBox, 
 			final Address mailingAddress)
-			throws DuplicateEntityFoundException {
+			throws ContactExistsException {
 		Contact contact = this.contactDelegate.find(relation);
 		if (contact != null) {			
 			this.contactDelegate.update(contact, mailingAddress, 
@@ -387,7 +398,7 @@ public class CreateRelationshipsServiceImpl
 	public TelephoneNumber createTelephoneNumber(final Person relation, 
 			final Long value, final Integer extension, final Boolean primary, 
 			final Boolean active, final TelephoneNumberCategory category) 
-					throws DuplicateEntityFoundException {
+					throws TelephoneNumberExistsException {
 			return this.telephoneNumberDelegate.create(
 					this.contactDelegate.find(relation), 
 					value, extension, primary, active, category);
@@ -399,7 +410,7 @@ public class CreateRelationshipsServiceImpl
 			final TelephoneNumber telephoneNumber, final Long value, 
 			final Integer extension, final Boolean primary, final Boolean active,
 			final TelephoneNumberCategory category) 
-					throws DuplicateEntityFoundException {		
+					throws TelephoneNumberExistsException {		
 		return this.telephoneNumberDelegate.update(
 				telephoneNumber, value, extension, primary, active, category);
 	}
@@ -416,7 +427,7 @@ public class CreateRelationshipsServiceImpl
 	public OnlineAccount createOnlineAccount(final Person relation, 
 			final String name, final Boolean primary, 
 			final OnlineAccountHost host, final Boolean active)
-			throws DuplicateEntityFoundException {
+			throws OnlineAccountExistsException {
 		return this.onlineAccountDelegate.create(
 				this.contactDelegate.find(relation), name, active, primary, host);
 	}
@@ -426,7 +437,7 @@ public class CreateRelationshipsServiceImpl
 	public OnlineAccount updateOnlineAccount(final OnlineAccount onlineAccount, 
 			final String name, final Boolean primary, final Boolean active,
 			final OnlineAccountHost host)
-			throws DuplicateEntityFoundException {		
+			throws OnlineAccountExistsException {		
 		return this.onlineAccountDelegate.update(onlineAccount, name, 
 				active, primary, host);
 	}
@@ -451,7 +462,7 @@ public class CreateRelationshipsServiceImpl
 		final FamilyAssociationCategory category, 
 		final FamilyAssociationFlags flags, final Date marriageDate, 
 		final Date divorceDate)	
-			throws DuplicateEntityFoundException, 
+			throws FamilyAssociationExistsException, 
 			ReflexiveRelationshipException,
 			DateConflictException, FamilyAssociationConflictException {
 		Relationship relationship = this.relate(offender, familyMember);	
@@ -472,7 +483,7 @@ public class CreateRelationshipsServiceImpl
 			final Person victim, 
 			final Date registerDate, final Boolean packetSent, 
 			final Date packetSentDate, final VictimAssociationFlags flags) 
-			throws DuplicateEntityFoundException, 
+			throws VictimExistsException, 
 			ReflexiveRelationshipException {
 		Relationship relationship = this.relate(offender, victim);
 		return this.victimAssociationDelegate.create(relationship, registerDate, 
@@ -486,17 +497,10 @@ public class CreateRelationshipsServiceImpl
 			final VisitationApproval approval, final Date startDate, 
 			final Date endDate,	final VisitationAssociationFlags flags, 
 			final String notes, final String guardianship)
-					throws DuplicateEntityFoundException,
+					throws VisitationExistsException,
 						ReflexiveRelationshipException,
 						DateConflictException {
 		Relationship relationship = this.relate(offender, visitor);
-		DateRange dateRange = new DateRange(startDate, endDate);
-		if(this.visitationAssociationDelegate.countForOverlapBetweenDate(
-			relationship, dateRange)>0){
-			throw new DateConflictException(
-				"Cannot create visitation assocaition with date range overlap "
-					+ "with one or more exisitng visitation assocaitions ");
-		}
 		return this.visitationAssociationDelegate.create(relationship, 
 				category, approval, startDate, endDate, flags, notes,
 				guardianship);

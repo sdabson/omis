@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenseterm.web.controller;
 
 import java.beans.PropertyEditor;
@@ -36,6 +53,7 @@ import omis.courtcase.domain.OffenderDangerDesignator;
 import omis.courtcase.domain.component.CourtCaseFlags;
 import omis.courtcase.domain.component.CourtCasePersonnel;
 import omis.courtcase.exception.CourtCaseExistsException;
+import omis.docket.domain.Docket;
 import omis.docket.exception.DocketExistsException;
 import omis.offender.domain.Offender;
 import omis.offender.report.OffenderReportService;
@@ -125,6 +143,8 @@ public class ManageOffenseTermController {
 
 	private static final String COURT_CASE_MODEL_KEY = "courtCase";
 
+	private static final String EXISTING_DOCKETS_MODEL_KEY = "existingDockets";
+	
 	private static final String COURTS_MODEL_KEY = "courts";
 
 	private static final String STATES_MODEL_KEY = "states";
@@ -236,6 +256,10 @@ public class ManageOffenseTermController {
 	private PropertyEditorFactory personPropertyEditorFactory;
 	
 	@Autowired
+	@Qualifier("docketPropertyEditorFactory")
+	private PropertyEditorFactory docketPropertyEditorFactory;
+	
+	@Autowired
 	@Qualifier("courtCasePropertyEditorFactory")
 	private PropertyEditorFactory courtCasePropertyEditorFactory;
 	
@@ -323,12 +347,15 @@ public class ManageOffenseTermController {
 			@RequestParam(value = "person", required = true)
 				final Person person) {
 		OffenseTermForm offenseTermForm = new OffenseTermForm();
-		offenseTermForm.getFields().setAllowCourt(true);
-		offenseTermForm.getFields().setAllowDocket(true);
+		offenseTermForm.setAllowExistingDocket(true);
+		offenseTermForm.setAllowDocketFields(true);
 		List<Sentence> sentences
 			= this.offenseTermService.findActiveSentences(person);
+		List<Docket> existingDockets
+			= this.offenseTermService.findDocketsWithoutCourtCase(person);
 		ModelAndView mav = this.prepareMav(offenseTermForm, person);
 		mav.addObject(OTHER_SENTENCES_MODEL_KEY, sentences);
+		mav.addObject(EXISTING_DOCKETS_MODEL_KEY, existingDockets);
 		return mav;
 	}
 	
@@ -347,10 +374,10 @@ public class ManageOffenseTermController {
 			@RequestParam(value = "expandedSentence", required = false)
 				final Sentence expandedSentence) {
 		OffenseTermForm offenseTermForm = new OffenseTermForm();
-		offenseTermForm.getFields().setAllowCourt(false);
-		offenseTermForm.getFields().setCourt(courtCase.getDocket().getCourt());
-		offenseTermForm.getFields().setAllowDocket(false);
-		offenseTermForm.getFields().setDocketValue(
+		offenseTermForm.setAllowDocketFields(false);
+		offenseTermForm.getDocketFields().setCourt(
+				courtCase.getDocket().getCourt());
+		offenseTermForm.getDocketFields().setValue(
 				courtCase.getDocket().getValue());
 		offenseTermForm.getFields().setInterState(courtCase.getInterState());
 		offenseTermForm.getFields().setInterStateNumber(
@@ -565,14 +592,27 @@ public class ManageOffenseTermController {
 				= this.offenseTermService.findActiveSentences(person);
 			ModelAndView mav = this.prepareRedisplay(
 					offenseTermForm, bindingResult, person);
+			List<Docket> existingDockets
+				= this.offenseTermService.findDocketsWithoutCourtCase(person);
 			mav.addObject(OTHER_SENTENCES_MODEL_KEY, sentences);
+			mav.addObject(EXISTING_DOCKETS_MODEL_KEY, existingDockets);
 			return mav;
 		}
 		
+		
+		// Creates or uses existing docket
+		Docket docket;
+		if (offenseTermForm.getExistingDocket() != null) {
+			docket = offenseTermForm.getExistingDocket();
+		} else {
+			docket = this.offenseTermService.createDocket(person,
+						offenseTermForm.getDocketFields().getCourt(),
+						offenseTermForm.getDocketFields().getValue());
+		}
+		
 		// Creates court case
-		CourtCase courtCase = this.offenseTermService.create(person,
-				offenseTermForm.getFields().getCourt(),
-				offenseTermForm.getFields().getDocketValue(),
+		CourtCase courtCase = this.offenseTermService.create(
+				docket,
 				offenseTermForm.getFields().getInterStateNumber(),
 				offenseTermForm.getFields().getInterState(),
 				offenseTermForm.getFields().getPronouncementDate(),
@@ -1641,6 +1681,8 @@ public class ManageOffenseTermController {
 				this.personPropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(CourtCase.class,
 				this.courtCasePropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(Docket.class,
+				this.docketPropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(Court.class,
 				this.courtPropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(State.class,

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.testng;
 
 import java.util.Date;
@@ -8,12 +25,14 @@ import omis.demographics.domain.Sex;
 import omis.exception.DuplicateEntityFoundException;
 import omis.offenderrelationship.service.CreateRelationshipsService;
 import omis.person.domain.Person;
+import omis.person.exception.PersonExistsException;
 import omis.person.service.delegate.PersonDelegate;
 import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +77,12 @@ public class OffenderRelationshipCreateTests
 	
 	/**
 	 * Tests the creation of offender relationship.
-	 * @throws DuplicateEntityFoundException 
+	 * @throws DuplicateEntityFoundException DuplicateEntityFoundException
+	 * @throws PersonExistsException PersonExistsException
 	 */
 	@Test
 	public void testOffenderRelationshipCreation() 
-		throws DuplicateEntityFoundException {
+		throws DuplicateEntityFoundException, PersonExistsException {
 		// Arrangement
 		final int birthDateInt = 111111111;
 		final int deathDateInt = 1222222222;
@@ -129,12 +149,15 @@ public class OffenderRelationshipCreateTests
 	
 	/**
 	 * Tests duplicate offender relationships on creation.
-	 * 
+	 * <p>Test is disabled until uniqueness of business key of person can be enforced. 
+	 * Once uniqueness can be enforced, this test will be enabled.
 	 * @throws DuplicateEntityFoundException if duplicate relationships exist
+	 * @throws PersonExistsException person exists exception
+	 * exception
 	 */
-	@Test
+	@Test(expectedExceptions = {PersonExistsException.class}, enabled = false)
 	public void testDuplicateOffenderRelationshipsCreate() 
-		throws DuplicateEntityFoundException {
+		throws DuplicateEntityFoundException, PersonExistsException {
 		// Assignment
 		final int birthDateInt = 111111111;
 		final int deathDateInt = 1222222222;

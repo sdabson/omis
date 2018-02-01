@@ -26,12 +26,14 @@
 	<jsp:include page="/WEB-INF/views/common/includes/headerListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingParticipant/scripts/hearingParticipants.js?VERSION=1"> </script>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/boardHearing/style/boardHearing.css" />
 	<title>
 		<fmt:message key="hearingParticipantListHeader"/>
 	</title>
 </head>
  <body>
  	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
+	<jsp:include page="/WEB-INF/views/boardHearing/includes/boardHearingHeader.jsp"/>
  	<h1>
 		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/hearingParticipant/hearingParticipantsActionMenu.html?boardHearing=${boardHearing.id}"></a>
 		<fmt:message key="hearingParticipantListHeader"/>

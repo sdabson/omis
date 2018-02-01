@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.boardhearing.domain.BoardHearing;
+import omis.boardhearing.web.controller.delegate.BoardHearingSummaryModelDelegate;
 import omis.hearingparticipant.domain.HearingParticipant;
 import omis.hearingparticipant.report.HearingParticipantSummary;
 import omis.hearingparticipant.report.HearingParticipantSummaryReportService;
@@ -100,6 +101,10 @@ public class HearingParticipantReportController {
 	@Qualifier("offenderSummaryModelDelegate")
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
 	
+	@Autowired
+	@Qualifier("boardHearingSummaryModelDelegate")
+	private BoardHearingSummaryModelDelegate boardHearingSummaryModelDelegate;
+	
 	/**
 	 * Default constructor for Hearing Participant Report Controller.
 	 */
@@ -127,6 +132,7 @@ public class HearingParticipantReportController {
 				boardHearing.getParoleEligibility().getOffender());
 		this.offenderSummaryModelDelegate.add(map,
 				boardHearing.getParoleEligibility().getOffender());
+		this.boardHearingSummaryModelDelegate.add(map, boardHearing);
 		
 		return new ModelAndView(LIST_VIEW_NAME, map);
 	}

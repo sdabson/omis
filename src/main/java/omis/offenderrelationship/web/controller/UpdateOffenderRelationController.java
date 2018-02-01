@@ -30,6 +30,8 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.web.controller.delegate.AddressFieldsControllerDelegate;
 import omis.address.web.form.AddressFields;
 import omis.beans.factory.PropertyEditorFactory;
@@ -39,6 +41,9 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.web.controller.delegate.OnlineAccountFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.TelephoneNumberFieldsControllerDelegate;
@@ -62,15 +67,20 @@ import omis.offenderrelationship.web.form.TelephoneNumberItem;
 import omis.offenderrelationship.web.validator.EditRelationshipsFormValidator;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonIdentityExistsException;
+import omis.person.exception.PersonNameExistsException;
 import omis.person.web.delegate.PersonFieldsControllerDelegate;
 import omis.person.web.form.PersonFields;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.relationship.domain.Relationship;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
 import omis.util.StringUtility;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -80,6 +90,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -156,6 +167,33 @@ public class UpdateOffenderRelationController {
 	private static final String RELATIONSHIP_MODEL_KEY = "relationship";
 	private static final String EXISTING_ADDRESS_MODEL_KEY
 		= "existingAddress";
+	private static final String PERSON_NAME_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "personName.Conflicts";
+	private static final String PERSON_IDENTITY_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "personIdentity.Conflicts";
+	private static final String ADDRESS_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "address.Conflicts";
+	private static final String CITY_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "city.Conflicts";
+	private static final String VICTIM_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "victim.Conflicts";
+	private static final String VISITATION_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "visitation.Conflicts";
+	private static final String ZIPCODE_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "zipcode.Conflicts";
+	private static final String CONTACT_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "contact.Conflicts";
+	private static final String PERSON_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "person.Conflicts";
+	private static final String TELEPHONE_NUMBER_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "telephoneNumber.Conflicts";
+	private static final String ONLINE_ACCOUNT_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "onlineAccount.Conflicts";
+	private static final String
+		FAMILY_ASSOCIATION_CONFLICT_EXCEPTION_MESSAGE_KEY
+		= "familyAssociation.Conflicts";
+	private static final String NOTE_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "note.Conflicts";
 	
 	/* Property names. */
 	private static final String ADDRESS_FIELDS_PROPERTY_NAME = "addressFields";
@@ -299,6 +337,10 @@ public class UpdateOffenderRelationController {
 	@Qualifier("reportControllerDelegate")
 	private ReportControllerDelegate reportControllerDelegate;
 	
+	@Autowired
+	@Qualifier("businessExceptionHandlerDelegate")
+	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
+	
 	/* Redirects. */
 	private static final String LIST_REDIRECT
 		= "redirect:/offenderRelationship/list.html?offender=%d";
@@ -306,6 +348,10 @@ public class UpdateOffenderRelationController {
 	/* Report parameter names. */
 	private static final String FAMILY_MEMBER_DETAILS_ID_REPORT_PARAM_NAME 
 		= "FAMILY_ASSOC_ID";
+	
+	/* Message bundles. */
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.offenderrelationship.msgs.form";
 	
 	/**
 	 * Instantiates a default instance of offender relationship controller.
@@ -322,6 +368,16 @@ public class UpdateOffenderRelationController {
 	 * @param editRelationshipsForm edit relationship form
 	 * @return model and view to redirect to list screen
 	 * @throws DuplicateEntityFoundException DuplicateEntityFoundException
+	 * @throws AddressExistsException address exists exception
+	 * @throws ZipCodeExistsException zipCode exists exception
+	 * @throws PersonNameExistsException person name exists exception
+	 * @throws PersonIdentityExistsException person identity exists exception
+	 * @throws CityExistsException city exists exception
+	 * @throws RelationshipNoteExistsException relationship note exists
+	 * exception
+	 * @throws ContactExistsException contact exists exception
+	 * @throws TelephoneNumberExistsException telephone number exists exception
+	 * @throws OnlineAccountExistsException online account exists exception
 	 */
 	@RequestMapping(value = "edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_EDIT')")
@@ -330,7 +386,11 @@ public class UpdateOffenderRelationController {
 		final Relationship relationship,
 		final EditRelationshipsForm editRelationshipsForm,
 		final BindingResult result) 
-		throws DuplicateEntityFoundException {
+		throws DuplicateEntityFoundException, AddressExistsException,
+		ZipCodeExistsException, PersonNameExistsException,
+		PersonIdentityExistsException, CityExistsException,
+		RelationshipNoteExistsException, ContactExistsException,
+		TelephoneNumberExistsException, OnlineAccountExistsException {
 		if (editRelationshipsForm.getPoBoxFields().getCountry() != null) {
 			// Has state
 			if (this.updateOffenderRelationService.hasStates(
@@ -2167,6 +2227,156 @@ public class UpdateOffenderRelationController {
 		return this.reportControllerDelegate.constructReportResponseEntity(
 			doc, reportFormat);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Handles {@code PersonNameExistsException}.
+	 * 
+	 * @param personNameExistsException person name exists exception
+	 * @return screen to handle {@code PersonNameExistsException}
+	 */
+	@ExceptionHandler(PersonNameExistsException.class)
+	public ModelAndView handlePersonNameExistsException(
+		final PersonNameExistsException personNameExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			PERSON_NAME_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, personNameExistsException);
+	}
+	
+	/**
+	 * Handles {@code PersonIdentityExistsException}.
+	 * 
+	 * @param personIdentityExistsException person identity exists exception
+	 * @return screen to handle {@code PersonIdentityExistsException}
+	 */
+	@ExceptionHandler(PersonIdentityExistsException.class)
+	public ModelAndView handlePersonIdentityExistsException(
+		final PersonIdentityExistsException personIdentityExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			PERSON_IDENTITY_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, personIdentityExistsException);
+	}
+	
+	/**
+	 * Handles {@code AddressExistsException}.
+	 * 
+	 * @param addressExistsException address exists exception thrown
+	 * @return screen to handle {@code AddressExistsException}
+	 */
+	@ExceptionHandler(AddressExistsException.class)
+	public ModelAndView handleAddressExistsException(
+		final AddressExistsException addressExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ADDRESS_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, addressExistsException);
+	}
+	
+	/**
+	 * Handles {@code CityExistsException}.
+	 * 
+	 * @param cityExistsException city exists exception thrown
+	 * @return screen to handle {@code CityExistsException}
+	 */
+	@ExceptionHandler(CityExistsException.class)
+	public ModelAndView handleCityExistsException(
+		final CityExistsException cityExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			CITY_EXISTS_EXCEPTION_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+			cityExistsException);
+	}
+	
+	/**
+	 * Handles {@code ZipCodeExistsException}.
+	 * 
+	 * @param zipCodeExistsException Zip code exists exception thrown
+	 * @return screen to handle {@code ZipCodeExistsException}
+	 */
+	@ExceptionHandler(ZipCodeExistsException.class)
+	public ModelAndView handleZipCodeExistsException(
+		final ZipCodeExistsException zipCodeExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ZIPCODE_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, zipCodeExistsException);
+	}
+	
+	/**
+	 * Handles {@code ContactExistsException}.
+	 * 
+	 * @param contactExistsException contact exists exception thrown
+	 * @return screen to handle {@code ContactExistsException}
+	 */
+	@ExceptionHandler(ContactExistsException.class)
+	public ModelAndView handleContactExistsException(
+		final ContactExistsException contactExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			CONTACT_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, 	contactExistsException);
+	}
+	
+	/**
+	 * Handles {@code TelephoneNumberExistsException}.
+	 * 
+	 * @param telephoneNumberExistsException telephone number exists exception
+	 * thrown
+	 * @return screen to handle {@code TelephoneNumberExistsException}
+	 */
+	@ExceptionHandler(TelephoneNumberExistsException.class)
+	public ModelAndView handleTelephoneNumberExistsException(
+		final TelephoneNumberExistsException telephoneNumberExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			TELEPHONE_NUMBER_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, telephoneNumberExistsException);
+	}
+	
+	/**
+	 * Handles {@code OnlineAccountExistsException}.
+	 * 
+	 * @param onlineAccountExistsException online account exists exception
+	 * thrown
+	 * @return screen to handle {@code OnlineAccountExistsException}
+	 */
+	@ExceptionHandler(OnlineAccountExistsException.class)
+	public ModelAndView handleOnlineAccountExistsException(
+		final OnlineAccountExistsException onlineAccountExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			ONLINE_ACCOUNT_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, onlineAccountExistsException);
+	}
+	
+	/**
+	 * Handles {@code RelationshipNoteExistsException}.
+	 * 
+	 * @param relationshipNoteExistsException relationship note exists exception
+	 * @return screen to handle {@code RelationshipNoteExistsException}
+	 */
+	@ExceptionHandler(RelationshipNoteExistsException.class)
+	public ModelAndView handleRelationshipNoteExistsException(
+		final RelationshipNoteExistsException relationshipNoteExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			NOTE_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, relationshipNoteExistsException);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Sets up and registers property editors.

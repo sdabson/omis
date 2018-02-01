@@ -39,6 +39,7 @@
 	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/boardHearing/style/boardHearing.css" />
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingParticipant/scripts/JQuery/jquery.omis.hearingParticipant.js?VERSION=1"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingParticipant/scripts/hearingParticipant.js?VERSION=1"></script>
 	<script type="text/javascript">

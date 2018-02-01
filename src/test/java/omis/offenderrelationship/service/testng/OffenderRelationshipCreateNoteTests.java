@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.testng;
 import java.util.Date;
 
@@ -9,6 +26,7 @@ import omis.relationship.domain.Relationship;
 import omis.relationship.domain.RelationshipNote;
 import omis.relationship.domain.RelationshipNoteCategory;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.relationship.service.delegate.RelationshipDelegate;
 import omis.relationship.service.delegate.RelationshipNoteCategoryDelegate;
 import omis.relationship.service.delegate.RelationshipNoteDelegate;
@@ -57,7 +75,8 @@ public class OffenderRelationshipCreateNoteTests
 	 */
 	@Test
 	public void testOffenderRelationshipCreateNote() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException {
+		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		RelationshipNoteExistsException {
 		// Arrangement
 		Person firstPerson = this.personDelegate.create("testLastName1", 
 			"testFirstName1", "testMiddleName1", "Mr.");
@@ -115,9 +134,10 @@ public class OffenderRelationshipCreateNoteTests
 	 * @throws DuplicateEntityFoundException if duplicate notes exist
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
+	@Test(expectedExceptions = {RelationshipNoteExistsException.class})
 	public void testDuplicateOffenderRelationshipsCreate() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException {
+		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
+		RelationshipNoteExistsException {
 		// Assignment
 		Person firstPerson = this.personDelegate.create("testLastName1", 
 			"testFirstName1", "testMiddleName1", "Mr.");

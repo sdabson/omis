@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service;
 
 import java.util.Date;
@@ -7,6 +24,8 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
@@ -19,6 +38,8 @@ import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonIdentityExistsException;
+import omis.person.exception.PersonNameExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.relationship.domain.Relationship;
@@ -55,13 +76,15 @@ public interface UpdateOffenderRelationService {
 	 * @param deceased whether relation is deceased
 	 * @param deathDate death date
 	 * @return updated relation
-	 * @throws DuplicateEntityFoundException if relation exists
+	 * @throws PersonNameExistsException if person name exists
+	 * @throws PersonIdentityExistsException if person identity exists
 	 */
 	Person updateRelation(Person person, String lastName, String firstName, 
 		String middleName, String suffix, Sex sex, Date birthDate, 
 		Country birthCountry, State birthState, City birthCity,  
 		Integer socialSecurityNumber, String stateId, Boolean deceased, 
-		Date deathDate)	throws DuplicateEntityFoundException;
+		Date deathDate)	throws PersonNameExistsException,
+		PersonIdentityExistsException;
 	
 	/**
 	 * Returns name suffixes.
@@ -76,10 +99,10 @@ public interface UpdateOffenderRelationService {
 	 * @param number number
 	 * @param zipCode ZIP code
 	 * @return newly created address
-	 * @throws DuplicateEntityFoundException if address exists
+	 * @throws AddressExistsException if address exists
 	 */
 	Address createAddress(String number, ZipCode zipCode)
-		throws DuplicateEntityFoundException;
+		throws AddressExistsException;
 
 	/**
 	 * Returns addresses matching query.
@@ -169,10 +192,10 @@ public interface UpdateOffenderRelationService {
 	 * @param extension extension
 	 * @param city city
 	 * @return newly created ZIP code
-	 * @throws DuplicateEntityFoundException if ZIP code exists
+	 * @throws ZipCodeExistsException if ZIP code exists
 	 */
 	ZipCode createZipCode(String value, String extension, City city)
-		throws DuplicateEntityFoundException;
+		throws ZipCodeExistsException;
 	
 	/**
 	 * Changes contact.

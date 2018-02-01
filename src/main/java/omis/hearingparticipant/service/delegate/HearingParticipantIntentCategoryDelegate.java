@@ -20,6 +20,7 @@ package omis.hearingparticipant.service.delegate;
 import java.util.List;
 import omis.hearingparticipant.dao.HearingParticipantIntentCategoryDao;
 import omis.hearingparticipant.domain.HearingParticipantIntentCategory;
+import omis.instance.factory.InstanceFactory;
 
 /**
  * Hearing Participant Intent Category Delegate.
@@ -34,16 +35,25 @@ public class HearingParticipantIntentCategoryDelegate {
 	private final HearingParticipantIntentCategoryDao
 		hearingParticipantIntentCategoryDao;
 	
+	private final InstanceFactory<HearingParticipantIntentCategory>
+		hearingParticipantIntentCategoryInstanceFactory;
+	
 	/**
 	 * Contructor for HearingParticipantIntentCategoryDelegate.
 	 * @param hearingParticipantIntentCategoryDao - Hearing Participant Intent
+	 * @param hearingParticipantIntentCategoryInstanceFactory - Hearing
+	 * Participant Intent Category Instance Factory
 	 * Category Dao
 	 */
 	public HearingParticipantIntentCategoryDelegate(
 			final HearingParticipantIntentCategoryDao
-				hearingParticipantIntentCategoryDao) {
+				hearingParticipantIntentCategoryDao,
+			final InstanceFactory<HearingParticipantIntentCategory>
+				hearingParticipantIntentCategoryInstanceFactory) {
 		this.hearingParticipantIntentCategoryDao =
 				hearingParticipantIntentCategoryDao;
+		this.hearingParticipantIntentCategoryInstanceFactory =
+				hearingParticipantIntentCategoryInstanceFactory;
 	}
 	
 	/**
@@ -52,5 +62,23 @@ public class HearingParticipantIntentCategoryDelegate {
 	 */
 	public List<HearingParticipantIntentCategory> findAll() {
 		return this.hearingParticipantIntentCategoryDao.findAll();
+	}
+	
+	/**
+	 * Creates a Hearing Participant Intent Category, for use in unit testing.
+	 * @param name - String name
+	 * @param valid - Boolean valid 
+	 * @return Newly created Hearing Participant Intent Category
+	 */
+	public HearingParticipantIntentCategory create(
+			final String name, final Boolean valid) {
+		HearingParticipantIntentCategory intent =
+				this.hearingParticipantIntentCategoryInstanceFactory
+				.createInstance();
+		
+		intent.setName(name);
+		intent.setValid(valid);
+		
+		return this.hearingParticipantIntentCategoryDao.makePersistent(intent);
 	}
 }

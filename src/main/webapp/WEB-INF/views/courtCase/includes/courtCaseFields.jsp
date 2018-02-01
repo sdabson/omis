@@ -1,5 +1,29 @@
 <%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
+
+<%--
  - Court case fields.
+ -
+ - Attribute: fieldsPropertyName name of court case fields; defaults to "fields"
+ - Attribute: courtCaseFields court case fields
+ - Attribute: offenderDangerDesignators offender danger designators
+ - Attribute: jurisdictionAuthorities jurisdiction authorities
+ - Attribute: states states
  -
  - Author: Stephen Abson
  - Author: Josh Divine
@@ -12,39 +36,6 @@
 <c:if test="${empty fieldsPropertyName}">
 	<c:set var="fieldsPropertyName" value="fields"/>
 </c:if>
-<form:hidden path="${fieldsPropertyName}.allowCourt"/>
-<span class="fieldGroup">
-	<form:label path="${fieldsPropertyName}.court" class="fieldLabel">
-		<fmt:message key="courtLabel" bundle="${courtCaseBundle}"/></form:label>
-	<c:choose>
-		<c:when test="${courtCaseFields.allowCourt}">
-			<form:select path="${fieldsPropertyName}.court">
-				<form:option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></form:option>
-				<form:options itemValue="id" itemLabel="name" items="${courts}"/>
-			</form:select>
-		</c:when>
-		<c:otherwise>
-			<span class="fieldValueLabel"><c:out value="${courtCaseFields.court.name}"/></span>
-			<form:hidden path="${fieldsPropertyName}.court"/>
-		</c:otherwise>
-	</c:choose>
-	<form:errors path="${fieldsPropertyName}.court" cssClass="error"/>
-</span>
-<form:hidden path="${fieldsPropertyName}.allowDocket"/>
-<span class="fieldGroup">
-	<form:label path="${fieldsPropertyName}.docketValue" class="fieldLabel">
-		<fmt:message key="docketValueLabel" bundle="${courtCaseBundle}"/></form:label>
-	<c:choose>
-		<c:when test="${courtCaseFields.allowDocket}">
-			<form:input path="${fieldsPropertyName}.docketValue"/>
-		</c:when>
-		<c:otherwise>
-			<span class="fieldValueLabel"><c:out value="${courtCaseFields.docketValue}"/></span>
-			<form:hidden path="${fieldsPropertyName}.docketValue"/>
-		</c:otherwise>
-	</c:choose>
-	<form:errors path="${fieldsPropertyName}.docketValue" cssClass="error"/>
-</span>
 <span class="fieldGroup">
 	<form:label path="${fieldsPropertyName}.interState" class="fieldLabel">
 		<fmt:message key="interStateLabel" bundle="${courtCaseBundle}"/></form:label>

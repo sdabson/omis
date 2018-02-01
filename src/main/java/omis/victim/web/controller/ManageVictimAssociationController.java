@@ -1,3 +1,20 @@
+/*
+ *  OMIS - Offender Management Information System
+ *  Copyright (C) 2011 - 2017 State of Montana
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.victim.web.controller;
 
 import java.util.ArrayList;
@@ -23,6 +40,8 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.web.controller.delegate.AddressFieldsControllerDelegate;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
@@ -32,9 +51,10 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
 import omis.country.domain.Country;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -42,12 +62,15 @@ import omis.person.domain.Person;
 import omis.person.web.delegate.PersonFieldsControllerDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.util.StringUtility;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
 import omis.victim.domain.VictimNoteCategory;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
+import omis.victim.exception.VictimNoteExistsException;
 import omis.victim.service.VictimAssociationService;
 import omis.victim.web.controller.delegate.VictimSummaryModelDelegate;
 import omis.victim.web.form.VictimAssociationForm;
@@ -167,15 +190,39 @@ public class ManageVictimAssociationController {
 	
 	/* Message keys. */
 	
-	private static final String DUPLICATE_ENTITY_FOUND_MESSAGE_KEY
+	private static final String VICTIM_EXISTS_MESSAGE_KEY
 		= "victimAssociation.exists";
+	
+	private static final String VICTIM_NOTE_EXISTS_MESSAGE_KEY
+		= "victimNote.exists";
 
 	private static final String REFLEXIVE_RELATIONSHIP_MESSAGE_KEY
 		= "victimAssociation.reflexiveRelationship";
 	
+	private static final String CITY_EXISTS_MESSAGE_KEY
+		= "city.exists";
+	
+	private static final String ZIP_CODE_EXISTS_MESSAGE_KEY
+		= "zipCode.exists";
+	
+	private static final String ADDRESS_EXISTS_MESSAGE_KEY
+		= "address.exists";
+	
+	private static final String TELEPHONE_NUMBER_EXISTS_MESSAGE_KEY
+		= "telephoneNumber.duplicate";
+	
+	private static final String ONLINE_ACCOUNT_EXISTS_MESSAGE_KEY
+		= "onlineAccount.duplicate";
+	
 	/* Message bundles. */
 	
 	private static final String ERROR_BUNDLE_NAME = "omis.victim.msgs.form";
+	private static final String CONTACT_ERROR_BUNDLE_NAME 
+		= "omis.contact.msgs.form";
+	private static final String ADDRESS_ERROR_BUNDLE_NAME 
+		= "omis.address.msgs.form";
+	private static final String REGION_ERROR_BUNDLE_NAME
+		= "omis.region.msgs.form";
 	
 	/* Services. */
 
@@ -403,8 +450,14 @@ public class ManageVictimAssociationController {
 	 * @param result binding result
 	 * @return redirect to victim association listing screen
 	 * @throws ReflexiveRelationshipException if offender is victim
-	 * @throws DuplicateEntityFoundException if victim association already
+	 * @throws VictimExistsException if victim association already
 	 * exists
+	 * @throws CityExistsException if city exists
+	 * @throws ZipCodeExistsException if zip code exits
+	 * @throws AddressExistsException if address exists
+	 * @throws TelephoneNumberExistsException if telephone number exists
+	 * @throws OnlineAccountExistsException if online account exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	@PreAuthorize("hasRole('ADMIN') or hasRole('VICTIM_ASSOCIATION_CREATE')")
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
@@ -416,8 +469,12 @@ public class ManageVictimAssociationController {
 			final VictimRedirectTarget redirectTarget,
 			final VictimAssociationForm victimAssociationForm,
 			final BindingResult result)
-					throws DuplicateEntityFoundException,
-						ReflexiveRelationshipException {
+					throws VictimExistsException,
+						ReflexiveRelationshipException, 
+						CityExistsException, ZipCodeExistsException, 
+						AddressExistsException, TelephoneNumberExistsException, 
+						OnlineAccountExistsException, 
+						VictimNoteExistsException {
 		this.victimAssociationFormValidator
 			.validate(victimAssociationForm, result);
 		if (result.hasErrors()) {
@@ -439,7 +496,7 @@ public class ManageVictimAssociationController {
 									.getBirthState(),
 								victimAssociationForm.getPersonFields()
 									.getBirthCountry());
-				} catch (DuplicateEntityFoundException e) {
+				} catch (CityExistsException e) {
 					
 					// Front end should ensure that city does not exist - SA
 					throw new AssertionError("City exists", e);
@@ -761,8 +818,9 @@ public class ManageVictimAssociationController {
 	 * @param victimAssociationForm victim association form
 	 * @param result binding result
 	 * @return redirect to victim association listing screen
-	 * @throws DuplicateEntityFoundException if victim association already
+	 * @throws VictimExistsException if victim association already
 	 * exists
+	 * @throws VictimNoteExistsException if victim note exists 
 	 */
 	@PreAuthorize("hasRole('ADMIN') or hasRole('VICTIM_ASSOCIATION_EDIT')")
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
@@ -771,7 +829,8 @@ public class ManageVictimAssociationController {
 				final VictimAssociation victimAssociation,
 			final VictimRedirectTarget redirectTarget,
 			final VictimAssociationForm victimAssociationForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result) throws VictimExistsException, 			
+				VictimNoteExistsException {
 		Offender offender = (Offender) victimAssociation.getRelationship()
 				.getFirstPerson();
 		this.victimAssociationFormValidator
@@ -1024,12 +1083,14 @@ public class ManageVictimAssociationController {
 									.getCountry())) {
 					mailingCities = this.victimAssociationService
 							.findCitiesByCountryWithoutState(
-									victimAssociationForm.getMailingAddressFields()
+									victimAssociationForm
+									.getMailingAddressFields()
 										.getCountry());
 				} else {
 					mailingCities = this.victimAssociationService
 							.findCitiesByCountry(
-									victimAssociationForm.getMailingAddressFields()
+									victimAssociationForm
+									.getMailingAddressFields()
 										.getCountry());
 				}
 			}
@@ -1048,7 +1109,8 @@ public class ManageVictimAssociationController {
 			mailingZipCodes = Collections.emptyList();
 		}
 		
-		this.addressFieldsControllerDelegate.prepareEditAddressFields(mav.getModelMap(), 
+		this.addressFieldsControllerDelegate.prepareEditAddressFields(
+				mav.getModelMap(), 
 			countries, mailingStates, mailingCities, mailingZipCodes, 
 			MAILING_ADDRESS_FIELDS_NAME);
 		List<State> poBoxStates;
@@ -1132,16 +1194,30 @@ public class ManageVictimAssociationController {
 	/* Exception handlers. */
 	
 	/**
-	 * Handles {@code DuplicateEntityFoundException}.
+	 * Handles {@code VictimExistsException}.
 	 * 
 	 * @param exception exception thrown
-	 * @return model and view to handle {@code DuplicateEntityFoundException} 
+	 * @return model and view to handle {@code VictimExistsException} 
 	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
+	@ExceptionHandler(VictimExistsException.class)
 	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException exception) {
+			final VictimExistsException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				DUPLICATE_ENTITY_FOUND_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				VICTIM_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles {@code VictimNoteExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code VictimNoteExistsException} 
+	 */
+	@ExceptionHandler(VictimNoteExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final VictimNoteExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				VICTIM_NOTE_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
 				exception);
 	}
 	
@@ -1156,6 +1232,76 @@ public class ManageVictimAssociationController {
 			final ReflexiveRelationshipException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				REFLEXIVE_RELATIONSHIP_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				exception);
+	}
+		
+	/**
+	 * Handles {@code CityExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code CityExistsException}
+	 */
+	@ExceptionHandler(CityExistsException.class)
+	public ModelAndView handleCityExistsException(
+			final CityExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				CITY_EXISTS_MESSAGE_KEY, REGION_ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles {@code ZipCodeExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code ZipCodeExistsException}
+	 */
+	@ExceptionHandler(ZipCodeExistsException.class)
+	public ModelAndView handleZipCodeExistsException(
+			final ZipCodeExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ZIP_CODE_EXISTS_MESSAGE_KEY, ADDRESS_ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles {@code AddressExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code AddressExistsException}
+	 */
+	@ExceptionHandler(AddressExistsException.class)
+	public ModelAndView handleAddressExistsException(
+			final AddressExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ADDRESS_EXISTS_MESSAGE_KEY, ADDRESS_ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles {@code TelephoneNumberExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code TelephoneNumberExistsException}
+	 */
+	@ExceptionHandler(TelephoneNumberExistsException.class)
+	public ModelAndView handleTelephoneNumberExistsException(
+			final TelephoneNumberExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				TELEPHONE_NUMBER_EXISTS_MESSAGE_KEY, CONTACT_ERROR_BUNDLE_NAME,
+				exception);
+	}
+
+	/**
+	 * Handles {@code OnlineAccountExistsException}.
+	 * 
+	 * @param exception exception thrown
+	 * @return model and view to handle {@code OnlineAccountExistsException}
+	 */
+	@ExceptionHandler(OnlineAccountExistsException.class)
+	public ModelAndView handleOnlineAccountExistsException(
+			final OnlineAccountExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ONLINE_ACCOUNT_EXISTS_MESSAGE_KEY, CONTACT_ERROR_BUNDLE_NAME,
 				exception);
 	}
 	
@@ -1188,7 +1334,7 @@ public class ManageVictimAssociationController {
 	 * @param victim victim
 	 * @return notes action menu
 	 */
-	@RequestMapping(value="/associationNotesActionMenu.html",
+	@RequestMapping(value = "/associationNotesActionMenu.html",
 			method = RequestMethod.GET)
 	public ModelAndView showNotesActionMenu(
 			@RequestParam(value = "offender", required = false)

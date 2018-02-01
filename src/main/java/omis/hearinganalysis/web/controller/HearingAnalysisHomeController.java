@@ -51,8 +51,10 @@ import omis.hearinganalysis.service.HearingAnalysisTaskService;
 import omis.hearinganalysis.web.form.HearingAnalysisHomeForm;
 import omis.hearinganalysis.web.form.HearingAnalysisTaskItem;
 import omis.hearinganalysis.web.form.HearingAnalysisTaskItemOperation;
+import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.paroleeligibility.domain.ParoleEligibility;
+import omis.person.domain.Person;
 import omis.task.domain.Task;
 import omis.task.domain.TaskParameterValue;
 import omis.task.domain.TaskTemplateParameterValue;
@@ -302,8 +304,16 @@ public class HearingAnalysisHomeController {
 							instanceValue = hearingAnalysis.getEligibility()
 									.getId().toString();
 						} else if (templateParameterValue.getTypeName().equals(
+								Person.class.getTypeName()) ||
+								templateParameterValue.getTypeName().equals(
+										Offender.class.getTypeName())) {
+							instanceValue = hearingAnalysis.getEligibility()
+									.getOffender().getId().toString();
+						} else if (templateParameterValue.getTypeName().equals(
 								Date.class.getTypeName())) {
-							instanceValue = convertDateToString(new Date());
+							instanceValue = convertDateToString(hearingAnalysis
+									.getEligibility()
+									.getHearingEligibilityDate());
 						} else {
 							throw new UnsupportedOperationException("Task " +
 									"Template Parameter Value Not Currently " +

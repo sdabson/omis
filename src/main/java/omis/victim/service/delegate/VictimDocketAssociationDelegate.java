@@ -6,11 +6,11 @@ import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.docket.domain.Docket;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.person.domain.Person;
 import omis.victim.dao.VictimDocketAssociationDao;
 import omis.victim.domain.VictimDocketAssociation;
+import omis.victim.exception.VictimDocketAssociationExistsException;
 
 /**
  * Victim docket association delegate.
@@ -23,25 +23,33 @@ public class VictimDocketAssociationDelegate {
 
 	/* Resources. */
 	private final VictimDocketAssociationDao victimDocketAssociationDao;
-	private final InstanceFactory<VictimDocketAssociation> victimDocketAssociationInstanceFactory;
+	private final InstanceFactory<VictimDocketAssociation> 
+		victimDocketAssociationInstanceFactory;
 	private final AuditComponentRetriever auditComponentRetriever;
 	
 	/* Exception messages */
-	private final String DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE = "Duplicate victim docket association found";
+	private final String DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE 
+		= "Duplicate victim docket association found";
 	
 	/* Constructor. */
 	
 	/**
-	 * Instantiates an instance of victim docket association delegate with the specified resources.
-	 * @param victimDocketAssociationDao
-	 * @param victimDocketAssociationInstanceFactory
-	 * @param auditComponentRetriever
+	 * Instantiates an instance of victim docket association delegate 
+	 * with the specified resources.
+	 * @param victimDocketAssociationDao victim docket association data access 
+	 * object
+	 * @param victimDocketAssociationInstanceFactory victim docket association 
+	 * instance factory
+	 * @param auditComponentRetriever audit component retriever
 	 */
-	public VictimDocketAssociationDelegate(final VictimDocketAssociationDao victimDocketAssociationDao,
-			final InstanceFactory<VictimDocketAssociation> victimDocketAssociationInstanceFactory,
+	public VictimDocketAssociationDelegate(
+			final VictimDocketAssociationDao victimDocketAssociationDao,
+			final InstanceFactory<VictimDocketAssociation> 
+				victimDocketAssociationInstanceFactory,
 			final AuditComponentRetriever auditComponentRetriever) {
 		this.victimDocketAssociationDao = victimDocketAssociationDao;
-		this.victimDocketAssociationInstanceFactory = victimDocketAssociationInstanceFactory;
+		this.victimDocketAssociationInstanceFactory 
+			= victimDocketAssociationInstanceFactory;
 		this.auditComponentRetriever = auditComponentRetriever;
 	}
 	
@@ -54,17 +62,23 @@ public class VictimDocketAssociationDelegate {
 	 * @param docket docket
 	 * @param victimImpactSummary victim impact summary
 	 * @return newly created victim docket association
-	 * @throws DuplicateEntityFoundException thrown when a duplicate victim docket association is found
+	 * @throws VictimDocketAssociationExistsException thrown when a duplicate 
+	 * victim 
+	 * docket association is found
 	 */
-	public VictimDocketAssociation create(final Person victim, final Docket docket, final String victimImpactSummary)
-			throws DuplicateEntityFoundException {
+	public VictimDocketAssociation create(final Person victim, 
+			final Docket docket, final String victimImpactSummary)
+			throws VictimDocketAssociationExistsException {
 		if (this.victimDocketAssociationDao.find(victim, docket) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE);
+			throw new VictimDocketAssociationExistsException(
+					DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE);
 		}
-		VictimDocketAssociation association = this.victimDocketAssociationInstanceFactory.createInstance();
+		VictimDocketAssociation association 
+			= this.victimDocketAssociationInstanceFactory.createInstance();
 		association.setVictim(victim);
 		association.setDocket(docket);
-		association.setCreationSignature(new CreationSignature(this.auditComponentRetriever.retrieveUserAccount(),
+		association.setCreationSignature(new CreationSignature(
+				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
 		return this.victimDocketAssociationDao.makePersistent(association);
 	}
@@ -75,13 +89,18 @@ public class VictimDocketAssociationDelegate {
 	 * @param association victim docket association
 	 * @param victimImpactSummary victim impact summary
 	 * @return updated victim docket association
-	 * @throws DuplicateEntityFoundException thrown when a duplicate victim docket association is found
+	 * @throws VictimDocketAssociationExistsException thrown when a duplicate 
+	 * victim docket association is found
 	 */
-	public VictimDocketAssociation update(final VictimDocketAssociation association,
-			final String victimImpactSummary) throws DuplicateEntityFoundException {
-		if (this.victimDocketAssociationDao.findExcluding(association, association.getVictim(),
+	public VictimDocketAssociation update(
+			final VictimDocketAssociation association,
+			final String victimImpactSummary) 
+					throws VictimDocketAssociationExistsException {
+		if (this.victimDocketAssociationDao.findExcluding(association, 
+				association.getVictim(),
 				association.getDocket()) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE);
+			throw new VictimDocketAssociationExistsException(
+					DUPLICATE_ASSOCIATION_FOUND_EXCEPTION_MESSAGE);
 		}
 		this.populateVictimDocketAssociation(association, victimImpactSummary);
 		return association;
@@ -119,7 +138,8 @@ public class VictimDocketAssociationDelegate {
 	/* Helper methods. */
 	
 	/*
-	 * Populates the specified victim docket association with the specified victim impact summary,
+	 * Populates the specified victim docket association with the specified 
+	 * victim impact summary,
 	 * and an update signature.
 	 * 
 	 * @param association victim docket association
@@ -130,7 +150,8 @@ public class VictimDocketAssociationDelegate {
 			final VictimDocketAssociation association,
 			final String victimImpactSummary) {
 		association.setVictimImpactSummary(victimImpactSummary);
-		association.setUpdateSignature(new UpdateSignature(this.auditComponentRetriever.retrieveUserAccount(),
+		association.setUpdateSignature(new UpdateSignature(
+				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
 		return association;
 	}

@@ -1,3 +1,20 @@
+/*
+ *  OMIS - Offender Management Information System
+ *  Copyright (C) 2011 - 2017 State of Montana
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.document.service.delegate;
 
 import java.util.Date;
@@ -7,11 +24,12 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.document.dao.DocumentDao;
 import omis.document.domain.Document;
-import omis.exception.DuplicateEntityFoundException;
+import omis.document.exception.DocumentExistsException;
 import omis.instance.factory.InstanceFactory;
 
 /** Service delegate for document.
  * @author Ryan Johns
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Nov 9, 2015)
  * @since OMIS 3.0 */ 
 public class DocumentDelegate {
@@ -19,8 +37,8 @@ public class DocumentDelegate {
 	private final InstanceFactory<Document> documentInstanceFactory;
 	private final AuditComponentRetriever auditComponentRetriever;
 	
-	private static final String DUPLICATE_DOCUMENT_FOUND_MSG = "Document already "
-			+ "exists with given file name.";
+	private static final String DUPLICATE_DOCUMENT_FOUND_MSG 
+		= "Document already exists with given file name.";
 	
 	/** Constructor.
 	 * @param documentDao - document dao.
@@ -40,16 +58,15 @@ public class DocumentDelegate {
 	 * @param fileExtension - file extension. 
 	 * @param title - title. 
 	 * @return document entity.
-	 * @throws DuplicateEntityFoundException - when document with existing file
+	 * @throws DocumentExistsException - when document with existing file
 	 * name exists. */
 	public Document create(final Date documentDate,
 			final String filename, final String fileExtension,
 			final String title) 
-					throws DuplicateEntityFoundException {
+					throws DocumentExistsException {
 		
-		if(!(this.documentDao.findByFileName(filename).isEmpty())){
-			throw new DuplicateEntityFoundException
-				(DUPLICATE_DOCUMENT_FOUND_MSG);
+		if (!(this.documentDao.findByFileName(filename).isEmpty())) {
+			throw new DocumentExistsException(DUPLICATE_DOCUMENT_FOUND_MSG);
 		}
 		
 		final Document document = this.documentInstanceFactory.createInstance();
@@ -66,14 +83,14 @@ public class DocumentDelegate {
 	 * @param document - document.
 	 * @param title - title. 
 	 * @param date - date. 
-	 * @throws DuplicateEntityFoundException */
+	 * @return document document.
+	 * @throws DocumentExistsException */
 	public Document update(final Document document, final String title, 
-			final Date date) throws DuplicateEntityFoundException {
+			final Date date) throws DocumentExistsException {
 		
-		if(!(this.documentDao.findByFileNameExcluding(document.getFilename(),
+		if (!(this.documentDao.findByFileNameExcluding(document.getFilename(),
 				document).isEmpty())){
-			throw new DuplicateEntityFoundException
-				(DUPLICATE_DOCUMENT_FOUND_MSG);
+			throw new DocumentExistsException(DUPLICATE_DOCUMENT_FOUND_MSG);
 		}
 		
 		document.setTitle(title);
@@ -84,7 +101,7 @@ public class DocumentDelegate {
 	}
 	
 	/**
-	 * Removes a specified document
+	 * Removes a specified document.
 	 * @param document - Document to remove
 	 */
 	public void remove(final Document document){

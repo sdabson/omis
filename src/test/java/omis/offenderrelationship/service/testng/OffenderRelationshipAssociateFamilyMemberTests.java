@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.service.testng;
 
 import java.util.Date;
@@ -10,6 +27,7 @@ import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
+import omis.family.exception.FamilyAssociationExistsException;
 import omis.family.service.delegate.FamilyAssociationCategoryDelegate;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
@@ -55,14 +73,17 @@ public class OffenderRelationshipAssociateFamilyMemberTests
 	 * Tests associate family member.
 	 * @throws DuplicateEntityFoundException DuplicateEntityFoundException
 	 * @throws DateConflictException DateConflictException
-	 * @throws FamilyAssociationConflictException 
-	 * FamilyAssociationConflictException
+	 * @throws FamilyAssociationConflictException
+	 * * FamilyAssociationConflictException
 	 * @throws ReflexiveRelationshipException ReflexiveRelationshipException
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 */
 	@Test
 	public void testAssociateFamilyMember() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		DateConflictException, FamilyAssociationConflictException {
+		throws DuplicateEntityFoundException, FamilyAssociationExistsException,
+		ReflexiveRelationshipException,	DateConflictException,
+		FamilyAssociationConflictException {
 		// Arrangement
 		final int shortNumber = 1;
 		final int endDateInt = 222222;
@@ -140,12 +161,14 @@ public class OffenderRelationshipAssociateFamilyMemberTests
 	 * @throws DateConflictException DateConflictException
 	 * @throws FamilyAssociationConflictException 
 	 * FamilyAssociationConflictException
+	 * @throws FamilyAssociationExistsException FamilyAssociationExistsException
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class, 
+	@Test(expectedExceptions = {FamilyAssociationExistsException.class, 
 		ReflexiveRelationshipException.class, DateConflictException.class})
 	public void testDuplicateAssociateFamilyMember() 
-		throws DuplicateEntityFoundException, ReflexiveRelationshipException,
-		DateConflictException, FamilyAssociationConflictException {
+		throws DuplicateEntityFoundException, FamilyAssociationExistsException,
+		ReflexiveRelationshipException, DateConflictException,
+		FamilyAssociationConflictException {
 		// Assignment
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Wang",
 			"Kevin", "Johns", "Mr.");

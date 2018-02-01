@@ -8,12 +8,14 @@ import omis.docket.domain.Docket;
 import omis.docket.service.delegate.DocketDelegate;
 import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
+import omis.document.exception.DocumentExistsException;
+import omis.document.exception.DocumentTagExistsException;
 import omis.document.service.delegate.DocumentDelegate;
 import omis.document.service.delegate.DocumentTagDelegate;
-import omis.exception.DuplicateEntityFoundException;
 import omis.person.domain.Person;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimDocumentAssociation;
+import omis.victim.exception.VictimDocumentAssociationExistsException;
 import omis.victim.service.VictimDocumentAssociationService;
 import omis.victim.service.delegate.VictimAssociationDelegate;
 import omis.victim.service.delegate.VictimDocumentAssociationDelegate;
@@ -40,10 +42,12 @@ import omis.victim.service.delegate.VictimDocumentAssociationDelegate;
  * Victim document association service.
  * 
  * @author Joel Norris
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Aug 30, 2017)
  * @since OMIS 3.0
  */
-public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssociationService {
+public class VictimDocumentAssociationServiceImpl 
+	implements VictimDocumentAssociationService {
 
 	/* Service delegates. */
 	private VictimDocumentAssociationDelegate victimDocumentAssociationDelegate;
@@ -57,18 +61,22 @@ public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssoc
 	/**
 	 * Instantiates an instance of victim document association service.
 	 *  
-	 * @param victimDocumentAssociationDelegate victim document association delegate
+	 * @param victimDocumentAssociationDelegate victim document association 
+	 * delegate
 	 * @param documentDelegate document delegate
 	 * @param documentTagDelegate document tag delegate
 	 * @param victimAssociationDelegate victim association delegate
+	 * @param docketDelegate docket delegate
 	 */
 	public VictimDocumentAssociationServiceImpl(
-			final VictimDocumentAssociationDelegate victimDocumentAssociationDelegate,
+			final VictimDocumentAssociationDelegate 
+				victimDocumentAssociationDelegate,
 			final DocumentDelegate documentDelegate,
 			final DocumentTagDelegate documentTagDelegate,
 			final VictimAssociationDelegate victimAssociationDelegate,
 			final DocketDelegate docketDelegate) {
-		this.victimDocumentAssociationDelegate = victimDocumentAssociationDelegate;
+		this.victimDocumentAssociationDelegate 
+			= victimDocumentAssociationDelegate;
 		this.documentDelegate = documentDelegate;
 		this.documentTagDelegate = documentTagDelegate;
 		this.victimAssociationDelegate = victimAssociationDelegate;
@@ -79,23 +87,27 @@ public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssoc
 	
 	/** {@inheritDoc} */
 	@Override
-	public VictimDocumentAssociation create(final Person victim, final Document document, 
+	public VictimDocumentAssociation create(final Person victim, 
+			final Document document, 
 			final Docket docket)
-		throws DuplicateEntityFoundException {
-		return this.victimDocumentAssociationDelegate.create(victim, document, docket);
+		throws VictimDocumentAssociationExistsException {
+		return this.victimDocumentAssociationDelegate.create(victim, document, 
+				docket);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public DocumentTag createDocumentTag(final Document document, final String name)
-		throws DuplicateEntityFoundException {
+	public DocumentTag createDocumentTag(final Document document, 
+			final String name)
+		throws DocumentTagExistsException {
 		return this.documentTagDelegate.tagDocument(document, name);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public DocumentTag updateDocumentTag(final DocumentTag documentTag, final String name)
-		throws DuplicateEntityFoundException {
+	public DocumentTag updateDocumentTag(final DocumentTag documentTag, 
+			final String name)
+		throws DocumentTagExistsException {
 		return this.documentTagDelegate.update(documentTag, name);
 	}
 
@@ -119,10 +131,12 @@ public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssoc
 
 	/** {@inheritDoc} */
 	@Override
-	public Document createDocument(final Date date, final String fileName, final String fileExtension,
+	public Document createDocument(final Date date, final String fileName, 
+			final String fileExtension,
 		final String title)
-		throws DuplicateEntityFoundException {
-		return this.documentDelegate.create(date, fileName, fileExtension, title);
+		throws DocumentExistsException {
+		return this.documentDelegate.create(date, fileName, fileExtension, 
+				title);
 	}
 
 	/** {@inheritDoc} */
@@ -133,8 +147,10 @@ public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssoc
 
 	/** {@inheritDoc} */
 	@Override
-	public List<VictimDocumentAssociation> findByDocketAndVictim(final Docket docket, final Person victim) {
-		return this.victimDocumentAssociationDelegate.findByDocketAndVictim(docket, victim);
+	public List<VictimDocumentAssociation> findByDocketAndVictim(
+			final Docket docket, final Person victim) {
+		return this.victimDocumentAssociationDelegate.findByDocketAndVictim(
+				docket, victim);
 	}
 
 	/** {@inheritDoc} */
@@ -153,16 +169,21 @@ public class VictimDocumentAssociationServiceImpl implements VictimDocumentAssoc
 	@Override
 	public List<Docket> findDocketsByVictim(final Person victim) {
 		List<Docket> dockets = new ArrayList<Docket>();
-		for (VictimAssociation association : this.victimAssociationDelegate.findByVictim(victim)) {
-			dockets.addAll(this.docketDelegate.findByPerson(association.getRelationship().getFirstPerson()));
+		for (VictimAssociation association : this.victimAssociationDelegate
+				.findByVictim(victim)) {
+			dockets.addAll(this.docketDelegate.findByPerson(association
+					.getRelationship().getFirstPerson()));
 		}
 		return dockets;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public VictimDocumentAssociation update(VictimDocumentAssociation victimDocumentAssociation, String title,
-			Date date, Docket docket) throws DuplicateEntityFoundException {
-		return this.victimDocumentAssociationDelegate.update(victimDocumentAssociation, title, date, docket);
+	public VictimDocumentAssociation update(
+			final VictimDocumentAssociation victimDocumentAssociation, 
+			final String title, final Date date, final Docket docket) 
+					throws VictimDocumentAssociationExistsException {
+		return this.victimDocumentAssociationDelegate.update(
+				victimDocumentAssociation, title, date, docket);
 	}
 }

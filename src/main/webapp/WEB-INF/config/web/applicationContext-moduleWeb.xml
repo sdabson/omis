@@ -60,6 +60,8 @@
   
   <import resource="applicationContext-custodyWeb.xml"/>
   
+  <import resource="applicationContext-docketWeb.xml"/>
+  
   <import resource="applicationContext-documentWeb.xml"/>
   
   <import resource="applicationContext-detainerNotificationWeb.xml"/>
@@ -186,6 +188,8 @@
   
   <import resource="applicationContext-trackedDocumentWeb.xml"/>
 
+  <import resource="applicationContext-unitManagerReviewWeb.xml"/>
+  
   <import resource="applicationContext-userWeb.xml"/>
   
   <import resource="applicationContext-userPreferenceWeb.xml"/>

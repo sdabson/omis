@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package omis.courtcase.web.controller;
 
 import java.util.ArrayList;
@@ -58,7 +75,7 @@ import omis.web.form.FormOperation;
  * @author Stephen Abson
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.6 (Sept 15, 2017)
+ * @version 0.1.7 (Jan 31, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -269,7 +286,7 @@ public class CourtCaseController {
 			courtCaseForm.setAllowDocket(true);
 		}
 			final ModelMap modelMap = this.prepareModel(courtCaseForm, 
-					redirectUrl, 0, defendant, docket);
+					redirectUrl, defendant, docket);
 			return new ModelAndView(EDIT_VIEW_NAME, modelMap);
 	}
 	
@@ -303,7 +320,6 @@ public class CourtCaseController {
 					"Court case or docket required.");
 		}
 		final CourtCaseForm courtCaseForm;
-		int chargeCount;
 		Person defendant;
 		Docket modelDocket;
 		if (crtCase != null) {
@@ -315,21 +331,19 @@ public class CourtCaseController {
 			courtCaseForm = this.prepareForm(crtCase, 
 					this.courtCaseService.findCharges(crtCase),
 					this.courtCaseService.findNotes(crtCase));
-			chargeCount = courtCaseForm.getCharges().size();
 			defendant = crtCase.getDocket().getPerson();
 			modelDocket = crtCase.getDocket();
 		} else {
 			courtCaseForm = new CourtCaseForm();
 			courtCaseForm.setDocketValue(docket.getValue());
 			courtCaseForm.setCourt(docket.getCourt());
-			chargeCount = 0;
 			defendant = docket.getPerson();
 			modelDocket = docket;
 		}
 		courtCaseForm.setAllowCourt(false);
 		courtCaseForm.setAllowDocket(false);
 		final ModelMap modelMap = prepareModel(courtCaseForm, redirectUrl,
-				chargeCount, defendant, modelDocket);
+				defendant, modelDocket);
 		modelMap.put(COURT_CASE_MODEL_KEY, crtCase);
 		return new ModelAndView(EDIT_VIEW_NAME, modelMap);
 	}
@@ -386,8 +400,8 @@ public class CourtCaseController {
 	
 	// Prepares a model and view to display court case form
 	private ModelMap prepareModel(final CourtCaseForm courtCaseForm,
-			final String previousUrl, final int chargeCount, 
-			final Person defendant, final Docket docket) {
+			final String previousUrl, final Person defendant, 
+			final Docket docket) {
 		final ModelMap modelMap = new ModelMap();
 		modelMap.put(COURT_CASE_FORM_MODEL_KEY, courtCaseForm);
 		List<Court> courts = this.courtCaseService.findCourts();
@@ -399,6 +413,12 @@ public class CourtCaseController {
 			noteCount = 0;
 		}
 		modelMap.put(PREVIOUS_URL_MODEL_KEY, previousUrl);
+		int chargeCount;
+		if (courtCaseForm.getCharges() == null) {
+			chargeCount = 0;
+		} else {
+			chargeCount = courtCaseForm.getCharges().size();
+		}
 		modelMap.put(CURRENT_CHARGE_INDEX_MODEL_KEY, chargeCount);
 		modelMap.put(CURRENT_COURT_CASE_NOTE_INDEX_MODEL_KEY, noteCount);
 		Person person;
@@ -463,7 +483,7 @@ public class CourtCaseController {
 		this.courtCaseFormValidator.validate(courtCaseForm, result);
 		if (result.hasErrors()) {
 			return this.prepareRedisplayMav(courtCaseForm, redirectUrl, result,
-					defendant, docket);
+					defendant, docket, null);
 		}
 		
 		// Creates initial court case with first charge
@@ -593,10 +613,10 @@ public class CourtCaseController {
 			if (crtCase != null) {
 				return this.prepareRedisplayMav(courtCaseForm, redirectUrl, 
 						result, crtCase.getDocket().getPerson(), 
-						crtCase.getDocket());
+						crtCase.getDocket(), crtCase);
 			} else {
 				return this.prepareRedisplayMav(courtCaseForm, redirectUrl, 
-						result, docket.getPerson(), docket);
+						result, docket.getPerson(), docket, null);
 			}
 		} 
 		
@@ -815,17 +835,13 @@ public class CourtCaseController {
 	// Prepares a model and view to redisplay the court case edit form 
 	private ModelAndView prepareRedisplayMav(final CourtCaseForm courtCaseForm,
 			final String redirectUrl, final BindingResult result,
-			final Person person, final Docket docket) {
-		int chargeCount;
-		if (courtCaseForm.getCharges() == null) {
-			chargeCount = 0;
-		} else {
-			chargeCount = courtCaseForm.getCharges().size();
-		}
-		ModelMap modelMap = this.prepareModel(courtCaseForm, redirectUrl,
-				chargeCount, person, docket);
+			final Person person, final Docket docket, 
+			final CourtCase courtCase) {
+		ModelMap modelMap = this.prepareModel(courtCaseForm, redirectUrl, 
+				person, docket);
 		modelMap.put(BindingResult.MODEL_KEY_PREFIX
 				+ COURT_CASE_FORM_MODEL_KEY, result);
+		modelMap.put(COURT_CASE_MODEL_KEY, courtCase);
 		return new ModelAndView(EDIT_VIEW_NAME, modelMap);
 	}
 	

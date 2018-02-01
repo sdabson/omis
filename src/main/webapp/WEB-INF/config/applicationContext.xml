@@ -117,6 +117,7 @@
     			<value>/WEB-INF/classes/omis/detainernotification/msgs/form</value>
     			<value>/WEB-INF/classes/omis/disciplinaryCode/msgs/form</value>
     			<value>/WEB-INF/classes/omis/dna/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/docket/msgs/form</value>
     			<value>/WEB-INF/classes/omis/document/msgs/form</value>
     			<value>/WEB-INF/classes/omis/employment/msgs/form</value>
     			<value>/WEB-INF/classes/omis/education/msgs/form</value>
@@ -168,6 +169,7 @@
     			<value>/WEB-INF/classes/omis/task/msgs/form</value>
     			<value>/WEB-INF/classes/omis/tierdesignation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/trackeddocument/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/unitmanagerreview/msgs/form</value>
     			<value>/WEB-INF/classes/omis/user/msgs/form</value>
     			<value>/WEB-INF/classes/omis/userpreference/msgs/form</value>
     			<value>/WEB-INF/classes/omis/victim/msgs/form</value>
@@ -211,6 +213,8 @@
   <bean id="helpLinkPropertyHolder" class="omis.config.util.PropertyHolder">
   	<constructor-arg name="propertyValue" value="${application.help.link}"/>
   </bean>
+  
+  <util:properties id="offenderProfileItemsProperties" location="classpath:offenderProfileItems.properties"/>
   
   <!--
     - Configuration property files for profiles that do not support report

@@ -1,3 +1,21 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package omis.offenderrelationship.service;
 
 import java.util.Date;
@@ -7,12 +25,15 @@ import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
 import omis.country.domain.Country;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
@@ -25,6 +46,7 @@ import omis.family.exception.FamilyAssociationConflictException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.PersonExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.relationship.domain.Relationship;
@@ -34,10 +56,12 @@ import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.component.VictimAssociationFlags;
+import omis.victim.exception.VictimExistsException;
 import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
+import omis.visitation.exception.VisitationExistsException;
 
 
 /**
@@ -136,38 +160,13 @@ public interface CreateRelationshipsService {
 	 * @param deceased deceased
 	 * @param deathDate death date
 	 * @return relation
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws PersonExistsException duplicate person found exception
 	 */
 	Person createRelation(String lastName, String firstName, String middleName, 
 		String suffix, Sex sex, Date birthDate, Country birthCountry, 
 		State birthState, City birthCity, Integer socialSecurityNumber, 
 		String stateId,	Boolean deceased, Date deathDate) 
-		throws DuplicateEntityFoundException;
-	
-	/**
-	 * Updates a relation for the specified person.
-	 * 
-	 * @param relation relation
-	 * @param lastName last name
-	 * @param firstName first name
-	 * @param middleName middle name
-	 * @param suffix suffix
-	 * @param sex sex
-	 * @param birthDate birth date
-	 * @param birthState birth state
-	 * @param birthCity birth city
-	 * @param socialSecurityNumber social security number
-	 * @param stateId state Id
-	 * @param deceased deceased
-	 * @param deathDate death date
-	 * @return updated relation
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
-	 */
-	Person updateRelation(Person relation, String lastName, String firstName, 
-			String middleName, String suffix, Sex sex, Date birthDate, 
-			State birthState, City birthCity, Integer socialSecurityNumber, 
-			String stateId, Boolean deceased, Date deathDate) 
-					throws DuplicateEntityFoundException;
+		throws PersonExistsException;
 
 	/**
 	 * Returns a list of name suffixes.
@@ -182,10 +181,10 @@ public interface CreateRelationshipsService {
 	 * @param number number
 	 * @param zipCode zip code
 	 * @return address
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws AddressExistsException duplicate address found exception
 	 */
 	Address createAddress(String number, ZipCode zipCode)
-			throws DuplicateEntityFoundException;
+			throws AddressExistsException;
 	
 	/**
 	 * Returns a list of addresses.
@@ -230,10 +229,10 @@ public interface CreateRelationshipsService {
 	 * @param value value
 	 * @param extension extension
 	 * @return ZIP code
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws ZipCodeExistsException duplicate zip code exception
 	 */
 	ZipCode createZipCode(City city, String value, String extension)
-			throws DuplicateEntityFoundException;
+			throws ZipCodeExistsException;
 	
 	/**
 	 * Change a contacts relation, p o box and mailing address.
@@ -241,10 +240,10 @@ public interface CreateRelationshipsService {
 	 * @param poBox PO box
 	 * @param mailingAddress mailing address
 	 * @return contact
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
+	 * @throws ContactExistsException duplicate contact found exception
 	 */
 	Contact changeContact(Person relation, PoBox poBox, Address mailingAddress)
-			throws DuplicateEntityFoundException;
+			throws ContactExistsException;
 	
 	/**
 	 * Find mailing address for specified relation.
@@ -398,13 +397,13 @@ public interface CreateRelationshipsService {
 	 * @param packetSentDate packet sent date
 	 * @param flags flags
 	 * @return victim association
-	 * @throws DuplicateEntityFoundException if victim association exists
+	 * @throws VictimExistsException if victim association exists
 	 * @throws ReflexiveRelationshipException Reflexive Relationship Exception
 	 */
 	VictimAssociation associateVictim(Offender offender, Person victim, 
 		Date registerDate, Boolean packetSent, 
 		Date packetSentDate, VictimAssociationFlags flags) 
-		throws DuplicateEntityFoundException,
+		throws VictimExistsException,
 		ReflexiveRelationshipException;
 	
 	/**
@@ -421,13 +420,13 @@ public interface CreateRelationshipsService {
 	 * @param guardianship guardianship
 	 * @return associated visitor
 	 * @throws DateConflictException date conflict exception
-	 * @throws DuplicateEntityFoundException if victim association exists
+	 * @throws VisitationExistsException if visitation association exists
 	 * @throws ReflexiveRelationshipException Reflexive Relationship Exception
 	 */
 	VisitationAssociation associateVisitor(Offender offender, Person visitor, 
 		VisitationAssociationCategory category, VisitationApproval approval,
 		Date startDate, Date endDate, VisitationAssociationFlags flags, 
-		String notes, String guardianship) throws DuplicateEntityFoundException,
+		String notes, String guardianship) throws VisitationExistsException,
 		ReflexiveRelationshipException, DateConflictException;
 	
 	/**

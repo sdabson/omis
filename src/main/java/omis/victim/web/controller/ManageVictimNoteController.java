@@ -1,21 +1,24 @@
+/*
+ *  OMIS - Offender Management Information System
+ *  Copyright (C) 2011 - 2017 State of Montana
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.victim.web.controller;
 
 import java.util.Date;
 import java.util.List;
-
-import omis.beans.factory.PropertyEditorFactory;
-import omis.beans.factory.spring.CustomDateEditorFactory;
-import omis.contact.domain.Contact;
-import omis.exception.DuplicateEntityFoundException;
-import omis.person.domain.Person;
-import omis.victim.domain.VictimAssociation;
-import omis.victim.domain.VictimNote;
-import omis.victim.domain.VictimNoteCategory;
-import omis.victim.service.VictimNoteService;
-import omis.victim.web.controller.delegate.VictimSummaryModelDelegate;
-import omis.victim.web.form.VictimNoteForm;
-import omis.victim.web.validator.VictimNoteFormValidator;
-import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,10 +33,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.contact.domain.Contact;
+import omis.person.domain.Person;
+import omis.victim.domain.VictimAssociation;
+import omis.victim.domain.VictimNote;
+import omis.victim.domain.VictimNoteCategory;
+import omis.victim.exception.VictimNoteExistsException;
+import omis.victim.service.VictimNoteService;
+import omis.victim.web.controller.delegate.VictimSummaryModelDelegate;
+import omis.victim.web.form.VictimNoteForm;
+import omis.victim.web.validator.VictimNoteFormValidator;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
+
 /**
  * Controller to manage victim notes.
  *
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Jul 26, 2015)
  * @since OMIS 3.0
  */
@@ -176,7 +194,7 @@ public class ManageVictimNoteController {
 	 * @param victimNoteForm form for victim note
 	 * @param result result
 	 * @return redirect to screen to list notes for victim
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws victimNoteExistsException if victim note exists
 	 */
 	@PreAuthorize(
 			"hasRole('ADMIN') or hasRole('VICTIM_NOTE_CREATE')")
@@ -185,7 +203,7 @@ public class ManageVictimNoteController {
 			@RequestParam(value = "victim", required = true)
 				final Person victim,
 			final VictimNoteForm victimNoteForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result) throws VictimNoteExistsException {
 		this.victimNoteFormValidator.validate(victimNoteForm, result);
 		if (result.hasErrors()) {
 			return this.prepareRedisplayMav(victimNoteForm, result, victim);
@@ -203,7 +221,7 @@ public class ManageVictimNoteController {
 	 * @param victimNoteForm form for victim note
 	 * @param result result
 	 * @return redirect to screen to list notes for victim of note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	@PreAuthorize("hasRole('ADMIN') or hasRole('VICTIM_NOTE_EDIT')")
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
@@ -212,7 +230,7 @@ public class ManageVictimNoteController {
 				final VictimNote victimNote,
 			final VictimNoteForm victimNoteForm,
 			final BindingResult result)
-					throws DuplicateEntityFoundException {
+					throws VictimNoteExistsException {
 		this.victimNoteFormValidator.validate(victimNoteForm, result);
 		if (result.hasErrors()) {
 			ModelAndView mav = this.prepareRedisplayMav(
@@ -246,18 +264,18 @@ public class ManageVictimNoteController {
 	/* Exceptions handlers. */
 	
 	/**
-	 * Handles {@code DuplicateEntityFoundException}.
+	 * Handles {@code VictimNoteExistsExceptionEntityFoundException}.
 	 * 
-	 * @param duplicateEntityFoundException exception to handle
-	 * @return screen to handle {@code DuplicateEntityFoundException}
+	 * @param VictimNoteExistsExceptionEntityFoundException exception to handle
+	 * @return screen to handle {@code VictimNoteExistsExceptionEntityFoundException}
 	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException
-				duplicateEntityFoundException) {
+	@ExceptionHandler(VictimNoteExistsException.class)
+	public ModelAndView handleVictimNoteExistsExceptionEntityFoundException(
+			final VictimNoteExistsException
+				victimNoteExistsException) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				DUPLICATE_ENTITY_FOUND_MESSAGE_KEY, ERROR_BUNDLE_NAME,
-				duplicateEntityFoundException);
+				victimNoteExistsException);
 	}
 	
 	/* Helper methods. */

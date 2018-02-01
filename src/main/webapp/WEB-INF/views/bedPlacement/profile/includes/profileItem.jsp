@@ -9,14 +9,9 @@
 	<div class="profileItem">
 		<a href="${pageContext.request.contextPath}/bedPlacement/list.html?offender=${offenderSummary.id}">
 			<span>
-    			<c:choose>
-    			<c:when test="${bedPlacementExists}">
-    					<fmt:message key="activePlacementLabel"/>
-    			</c:when>
-    			<c:otherwise>
-    					<fmt:message key="nonActivePlacementLabel"/>
-    			</c:otherwise>
-    			</c:choose>
+				<fmt:message key="bedPlacementProfileItemLabel">
+    				<fmt:param value="${bedPlacement}"/>
+    			</fmt:message>
     		</span>
     	</a>
     </div>

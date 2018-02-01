@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.victim.service.delegate;
 
 import java.util.Date;
@@ -13,11 +30,13 @@ import omis.victim.dao.VictimNoteDao;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
 import omis.victim.domain.VictimNoteCategory;
+import omis.victim.exception.VictimNoteExistsException;
 
 /**
  * Delegate for victim notes.
  *
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Jul 22, 2015)
  * @since OMIS 3.0
  */
@@ -61,13 +80,13 @@ public class VictimNoteDelegate {
 	 * @param date date
 	 * @param value value
 	 * @return created victim note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	public VictimNote create(
 			final Person victim, final VictimNoteCategory category,
 			final VictimAssociation association, final Date date,
 			final String value)
-				throws DuplicateEntityFoundException {
+				throws VictimNoteExistsException {
 		
 		// If association is provided, checks that victim and second person
 		// of relationship are equal; otherwise, association is illegal
@@ -81,7 +100,7 @@ public class VictimNoteDelegate {
 		
 		// Checks whether victim note exists
 		if (this.victimNoteDao.find(victim, category, date) != null) {
-			throw new DuplicateEntityFoundException("Victim note exists");
+			throw new VictimNoteExistsException("Victim note exists");
 		}
 		
 		// Creates, persists and updates victim note
@@ -103,21 +122,23 @@ public class VictimNoteDelegate {
 	 * @param date date
 	 * @param value value
 	 * @return updated victim note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @throws VictimNoteExistsException if victim note exists
 	 */
 	public VictimNote update(final VictimNote victimNote,
 			final VictimNoteCategory category,
 			final VictimAssociation association,
 			final Date date, final String value)
-				throws DuplicateEntityFoundException {
+				throws VictimNoteExistsException {
 		if (association != null) {
 			// If association is provided, checks that victim of note and second
-			// person of relationship are equal; otherwise, association is illegal
+			// person of relationship are equal; otherwise, association is 
+			//illegal
 			if (association.getRelationship().getSecondPerson() != null) {
 				if (!victimNote.getVictim().equals(association.getRelationship()
 						.getSecondPerson())) {
 					throw new IllegalArgumentException(
-							"Second person of relationship does not equal victim");
+							"Second person of relationship does not equal "
+							+ "victim");
 				}
 			}
 		}
@@ -125,7 +146,7 @@ public class VictimNoteDelegate {
 		// Checks whether victim note exists
 		if (this.victimNoteDao.findExcluding(victimNote.getVictim(), category,
 				date, victimNote) != null) {
-			throw new DuplicateEntityFoundException("Victim note exists");
+			throw new VictimNoteExistsException("Victim note exists");
 		}
 		
 		// Updates, persists and returns victim note
@@ -197,7 +218,7 @@ public class VictimNoteDelegate {
 	 * @param association association
 	 * @return count of notes by association
 	 */
-	public long countByAssociation(VictimAssociation association) {
+	public long countByAssociation(final VictimAssociation association) {
 		return this.victimNoteDao.countNotes(association);
 	}
 }

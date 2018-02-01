@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenseterm.service.testng;
 
 import java.text.ParseException;
@@ -121,11 +138,13 @@ public class OffenseTermServiceCreateTests
 	 * Tests the create method.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
-	 * @throws DocketExistsException 
+	 * @throws DocketExistsException if docket exists
+	 * @throws CourtCaseExistsException if court case exists
 	 */
 	@Test
 	public void testCreate() 
-			throws DuplicateEntityFoundException, DocketExistsException {
+			throws DuplicateEntityFoundException, DocketExistsException,
+				CourtCaseExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", 
 				"John", "Jay", null);
@@ -160,12 +179,13 @@ public class OffenseTermServiceCreateTests
 				OffenderDangerDesignator.NON_DANGEROUS;
 		CourtCaseFlags flags = new CourtCaseFlags(false, false, false, false);
 		String comments = "Words";
+		Docket docket = this.docketDelegate.create(person, court, docketValue);
 		
 		// Action
-		CourtCase courtCase = this.offenseTermService.create(person, court, 
-				docketValue, interStateNumber, mt, pronouncementDate, 
-				sentenceReviewDate, jurisdictionAuthority, dangerDesignator, 
-				personnel, flags, comments);
+		CourtCase courtCase = this.offenseTermService.create(docket,
+				interStateNumber, mt, pronouncementDate, sentenceReviewDate,
+				jurisdictionAuthority, dangerDesignator, personnel, flags,
+				comments);
 		
 		// Assert
 		PropertyValueAsserter.create()
@@ -185,13 +205,13 @@ public class OffenseTermServiceCreateTests
 	}
 	
 	/**
-	 * Tests {@code DocketExistsException} exception is thrown by create.
+	 * Tests {@code CourtCaseExistsException} exception is thrown by create.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 * @throws DocketExistsException 
-	 * @throws CourtCaseExistsException 
+	 * @throws CourtCaseExistsException if court case exists (expected)
 	 */
-	@Test(expectedExceptions = {DocketExistsException.class})
+	@Test(expectedExceptions = {CourtCaseExistsException.class})
 	public void testDocketExistsException() 
 			throws DuplicateEntityFoundException, DocketExistsException, 
 			CourtCaseExistsException {
@@ -239,8 +259,8 @@ public class OffenseTermServiceCreateTests
 				dangerDesignator, personnel, flags, comments);
 		
 		// Action
-		this.offenseTermService.create(person, court, docketValue, 
-				interStateNumber, mt, pronouncementDate, sentenceReviewDate, 
+		this.offenseTermService.create(docket, interStateNumber, mt,
+				pronouncementDate, sentenceReviewDate, 
 				jurisdictionAuthority, dangerDesignator, personnel, flags, 
 				comments);
 	}

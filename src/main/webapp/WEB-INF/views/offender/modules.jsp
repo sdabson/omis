@@ -361,6 +361,12 @@
     		</a>
     	</li>
     </sec:authorize>
+     <sec:authorize access="hasRole('UNIT_MANAGER_REVIEW_LIST') or hasRole('ADMIN')">
+    	<li class="moduleLink">
+    		<a href="${pageContext.request.contextPath}/unitManagerReview/list.html?offender=${offenderSummary.id}">
+    			<fmt:message key="unitManagerReviewLink"/></a>
+    	</li>
+    </sec:authorize>
     <sec:authorize access="hasRole('USER_ACCOUNT_LIST') or hasRole('ADMIN')">
     	<li class="moduleLink">
     		<a href="${pageContext.request.contextPath}/user/admin/userAccount/list.html?user=${offenderSummary.id}">

@@ -6,7 +6,7 @@
 <div id="offenderHeaderDetails">
 <fmt:bundle basename="omis.offender.msgs.offenderHeader">
 <div id="offenderHeaderBadge" class="offenderHeaderContainer accentDark">
-	<div class="item foregroundUltraLight noSelect">
+	<div class="item foregroundUltraLight">
 		<c:forEach var="summaryItem" items="${basicInformationSummaryItemRegistry.items}" varStatus="i">
 				<c:if test="${summaryItem.enabled}">
 					<jsp:include page="${summaryItem.includedPageName}"/>

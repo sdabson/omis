@@ -81,8 +81,12 @@ div.itemsContainer{
 
 /* Header Cell. */
 div.headerCell {
-	margin-top: 4px;
+	margin-top: 2px;
 	margin-left: 4px;
+	max-width: 320px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 1.5;
 }
 
 /* Header non-Button Links */
@@ -106,7 +110,6 @@ span.offenderHeaderFieldLabel:after {
 
 /* Field value. */
 span.offenderHeaderFieldValue {
-	white-space: normal;
 }
 
 span.offenderNameValue{
@@ -315,7 +318,7 @@ it ensures that the last pane can scroll to the far left as needed */
 }
 
 
-@media only screen and (max-width:1200px ) {
+@media only screen and (max-width:1350px ) {
 	#navLeftArrow, #navRightArrow{
 		opacity: 1;
 	}

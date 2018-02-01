@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.victim.service;
 
 import java.util.List;
@@ -7,17 +24,22 @@ import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.country.domain.Country;
 import omis.exception.DuplicateEntityFoundException;
 import omis.person.domain.Person;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.residence.domain.ResidenceTerm;
 
 /**
@@ -25,6 +47,7 @@ import omis.residence.domain.ResidenceTerm;
  *
  * @author Stephen Abson
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Jan 5, 2016)
  * @since OMIS 3.0
  */
@@ -37,11 +60,11 @@ public interface VictimContactService {
 	 * @param buildingCategory building category
 	 * @param zipCode ZIP code
 	 * @return created address
-	 * @throws DuplicateEntityFoundException if address exists
+	 * @throws AddressExistsException if address exists
 	 */
 	Address createAddress(String houseNumber, BuildingCategory buildingCategory,
 			ZipCode zipCode)
-				throws DuplicateEntityFoundException;
+				throws AddressExistsException;
 	
 	/**
 	 * Returns contact for victim.
@@ -71,8 +94,10 @@ public interface VictimContactService {
 	 * @param victim victim the contact of whom to update
 	 * @param address address
 	 * @return updated - or newly created - victim contact
+	 * @throws DuplicateEntityFoundException 
 	 */
-	ResidenceTerm updateResidenceTerm(Person victim, Address address);
+	ResidenceTerm updateResidenceTerm(Person victim, Address address) 
+			throws DuplicateEntityFoundException;
 	
 	/**
 	 * Adds telephone number.
@@ -83,12 +108,12 @@ public interface VictimContactService {
 	 * @param primary whether primary
 	 * @param category category
 	 * @return added telephone number
-	 * @throws DuplicateEntityFoundException if telephone number exists
+	 * @throws TelephoneNumberExistsException if telephone number exists
 	 */
 	TelephoneNumber addTelephoneNumber(Contact contact, Long value,
 			Integer extension, Boolean primary,
 			TelephoneNumberCategory category)
-				throws DuplicateEntityFoundException;
+				throws TelephoneNumberExistsException;
 	
 	/**
 	 * Adds online account.
@@ -98,11 +123,11 @@ public interface VictimContactService {
 	 * @param primary whether primary
 	 * @param host host
 	 * @return added online account
-	 * @throws DuplicateEntityFoundException if online account exists
+	 * @throws OnlineAccountExistsException if online account exists
 	 */
 	OnlineAccount addOnlineAccount(Contact contact, String name,
 			Boolean primary, OnlineAccountHost host)
-				throws DuplicateEntityFoundException;
+				throws OnlineAccountExistsException;
 	
 	/**
 	 * Updates telephone number.
@@ -113,12 +138,12 @@ public interface VictimContactService {
 	 * @param primary whether primary
 	 * @param category category
 	 * @return updated telephone number
-	 * @throws DuplicateEntityFoundException if telephone number exists
+	 * @throws TelephoneNumberExistsException if telephone number exists
 	 */
 	TelephoneNumber updateTelephoneNumber(TelephoneNumber telephoneNumber,
 			Long value, Integer extension, Boolean primary,
 			TelephoneNumberCategory category)
-				throws DuplicateEntityFoundException;
+				throws TelephoneNumberExistsException;
 	
 	/**
 	 * Updates online account.
@@ -128,11 +153,11 @@ public interface VictimContactService {
 	 * @param primary whether primary
 	 * @param host host
 	 * @return updated online account
-	 * @throws DuplicateEntityFoundException if online account exists
+	 * @throws OnlineAccountExistsException if online account exists
 	 */
 	OnlineAccount updateOnlineAccount(OnlineAccount onlineAccount,
 			String name, Boolean primary, OnlineAccountHost host)
-				throws DuplicateEntityFoundException;
+				throws OnlineAccountExistsException;
 	
 	/**
 	 * Removes telephone number.
@@ -239,10 +264,10 @@ public interface VictimContactService {
 	 * @param state State
 	 * @param country country
 	 * @return city
-	 * @throws DuplicateEntityFoundException if city exists
+	 * @throws CityExistsException if city exists
 	 */
 	City createCity(String name, State state, Country country)
-			throws DuplicateEntityFoundException;
+			throws CityExistsException;
 
 	/**
 	 * Creates ZIP code.
@@ -251,8 +276,8 @@ public interface VictimContactService {
 	 * @param extension extension
 	 * @param city city
 	 * @return ZIP code
-	 * @throws DuplicateEntityFoundException if ZIP code exists
+	 * @throws ZipCodeExistsException if ZIP code exists
 	 */
 	ZipCode createZipCode(String value, String extension, City city)
-				throws DuplicateEntityFoundException;
+				throws ZipCodeExistsException;
 }

@@ -37,6 +37,13 @@
 		<li>
 			<a class="removeLink" href="${pageContext.request.contextPath}/trackedDocument/remove.html?docket=${docket.id}"><span class="visibleLinkLabel"><fmt:message key="removeLink" /></span></a>
 		</li>
-		</sec:authorize>	
+		</sec:authorize>
+		<sec:authorize access="hasRole('TRACKED_DOCUMENT_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty docket}">
+			<li>
+				<a href="${pageContext.request.contextPath}/trackedDocument/trackedDocumentDetailsReport.html?docket=${docket.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="trackedDocumentDetailsReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>			
 	</ul>
 </fmt:bundle>

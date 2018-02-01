@@ -18,7 +18,9 @@
 package omis.trackeddocument.web.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
@@ -27,6 +29,10 @@ import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.person.domain.Person;
+import omis.report.ReportFormat;
+import omis.report.ReportRunner;
+import omis.report.web.controller.delegate.ReportControllerDelegate;
+import omis.tierdesignation.domain.OffenderTierDesignation;
 import omis.trackeddocument.domain.TrackedDocumentCategory;
 import omis.trackeddocument.domain.TrackedDocumentReceival;
 import omis.trackeddocument.exception.TrackedDocumentReceivalExistsException;
@@ -40,6 +46,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -57,6 +64,7 @@ import org.springframework.web.servlet.ModelAndView;
  * Controller for tracked document.
  * 
  * @author Yidong Li
+ * @author Sierra Rosales
  * @version 0.1.5 (Jan 8, 2018)
  * @since OMIS 3.0
  */
@@ -97,6 +105,22 @@ public class ManageTrackedDocumentController {
 		= "createFlag";
 	private static final String TRACKED_DOCUMENT_MODEL_KEY 
 		= "trackedDocument";
+	
+	/* Report names. */
+	
+	private static final String TRACKED_DOCUMENT_LISTING_REPORT_NAME
+		= "/Legal/Tracked_Documents/Tracked_Document_Listing";
+	
+	private static final String TRACKED_DOCUMENT_DETAILS_REPORT_NAME
+		= "/Legal/Tracked_Documents/Tracked_Document_Details";
+	
+	/* Report parameter names. */
+	
+	private static final String TRACKED_DOCUMENT_LISTING_ID_REPORT_PARAM_NAME
+		= "OFFENDER_ID";
+	
+	private static final String TRACKED_DOCUMENT_DETAILS_ID_REPORT_PARAM_NAME
+		= "DOCKET_ID";	
 	
 	/* Message bundles. */
 	private static final String ERROR_BUNDLE_NAME
@@ -153,6 +177,18 @@ public class ManageTrackedDocumentController {
 	@Autowired
 	@Qualifier("trackedDocumentFormValidator")
 	private TrackedDocumentFormValidator trackedDocumentFormValidator;	
+	
+	/* Report runners. */
+	
+	@Autowired
+	@Qualifier("reportRunner")
+	private ReportRunner reportRunner;
+	
+	/* Controller delegates. */
+	
+	@Autowired
+	@Qualifier("reportControllerDelegate")
+	private ReportControllerDelegate reportControllerDelegate;	
 	
 	/* Constructor. */
 	/** Instantiates a default tracked document management controller. */
@@ -444,6 +480,56 @@ public class ManageTrackedDocumentController {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 			TRACKED_DOCUMENT_RECEIVAL_EXISTS_EXCEPTION_MESSAGE_KEY,
 			ERROR_BUNDLE_NAME, trackedDocumentReceivalExistsException);
+	}
+
+	/**
+	 * Returns the tracked document listing report for the specified offender.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/trackedDocumentListingReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('TRACKED_DOCUMENT_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportTrackedDocumentListing(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(TRACKED_DOCUMENT_LISTING_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				TRACKED_DOCUMENT_LISTING_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the tracked document detail report for the specified docket.
+	 * 
+	 * @param docket docket
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/trackedDocumentDetailsReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('TRACKED_DOCUMENT_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportTrackedDocumentDetails(@RequestParam(
+			value = "docket", required = true)
+			final Docket docket,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(TRACKED_DOCUMENT_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(docket.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				TRACKED_DOCUMENT_DETAILS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
 	}
 	
 	/**
