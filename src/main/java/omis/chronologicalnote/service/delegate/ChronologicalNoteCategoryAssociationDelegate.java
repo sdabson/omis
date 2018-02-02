@@ -15,7 +15,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package omis.chronologicalnote.service;
+package omis.chronologicalnote.service.delegate;
+
+import java.util.List;
 
 import omis.chronologicalnote.dao.ChronologicalNoteCategoryAssociationDao;
 import omis.chronologicalnote.domain.ChronologicalNote;
@@ -64,7 +66,7 @@ public class ChronologicalNoteCategoryAssociationDelegate {
 	 * @return newly created chronological note category association
 	 * @throws ChronologicalNoteCategoryAssociationExistsException Thrown when a duplicate chronological note category association is found
 	 */
-	ChronologicalNoteCategoryAssociation create(final ChronologicalNote note, final ChronologicalNoteCategory category)
+	public ChronologicalNoteCategoryAssociation create(final ChronologicalNote note, final ChronologicalNoteCategory category)
 			throws ChronologicalNoteCategoryAssociationExistsException {
 		if (this.chronologicalNoteCategoryAssociationDao.find(note, category) != null) {
 			throw new ChronologicalNoteCategoryAssociationExistsException("Association already exists between category and note");
@@ -83,11 +85,15 @@ public class ChronologicalNoteCategoryAssociationDelegate {
 	 * @throws IllegalArgumentException Thrown when no association exists for the specified chronological note and
 	 * chronological note category.
 	 */
-	void remove(final ChronologicalNote note, final ChronologicalNoteCategory category) throws IllegalArgumentException {
+	public void remove(final ChronologicalNote note, final ChronologicalNoteCategory category) throws IllegalArgumentException {
 		ChronologicalNoteCategoryAssociation association = this.chronologicalNoteCategoryAssociationDao.find(note, category);
 		if (association == null) {
 			throw new IllegalArgumentException("No association for specified note and category exists");
 		}
 		this.chronologicalNoteCategoryAssociationDao.makeTransient(association);
+	}
+	
+	public List<ChronologicalNoteCategory> findAssociatedCategories(final ChronologicalNote note) {
+		return this.chronologicalNoteCategoryAssociationDao.findAssociatedCategories(note);
 	}
 }

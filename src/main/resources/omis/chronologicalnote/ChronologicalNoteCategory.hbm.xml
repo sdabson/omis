@@ -26,8 +26,8 @@
        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.chronologicalnote.domain">
-	<class entity-name="omis.omis.chronologicalnote.domain.ChronologicalNoteCategory"
-		proxy="omis.omis.chronologicalnote.domain.ChronologicalNoteCategory"
+	<class entity-name="omis.chronologicalnote.domain.ChronologicalNoteCategory"
+		proxy="omis.chronologicalnote.domain.ChronologicalNoteCategory"
 		name="omis.chronologicalnote.domain.impl.ChronologicalNoteCategoryImpl"
 		table="`CHRONO_NOTE_CATEGORY`">
 		<id name="id" column="`ID`" type="java.lang.Long">
@@ -43,6 +43,12 @@
 		select category
 		from
 			omis.chronologicalnote.domain.ChronologicalNoteCategory category
+		order by category.name
+	]]></query>
+	<query name="findValidChronologicalNoteCategories"><![CDATA[
+		select category
+		from omis.chronologicalnote.domain.ChronologicalNoteCategory category
+		where category.valid is true
 		order by category.name
 	]]></query>
 </hibernate-mapping>

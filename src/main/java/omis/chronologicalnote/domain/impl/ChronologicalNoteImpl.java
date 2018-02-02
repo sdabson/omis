@@ -127,7 +127,7 @@ public class ChronologicalNoteImpl implements ChronologicalNote {
 		}
 		ChronologicalNote that = (ChronologicalNote) obj;
 		if (this.getOffender() == null) {
-			throw new IllegalStateException("Name required");
+			throw new IllegalStateException("Offender required");
 		}
 		if (!this.getOffender().equals(that.getOffender())) {
 			return false;

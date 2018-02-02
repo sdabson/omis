@@ -35,26 +35,26 @@ import omis.offender.domain.Offender;
 public interface ChronologicalNoteService {
 
 	/**
-	 * Creates a chronological note with the specified date, offender, and description.
+	 * Creates a chronological note with the specified date, offender, and narrative.
 	 * 
 	 * @param date date
 	 * @param offender offender
-	 * @param description description
+	 * @param narrative narrative
 	 * @return newly created chronological note
 	 * @throws ChronologicalNoteExistsException Thrown if a duplicate chronological note exists.
 	 */
-	ChronologicalNote create(Date date, Offender offender, String description) throws ChronologicalNoteExistsException;
+	ChronologicalNote create(Date date, Offender offender, String narrative) throws ChronologicalNoteExistsException;
 	
 	/**
-	 * Updates the specified note with the specified date and description.
+	 * Updates the specified note with the specified date and narrative.
 	 * 
 	 * @param note chronological note
 	 * @param date date
-	 * @param description description
+	 * @param narrative narrative
 	 * @return updated chronological note
 	 * @throws ChronologicalNoteExistsException Thrown if a duplicate chronological note exists.
 	 */
-	ChronologicalNote update(ChronologicalNote note, Date date, String description) throws ChronologicalNoteExistsException;
+	ChronologicalNote update(ChronologicalNote note, Date date, String narrative) throws ChronologicalNoteExistsException;
 	
 	/**
 	 * Removes the specified chronological note.
@@ -66,22 +66,26 @@ public interface ChronologicalNoteService {
 	/**
 	 * Associates the specified chronological note and chronological note category.
 	 * 
+	 * <p>
+	 * Throws an {@code IllegalArgumentException} if an association already exists between the
+	 * specified chronological note and chronological note category.
+	 * 
 	 * @param note chronological note
 	 * @param category chronological note category
-	 * @throws IllegalArgumentException Thrown if an association already exists between the
-	 * specified chronological note and chronological note category.
 	 */
-	void associateCategory(ChronologicalNote note, ChronologicalNoteCategory category) throws IllegalArgumentException;
+	void associateCategory(ChronologicalNote note, ChronologicalNoteCategory category);
 	
 	/**
 	 * Dissociates the specified chronological note and chronological note category.
 	 * 
+	 * <p>
+	 * Throws an {@code IllegalArgumentException} if no association exists between the specified chronological note and
+	 * chronological note category. 
+	 * 
 	 * @param note chronological note
 	 * @param category chronological note category
-	 * @throws IllegalArgumentException Thrown if no association exists between the specified chronological note and
-	 * chronological note category. 
 	 */
-	void dissociateCategory(ChronologicalNote note, ChronologicalNoteCategory category) throws IllegalArgumentException;
+	void dissociateCategory(ChronologicalNote note, ChronologicalNoteCategory category);
 	
 	/**
 	 * Returns chronological note categories.

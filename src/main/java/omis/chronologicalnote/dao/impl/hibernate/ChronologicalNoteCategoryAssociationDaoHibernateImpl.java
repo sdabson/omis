@@ -45,6 +45,8 @@ public class ChronologicalNoteCategoryAssociationDaoHibernateImpl
 		= "findByNote";
 	private static final String FIND_QUERY_NAME
 		= "findChronologicalNoteCategoryAssociation";
+	private static final String FIND_ASSOCIATED_CATEGORIES_QUERY_NAME
+		= "findAssociatedChronologicalNoteCategoriesByNote";
 
 	/* Parameters. */
 	private static final String NOTE_PARAM_NAME
@@ -109,5 +111,17 @@ public class ChronologicalNoteCategoryAssociationDaoHibernateImpl
 		.setParameter(NOTE_PARAM_NAME, note)
 		.list();
 		return chronologicalNoteCategoryAssociation;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<ChronologicalNoteCategory> findAssociatedCategories(ChronologicalNote note) {
+		@SuppressWarnings("unchecked")
+		List<ChronologicalNoteCategory> categories = this.getSessionFactory()
+				.getCurrentSession()
+				.getNamedQuery(FIND_ASSOCIATED_CATEGORIES_QUERY_NAME)
+				.setParameter(NOTE_PARAM_NAME, note)
+				.list();
+		return categories;
 	}
 }

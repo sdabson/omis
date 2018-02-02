@@ -62,5 +62,5 @@ public interface ChronologicalNoteReportService {
 	 * @param note chronological note.
 	 * @return list of chronological note category names
 	 */
-	List<String> findCategoryNamesByNote(ChronologicalNote note);
+	List<String> findCategoryNamesByNote(ChronologicalNote note);;
 }

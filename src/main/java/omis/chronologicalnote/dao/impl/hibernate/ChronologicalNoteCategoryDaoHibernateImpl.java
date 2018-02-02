@@ -40,6 +40,7 @@ public class ChronologicalNoteCategoryDaoHibernateImpl
 	/* Query names. */
 	private static final String FIND_CATEGORIES_QUERY_NAME
 		= "findChronologicalNoteCategories";
+	private static final String FIND_ALL_CATEGORIES_QUERY_NAME = "findValidChronologicalNoteCategories";
 	
 	/* Constructors. */
 	/**
@@ -62,6 +63,16 @@ public class ChronologicalNoteCategoryDaoHibernateImpl
 		List<ChronologicalNoteCategory> categories = this.getSessionFactory()
 			.getCurrentSession().getNamedQuery(FIND_CATEGORIES_QUERY_NAME)
 			.list();
+		return categories;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<ChronologicalNoteCategory> findAll() {
+		@SuppressWarnings("unchecked")
+		List<ChronologicalNoteCategory> categories = this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(FIND_ALL_CATEGORIES_QUERY_NAME)
+				.list();
 		return categories;
 	}
 }

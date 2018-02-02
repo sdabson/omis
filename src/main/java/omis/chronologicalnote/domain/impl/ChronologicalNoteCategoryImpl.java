@@ -18,7 +18,6 @@
 
 package omis.chronologicalnote.domain.impl;
 
-import omis.chronologicalnote.domain.ChronologicalNote;
 import omis.chronologicalnote.domain.ChronologicalNoteCategory;
 
 /** Implementation of chronological note category.
@@ -91,14 +90,14 @@ public class ChronologicalNoteCategoryImpl
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ChronologicalNote)) {
+		if (!(obj instanceof ChronologicalNoteCategory)) {
 			return false;
 		}
-		ChronologicalNote that = (ChronologicalNote) obj;
+		ChronologicalNoteCategory that = (ChronologicalNoteCategory) obj;
 		if (this.getName() == null) {
 			throw new IllegalStateException("Name required");
 		}
-		if (!this.getName().equals(that.getOffender())) {
+		if (!this.getName().equals(that.getName())) {
 			return false;
 		}
 		return true;

@@ -60,4 +60,12 @@ public interface ChronologicalNoteCategoryAssociationDao extends GenericDao<Chro
 	 * @return chronological note category association
 	 */
 	ChronologicalNoteCategoryAssociation find(ChronologicalNote note, ChronologicalNoteCategory category);
+
+	/**
+	 * Returns associated chronological note categories for the specified chronological note.
+	 * 
+	 * @param note chronological note
+	 * @return list of chronological note categories
+	 */
+	List<ChronologicalNoteCategory> findAssociatedCategories(ChronologicalNote note);
 }

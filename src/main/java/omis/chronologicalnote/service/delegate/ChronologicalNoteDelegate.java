@@ -60,7 +60,7 @@ public class ChronologicalNoteDelegate {
 	 * @return newly created chronological note
 	 * @throws ChronologicalNoteExistsException Thrown when a duplicate chronological note is found.
 	 */
-	ChronologicalNote create(final Date date, final Offender offender, final String narrative)
+	public ChronologicalNote create(final Date date, final Offender offender, final String narrative)
 		throws ChronologicalNoteExistsException {
 		if (this.chronologicalNoteDao.find(date, offender, narrative) != null) {
 			throw new ChronologicalNoteExistsException("Chronological note already exists.");
@@ -80,12 +80,21 @@ public class ChronologicalNoteDelegate {
 	 * @return updated chronological note
 	 * @throws ChronologicalNoteExistsException Thrown when a duplicate chronological note is found.
 	 */
-	ChronologicalNote update(final ChronologicalNote note, final Date date, final String narrative)
+	public ChronologicalNote update(final ChronologicalNote note, final Date date, final String narrative)
 			throws ChronologicalNoteExistsException {
 		if (this.chronologicalNoteDao.findExcluding(note, date, note.getOffender(), narrative) != null) {
 			throw new ChronologicalNoteExistsException("Chronological note already exists.");
 		}
 		return this.chronologicalNoteDao.makePersistent(this.populateNote(note, date, narrative));
+	}
+	
+	/**
+	 * Removes the specified chronological note.
+	 * 
+	 * @param note chronological note
+	 */
+	public void remove(final ChronologicalNote note) {
+		this.chronologicalNoteDao.makeTransient(note);
 	}
 	
 	/* Helper methodos. */

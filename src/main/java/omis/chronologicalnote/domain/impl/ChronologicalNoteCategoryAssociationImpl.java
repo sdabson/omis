@@ -94,7 +94,7 @@ public class ChronologicalNoteCategoryAssociationImpl
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ChronologicalNote)) {
+		if (!(obj instanceof ChronologicalNoteCategoryAssociation)) {
 			return false;
 		}
 		ChronologicalNoteCategoryAssociation that
@@ -105,10 +105,10 @@ public class ChronologicalNoteCategoryAssociationImpl
 		if (!this.getNote().equals(that.getNote())) {
 			return false;
 		}
-		if (this.getNote() == null) {
-			throw new IllegalStateException("Note required");
+		if (this.getCategory() == null) {
+			throw new IllegalStateException("Category required");
 		}
-		if (!this.getNote().equals(that.getNote())) {
+		if (!this.getCategory().equals(that.getCategory())) {
 			return false;
 		}
 		return true;

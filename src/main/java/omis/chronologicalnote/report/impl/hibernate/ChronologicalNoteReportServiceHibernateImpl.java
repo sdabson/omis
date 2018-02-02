@@ -43,8 +43,8 @@ public class ChronologicalNoteReportServiceHibernateImpl
 		FIND_BY_OFFENDER_AND_CATEGORIES_QUERY_NAME
 		= "findChronologicalNoteSummaryByOffenderAndCategories";
 	private static final String FIND_CATEGORIES_QUERY_NAME = "findCategories";
-	private static final String FIND_CATEGORY_NAME_QUERY_NAME
-		= "findCategoryNames";
+	private static final String FIND_CATEGORY_NAME_BY_NOTE_QUERY_NAME
+		= "findCategoryNamesByNote";
 	
 	/* Parameter names. */
 	private static final String OFFENDER_PARAM_NAME = "offender";
@@ -112,7 +112,7 @@ public class ChronologicalNoteReportServiceHibernateImpl
 		@SuppressWarnings("unchecked")
 		List<String> categoryNames = this.sessionFactory
 			.getCurrentSession()
-			.getNamedQuery(FIND_CATEGORY_NAME_QUERY_NAME)
+			.getNamedQuery(FIND_CATEGORY_NAME_BY_NOTE_QUERY_NAME)
 			.setParameter(NOTE_PARAM_NAME, note)
 			.list();
 		return categoryNames;

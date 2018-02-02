@@ -26,8 +26,8 @@
        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.chronologicalnote.domain">
-	<class entity-name="omis.omis.chronologicalnote.domain.ChronologicalNote"
-		proxy="omis.omis.chronologicalnote.domain.ChronologicalNote"
+	<class entity-name="omis.chronologicalnote.domain.ChronologicalNote"
+		proxy="omis.chronologicalnote.domain.ChronologicalNote"
 		name="omis.chronologicalnote.domain.impl.ChronologicalNoteImpl"
 		table="`CHRONO_NOTE`">
 		<id name="id" column="`ID`" type="java.lang.Long">
@@ -51,7 +51,7 @@
 	<query name="findByOffender"><![CDATA[
 		select note
 		from
-			omis.chronologicalnote.domain.ChronologicalNote
+			omis.chronologicalnote.domain.ChronologicalNote note
 		where
 			note.offender = :offender
 		order by note.date
@@ -60,7 +60,7 @@
 	<query name="findChronologicalNote"><![CDATA[
 		select note
 		from
-			omis.chronologicalnote.domain.ChronologicalNote
+			omis.chronologicalnote.domain.ChronologicalNote note
 		where
 			note.offender = :offender
 			and note.date = :date
@@ -71,7 +71,7 @@
 	<query name="findExcludingChronologicalNote"><![CDATA[
 		select note
 		from
-			omis.chronologicalnote.domain.ChronologicalNote
+			omis.chronologicalnote.domain.ChronologicalNote note
 		where
 			note.offender = :offender
 			and note.date = :date

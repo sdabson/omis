@@ -26,17 +26,17 @@
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="omis.chronologicalnote.report">
+<hibernate-mapping package="omis.chronologicalnote">
 	<query name="findChronologicalNoteSummaryByOffender"><![CDATA[
-	select new omis.chronologicalnote.report.ChronologicalNoteSummary(
+	select new omis.chronologicalnote.report.ChronologicalNoteSummary( 
 		note.id,
 		note.date,
 		note.narrative,
-		(select category.name 
-		 from omis.chronologicalnote.domain.ChronologicalNoteCategoryAssociation association
-		 inner join association.category category
-		 where association.note = note
-		 order by category.name
+		(select innercategory.name 
+		 from omis.chronologicalnote.domain.ChronologicalNoteCategoryAssociation innerassociation
+		 inner join innerassociation.category innercategory
+		 where innerassociation.note = note
+		 order by innercategory.name
 		),
 		name.lastName,
 		name.firstName,
@@ -44,21 +44,28 @@
 		note.updateSignature.date
       ) 
     from 
-    	omis.chronologicalnote.domain.ChronologicalNote note
+    	omis.chronologicalnote.domain.ChronologicalNoteCategoryAssociation association
+    	inner join association.note note
     	inner join note.offender offender
     	inner join association.category category
     	inner join note.updateSignature.userAccount userAccount
     	inner join userAccount.user user
     	inner join user.name name
     where offender = :offender
-    and note.date = :date
 	]]></query>
 	
-	<query name="findChronologicalNoteSummaryByOffenderAndCategories"><![CDATA[
+	<query name="findChronologicalNoteSummaryByOffenderAndCategories"><![CDATA[ 
 	select new omis.chronologicalnote.report.ChronologicalNoteSummary(
 		note.id,
 		note.date,
 		note.narrative,
+		(select innercategory.name 
+		 from omis.chronologicalnote.domain.ChronologicalNoteCategoryAssociation innerassociation
+		 inner join innerassociation.category innercategory
+		 inner join innerassociation.note innernote
+		 where innernote = note
+		 order by innercategory.name
+		),
 		name.lastName,
 		name.firstName,
 		userAccount.username,
@@ -72,21 +79,23 @@
     	inner join userAccount.user user
     	inner join user.name name
     where offender = :offender
-    and association.category in (:categories)
+    and category in (:categories)
 	]]></query>
     
-    <query name="findCategories"><![CDATA[
+    <query name="findCategories"><![CDATA[   
 	select category
 		from
 			omis.chronologicalnote.domain.ChronologicalNoteCategory category
 		order by category.name
     ]]></query>
     
-    <query name="findCategoryNames"><![CDATA[
-	select association.category.name
+    <query name="findCategoryNamesByNote"><![CDATA[   
+	select category.name
 	from
 		omis.chronologicalnote.domain.ChronologicalNoteCategoryAssociation association
+		inner join association.category category
+		inner join association.note note
 	where
-		association.note = :note
+		note = :note
     ]]></query>
 </hibernate-mapping>
