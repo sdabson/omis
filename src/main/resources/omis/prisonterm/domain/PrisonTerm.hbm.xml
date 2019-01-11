@@ -25,10 +25,8 @@
 		     <many-to-one name="userAccount" entity-name="omis.user.domain.UserAccount" not-null="true" column="`UPDATE_ACCOUNT_ID`"/>
 		 	  	<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
 		  	</component>
-		       
 		<many-to-one name="offender" column="`OFFENDER_ID`" cascade="none" not-null="true"
 			entity-name="omis.offender.domain.Offender" unique="false"/>
-		
 		<property name="status" column="`STATUS`" not-null="true">
 			<type name="org.hibernate.type.EnumType">
 				<param name="enumClass">omis.prisonterm.domain.PrisonTermStatus</param>
@@ -36,13 +34,10 @@
 				<param name="type">12</param>
 			</type>
 		</property>
-		
 		<property name="sentenceToFollow" column="`SENTENCE_TO_FOLLOW`" type="yes_no" not-null="false"/>
-		
 		<property name="preSentenceCredits" column="`PRE_SENTENCE_CREDITS`" type="java.lang.Integer" not-null="false"/>
 		<property name="sentenceTermYears" column="`SENTENCE_TERM_YEARS`" type="java.lang.Integer" not-null="false"/>
 		<property name="sentenceTermDays" column="`SENTENCE_TERM_DAYS`" type="java.lang.Integer" not-null="false"/>
-		
 		<property name="actionDate" type="java.util.Date" not-null="true" column="`ACTION_DATE`"/>
 		<property name="sentenceDate" type="java.util.Date" not-null="false" column="`SENTENCE_DATE`"/>
 		<property name="paroleEligibilityDate" type="java.util.Date" not-null="false" column="`PAROLE_ELIGIBILITY_DATE`"/>
@@ -50,8 +45,8 @@
 		<property name="maximumDischargeDate" type="java.util.Date" not-null="false" column="`MAXIMUM_DISCHARGE_DATE`"/>
 		<property name="comments" type="java.lang.String" not-null="true" column="`COMMENTS`"/>
 		<property name="verificationDate" type="java.util.Date" not-null="false" column="`VERIFICATION_DATE`"/>
-		
 		<many-to-one name="verificationUser" entity-name="omis.user.domain.UserAccount" not-null="false" column="`VERIFICATION_ACCOUNT_ID`"/>
+		<many-to-one name="sentenceCalculation" column="`PRISON_TERM_DOCMNT_ASSOCTN_ID`" entity-name="omis.prisonterm.domain.PrisonTermDocumentAssociation" not-null="false" />
  	</class>
 	<query name="findPrisonTerm"><![CDATA[
 		select prisonTerm

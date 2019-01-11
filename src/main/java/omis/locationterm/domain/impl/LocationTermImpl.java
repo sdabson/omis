@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.domain.impl;
 
 import omis.audit.domain.CreationSignature;
@@ -32,6 +49,8 @@ public class LocationTermImpl
 	private Location location;
 	
 	private Boolean locked;
+	
+	private String notes;
 	
 	/** Instantiates a default implementation of location term. */
 	public LocationTermImpl() {
@@ -157,6 +176,18 @@ public class LocationTermImpl
 	
 	/** {@inheritDoc} */
 	@Override
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getNotes() {
+		return this.notes;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
 	public int hashCode() {
 		int hashCode = 14;
 		if (this.getDateRange() == null) {
@@ -172,5 +203,17 @@ public class LocationTermImpl
 		hashCode = 29 * hashCode + this.getLocation().hashCode();
 		hashCode = 29 * hashCode + this.getOffender().hashCode();
 		return hashCode;
+	}
+	
+	/**
+	 * Returns string representation of {@code this} including offender,
+	 * location, date range.
+	 * 
+	 * @return string representation of {@code this}
+	 */
+	@Override
+	public String toString() {
+		return String.format("#%d: [%s] [%s] [%s]", this.getId(),
+				this.getOffender(), this.getLocation(), this.getDateRange());
 	}
 }

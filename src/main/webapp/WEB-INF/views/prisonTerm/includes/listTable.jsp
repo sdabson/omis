@@ -14,6 +14,9 @@
 			<th class="date"><fmt:message key="prisonTermActionDateLabel"/></th>
 			<th class="date"><fmt:message key="prisonTermParoleEligibilityDateLabel"/></th>
 			<th class="date"><fmt:message key="prisonTermProjectedDischargeDateLabel"/></th>
+			<th><fmt:message key="sentenceToFollowLabel"/></th>
+			<th><fmt:message key="verificationUserLabel"/></th>
+			<th class="date"><fmt:message key="verificationDateLabel"/></th>
 			<th><fmt:message key="prisonTermStatusLabel"/></th>
 		</tr>
 	</thead>

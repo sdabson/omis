@@ -128,6 +128,16 @@ public class RelationshipNoteDelegate {
 	}
 	
 	/**
+	 * Removes notes by relationship.
+	 * 
+	 * @param relationship relationship by which to remove notes
+	 * @return count of notes removed
+	 */
+	public int removeByRelationship(final Relationship relationship) {
+		return this.relationshipNoteDao.removeByRelationship(relationship);
+	}
+	
+	/**
 	 * Returns notes by relationship.
 	 * 
 	 * @param relationship relationship by which to return notes
@@ -137,7 +147,6 @@ public class RelationshipNoteDelegate {
 			final Relationship relationship) {
 		return this.relationshipNoteDao.findByRelationship(relationship);
 	}
-	
 	
 	/* Helper methods. */
 	
@@ -151,5 +160,15 @@ public class RelationshipNoteDelegate {
 		note.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
+	}
+
+	/**
+	 * Returns count of notes by relationship.
+	 * 
+	 * @param relationship relationship
+	 * @return count of notes by relationship
+	 */
+	public long countByRelationship(Relationship relationship) {
+		return this.relationshipNoteDao.countByRelationship(relationship);
 	}
 }

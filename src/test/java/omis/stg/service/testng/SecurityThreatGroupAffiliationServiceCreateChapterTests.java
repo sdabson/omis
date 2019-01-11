@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.testng;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -5,12 +22,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
 
 import omis.country.domain.Country;
+import omis.country.exception.CountryExistsException;
 import omis.country.service.delegate.CountryDelegate;
-import omis.exception.DuplicateEntityFoundException;
 import omis.region.domain.State;
+import omis.region.exception.StateExistsException;
 import omis.region.service.delegate.StateDelegate;
 import omis.stg.domain.SecurityThreatGroup;
 import omis.stg.domain.SecurityThreatGroupChapter;
+import omis.stg.exception.SecurityThreatGroupChapterExistsException;
+import omis.stg.exception.SecurityThreatGroupExistsException;
 import omis.stg.service.SecurityThreatGroupAffiliationService;
 import omis.stg.service.delegate.SecurityThreatGroupChapterDelegate;
 import omis.stg.service.delegate.SecurityThreatGroupDelegate;
@@ -21,6 +41,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create security threat group chapters.
  *
  * @author Josh Divine
+ * @author Sheronda Vaughn
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -59,10 +80,14 @@ public class SecurityThreatGroupAffiliationServiceCreateChapterTests
 	/**
 	 * Tests the creation of a security threat group chapter.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupExistsException 
+	 * @throws CountryExistsException 
+	 * @throws StateExistsException 
 	 */
 	@Test
-	public void testCreateChapter() throws DuplicateEntityFoundException {
+	public void testCreateChapter() throws SecurityThreatGroupChapterExistsException, 
+		SecurityThreatGroupExistsException, CountryExistsException, StateExistsException {
 		// Arrangements
 		String name = "Chapter";
 		Country country = this.countryDelegate.create("Country", "C", true);
@@ -84,13 +109,17 @@ public class SecurityThreatGroupAffiliationServiceCreateChapterTests
 	}
 
 	/**
-	 * Tests {@code DuplicateEntityFoundException} is thrown.
+	 * Tests {@code SecurityThreatGroupChapterExistsException} is thrown.
 	 * 
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupExistsException 
+	 * @throws StateExistsException 
+	 * @throws CountryExistsException 
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
-	public void testDuplicateEntityFoundException() 
-			throws DuplicateEntityFoundException {
+	@Test(expectedExceptions = {SecurityThreatGroupChapterExistsException.class})
+	public void testSecurityThreatGroupChapterExistsException() 
+			throws SecurityThreatGroupChapterExistsException, SecurityThreatGroupExistsException, 
+			StateExistsException, CountryExistsException {
 		// Arrangements
 		String name = "Chapter";
 		Country country = this.countryDelegate.create("Country", "C", true);
@@ -105,5 +134,4 @@ public class SecurityThreatGroupAffiliationServiceCreateChapterTests
 		this.securityThreatGroupAffiliationService.createChapter(name, 
 						securityThreatGroup);
 	}
-
 }

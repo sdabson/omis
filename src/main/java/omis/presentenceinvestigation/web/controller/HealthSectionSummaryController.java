@@ -54,7 +54,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Health section summary controller.
  *
  * @author Sheronda Vaughn
- * @version 0.1.0 (May 10, 2017)
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -604,7 +605,7 @@ public class HealthSectionSummaryController {
 				request);
 		map.addAttribute("ratings", HealthRating.values());
 		this.offenderSummaryModelDelegate.add(map, (Offender) 
-				request.getDocket().getPerson());
+				request.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(
 				map, request);
 		map.addAttribute(HEALTH_SECTION_SUMMARY_MODEL_KEY, summary);

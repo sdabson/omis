@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.residence.service.delegate;
 
 import java.util.Date;
@@ -9,7 +26,6 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.audit.domain.VerificationSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
@@ -17,11 +33,13 @@ import omis.residence.dao.ResidenceTermDao;
 import omis.residence.domain.ResidenceCategory;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
+import omis.residence.exception.ResidenceTermExistsException;
 
 /**
  * Residence term service implementation delegate.
  * 
  * @author Sheronda Vaughn
+ * @author Yidong Li
  * @version 0.1.0 (May 5, 2015)
  * @since OMIS 3.0
  *
@@ -48,7 +66,6 @@ public class ResidenceTermDelegate {
 	 * the specified date access object and instance factory.
 	 * 
 	 * @param residenceTermDao residence term dao
-	 * @param nonResidenceTermDao non residence term dao
 	 * @param residenceTermInstanceFactory residence term instance factory
 	 * @param auditComponentRetriever audit component retriever
 	 */
@@ -75,7 +92,7 @@ public class ResidenceTermDelegate {
 	 * @param notes notes
 	 * @param verificationSignature verification signature
 	 * @return residence term
-	 * @throws DuplicateEntityFoundException thrown when a duplicate residence
+	 * @throws ResidenceTermExistsException thrown when a duplicate residence
 	 * term exist
 	 */
 	public ResidenceTerm createResidenceTerm(final Person person,
@@ -84,10 +101,9 @@ public class ResidenceTermDelegate {
 			final Address address, final ResidenceStatus residenceStatus, 
 			final Boolean confirmed, final String notes, 
 			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {
-		if (this.residenceTermDao.find(person, dateRange, address, 
-				residenceCategory, residenceStatus) != null) { 
-			throw new DuplicateEntityFoundException(
+			throws ResidenceTermExistsException {
+		if (this.residenceTermDao.find(person, dateRange, address) != null) { 
+			throw new ResidenceTermExistsException(
 					"Duplicate residence term found");
 		}		
 		ResidenceTerm residenceTerm = this.residenceTermInstanceFactory
@@ -117,7 +133,7 @@ public class ResidenceTermDelegate {
 	 * @param notes notes
 	 * @param verificationSignature verification signature
 	 * @return update residence term
-	 * @throws DuplicateEntityFoundException thrown when a duplicate 
+	 * @throws ResidenceTermExistsException thrown when a duplicate 
 	 * residence term is found excluding the residence term in view
 	 */
 	public ResidenceTerm updateResidenceTerm(final ResidenceTerm residenceTerm,
@@ -126,11 +142,11 @@ public class ResidenceTermDelegate {
 			final Address address, final ResidenceStatus residenceStatus, 
 			final Boolean confirmed, final String notes, 
 			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {	
+			throws ResidenceTermExistsException {	
 		if (this.residenceTermDao.findExcluding(
 				residenceTerm.getPerson(), dateRange, address, 
-				residenceTerm, residenceCategory, residenceStatus) != null) {
-			throw new DuplicateEntityFoundException(
+				residenceTerm) != null) {
+			throw new ResidenceTermExistsException(
 					"Duplicate residence term found");
 		}		
 		this.populateResidenceTerm(residenceTerm, dateRange, address, 
@@ -165,7 +181,7 @@ public class ResidenceTermDelegate {
 			final ResidenceCategory category,
 			final ResidenceStatus status) {
 		return this.residenceTermDao.find(person,
-				new DateRange(startDate, endDate), address, category, status);
+				new DateRange(startDate, endDate), address);
 	}
 	
 	/* Helper methods. */
@@ -239,8 +255,8 @@ public class ResidenceTermDelegate {
 	 * @param dateRange date range
 	 * @return list of residence terms
 	 */
-	public List<ResidenceTerm> findAssociatedResidenceTerms(Person person,
-			DateRange dateRange) {
+	public List<ResidenceTerm> findAssociatedResidenceTerms(final Person person,
+			final DateRange dateRange) {
 		return this.residenceTermDao.findAssociatedResidenceTerms(
 				person, dateRange);
 	}
@@ -253,8 +269,8 @@ public class ResidenceTermDelegate {
 	 * @param dateRange date range
 	 * @return list of residence terms
 	 */
-	public List<ResidenceTerm> findResidenceTermsByPerson(Person person,
-			DateRange dateRange) {
+	public List<ResidenceTerm> findResidenceTermsByPerson(final Person person,
+			final DateRange dateRange) {
 		return this.residenceTermDao.findAssociatedResidenceTerms(
 				person, dateRange);
 	}
@@ -269,9 +285,9 @@ public class ResidenceTermDelegate {
 	 * @param dateRange date range
 	 * @return list of residence terms
 	 */
-	public List<ResidenceTerm> findResidenceTermsByPersonExcluding(Person
-			person, ResidenceTerm residenceTerm, Address address, 
-			DateRange dateRange) {
+	public List<ResidenceTerm> findResidenceTermsByPersonExcluding(final Person
+			person, final ResidenceTerm residenceTerm, final Address address, 
+			final DateRange dateRange) {
 		return this.residenceTermDao.findResidenceTermsByPersonExcluding(
 				person, residenceTerm, address, dateRange);
 	}

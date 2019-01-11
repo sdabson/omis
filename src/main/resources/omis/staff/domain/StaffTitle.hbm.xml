@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Staff title mapping and queries.
+  -
+  - Author: Stephen Abson
+  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.staff.domain">
+	
+	<!-- Maps entity. -->
 	<class	entity-name="omis.staff.domain.StaffTitle"
 			proxy="omis.staff.domain.StaffTitle"
 			name="omis.staff.domain.impl.StaffTitleImpl"
@@ -16,20 +42,28 @@
 		<property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
 		<property name="sortOrder" type="short" not-null="true" column="`SORT_ORDER`"/>
 	</class>
+	
+	<!-- Returns staff titles by sort order and name. -->
 	<query name="findAllStaffTitles"><![CDATA[
 		select staffTitle
 		from omis.staff.domain.StaffTitle staffTitle
 		order by staffTitle.sortOrder, staffTitle.name
 	]]></query>
+	
+	<!-- Returns maximum sort order for staff titles. -->
 	<query name="findMaxStaffTitleSortOrder">
 		select coalesce(max(staffTitle.sortOrder), 0)
 		from omis.staff.domain.StaffTitle staffTitle
 	</query>
+	
+	<!-- Finds staff title by name. -->
 	<query name="findStaffTitle">
 		select staffTitle
 		from omis.staff.domain.StaffTitle staffTitle
 		where staffTitle.name = :name
 	</query>
+	
+	<!-- Finds staff title by name with exclusions. -->
 	<query name="findStaffTitleExcluding">
 		select staffTitle
 		from omis.staff.domain.StaffTitle staffTitle

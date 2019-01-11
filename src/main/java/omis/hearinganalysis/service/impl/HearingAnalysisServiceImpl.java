@@ -28,19 +28,20 @@ import omis.hearinganalysis.service.HearingAnalysisService;
 import omis.hearinganalysis.service.delegate.HearingAnalysisCategoryDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisNoteDelegate;
-import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
-import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
 import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
+import omis.paroleboardmember.domain.ParoleBoardMember;
+import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
 /**
  * Implementation of service for hearing analysis.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.4 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class HearingAnalysisServiceImpl implements HearingAnalysisService {
@@ -55,7 +56,7 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	
 	private final BoardMeetingSiteDelegate boardMeetingSiteDelegate;
 	
-	private final BoardAttendeeDelegate boardAttendeeDelegate;
+	private final ParoleBoardMemberDelegate paroleBoardMemberDelegate;
 	
 	private final HearingAnalysisCategoryDelegate 
 			hearingAnalysisCategoryDelegate;
@@ -75,14 +76,14 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 			final HearingAnalysisNoteDelegate hearingAnalysisNoteDelegate,
 			final ParoleBoardItineraryDelegate paroleBoardItineraryDelegate,
 			final BoardMeetingSiteDelegate boardMeetingSiteDelegate,
-			final BoardAttendeeDelegate boardAttendeeDelegate,
+			final ParoleBoardMemberDelegate paroleBoardMemberDelegate,
 			final HearingAnalysisCategoryDelegate 
 					hearingAnalysisCategoryDelegate) {
 		this.hearingAnalysisDelegate = hearingAnalysisDelegate;
 		this.hearingAnalysisNoteDelegate = hearingAnalysisNoteDelegate;
 		this.paroleBoardItineraryDelegate = paroleBoardItineraryDelegate;
 		this.boardMeetingSiteDelegate = boardMeetingSiteDelegate;
-		this.boardAttendeeDelegate = boardAttendeeDelegate;
+		this.paroleBoardMemberDelegate = paroleBoardMemberDelegate;
 		this.hearingAnalysisCategoryDelegate = hearingAnalysisCategoryDelegate;
 	}
 	
@@ -90,22 +91,25 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 	@Override
 	public HearingAnalysis createHearingAnalysis(
 			final ParoleEligibility eligibility, 
-			final BoardMeetingSite meetingSite,
-			final BoardAttendee analyst, final HearingAnalysisCategory category) 
+			final ParoleBoardMember analyst, 
+			final HearingAnalysisCategory category, 
+			final Date expectedCompletionDate) 
 					throws DuplicateEntityFoundException {
-		return this.hearingAnalysisDelegate.create(eligibility, meetingSite, 
-				category, analyst);
+		return this.hearingAnalysisDelegate.create(eligibility, category, 
+				analyst, expectedCompletionDate);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public HearingAnalysis updateHearingAnalysis(
 			final HearingAnalysis hearingAnalysis, 
-			final BoardMeetingSite meetingSite,
-			final BoardAttendee analyst, final HearingAnalysisCategory category) 
+			final ParoleBoardMember analyst, 
+			final HearingAnalysisCategory category,
+			final Date expectedCompletionDate)
 					throws DuplicateEntityFoundException {
-		return this.hearingAnalysisDelegate.update(hearingAnalysis, meetingSite, 
-				category, analyst);
+		return this.hearingAnalysisDelegate.update(hearingAnalysis, 
+				hearingAnalysis.getEligibility(), category, analyst, 
+				expectedCompletionDate);
 	}
 
 	/** {@inheritDoc} */
@@ -150,11 +154,12 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<ParoleBoardItinerary> findItinerariesAfterDate(
-			final Date effectiveDate) {
-		return this.paroleBoardItineraryDelegate.findAfterDate(effectiveDate);
+	public List<ParoleBoardItinerary> 
+			findItinerariesByEffectiveDate(final Date effectiveDate) {
+		return this.paroleBoardItineraryDelegate.findByEffectiveDate(
+				effectiveDate);
 	}
-
+	
 	/** {@inheritDoc} */
 	@Override
 	public List<BoardMeetingSite> findBoardMeetingSitesByItinerary(
@@ -165,10 +170,10 @@ public class HearingAnalysisServiceImpl implements HearingAnalysisService {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<BoardAttendee> findBoardAttendeesByItinerary(
-			final ParoleBoardItinerary itinerary) {
-		return this.boardAttendeeDelegate.findBoardAttendeesByBoardItinerary(
-				itinerary);
+	public List<ParoleBoardMember> findBoardMembersByDate(
+			final Date effectiveDate) {
+		return this.paroleBoardMemberDelegate.findBoardMembersByDate(
+				effectiveDate);
 	}
 
 	/** {@inheritDoc} */

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.web.controller;
 
 import java.util.ArrayList;
@@ -11,6 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +40,6 @@ import omis.audit.domain.VerificationSignature;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -34,17 +51,23 @@ import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupAffiliationNote;
 import omis.stg.domain.SecurityThreatGroupChapter;
 import omis.stg.domain.SecurityThreatGroupRank;
+import omis.stg.exception.SecurityThreatGroupAffiliationExistsException;
+import omis.stg.exception.SecurityThreatGroupAffiliationNoteExistsException;
+import omis.stg.exception.SecurityThreatGroupChapterExistsException;
+import omis.stg.exception.SecurityThreatGroupRankExistsException;
 import omis.stg.service.SecurityThreatGroupAffiliationService;
 import omis.stg.web.form.SecurityThreatGroupAffiliationForm;
 import omis.stg.web.form.SecurityThreatGroupAffiliationNoteItem;
 import omis.stg.web.form.SecurityThreatGroupAffiliationNoteItemOperation;
 import omis.stg.web.validator.SecurityThreatGroupAffiliationFormValidator;
 import omis.user.domain.UserAccount;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
  * Controller for managing security threat group affiliations.
  * 
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Jan 17, 2014)
  * @since OMIS 3.0
  */
@@ -107,6 +130,26 @@ public class ManageSecurityThreatGroupAffiliationController {
 	/* Field formats. */
 	
 	private static final String USER_ACCOUNT_LABEL_FORMAT = "%s, %s (%s)";
+	
+	/* Message Keys. */
+	
+	private static final String SECURITY_THREAT_GROUP_AFFILLIATION_EXISTS_EXCEPTION
+		= "stgAffilliation.exists";
+	
+	private static final String 
+		SECURITY_THREAT_GROUP_AFFILLIATION_NOTE_EXISTS_EXCEPTION 
+		= "stgAffilliationNote.exists";
+	
+	private static final String SECURITY_THREAT_GROUP_RANK_EXISTS_EXCEPTION 
+		= "stgRank.exists";
+	
+	private static final String SECURITY_THREAT_GROUP_CHAPTER_EXISTS_EXCEPTION 
+		= "stgChapter.exists";
+	
+	/* Message bundles. */
+	
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.stg.msgs.form";
 	
 	/* Services. */
 	
@@ -180,6 +223,10 @@ public class ManageSecurityThreatGroupAffiliationController {
 	
 	@Autowired
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
+	
+	@Autowired
+	@Qualifier("businessExceptionHandlerDelegate")
+	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
 	
 	/* Constructor. */
 	
@@ -288,7 +335,10 @@ public class ManageSecurityThreatGroupAffiliationController {
 	 * affiliation
 	 * @param result binding result
 	 * @return redirect to list security threat group by offender
-	 * @throws DuplicateEntityFoundException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException 
+	 * @throws SecurityThreatGroupRankExistsException 
+	 * @throws SecurityThreatGroupChapterExistsException 
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('STG_AFFILIATION_CREATE') or hasRole('ADMIN')")
@@ -297,7 +347,9 @@ public class ManageSecurityThreatGroupAffiliationController {
 				final Offender offender,
 			final SecurityThreatGroupAffiliationForm
 				securityThreatGroupAffiliationForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result) throws SecurityThreatGroupAffiliationExistsException, 
+				SecurityThreatGroupAffiliationNoteExistsException, 
+				SecurityThreatGroupRankExistsException, SecurityThreatGroupChapterExistsException {
 		this.securityThreatGroupAffiliationFormValidator.validate(
 				securityThreatGroupAffiliationForm, result);
 		if (result.hasErrors()) {
@@ -379,7 +431,10 @@ public class ManageSecurityThreatGroupAffiliationController {
 	 * affiliation
 	 * @param result binding result
 	 * @return redirect to list security threat group by offender
-	 * @throws DuplicateEntityFoundException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException 
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupRankExistsException 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('STG_AFFILIATION_EDIT') or hasRole('ADMIN')")
@@ -388,7 +443,9 @@ public class ManageSecurityThreatGroupAffiliationController {
 				final SecurityThreatGroupAffiliation affiliation,
 			final SecurityThreatGroupAffiliationForm
 				securityThreatGroupAffiliationForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result) throws SecurityThreatGroupAffiliationExistsException,
+					SecurityThreatGroupAffiliationNoteExistsException, 
+					SecurityThreatGroupChapterExistsException, SecurityThreatGroupRankExistsException {
 		this.securityThreatGroupAffiliationFormValidator.validate(
 				securityThreatGroupAffiliationForm, result);
 		if (result.hasErrors()) {
@@ -580,13 +637,13 @@ public class ManageSecurityThreatGroupAffiliationController {
 	 * 
 	 * @param items security threat group affiliation note items
 	 * @param affiliation security threat group affiliation
-	 * @throws DuplicateEntityFoundException thrown when a duplicate security
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException thrown when a duplicate security
 	 * threat group affiliation note is found
 	 */
 	private void processSecurityThreatGroupAffiliationNoteItems(
 			final List<SecurityThreatGroupAffiliationNoteItem> items,
 			final SecurityThreatGroupAffiliation affiliation)
-		throws DuplicateEntityFoundException {
+		throws SecurityThreatGroupAffiliationNoteExistsException {
 		if (items != null) {
 			for (SecurityThreatGroupAffiliationNoteItem item 
 					: items) {
@@ -607,6 +664,64 @@ public class ManageSecurityThreatGroupAffiliationController {
 				}
 			}
 		}
+	}
+	
+	/* Exception handlers. */
+	
+	/**
+	 * Security threat group affiliation exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupAffiliationExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupAffiliationExistsException(
+			final SecurityThreatGroupAffiliationExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_AFFILLIATION_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group affiliation note exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupAffiliationNoteExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupAffiliationNoteExistsException(
+			final SecurityThreatGroupAffiliationNoteExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_AFFILLIATION_NOTE_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group rank exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupRankExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupRankExistsException(
+			final SecurityThreatGroupRankExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_RANK_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group chapter exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupChapterExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupChapterExistsException(
+			final SecurityThreatGroupChapterExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_CHAPTER_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
 	}
 	
 	/* Init binder. */

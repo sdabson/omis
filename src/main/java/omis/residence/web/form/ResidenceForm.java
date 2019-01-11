@@ -1,5 +1,19 @@
-/**
- * 
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package omis.residence.web.form;
 
@@ -7,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
+import omis.address.web.form.AddressFields;
 import omis.audit.domain.VerificationMethod;
 import omis.location.domain.Location;
 import omis.region.domain.City;
@@ -22,6 +38,7 @@ import omis.user.domain.UserAccount;
  * Residence form.
  * 
  * @author Sheronda Vaughn
+ * @author Stephen Abson
  * @version 0.1.0 (Mar 2, 2015)
  * @since OMIS 3.0
  */
@@ -51,6 +68,8 @@ public class ResidenceForm {
 	
 	private Boolean confirmed;
 	
+	private Boolean mailingAddressAtResidence;
+	
 	private Boolean createNewLocation;
 	
 	private String locationName;
@@ -73,6 +92,28 @@ public class ResidenceForm {
 	= new ArrayList<NonResidenceTerm>();
 	
 	private Boolean endConflictingNonResidenceTerms; 
+	
+	private AddressFields addressFields;
+	
+	private Address existingAddress;
+	
+	private ExistingResidenceAddressOperation existingAddressOperation;
+	
+	private Boolean showAddressFields;
+	
+	private Boolean enterAddressFields;
+	
+	private String existingStringAddressQuery;
+	
+	private Boolean createNewCity;
+	
+	private String cityName;
+	
+	private Boolean createNewZipCode;
+	
+	private String zipCodeValue;
+	
+	private String zipCodeExtension;
 	
 	/**
 	 * Instantiates a default instance of residence form.
@@ -296,20 +337,39 @@ public class ResidenceForm {
 	public void setConfirmed(final Boolean confirmed) {
 		this.confirmed = confirmed;
 	}
-			
+	
 	/**
+	 * Returns whether residence is at mailing address.
+	 * 
+	 * @return whether residence is at mailing address
+	 */
+	public Boolean getMailingAddressAtResidence() {
+		return this.mailingAddressAtResidence;
+	}
+	
+	/**
+	 * Sets whether residence is at mailing address.
+	 * 
+	 * @param mailingAddressAtResidence whether residence is at mailing address
+	 */
+	public void setMailingAddressAtResidence(
+			final Boolean mailingAddressAtResidence) {
+		this.mailingAddressAtResidence = mailingAddressAtResidence;
+	}
+	
+	/**
+	 * Returns whether to create new location.
 	 *
-	 *
-	 * @return the createNewLocation
+	 * @return whether to create new location
 	 */
 	public Boolean getCreateNewLocation() {
 		return this.createNewLocation;
 	}
 
 	/**
+	 * Sets whether to create new location.
 	 *
-	 *
-	 * @param createNewLocation createNewLocation
+	 * @param createNewLocation whether to create new location
 	 */
 	public void setCreateNewLocation(final Boolean createNewLocation) {
 		this.createNewLocation = createNewLocation;
@@ -498,5 +558,203 @@ public class ResidenceForm {
 	 */
 	public void setEndConflictingNonResidenceTerms(final Boolean endConflictingNonResidenceTerms) {
 		this.endConflictingNonResidenceTerms = endConflictingNonResidenceTerms;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the addressFields
+	 */
+	public AddressFields getAddressFields() {
+		return this.addressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @param addressFields addressFields
+	 */
+	public void setAddressFields(AddressFields addressFields) {
+		this.addressFields = addressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the existingAddress
+	 */
+	public Address getExistingAddress() {
+		return this.existingAddress;
+	}
+
+	/**
+	 *
+	 *
+	 * @param existingAddress existingAddress
+	 */
+	public void setExistingAddress(Address existingAddress) {
+		this.existingAddress = existingAddress;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the existingAddressOperation
+	 */
+	public ExistingResidenceAddressOperation getExistingAddressOperation() {
+		return this.existingAddressOperation;
+	}
+
+	/**
+	 *
+	 *
+	 * @param existingAddressOperation existingAddressOperation
+	 */
+	public void setExistingAddressOperation(ExistingResidenceAddressOperation existingAddressOperation) {
+		this.existingAddressOperation = existingAddressOperation;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the showAddressFields
+	 */
+	public Boolean getShowAddressFields() {
+		return this.showAddressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @param showAddressFields showAddressFields
+	 */
+	public void setShowAddressFields(Boolean showAddressFields) {
+		this.showAddressFields = showAddressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the enterAddressFields
+	 */
+	public Boolean getEnterAddressFields() {
+		return this.enterAddressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @param enterAddressFields enterAddressFields
+	 */
+	public void setEnterAddressFields(Boolean enterAddressFields) {
+		this.enterAddressFields = enterAddressFields;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the existingStringAddress
+	 */
+	public String getExistingStringAddressQuery() {
+		return this.existingStringAddressQuery;
+	}
+
+	/**
+	 *
+	 *
+	 * @param existingStringAddressQuery existing String Address query
+	 */
+	public void setExistingStringAddressQuery(String existingStringAddressQuery) {
+		this.existingStringAddressQuery = existingStringAddressQuery;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the createNewCity
+	 */
+	public Boolean getCreateNewCity() {
+		return this.createNewCity;
+	}
+
+	/**
+	 *
+	 *
+	 * @param createNewCity createNewCity
+	 */
+	public void setCreateNewCity(Boolean createNewCity) {
+		this.createNewCity = createNewCity;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the createNewZipCode
+	 */
+	public Boolean getCreateNewZipCode() {
+		return this.createNewZipCode;
+	}
+
+	/**
+	 *
+	 *
+	 * @param createNewZipCode createNewZipCode
+	 */
+	public void setCreateNewZipCode(Boolean createNewZipCode) {
+		this.createNewZipCode = createNewZipCode;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the cityName
+	 */
+	public String getCityName() {
+		return this.cityName;
+	}
+
+	/**
+	 *
+	 *
+	 * @param cityName cityName
+	 */
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the zipCodeValue
+	 */
+	public String getZipCodeValue() {
+		return this.zipCodeValue;
+	}
+
+	/**
+	 *
+	 *
+	 * @param zipCodeValue zipCodeValue
+	 */
+	public void setZipCodeValue(String zipCodeValue) {
+		this.zipCodeValue = zipCodeValue;
+	}
+
+	/**
+	 *
+	 *
+	 * @return the zipCodeExtension
+	 */
+	public String getZipCodeExtension() {
+		return this.zipCodeExtension;
+	}
+
+	/**
+	 *
+	 *
+	 * @param zipCodeExtension zipCodeExtension
+	 */
+	public void setZipCodeExtension(String zipCodeExtension) {
+		this.zipCodeExtension = zipCodeExtension;
 	}
 }

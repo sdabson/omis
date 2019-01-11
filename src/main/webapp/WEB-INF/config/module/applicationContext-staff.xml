@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Staff module configuration.
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,9 +40,24 @@
   	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   </bean>
   
+  <bean id="staffAssignmentService" class="omis.staff.service.impl.StaffAssignmentServiceImpl">
+    <constructor-arg name="staffAssignmentDelegate" ref="staffAssignmentDelegate"/>
+    <constructor-arg name="personDelegate" ref="personDelegate"/>
+    <constructor-arg name="suffixDelegate" ref="suffixDelegate"/>
+    <constructor-arg name="personDemographicsDelegate" ref="personDemographicsDelegate"/>
+    <constructor-arg name="staffPhotoAssociationDelegate" ref="staffPhotoAssociationDelegate"/>
+    <constructor-arg name="photoDelegate" ref="photoDelegate"/>
+    <constructor-arg name="eyeColorDelegate" ref="eyeColorDelegate"/>
+    <constructor-arg name="hairColorDelegate" ref="hairColorDelegate"/>
+    <constructor-arg name="staffTitleDelegate" ref="staffTitleDelegate"/>
+    <constructor-arg name="supervisoryOrganizationDelegate" ref="supervisoryOrganizationDelegate"/>
+    <constructor-arg name="locationDelegate" ref="locationDelegate"/>
+    <constructor-arg name="organizationDivisionDelegate" ref="organizationDivisionDelegate"/>
+  </bean>
+  
   <!-- Delegates -->
   
-   <bean id="staffTitleDelegate" class="omis.staff.service.delegate.StaffTitleDelegate">
+  <bean id="staffTitleDelegate" class="omis.staff.service.delegate.StaffTitleDelegate">
     <constructor-arg name="staffTitleDao" ref="staffTitleDao"/>
     <constructor-arg name="staffTitleInstanceFactory" ref="staffTitleInstanceFactory"/>
   </bean>
@@ -30,18 +67,28 @@
     <constructor-arg name="staffAssignmentInstanceFactory" ref="staffAssignmentInstanceFactory"/>
   </bean>
   
+  <bean id="staffPhotoAssociationDelegate" class="omis.staff.service.delegate.StaffPhotoAssociationDelegate">
+    <constructor-arg name="staffPhotoAssociationInstanceFactory" ref="staffPhotoAssociationInstanceFactory"/>
+    <constructor-arg name="staffPhotoAssociationDao" ref="staffPhotoAssociationDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
   <!-- Instance factories -->
   
-    <bean id="staffTitleInstanceFactory"
-        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+  <bean id="staffTitleInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
     <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
     <constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
   </bean>
   
   <bean id="staffAssignmentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
-		<constructor-arg name="entityName" value="omis.staff.domain.StaffAssignment" />
-	</bean>
+	<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+	<constructor-arg name="entityName" value="omis.staff.domain.StaffAssignment" />
+  </bean>
+  
+  <bean id="staffPhotoAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.staff.domain.StaffPhotoAssociation"/>
+  </bean>
   
   <!-- Data access objects -->
     
@@ -57,20 +104,54 @@
   	<constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
   </bean>
   
-    <!-- Property editor factories -->
+  <bean id="staffPhotoAssociationDao"
+        class="omis.staff.dao.impl.hibernate.StaffPhotoAssociationDaoHibernateImpl">
+    <constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    <constructor-arg name="entityName" value="omis.staff.domain.StaffPhotoAssociation"/>
+  </bean>
+  
+  <!-- Property editor factories -->
   
   <bean id="staffTitlePropertyEditorFactory"
         class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
     <constructor-arg name="dao" ref="staffTitleDao"/>
     <constructor-arg name="entityName" value="omis.staff.domain.StaffTitle"/>
     <constructor-arg name="configuration" ref="hibernateConfiguration"/>
-  </bean>  
+  </bean>
   
-  <bean id="staffAssignmentPropertyEditorFactory"
-	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+  <bean id="staffPhotoAssociationPropertyEditorFactory"
+        class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+    <constructor-arg name="dao" ref="staffPhotoAssociationDao"/>
+    <constructor-arg name="entityName" value="omis.staff.domain.StaffPhotoAssociation"/>
+    <constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  </bean>   
+  
+  <bean id="staffAssignmentPropertyEditorFactory" class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
 		<constructor-arg name="dao" ref="staffAssignmentDao" />
 		<constructor-arg name="entityName"
 			value="omis.staff.domain.StaffAssignment" />
 		<constructor-arg name="configuration" ref="hibernateConfiguration" />
-	</bean>
+  </bean>
+  
+  <!-- Locator for staff photos. -->
+  
+  <bean id="staffPhotoLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+    <constructor-arg name="path" value="${application.resource.path}\Photos\StaffPhotos"/>
+  </bean>
+  
+  <!-- Photo I/O helpers. -->
+  
+  <bean id="staffPhotoRetriever" class="omis.media.io.impl.SimplePhotoRetrieverImpl">
+    <constructor-arg name="fileLocator" ref="staffPhotoLocator"/>
+    <constructor-arg name="defaultFilename" value="NotFound.jpg"/>
+  </bean>
+  
+  <bean id="staffPhotoPersister" class="omis.media.io.impl.SimplePhotoPersisterImpl">
+    <constructor-arg name="fileLocator" ref="staffPhotoLocator"/>
+  </bean>
+  
+  <bean id="staffPhotoRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+    <constructor-arg name="fileLocator" ref="staffPhotoLocator"/>
+  </bean>
+  
 </beans>

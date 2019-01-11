@@ -31,7 +31,6 @@
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/colors.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/fonts.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/caseload/style/form.css"/>
 	<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
@@ -40,15 +39,18 @@
 	<jsp:include page="/WEB-INF/views/common/includes/personFieldsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/address/includes/addressFieldsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/contact/includes/poBoxFieldsResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/contactSummaryResources.jsp"/> 
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/offenderRelationship/scripts/createOffenderRelationships.js?VERSION=1"></script>
 	<script type="text/javascript">
 		var offender = ${offender.id};
 		var offenderRelationshipTelephoneNumberIndex= ${offenderRelationshipTelephoneNumberIndex};
 		var offenderRelationshipOnlineAccountIndex= ${offenderRelationshipOnlineAccountIndex};
+		var offenderRelationshipNoteItemIndex = ${offenderRelationshipNoteItemIndex};
 		var createFamilyMemberStatus= ${createFamilyMemberStatus};
 		var createVictimStatus= ${createVictimStatus};
 		var createVisitorStatus= ${createVisitorStatus};
 		var newRelation = ${newRelation};
+		var spauseStatus = ${spauseStatus};
 	</script>
 </head>
 <body>

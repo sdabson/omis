@@ -38,32 +38,38 @@
 	 			</c:if>
 	 		</li>
 	 	</sec:authorize>
-	 	 	
+		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty offender}">
+			<li>
+				<omis:reportPro reportPath="/Relationships/Victims/BOPP_Pending_Hearing_Victim_Notification&DOC_ID=${offender.offenderNumber}" decorate="no" title="" className="newTab reportLink"><fmt:message key="boppVictimNotificationReportLinkLabel"/></omis:reportPro>
+			</li>
+		</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/victim/association/bOPPVictimStatementReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="bOPPVictimStatementReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>	 		 	 	
 		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
 		<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimImpactStatementReport.html?reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimImpactReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/victim/association/victimImpactStatementReport.html?reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="victimImpactReportLinkLabel"/></a>
 			</li>
 		</c:if>	
 		</sec:authorize>
 		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
 		<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimImpactStatementKidReport.html?reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimImpactKidReportLinkLabel"/></a>
-			</li>
-		</c:if>
-		</sec:authorize>
-		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
-			<c:if test="${not empty offender}">
-			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimListingReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/victim/association/victimImpactStatementKidReport.html?reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="victimImpactKidReportLinkLabel"/></a>
 			</li>
 		</c:if>
 		</sec:authorize>
 				<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimListingLegacyReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimListingLegacyReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/victim/association/victimListingLegacyReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="victimListingLegacyReportLinkLabel"/></a>
 			</li>
 		</c:if>
 		</sec:authorize>
@@ -74,6 +80,13 @@
 			</li>
 		</c:if>
 		</sec:authorize>
+		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/victim/association/victimListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="victimListingReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
 		<c:if test="${not empty victimAssociation}">
 			<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
 				<li>
@@ -105,16 +118,30 @@
 		<sec:authorize access="(hasRole('VICTIM_ASSOCIATION_VIEW') and hasRole('OFFENDER_SSN_VIEW')) or hasRole('ADMIN')">
 			<c:if test="${not empty victimAssociation}">
 			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimDetailsReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimDetailsReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/victim/association/victimAssocDetailsReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="victimAssocDetailsReportLinkLabel"/></a>
 			</li>
 			</c:if>
 		</sec:authorize>
 		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty victimAssociation}">
 			<li>
-				<a href="${pageContext.request.contextPath}/victim/association/victimDetailsRedactedReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="victimDetailsRedactedReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/victim/association/victimAssocDetailsRedactedReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="victimAssocDetailsRedactedReportLinkLabel"/></a>
 			</li>
 			</c:if>
 		</sec:authorize>
+		<sec:authorize access="(hasRole('VICTIM_ASSOCIATION_VIEW') and hasRole('OFFENDER_SSN_VIEW')) or hasRole('ADMIN')">
+			<c:if test="${not empty victimAssociation}">
+			<li>
+				<a href="${pageContext.request.contextPath}/victim/association/victimDetailsReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="victimDetailsReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty victimAssociation}">
+			<li>
+				<a href="${pageContext.request.contextPath}/victim/association/victimDetailsRedactedReport.html?victimAssociation=${victimAssociation.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="victimDetailsRedactedReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/ 
 package omis.health.dao.impl.hibernate;
 
 import java.util.Arrays;
@@ -38,6 +55,10 @@ public class InternalReferralDaoHibernateImpl
 	private static final String
 	FIND_BY_OFFENDER_DATE_TIME_AND_PROVIDER_EXCLUDING =
 		"findInternalReferralByOffenderDateTimeProviderExcluding";
+	
+	private static final String
+	FIND_EXISTING_BY_OFFENDER_APPOINTMENT_ASSOCIATION =
+		"findExistingInternalReferralByOffenderAppointmentAssociation";
 
 	// Parameters
 	private static final String OFFENDER_APPOINTMENT_ASSOCIATION_PARAM_NAME =
@@ -53,6 +74,9 @@ public class InternalReferralDaoHibernateImpl
 
 	private static final String PROVIDER_ASSIGNMENT_PARAM_NAME =
 			"providerAssignment";
+	
+	private static final String OFFEDNER_APPOINTMENT_ASSOCIATION_PARAM_NAME
+		="offenderAppointmentAssociation";
 
 	// Constructors
 
@@ -127,6 +151,19 @@ public class InternalReferralDaoHibernateImpl
 												EXCLUDE_PARAM_NAME,
 												Arrays.asList(internalReferral))
 												.uniqueResult();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public InternalReferral findExisting(final OffenderAppointmentAssociation
+		offenderAppointmentAssociation) {
+		InternalReferral internalReferral
+		= (InternalReferral) this.getSessionFactory()
+		.getCurrentSession().getNamedQuery(FIND_EXISTING_BY_OFFENDER_APPOINTMENT_ASSOCIATION)
+		.setParameter(OFFEDNER_APPOINTMENT_ASSOCIATION_PARAM_NAME,
+			offenderAppointmentAssociation).setReadOnly(true)
+		.uniqueResult();
+		return 	internalReferral;
 	}
 
 }

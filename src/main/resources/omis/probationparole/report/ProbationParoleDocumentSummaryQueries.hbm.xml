@@ -1,0 +1,33 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.probationparole.domain">
+	<query name="findProbationParoleDocumentAssociationSummariesByOffender"><![CDATA[
+		select new omis.probationparole.report.ProbationParoleDocumentAssociationSummary(
+			probationParoleDocumentAssociation.id,
+			document.date,
+			name.firstName,
+			name.lastName,
+			document.title,
+			category.name
+		)
+	from
+		omis.probationparole.domain.ProbationParoleDocumentAssociation probationParoleDocumentAssociation
+			inner join
+				probationParoleDocumentAssociation.document document
+			inner join
+				probationParoleDocumentAssociation.category category
+			inner join
+				probationParoleDocumentAssociation.updateSignature updateSignature
+			inner join
+				updateSignature.userAccount userAccount
+			inner join
+				userAccount.user user
+			inner join
+				user.name name
+		where
+			probationParoleDocumentAssociation.offender = :offender
+		order by
+			document.date
+	]]></query>
+</hibernate-mapping>

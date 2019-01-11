@@ -6,23 +6,24 @@ import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.condition.domain.Condition;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.violationevent.dao.ConditionViolationDao;
 import omis.violationevent.domain.ConditionViolation;
 import omis.violationevent.domain.ViolationEvent;
+import omis.violationevent.exception.ConditionViolationExistsException;
 
 /**
- * ConditionViolationDelegate.java
+ * Condition Violation Delegate.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Feb 15, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Jul 26, 2018)
  *@since OMIS 3.0
  *
  */
 public class ConditionViolationDelegate {
 	private static final String DUPLICATE_ENTITY_FOUND_MSG =
-			"Condition Violation already exists with given Condition and Violation Event";
+			"Condition Violation already exists with given Condition and "
+			+ "Violation Event";
 	
 	private final ConditionViolationDao conditionViolationDao;
 	
@@ -32,10 +33,11 @@ public class ConditionViolationDelegate {
 	private final AuditComponentRetriever auditComponentRetriever;
 
 	/**
-	 * Constructor for ConditionViolationDelegate
-	 * @param conditionViolationDao
-	 * @param conditionViolationInstanceFactory
-	 * @param auditComponentRetriever
+	 * Constructor for ConditionViolationDelegate.
+	 * @param conditionViolationDao - condition violation dao
+	 * @param conditionViolationInstanceFactory - condition violation instance
+	 * factory
+	 * @param auditComponentRetriever - audit component retriever
 	 */
 	public ConditionViolationDelegate(
 			final ConditionViolationDao conditionViolationDao,
@@ -43,23 +45,27 @@ public class ConditionViolationDelegate {
 				conditionViolationInstanceFactory,
 			final AuditComponentRetriever auditComponentRetriever) {
 		this.conditionViolationDao = conditionViolationDao;
-		this.conditionViolationInstanceFactory = conditionViolationInstanceFactory;
+		this.conditionViolationInstanceFactory =
+				conditionViolationInstanceFactory;
 		this.auditComponentRetriever = auditComponentRetriever;
 	}
 	
 	/**
-	 * Create a ConditionViolation with specified properties
+	 * Create a ConditionViolation with specified properties.
 	 * @param condition - Condition
 	 * @param violationEvent - ViolationEvent
+	 * @param details - details
 	 * @return Newly created ConditionViolation
-	 * @throws DuplicateEntityFoundExcepton - when ConditionViolation already
-	 * exists with given Condition and ViolationEvent
+	 * @throws ConditionViolationExistsException - when ConditionViolation
+	 * already exists with given Condition and ViolationEvent
 	 */
 	public ConditionViolation create(final Condition condition,
-			final ViolationEvent violationEvent)
-			throws DuplicateEntityFoundException{
-		if(this.conditionViolationDao.find(condition, violationEvent) != null){
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			final ViolationEvent violationEvent, final String details)
+			throws ConditionViolationExistsException {
+		if (this.conditionViolationDao.find(condition, violationEvent, details)
+				!= null) {
+			throw new ConditionViolationExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		ConditionViolation conditionViolation = 
@@ -67,6 +73,7 @@ public class ConditionViolationDelegate {
 		
 		conditionViolation.setCondition(condition);
 		conditionViolation.setViolationEvent(violationEvent);
+		conditionViolation.setDetails(details);
 		conditionViolation.setCreationSignature(
 				new CreationSignature(
 						this.auditComponentRetriever.retrieveUserAccount(), 
@@ -80,23 +87,27 @@ public class ConditionViolationDelegate {
 	}
 	
 	/**
-	 * Updates a ConditionViolation with specified properties
+	 * Updates a ConditionViolation with specified properties.
 	 * @param conditionViolation - ConditionViolation to update
 	 * @param condition - Condition
+	 * @param details - details
 	 * @return Updated ConditionViolation
-	 * @throws DuplicateEntityFoundExcepton - when ConditionViolation already
-	 * exists with given Condition and ViolationEvent
+	 * @throws ConditionViolationExistsException - when ConditionViolation
+	 * already exists with given Condition and ViolationEvent
 	 */
-	public ConditionViolation update(final ConditionViolation conditionViolation,
-			final Condition condition)
-			throws DuplicateEntityFoundException{
-		if(this.conditionViolationDao.findExcluding(condition, 
-				conditionViolation.getViolationEvent(), conditionViolation)
-					!= null){
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+	public ConditionViolation update(
+			final ConditionViolation conditionViolation,
+			final Condition condition, final String details)
+			throws ConditionViolationExistsException {
+		if (this.conditionViolationDao.findExcluding(condition, 
+				conditionViolation.getViolationEvent(), details,
+				conditionViolation) != null) {
+			throw new ConditionViolationExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		conditionViolation.setCondition(condition);
+		conditionViolation.setDetails(details);
 		conditionViolation.setUpdateSignature(
 				new UpdateSignature(
 						this.auditComponentRetriever.retrieveUserAccount(),
@@ -106,43 +117,43 @@ public class ConditionViolationDelegate {
 	}
 	
 	/**
-	 * Removes a ConditionViolation
+	 * Removes a ConditionViolation.
 	 * @param conditionViolation - ConditionViolation to remove
 	 */
-	public void remove(final ConditionViolation conditionViolation){
+	public void remove(final ConditionViolation conditionViolation) {
 		this.conditionViolationDao.makeTransient(conditionViolation);
 	}
 	
 	/**
 	 * Finds and returns a list of ConditionViolations by specified 
-	 * ViolationEvent
+	 * ViolationEvent.
 	 * @param violationEvent - ViolationEvent
 	 * @return List of ConditionViolations by specified ViolationEvent
 	 */
 	public List<ConditionViolation> findByViolationEvent(
-			final ViolationEvent violationEvent){
+			final ViolationEvent violationEvent) {
 		return this.conditionViolationDao.findByViolationEvent(violationEvent);
 	}
 	
 	/**
 	 * Finds and returns a list of ConditionViolations with no 
-	 * Infraction/resolution association by specified ViolationEvent
+	 * Infraction/resolution association by specified ViolationEvent.
 	 * @param violationEvent - ViolationEvent
 	 * @return List of ConditionViolations  with no 
 	 * Infraction/resolution association by specified ViolationEvent
 	 */
 	public List<ConditionViolation> findUnresolvedByViolationEvent(
-			final ViolationEvent violationEvent){
+			final ViolationEvent violationEvent) {
 		return this.conditionViolationDao.findUnresolvedByViolationEvent(
 				violationEvent);
 	}
 	
 	/**
-	 * Returns a ConditionViolation with the specified ID
+	 * Returns a ConditionViolation with the specified ID.
 	 * @param id - Long
 	 * @return ConditionViolation with specified ID
 	 */
-	public ConditionViolation findById(final Long id){
+	public ConditionViolation findById(final Long id) {
 		return this.conditionViolationDao.findById(id, false);
 	}
 }

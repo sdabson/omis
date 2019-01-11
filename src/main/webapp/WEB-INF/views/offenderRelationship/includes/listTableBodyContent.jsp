@@ -1,6 +1,7 @@
 <%--
  - Author: Yidong Li
- - Version: 0.1.0 (Jan 12, 2016)
+ - Author: Stephen Abson
+ - Version: 0.1.1 (Dec 6, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -16,34 +17,29 @@
 			<td>
 				<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/offenderRelationship/offenderRelationshipRowActionMenu.html?offenderYesNo=${offenderRelationSummaryItem.offender}&hasRelationshipAssociations=${hasRelationshipAssociations}&relationship=${offenderRelationSummaryItem.id}&familyAssociation=${offenderRelationSummaryItem.familyAssociationId}"></a>
 			</td>
-			<td><c:out value="${offenderRelationSummaryItem.lastName}"/>, <c:out value="${offenderRelationSummaryItem.firstName}"/>
-				<c:choose>
-					<c:when test="${not empty offenderRelationSummaryItem.middleName}">
-						<c:set value="${fn:substring(offenderRelationSummaryItem.middleName, 0, 1)}." var="middleName"/>
-					</c:when>
-					<c:otherwise>
-						<c:set value="" var="middleName"/>
-					</c:otherwise>
-				</c:choose>
-				<c:out value="${middleName}"/>
-				<c:choose>
-					<c:when test="${not empty offenderRelationSummaryItem.suffix}">
-						<c:set value="${offenderRelationSummaryItem.suffix}" var="suffix"/>
-					</c:when>
-					<c:otherwise>
-						<c:set value="" var="suffix"/>
-					</c:otherwise>
-				</c:choose>
-				<c:out value="${suffix}"/>
-				<c:choose>
-					<c:when test="${not empty offenderRelationSummaryItem.offenderNumber}">
-						<c:set value="#${offenderRelationSummaryItem.offenderNumber}" var="offenderNumber"/>
-					</c:when>
-					<c:otherwise>
-						<c:set value="" var="offenderNumber"/>
-					</c:otherwise>
-				</c:choose>
-				<c:out value="${offenderNumber}"/>
+			<td>
+				<c:if test="${empty relation}">
+					<c:out value="${offenderRelationSummaryItem.lastName}"/>, <c:out value="${offenderRelationSummaryItem.firstName}"/>
+					<c:if test="${not empty offenderRelationSummaryItem.middleName}">
+						<c:out value="${fn:substring(offenderRelationSummaryItem.middleName, 0, 1)}"/>.
+					</c:if>
+					<c:if test="${not empty offenderRelationSummaryItem.suffix}">
+						<c:out value="${offenderRelationSummaryItem.suffix}"/>
+					</c:if>
+					<c:if test="${not empty offenderRelationSummaryItem.offenderNumber}">
+						#<c:out value="${offenderRelationSummaryItem.offenderNumber}"/>
+					</c:if>
+				</c:if>
+				<c:if test="${empty offender}">
+					<c:out value="${offenderRelationSummaryItem.offenderLastName}"/>, <c:out value="${offenderRelationSummaryItem.offenderFirstName}"/>
+					<c:if test="${not empty offenderRelationSummaryItem.offenderMiddleName}">
+						<c:out value="${fn:substring(offenderRelationSummaryItem.middleName, 0, 1)}"/>
+					</c:if>
+					<c:if test="${offenderRelationSummaryItem.offenderSuffix}">
+						<c:out value="${offenderRelationSummaryItem.offenderSuffix}"/>
+					</c:if>
+					#<c:out value="${offenderRelationSummaryItem.offenderOffenderNumber}"/>
+				</c:if>
 			</td>
 			<c:if test="${not empty offenderRelationSummaryItem.familyAssociationCategoryName}">
 				<td><c:out value="${offenderRelationSummaryItem.familyAssociationCategoryName}"/></td>
@@ -57,8 +53,8 @@
 			<c:if test="${not offenderRelationSummaryItem.victim}">
 				<td><fmt:message key="noLabel"/></td>
 			</c:if>
-			<c:if test="${offenderRelationSummaryItem.victim!=false and offenderRelationSummaryItem.victim!=true}">
-				<td> </td>
+			<c:if test="${empty offenderRelationSummaryItem.victim}">
+				<td></td>
 			</c:if>
 			<c:if test="${not empty offenderRelationSummaryItem.visitationAssociationCategoryName}">
 				<td><c:out value="${offenderRelationSummaryItem.visitationAssociationCategoryName}"/></td>

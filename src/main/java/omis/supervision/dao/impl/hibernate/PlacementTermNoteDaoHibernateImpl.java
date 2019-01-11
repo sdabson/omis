@@ -42,20 +42,17 @@ public class PlacementTermNoteDaoHibernateImpl
 	
 	private static final String FIND_BY_PLACEMENT_TERM_QUERY_NAME
 		= "findPlacementTermNotesByPlacementTerm";
-	
 	private static final String FIND_QUERY_NAME = "findPlacementTermNote";
-	
 	private static final String FIND_EXCLUDING_QUERY_NAME
 		= "findPlacementTermNoteExcluding";
+	private static final String DELETE_BY_PLACEMENT_TERM_QUERY_NAME
+	= "deletePlacementTermNotesByPlacementTerm";
 	
 	/* Parameter names. */
 	
 	private static final String PLACEMENT_TERM_PARAM_NAME = "placementTerm";
-
 	private static final String VALUE_PARAM_NAME = "value";
-
 	private static final String DATE_PARAM_NAME = "date";
-	
 	private static final String EXCLUDED_NOTES_PARAM_NAME = "excludedNotes";
 
 	/* Constructors. */
@@ -123,5 +120,14 @@ public class PlacementTermNoteDaoHibernateImpl
 	public List<PlacementTermNote> findAll() {
 		throw new UnsupportedOperationException(
 				"Finding all placement notes not supported");
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int removeByPlacementTerm(PlacementTerm placementTerm) {
+		return this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(DELETE_BY_PLACEMENT_TERM_QUERY_NAME)
+				.setParameter(PLACEMENT_TERM_PARAM_NAME, placementTerm)
+				.executeUpdate();
 	}
 }

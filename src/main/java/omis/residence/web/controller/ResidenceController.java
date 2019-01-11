@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.residence.web.controller;
 
 import java.util.Date;
@@ -22,22 +39,27 @@ import org.springframework.web.servlet.ModelAndView;
 
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.audit.domain.VerificationMethod;
 import omis.audit.domain.VerificationSignature;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.config.util.FeatureToggles;
 import omis.content.RequestContentMapping;
 import omis.content.RequestContentType;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
+import omis.location.exception.LocationExistsException;
 import omis.location.exception.LocationNotAllowedException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.organization.exception.OrganizationExistsException;
 import omis.person.domain.Person;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
@@ -46,8 +68,11 @@ import omis.residence.domain.NonResidenceTerm;
 import omis.residence.domain.ResidenceCategory;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
+import omis.residence.exception.AllowedResidentialLocationRuleExistsException;
+import omis.residence.exception.NonResidenceTermExistsException;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 import omis.residence.report.ResidenceReportService;
 import omis.residence.report.ResidenceSummary;
 import omis.residence.report.ResidenceType;
@@ -64,6 +89,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * 
  * @author Sheronda Vaughn
  * @author Joel Norris
+ * @author Yidong Li
+ * @author Stephen Abson
  * @version 0.1.2 (January 19, 2018)
  * @since OMIS 3.0
  */
@@ -149,12 +176,10 @@ public class ResidenceController {
 	
 	private static final String STATUS_OPTIONS_MODEL_KEY = "statusOptions";
 	
-	private static final String NON_RESIDENCE_TERMS_PARAM_NAME = "nonResidenceTerms";
-	
+	private static final String NON_RESIDENCE_TERMS_PARAM_NAME
+		= "nonResidenceTerms";
+		
 	/* Message Keys. */
-
-	private static final String TERM_EXISTS_MESSAGE_KEY
-		= "term.exists";
 
 	private static final String PRIMARY_RESIDENCE_EXISTS_MESSAGE_KEY
 		= "primaryResidence.exists";
@@ -164,7 +189,33 @@ public class ResidenceController {
 
 	private static final String LOCATION_NOT_ALLOWED_EXISTS_MESSAGE_KEY
 		= "locationNotAllowed.exists";
+	
+	private static final String RESIDENCE_TREM_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "residenceTerm.Exists";
+	
+	private static final String NONRESIDENCE_TERM_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "nonResidenceTerm.exists";
+	
+	private static final String CITY_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "city.exists";
+	
+	private static final String ZIP_CODE_EXISTS_EXCEPTION_MESSAGE_KEY
+		= "zipCode.exists";
+	
+	private static final String ADDRESS_EXISTS_MESSAGE_KEY
+		= "address.exists";
+	
+	private static final String ORGANIZATION_EXISTS_MESSAGE_KEY
+		= "organization.exists";
 
+	private static final 
+		String ALLOWED_RESIDENTIAL_LOCATION_RULE_EXISTS_MESSAGE_KEY
+		= "allowedResidentialLocationRule.exists";
+	
+	private static final 
+	String LOCATION_EXISTS_MESSAGE_KEY
+		= "location.exists";
+	
 	/* Message bundles. */
 
 	private static final String ERROR_BUNDLE_NAME
@@ -251,6 +302,12 @@ public class ResidenceController {
 	@Autowired
 	@Qualifier("userAccountPropertyEditorFactory")
 	private PropertyEditorFactory userAccountPropertyEditorFactory;
+	
+	/* Feature toggles. */
+	
+	@Autowired
+	@Qualifier("featureToggles")
+	private FeatureToggles featureToggles;
 
 	/* Report names. */
 	
@@ -276,6 +333,15 @@ public class ResidenceController {
 
 	private static final String NON_RESIDENCE_DETAILS_ID_REPORT_PARAM_NAME 
 		= "NON_RESD_ID";
+	
+	/* Module name. */
+	
+	private static final String MODULE_NAME = "residence";
+	
+	/* Toggle keys. */
+	
+	private static final String ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY
+		= "allowMailingAddressAtResidence";
 	
 	/* Report runners. */
 	
@@ -357,13 +423,14 @@ public class ResidenceController {
 		residenceForm.setState(state);	
 		ResidenceTerm term = null;
 		if (ResidenceStatusOption.PRIMARY_RESIDENCE
-				.equals(residenceStatusOption) || 
-				ResidenceStatusOption.FOSTER_CARE.equals(
+				.equals(residenceStatusOption) 
+				|| ResidenceStatusOption.FOSTER_CARE.equals(
 						residenceStatusOption)) {
 			term = this.residenceService
 					.findPrimaryResidence(new Date(), offender);
 			residenceForm.setExistingPrimaryResidence(term);
-			residenceForm.setNonResidenceTerms(this.residenceService.findNonResidenceTerms(
+			residenceForm.setNonResidenceTerms(
+					this.residenceService.findNonResidenceTerms(
 					new Date(),  offender));
 		}
 		ModelAndView mav = this.prepareMav(residenceForm, offender,
@@ -380,12 +447,19 @@ public class ResidenceController {
 	 * @param residenceForm residenceForm
 	 * @param result result
 	 * @return model and view to redirect list URL
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
 	 * @throws PrimaryResidenceExistsException 
 	 * primary residence exists exception
 	 * @throws ResidenceStatusConflictException 
 	 * residence status conflict exception
 	 * @throws LocationNotAllowedException location not allowed exception
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException 
+	 * @throws AllowedResidentialLocationRuleExistsException 
+	 * @throws CityExistsException 
+	 * @throws ZipCodeExistsException 
+	 * @throws AddressExistsException 
+	 * @throws OrganizationExistsException 
+	 * @throws LocationExistsException 
 	 */
 	@RequestContentMapping(nameKey = "residenceCreateSubmitName",
 			descriptionKey = "residenceCreateSubmitDescription",
@@ -400,16 +474,41 @@ public class ResidenceController {
 			final Offender offender,
 			final ResidenceForm residenceForm,
 			final BindingResult result) 
-					throws DuplicateEntityFoundException, 
-					PrimaryResidenceExistsException, 
+					throws PrimaryResidenceExistsException, 
 					ResidenceStatusConflictException, 
-					LocationNotAllowedException {
+					LocationNotAllowedException,
+					ResidenceTermExistsException,
+					NonResidenceTermExistsException, 
+					AllowedResidentialLocationRuleExistsException, 
+					CityExistsException, ZipCodeExistsException, 
+					AddressExistsException, LocationExistsException, 
+					OrganizationExistsException {
 		this.residenceFormValidator.validate(residenceForm, result);	
 		if (result.hasErrors()) {
 			ModelAndView mav = this.prepareRedisplayMav(offender,
 					residenceForm, result, null, null);	
 			return mav;
 		}
+		City newCity;
+		ZipCode newZipCode;
+		if (residenceForm.getCreateNewCity()) {
+			newCity = this.residenceService.createCity(
+					residenceForm.getCityName(), residenceForm.getState(), 
+					residenceForm.getState().getCountry());
+		} else {
+			newCity = residenceForm.getCity();
+		}
+		
+		if (residenceForm.getCreateNewZipCode() != null
+				&& residenceForm.getCreateNewZipCode()) {
+			newZipCode = this.residenceService.createZipCode(
+					residenceForm.getZipCodeValue(), 
+					residenceForm.getZipCodeExtension(), 
+					newCity);
+		} else {
+			newZipCode = residenceForm.getZipCode();
+		}		
+		
 		final ResidenceStatus status;
 		final ResidenceType residenceType;
 		if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
@@ -424,7 +523,7 @@ public class ResidenceController {
 					residenceForm.getValue(), null, 
 					null,
 					null, 
-					residenceForm.getZipCode());
+					newZipCode);
 			residenceForm.getStatusOption();
 			if (ResidenceStatusOption.PRIMARY_RESIDENCE
 					.equals(residenceForm.getStatusOption())) {
@@ -442,11 +541,14 @@ public class ResidenceController {
 				status = ResidenceStatus.RESIDENT;
 			}
 			if (primary && residenceForm.getEndConflictingNonResidenceTerms()) {
-				for(NonResidenceTerm term : residenceForm.getNonResidenceTerms()) {
-					this.residenceService.endNonResidenceTerm(term, residenceForm.getStartDate());
+				for (NonResidenceTerm term : residenceForm
+						.getNonResidenceTerms()) {
+					this.residenceService.endNonResidenceTerm(term, 
+							residenceForm.getStartDate());
 				}
 			}
-			if (primary && residenceForm.getExistingPrimaryResidence() != null) {
+			if (primary && residenceForm.getExistingPrimaryResidence() 
+					!= null) {
 				ResidenceTerm primaryResidence = residenceForm
 						.getExistingPrimaryResidence();
 				if (ExistingResidenceOperation.HISTORICAL.equals(
@@ -488,6 +590,13 @@ public class ResidenceController {
 									residenceForm.getVerificationDate(),
 									residenceForm.getVerified(),
 									residenceForm.getVerificationMethod()));
+			if (this.getAllowMailingAddressAtResidence()) {
+				if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
+						residenceForm.getStatusOption())) {
+					this.residenceService.changeMailingAddress(
+							offender, createNewAddress);
+				}
+			}
 			residenceType = ResidenceType.RESIDENCE;
 		} else if (ResidenceStatusOption.GROUP_HOME.equals(
 				residenceForm.getStatusOption()) 
@@ -505,7 +614,7 @@ public class ResidenceController {
 			if (residenceForm.getCreateNewLocation()) {
 				Address createNewAddress = this.residenceService.createAddress(
 					residenceForm.getValue(), null, null, null, 
-					residenceForm.getZipCode());
+					newZipCode);
 			
 				createNewLocation = this.residenceService.createLocation(
 						residenceForm.getLocationName(),  
@@ -515,23 +624,23 @@ public class ResidenceController {
 			} else {
 				createNewLocation = residenceForm.getLocation();
 			}
-				this.residenceService.createNonResidenceTerm(
-					offender, new DateRange(residenceForm.getStartDate(), 
-							residenceForm.getEndDate()), status,
-							createNewLocation, residenceForm.getConfirmed(), 
-							residenceForm.getResidenceComment(), 
-							new VerificationSignature(
-									residenceForm.getVerifiedByUserAccount(),
-									residenceForm.getVerificationDate(),
-									residenceForm.getVerified(),
-									residenceForm.getVerificationMethod()));
+			this.residenceService.createNonResidenceTerm(
+				offender, new DateRange(residenceForm.getStartDate(), 
+						residenceForm.getEndDate()), status,
+						createNewLocation, residenceForm.getConfirmed(), 
+						residenceForm.getResidenceComment(), 
+						new VerificationSignature(
+								residenceForm.getVerifiedByUserAccount(),
+								residenceForm.getVerificationDate(),
+								residenceForm.getVerified(),
+								residenceForm.getVerificationMethod()));
 			residenceType = ResidenceType.NONRESIDENCE;		
 		} else if (ResidenceStatusOption.HOMELESS.equals(
 				residenceForm.getStatusOption())) {
 			this.residenceService.createHomelessTerm(
 					offender, new DateRange(residenceForm.getStartDate(), 
 							residenceForm.getEndDate()), 
-							residenceForm.getCity(), 
+							newCity, 
 							residenceForm.getState(), 
 							residenceForm.getResidenceComment(),
 							residenceForm.getConfirmed());
@@ -587,7 +696,7 @@ public class ResidenceController {
 				residenceForm.setEndDate(residenceTerm.getDateRange()
 						.getEndDate());
 			}
-			residenceForm.setValue(residenceTerm.getAddress().getValue());			
+			residenceForm.setValue(residenceTerm.getAddress().getValue());
 			residenceForm.setState(
 					residenceTerm.getAddress().getZipCode().getCity()
 					.getState());
@@ -608,6 +717,19 @@ public class ResidenceController {
 			throw new IllegalArgumentException(
 					"Residence term status not supported: " 
 							+ residenceTerm.getStatus());
+		}
+		if (this.getAllowMailingAddressAtResidence()) {
+			if (ResidenceStatus.RESIDENT.equals(
+						residenceTerm.getStatus())
+					&& ResidenceCategory.PRIMARY.equals(
+						residenceTerm.getCategory())) {
+				if (residenceTerm.getAddress().equals(
+						this.residenceService.findMailingAddress(person))) {
+					residenceForm.setMailingAddressAtResidence(true);
+				} else {
+					residenceForm.setMailingAddressAtResidence(false);
+				}
+			}
 		}
 		ModelAndView mav = this.prepareMav(residenceForm, 
 				offender, residenceForm.getStatusOption());
@@ -643,15 +765,17 @@ public class ResidenceController {
 			residenceForm.setConfirmed(nonResidenceTerm.getConfirmed());
 			residenceForm.setLocation(nonResidenceTerm.getLocation());
 			if (nonResidenceTerm.getLocation() != null) {
-			residenceForm.setState(nonResidenceTerm.getLocation().getAddress()
+				residenceForm.setState(nonResidenceTerm.getLocation()
+						.getAddress()
 					.getZipCode().getCity().getState());
-			residenceForm.setCity(nonResidenceTerm.getLocation().getAddress()
+				residenceForm.setCity(nonResidenceTerm.getLocation()
+						.getAddress()
 					.getZipCode().getCity());	
 			}		
 			if (nonResidenceTerm.getDateRange() != null) {
-					residenceForm.setStartDate(
+				residenceForm.setStartDate(
 							nonResidenceTerm.getDateRange().getStartDate());
-					residenceForm.setEndDate(
+				residenceForm.setEndDate(
 							nonResidenceTerm.getDateRange().getEndDate());
 			}
 			residenceForm.setResidenceComment(nonResidenceTerm.getNotes());
@@ -662,7 +786,8 @@ public class ResidenceController {
 				residenceForm.setVerificationDate(
 						nonResidenceTerm.getVerificationSignature().getDate());
 				residenceForm.setVerificationMethod(
-						nonResidenceTerm.getVerificationSignature().getMethod());
+						nonResidenceTerm.getVerificationSignature()
+						.getMethod());
 			}
 		} else if (ResidenceStatus.HOMELESS.equals(
 				nonResidenceTerm.getStatus())) {
@@ -707,23 +832,25 @@ public class ResidenceController {
 			status = ResidenceStatus.GROUP_HOME;
 		} else { 
 			status = ResidenceStatus.HOTEL;				
-		}	
+		}					
 		if (residenceForm.getState() != null) {	
 			mav.addObject(CITIES_MODEL_KEY, 
 					this.residenceService.findCitiesInState(
 							residenceForm.getState()));
 			if (residenceForm.getCity() != null) {
-			mav.addObject(ZIP_CODES_MODEL_KEY, this.residenceService
+				mav.addObject(ZIP_CODES_MODEL_KEY, this.residenceService
 					.findZipCodesInCity(residenceForm.getCity()));	
-			mav.addObject(ALLOWED_LOCATIONS_MODEL_KEY, 
+				mav.addObject(ALLOWED_LOCATIONS_MODEL_KEY, 
 					this.residenceService.findAllowedLocationsInCity(
 							residenceForm.getCity(), status));				
 			} else {
-			mav.addObject(ALLOWED_LOCATIONS_MODEL_KEY, 
+				mav.addObject(ALLOWED_LOCATIONS_MODEL_KEY, 
 					this.residenceService.findAllowedLocationsInState(
 							residenceForm.getState(), status));
 			}
 		}
+		mav.addObject(ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY,
+				this.getAllowMailingAddressAtResidence());
 		mav.addObject(VERIFICATION_METHODS_MODEL_KEY, 
 				this.residenceService.findAllVerificationMethods());	
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
@@ -746,13 +873,13 @@ public class ResidenceController {
 		ModelAndView mav = this.prepareMav(residenceForm, offender,
 				residenceForm.getStatusOption());
 		if ((ResidenceStatusOption.PRIMARY_RESIDENCE
-				.equals(residenceForm.getStatusOption()) || 
-				ResidenceStatusOption.FOSTER_CARE.equals(
+				.equals(residenceForm.getStatusOption()) 
+				|| ResidenceStatusOption.FOSTER_CARE.equals(
 						residenceForm.getStatusOption())) 
 				&& residenceForm.getExistingPrimaryResidence() != null) {
 			List<ResidenceSummary> residences = this.residenceReportService
 					.findByOffender(offender, new Date());
-			for(ResidenceSummary residence : residences) {
+			for (ResidenceSummary residence : residences) {
 				if (ResidenceCategory.PRIMARY.equals(residence.getCategory())) {
 					mav.addObject(EXISTING_RESIDENCE_SUMMARY_MODEL_KEY,
 							residence);
@@ -770,6 +897,12 @@ public class ResidenceController {
 		return mav;
 	}
 
+	// Returns whether residence can be used as mailing address
+	private boolean getAllowMailingAddressAtResidence() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY);
+	}
+	
 	/**
 	 * Updates the specified residence address with the values from the 
 	 * current form view. 
@@ -779,12 +912,20 @@ public class ResidenceController {
 	 * @param residenceForm residence form 
 	 * @param result result
 	 * @return model and view to redirect list URL
-	 * @throws DuplicateEntityFoundException duplicate entity found exception
 	 * @throws PrimaryResidenceExistsException 
 	 * primary residence exists exception
 	 * @throws ResidenceStatusConflictException 
 	 * residence status conflict exception
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws CityExistsException city exists exception
+	 * @throws ZipCodeExistsException zip code exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists 
+	 * exception
 	 * @throws LocationNotAllowedException location not allowed exception
+	 * @throws AllowedResidentialLocationRuleExistsException 
+	 * @throws AddressExistsException 
+	 * @throws OrganizationExistsException 
+	 * @throws LocationExistsException 
 	 */
 	@RequestMapping(value = {"editResidenceTerm.html", 
 		"editNonResidenceTerm.html"},
@@ -798,10 +939,15 @@ public class ResidenceController {
 			final NonResidenceTerm nonResidenceTerm,
 			final ResidenceForm residenceForm,
 			final BindingResult result) 
-					throws DuplicateEntityFoundException, 
-					PrimaryResidenceExistsException, 
+					throws PrimaryResidenceExistsException, 
 					ResidenceStatusConflictException, 
-					LocationNotAllowedException {
+					LocationNotAllowedException,
+					ResidenceTermExistsException,
+					CityExistsException, ZipCodeExistsException,
+					NonResidenceTermExistsException, 
+					AllowedResidentialLocationRuleExistsException, 
+					AddressExistsException, LocationExistsException, 
+					OrganizationExistsException {
 		this.residenceFormValidator.validate(residenceForm, result);
 		final Offender offender;
 		if (residenceTerm != null) {
@@ -817,6 +963,26 @@ public class ResidenceController {
 					residenceForm, result, residenceTerm, nonResidenceTerm);	
 			return mav;
 		}
+		City newCity;
+		ZipCode newZipCode;
+		if (residenceForm.getCreateNewCity()) {
+			newCity = this.residenceService.createCity(
+					residenceForm.getCityName(), residenceForm.getState(), 
+					residenceForm.getState().getCountry());
+		} else {
+			newCity = residenceForm.getCity();
+		}
+		
+		if (residenceForm.getCreateNewZipCode() != null
+				&& residenceForm.getCreateNewZipCode()) {
+			newZipCode = this.residenceService.createZipCode(
+					residenceForm.getZipCodeValue(), 
+					residenceForm.getZipCodeExtension(), 
+					newCity);
+		} else {
+			newZipCode = residenceForm.getZipCode();
+		}		
+		
 		final ResidenceStatus status;
 		final ResidenceType residenceType;
 		if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
@@ -828,9 +994,9 @@ public class ResidenceController {
 			boolean primary;
 			boolean fosterCare;	
 
-			Address updatedAddress = this.residenceService.updateAddress(					
+			Address updatedAddress = this.residenceService.updateAddress(
 					residenceTerm.getAddress(), residenceForm.getValue(), null, 
-					null, null, residenceForm.getZipCode());
+					null, null, newZipCode);
 			if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
 					residenceForm.getStatusOption())) {				
 				primary = true;
@@ -863,6 +1029,13 @@ public class ResidenceController {
 									residenceForm.getVerificationDate(),
 									residenceForm.getVerified(),
 									residenceForm.getVerificationMethod()));
+			if (this.getAllowMailingAddressAtResidence()) {
+				if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
+						residenceForm.getStatusOption())) {
+					this.residenceService.changeMailingAddress(
+							residenceTerm.getPerson(), updatedAddress);
+				}
+			}
 			residenceType = ResidenceType.RESIDENCE;		
 		} else if (ResidenceStatusOption.GROUP_HOME.equals(
 				residenceForm.getStatusOption()) 
@@ -880,7 +1053,7 @@ public class ResidenceController {
 			if (residenceForm.getCreateNewLocation()) {
 				Address createNewAddress = this.residenceService.createAddress(
 					residenceForm.getValue(), null, null, null, 
-					residenceForm.getZipCode());
+					newZipCode);
 			
 				createNewUpdatedLocation = this.residenceService.createLocation(
 						residenceForm.getLocationName(),  
@@ -908,7 +1081,7 @@ public class ResidenceController {
 			this.residenceService.updateHomelessTerm(nonResidenceTerm, 
 					new DateRange(residenceForm.getStartDate(), 
 							residenceForm.getEndDate()), 
-							residenceForm.getCity(), 
+							newCity, 
 							residenceForm.getState(), 
 							residenceForm.getResidenceComment(),
 							residenceForm.getConfirmed());
@@ -1011,7 +1184,6 @@ public class ResidenceController {
 	/**
 	 * Returns a view for zip code options.
 	 * 
-	 * @param state state
 	 * @param city city
 	 * @return model and view for zip code options
 	 */
@@ -1063,15 +1235,15 @@ public class ResidenceController {
 	}
 
 	/**
-	 * Returns residence row action menu
+	 * Returns residence row action menu.
 	 * @param residenceTerm - residence term
 	 * @return ModelAndView
 	 */
-	@RequestMapping(value="/residenceRowActionMenu.html",
-			method=RequestMethod.GET)
+	@RequestMapping(value = "/residenceRowActionMenu.html",
+			method = RequestMethod.GET)
 	public ModelAndView displayResidenceTermRowActionMenu(
 			@RequestParam(value = "residenceTerm", 
-			required = true) final ResidenceTerm residenceTerm){
+			required = true) final ResidenceTerm residenceTerm) {
 		
 		ModelMap map = new ModelMap();
 		
@@ -1081,15 +1253,15 @@ public class ResidenceController {
 	}
 
 	/**
-	 * Returns non residence row action menu
+	 * Returns non residence row action menu.
 	 * @param nonResidenceTerm - non residence term
 	 * @return ModelAndView
 	 */
-	@RequestMapping(value="/nonResidenceRowActionMenu.html",
-			method=RequestMethod.GET)
+	@RequestMapping(value = "/nonResidenceRowActionMenu.html",
+			method = RequestMethod.GET)
 	public ModelAndView displayNonResidenceTermRowActionMenu(
 			@RequestParam(value = "nonResidenceTerm", 
-			required = true) final NonResidenceTerm nonResidenceTerm){
+			required = true) final NonResidenceTerm nonResidenceTerm) {
 		
 		ModelMap map = new ModelMap();
 		
@@ -1105,30 +1277,19 @@ public class ResidenceController {
 	 * @param person person
 	 * @return model and view for contents of non residence term table
 	 */
-	@RequestMapping(value = "/displayNonResidenceTermsTableContent.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/displayNonResidenceTermsTableContent.html", 
+			method = RequestMethod.GET)
 	public ModelAndView displayNonResidenceTermsTableContent(
 			@RequestParam(value = "date", required = true)final Date date,
-			@RequestParam(value = "person", required = true)final Person person) {
+			@RequestParam(value = "person", required = true)
+			final Person person) {
 		ModelMap map = new ModelMap();
 		map.addAttribute(NON_RESIDENCE_TERMS_PARAM_NAME,
 				this.residenceService.findNonResidenceTerms(date, person));
-		return new ModelAndView(NON_RESIDENCE_TERMS_TABLE_CONTENT_VIEW_NAME, map);
+		return new ModelAndView(
+				NON_RESIDENCE_TERMS_TABLE_CONTENT_VIEW_NAME, map);
 	}
 	
-	/**
-	 * Duplicate entity found exception handler.
-	 * 
-	 * @param exception exception
-	 * @return exception
-	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException exception) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				TERM_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
-				exception); 
-	}
-
 	/**
 	 * Primary residence exists exception.
 	 * 
@@ -1170,7 +1331,124 @@ public class ResidenceController {
 				LOCATION_NOT_ALLOWED_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
 				exception);
 	}
+	
+	/**
+	 * Handles {@code ResidenceTermExistsException}.
+	 * 
+	 * @param residenceTermExistsException exception thrown
+	 * @return screen to handle {@code ResidenceTermExistsException}
+	 */
+	@ExceptionHandler(ResidenceTermExistsException.class)
+	public ModelAndView handleResidenceTermExistsException(
+		final ResidenceTermExistsException residenceTermExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			RESIDENCE_TREM_EXISTS_EXCEPTION_MESSAGE_KEY,
+			ERROR_BUNDLE_NAME, residenceTermExistsException);
+	}
+	
+	/**
+	 * NonResidence term exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return exception
+	 */
+	@ExceptionHandler(NonResidenceTermExistsException.class)
+	public ModelAndView handleNonResidenceTermExistsException(
+			final NonResidenceTermExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				NONRESIDENCE_TERM_EXISTS_EXCEPTION_MESSAGE_KEY, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * City exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return exception
+	 */
+	@ExceptionHandler(CityExistsException.class)
+	public ModelAndView handleCityExistsException(
+			final CityExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				CITY_EXISTS_EXCEPTION_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
+				exception);
+	}
+	
+	/**
+	 * Zip code exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return exception
+	 */
+	@ExceptionHandler(ZipCodeExistsException.class)
+	public ModelAndView handleZipCodeExistsException(
+			final ZipCodeExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ZIP_CODE_EXISTS_EXCEPTION_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
+				exception);
+	}
+	
+	/**
+	 * Address exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return address exception
+	 */
+	@ExceptionHandler(AddressExistsException.class)
+	public ModelAndView handleAddresExistsException(
+			final AddressExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ADDRESS_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, exception);
+	}
 
+	/**
+	 * Organization exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return organization exception
+	 */
+	@ExceptionHandler(OrganizationExistsException.class)
+	public ModelAndView handleOrganizationExistsException(
+			final OrganizationExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ORGANIZATION_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Allowed residential location rule exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return allowed residential location rule exception
+	 */
+	@ExceptionHandler(AllowedResidentialLocationRuleExistsException.class)
+	public ModelAndView handleAllowedResidentialLocationRuleExistsException(
+			final AllowedResidentialLocationRuleExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ALLOWED_RESIDENTIAL_LOCATION_RULE_EXISTS_MESSAGE_KEY, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Location exists exception.
+	 *
+	 *
+	 * @param exception exception
+	 * @return location exception
+	 */
+	@ExceptionHandler(LocationExistsException.class)
+	public ModelAndView handleLocationExistsException(
+			final LocationExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				LOCATION_EXISTS_MESSAGE_KEY, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
 	/* Reports. */
 	
 	/**

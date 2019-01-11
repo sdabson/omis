@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.prisonterm.domain">
+	<class entity-name="omis.prisonterm.domain.PrisonTermDocumentAssociation"
+			proxy="omis.prisonterm.domain.PrisonTermDocumentAssociation"
+			name="omis.prisonterm.domain.impl.PrisonTermDocumentAssociationImpl"
+			table="`PRISON_TRM_DOCMNT_ASSOCITN`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`PRISON_TRM_DOCMNT_ASSOCITN_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="document" column="`DOCUMENT_ID`" entity-name="omis.document.domain.Document" not-null="true" />
+			<many-to-one name="prisonTerm" column="`PRISON_TERM_ID`" entity-name="omis.prisonterm.domain.PrisonTerm" not-null="true" />
+			<component name="creationSignature" class="omis.audit.domain.CreationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature" class="omis.audit.domain.UpdateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findPrisonTermDocumentAssociation"><![CDATA[
+		select prisonTermDocumentAssociation
+		from
+			omis.prisonterm.domain.PrisonTermDocumentAssociation prisonTermDocumentAssociation
+		where
+			prisonTermDocumentAssociation.document = :document
+		and
+			prisonTermDocumentAssociation.prisonTerm = :prisonTerm
+	]]></query>
+	<query name="findExcludingPrisonTermDocumentAssociation"><![CDATA[
+		select prisonTermDocumentAssociation
+		from
+			omis.prisonterm.domain.PrisonTermDocumentAssociation prisonTermDocumentAssociation
+		where
+			prisonTermDocumentAssociation.document = :document
+		and
+			prisonTermDocumentAssociation.prisonTerm = :prisonTerm
+		and
+			prisonTermDocumentAssociation != :prisonTermDocumentAssociation
+	]]></query>
+</hibernate-mapping>

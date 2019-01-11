@@ -3,6 +3,7 @@
  - Author: 	Stephen Abson
  - 			Joel Norris
  			Ryan Johns
+ 			Yidong
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -407,5 +408,95 @@
 	   and 
 	   		((:startDate is null or appointment.date >= :startDate) and
 	           (:endDate is null or appointment.date <= :endDate))
+	]]></query>
+	<query name="countInternalReferralSummariesByFacility"><![CDATA[
+    select count(internalReferral.id)
+    from omis.health.domain.ProviderInternalReferralAssociation providerInternalReferralAssociation
+      inner join providerInternalReferralAssociation.internalReferral internalReferral
+      inner join internalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      left outer join internalReferral.statusReason as statusReason
+    where facility = :facility
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+      and providerInternalReferralAssociation.primary = true
+  	]]></query>
+  	<query name="countExternalReferralSummariesByFacility"><![CDATA[
+    select count(externalReferral.id)
+    from omis.health.domain.ExternalReferral externalReferral
+      inner join externalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.appointment appointment
+      inner join appointment.facility facility
+      left outer join externalReferral.statusReason statusReason
+    where facility = :facility
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+  	]]></query>
+  	<query name="countLabWorksByFacility"><![CDATA[
+	  select count(labWork.id)
+	  from omis.health.domain.LabWork labWork
+	  	inner join labWork.offenderAppointmentAssociation offenderAppointmentAssociation
+	  	inner join offenderAppointmentAssociation.appointment appointment
+	    inner join appointment.facility facility
+	   where
+	   	facility = :facility
+	   	and ((:appointmentStatusesContainsNull = true and appointment.status is null)
+	    		or (:appointmentStatusesContainsNull = false
+	    			and appointment.status in (:appointmentStatuses)))
+	   and 
+	   		((:startDate is null or appointment.date >= :startDate) and
+	           (:endDate is null or appointment.date <= :endDate))
+	]]></query>
+	<query name="countInternalReferralSummariesByOffender"><![CDATA[
+    select count(internalReferral.id)
+    from omis.health.domain.ProviderInternalReferralAssociation providerInternalReferralAssociation
+      inner join providerInternalReferralAssociation.internalReferral internalReferral
+      inner join internalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offenderAppointmentAssociation.appointment appointment
+      left outer join internalReferral.statusReason as statusReason
+    where offender = :offender
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+      and providerInternalReferralAssociation.primary = true
+    ]]></query>
+    <query name="countExternalReferralSummariesByOffender"><![CDATA[
+    select count(externalReferral.id)
+    from omis.health.domain.ExternalReferral externalReferral
+      inner join externalReferral.offenderAppointmentAssociation offenderAppointmentAssociation
+      inner join offenderAppointmentAssociation.offender offender
+      inner join offenderAppointmentAssociation.appointment appointment
+      left outer join externalReferral.statusReason statusReason
+    where offender = :offender
+    	and ((:appointmentStatusesContainsNull = true and statusReason is null)
+    		or (:appointmentStatusesContainsNull = false
+    			and statusReason.appointmentStatus in (:appointmentStatuses)))
+      and ((:startDate is null or appointment.date >= :startDate) and
+           (:endDate is null or appointment.date <= :endDate))
+    ]]></query>
+    <query name="countLabWorksByOffender"><![CDATA[
+	  select count(labWork.id)
+	  from omis.health.domain.LabWork as labWork
+	  	inner join labWork.offenderAppointmentAssociation as offenderAppointmentAssociation
+	  	inner join offenderAppointmentAssociation.offender as offender
+	  	inner join offenderAppointmentAssociation.appointment as appointment
+	  where 
+	  		offender = :offender
+	  	and ((:appointmentStatusesContainsNull = true and appointment.status is null)
+	    		or (:appointmentStatusesContainsNull = false
+	    			and appointment.status in (:appointmentStatuses)))
+	  and 
+	  	((:startDate is null or appointment.date >= :startDate) and
+	          (:endDate is null or appointment.date <= :endDate))
 	]]></query>
 </hibernate-mapping>

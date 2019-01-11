@@ -3,7 +3,8 @@ package omis.paroleboarditinerary.web.form;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import omis.paroleboarditinerary.domain.ParoleBoardLocation;
+
+import omis.paroleboardlocation.domain.ParoleBoardLocation;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 
 /**
@@ -23,6 +24,8 @@ public class ParoleBoardItineraryForm implements Serializable {
 	private Date endDate;
 	
 	private ParoleBoardLocation paroleBoardLocation;
+	
+	private OnsiteCategory onsite;
 	
 	private ParoleBoardMember boardMember1;
 
@@ -96,6 +99,24 @@ public class ParoleBoardItineraryForm implements Serializable {
 	public void setParoleBoardLocation(
 			final ParoleBoardLocation paroleBoardLocation) {
 		this.paroleBoardLocation = paroleBoardLocation;
+	}
+
+	/**
+	 * Returns the on-site.
+	 *
+	 * @return on-site
+	 */
+	public OnsiteCategory getOnsite() {
+		return onsite;
+	}
+
+	/**
+	 * Sets the on-site.
+	 *
+	 * @param onsite on-site
+	 */
+	public void setOnsite(OnsiteCategory onsite) {
+		this.onsite = onsite;
 	}
 
 	/**

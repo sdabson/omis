@@ -10,7 +10,7 @@
 	<label for="boardMember1" class="fieldLabel">
 		<fmt:message key="boardMember1Label"/>
 	</label>
-	<select name="boardMember1">
+	<select name="boardMember1" id="boardMember1">
 		<jsp:include page="../../includes/nullOption.jsp"/>
 		<c:forEach items="${boardAttendees}" var="attendee">
 			<c:set var="name" value="${attendee.boardMember.staffAssignment.staffMember.name}" />
@@ -25,7 +25,7 @@
 	<label for="boardMember2" class="fieldLabel">
 		<fmt:message key="boardMember2Label"/>
 	</label>
-	<select name="boardMember2">
+	<select name="boardMember2" id="boardMember2">
 		<jsp:include page="../../includes/nullOption.jsp"/>
 		<c:forEach items="${boardAttendees}" var="attendee">
 			<c:set var="name" value="${attendee.boardMember.staffAssignment.staffMember.name}" />
@@ -40,7 +40,7 @@
 	<label for="boardMember3" class="fieldLabel">
 		<fmt:message key="boardMember3Label"/>
 	</label>
-	<select name="boardMember3">
+	<select name="boardMember3" id="boardMember3">
 		<jsp:include page="../../includes/nullOption.jsp"/>
 		<c:forEach items="${boardAttendees}" var="attendee">
 			<c:set var="name" value="${attendee.boardMember.staffAssignment.staffMember.name}" />

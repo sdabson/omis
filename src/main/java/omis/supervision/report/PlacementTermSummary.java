@@ -122,7 +122,11 @@ public class PlacementTermSummary
 		} else {
 			diffDate = effectiveDate;
 		}
-		this.dayCount = DateRange.countDaysInclusively(startDate, diffDate);
+		if (startDate.equals(diffDate) || startDate.before(diffDate)) {
+			this.dayCount = DateRange.countDaysExactly(startDate, diffDate);
+		} else {
+			this.dayCount = -DateRange.countDaysExactly(diffDate, startDate);
+		}
 		this.startChangeReasonName = startChangeReasonName;
 		this.endChangeReasonName = endChangeReasonName;
 		this.status = status;
@@ -141,8 +145,14 @@ public class PlacementTermSummary
 			} else {
 				statusEndDateToUse = effectiveDate;
 			}
-			this.statusDayCount = DateRange.countDaysInclusively(
-					statusStartDateToUse, statusEndDateToUse);
+			if (statusStartDateToUse.equals(statusEndDateToUse)
+					|| statusStartDateToUse.before(statusEndDateToUse)) {
+				this.statusDayCount = DateRange.countDaysExactly(
+						statusStartDateToUse, statusEndDateToUse);
+			} else {
+				this.statusDayCount = -DateRange.countDaysExactly(
+						statusEndDateToUse, statusStartDateToUse);
+			}
 		} else {
 			this.statusDayCount = null;
 		}

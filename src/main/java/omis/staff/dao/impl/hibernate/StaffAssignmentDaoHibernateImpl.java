@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.staff.dao.impl.hibernate;
 
 import java.util.Date;
@@ -18,7 +35,8 @@ import omis.supervision.domain.SupervisoryOrganization;
  * @author Stephen Abson
  * @author Joel Norris
  * @author Josh Divine
- * @version 0.1.1 (Nov 9, 2017)
+ * @author Yidong Li
+ * @version 0.1.1 (Sept. 20, 2018)
  * @since OMIS 3.0
  */
 public class StaffAssignmentDaoHibernateImpl
@@ -52,6 +70,10 @@ public class StaffAssignmentDaoHibernateImpl
 	private static final String FIND_STAFF_ASSIGNMENT_EXCLUDING_QUERY_NAME = 
 			"findStaffAssignmentExcluding";
 	
+	private static final String
+		FIND_STAFF_ASSIGNMENTS_BY_STAFF_MEMBER_QUERY_NAME = 
+		"findStaffAssignmentsByStaffMember";
+	
 	/* Parameters. */
 	
 	private static final String DATE_PARAM_NAME = "date";
@@ -69,6 +91,8 @@ public class StaffAssignmentDaoHibernateImpl
 	
 	private static final String EXCLUDED_ASSIGNMENT_PARAM_NAME = 
 			"excludedAssignment";
+	
+	private static final String STAFF_MEMBER_PARAM_NAME = "staffMember";
 	
 	/* Property names. */
 	
@@ -195,5 +219,19 @@ public class StaffAssignmentDaoHibernateImpl
 						excludedStaffAssignment)
 				.uniqueResult();
 		return staffAssignment;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<StaffAssignment> findByStaffMember(
+		final Person staffMember) {
+		@SuppressWarnings("unchecked")
+		List<StaffAssignment> staffAssignments
+		= (List<StaffAssignment>) this.getSessionFactory()
+		.getCurrentSession().getNamedQuery(
+		FIND_STAFF_ASSIGNMENTS_BY_STAFF_MEMBER_QUERY_NAME)
+		.setParameter(STAFF_MEMBER_PARAM_NAME, staffMember)
+		.list();
+		return staffAssignments;
 	}
 }

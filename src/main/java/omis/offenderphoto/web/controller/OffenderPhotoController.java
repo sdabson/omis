@@ -1,6 +1,25 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderphoto.web.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +44,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.config.util.FeatureToggles;
 import omis.exception.BusinessException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.io.FileRemover;
@@ -41,7 +61,10 @@ import omis.offenderphoto.service.OffenderPhotoService;
 import omis.offenderphoto.web.form.OffenderPhotoAssociationNoteItem;
 import omis.offenderphoto.web.form.OffenderPhotoAssociationNoteItemOperation;
 import omis.offenderphoto.web.form.OffenderPhotoForm;
+import omis.offenderphoto.web.form.OffenderPhotoItem;
+import omis.offenderphoto.web.form.OffenderPhotoJoinForm;
 import omis.offenderphoto.web.validator.OffenderPhotoFormValidator;
+import omis.offenderphoto.web.validator.OffenderPhotoJoinFormValidator;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
@@ -51,7 +74,8 @@ import omis.report.web.controller.delegate.ReportControllerDelegate;
  *  
  * @author Stephen Abson
  * @author Joel Norris
- * @version 0.1.2 (Dec 15, 2016)
+ * @author Josh Divine
+ * @version 0.1.3 (Feb 12, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -62,26 +86,28 @@ public class OffenderPhotoController {
 	/* View names. */
 	
 	private static final String LIST_VIEW_NAME = "offenderPhoto/list";
-	
 	private static final String EDIT_FORM_VIEW_NAME = "offenderPhoto/edit";
-	
+	private static final String JOIN_PHOTO_FORM_VIEW_NAME
+	= "offenderPhoto/join/edit";
 	private static final String PHOTOS_ACTION_MENU
 		= "offenderPhoto/includes/photosActionMenu";
-	
 	private static final String
 	OFFENDER_PHOTO_ASSOCIATION_ACTION_MENU_VIEW_NAME
 		= "offenderPhoto/includes/photoActionMenu";
-	
 	private static final String
 	OFFENDER_PHOTO_ASSOCIATION_ROW_ACTION_MENU_VIEW_NAME
 		= "offenderPhoto/includes/photosRowActionMenu";
-	
 	private static final String
 	OFFENDER_PHOTO_ASSOC_NOTE_ACTION_MENU_VIEW_NAME 
 		= "offenderPhoto/includes/photoAssociationNoteItemsActionMenu";
-	
 	private static final String NOTE_ITEM_ROW_VIEW_NAME
 		= "offenderPhoto/includes/offenderPhotoAssociationNoteItemTableRow";
+	
+	/* Feature toggle repository. */
+	
+	@Autowired
+	@Qualifier("featureToggles")
+	private FeatureToggles featureToggles;
 
 	/* Redirects. */
 	
@@ -91,30 +117,27 @@ public class OffenderPhotoController {
 	/* Model keys. */
 		
 	private static final String ASSOCIATIONS_MODEL_KEY = "associations";
-	
 	private static final String OFFENDER_PHOTO_FORM_MODEL_KEY
 		= "offenderPhotoForm";
-
 	private static final String ASSOCIATION_MODEL_KEY = "association";
-	
 	private static final String OFFENDER_MODEL_KEY = "offender";
-	
 	private static final String OFFENDER_PHOTO_ASSOCIATION_MODEL_KEY
 		= "association";
-	
 	private static final String PROFILE_MODEL_KEY = "profile";
-	
 	private static final String NOTE_ITEM_MODEL_KEY
 		= "offenderPhotoAssociationNoteItem";
-	
 	private static final String NOTE_ITEM_INDEX_MODEL_KEY
-		= "offenderPhotoAssociationNoteItemIndex"; 
+		= "offenderPhotoAssociationNoteItemIndex";
+	private static final String PHOTO_DATA_MODEL_KEY = "photoData";
+	private static final String ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY
+		= "allowEnhancedImageEditor";
+	private static final String OFFENDER_PHOTO_JOIN_FORM_MODEL_KEY
+	= "offenderPhotoJoinForm";
 	
 	/* Report names. */
 	
 	private static final String OFFENDER_PHOTO_LISTING_REPORT_NAME 
 		= "/BasicInformation/Mugshots/Mugshot_Listing";
-	
 	private static final String OFFENDER_PHOTO_DETAILS_REPORT_NAME 
 		= "/BasicInformation/Mugshots/Mugshot_Detail";
 	
@@ -122,7 +145,6 @@ public class OffenderPhotoController {
 	
 	private static final String OFFENDER_PHOTO_LISTING_ID_REPORT_PARAM_NAME
 		= "DOC_ID";
-	
 	private static final String OFFENDER_PHOTO_DETAILS_ID_REPORT_PARAM_NAME
 		= "PERSON_PHOTO_ASSOC_ID";
 
@@ -180,6 +202,10 @@ public class OffenderPhotoController {
 	@Qualifier("editOffenderPhotoFormValidator")
 	private OffenderPhotoFormValidator editOffenderPhotoFormValidator;
 
+	@Autowired
+	@Qualifier("offenderPhotoJoinFormValidator")
+	private OffenderPhotoJoinFormValidator offenderPhotoJoinFormValidator;
+	
 	/* Helpers. */
 	@Autowired
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
@@ -367,7 +393,8 @@ public class OffenderPhotoController {
 							offenderPhotoForm.getPhotoDate());
 		}
 		offenderPhotoPersister.persist(
-				association.getPhoto(), offenderPhotoForm.getPhotoData());
+				association.getPhoto(), this.decodePhotoData(
+						offenderPhotoForm.getPhotoData()));
 		this.processOffenderPhotoAssociationNoteItems(
 				offenderPhotoForm.getNoteItems(), association);
 		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
@@ -403,6 +430,129 @@ public class OffenderPhotoController {
 				offenderPhotoForm.getPhotoDate());
 		this.processOffenderPhotoAssociationNoteItems(
 				offenderPhotoForm.getNoteItems(), association);
+		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
+	}
+	
+	/**
+	 * Returns a model and view to join offender photos to make a mugshot for
+	 * the specified offender. Profile flag sets whether the resulting image
+	 * should be used as the current profile mugshot for the offender.
+	 * 
+	 * @param offender offender
+	 * @param profile profile
+	 * @return model and view for offender photo join form
+	 */
+	@PreAuthorize("(hasRole('OFFENDER_PHOTO_VIEW') and"
+			+ " hasRole('OFFENDER_PHOTO_CREATE')) or hasRole('ADMIN')")
+	@RequestMapping(value = "/join.html", method = RequestMethod.GET)
+	public ModelAndView join(@RequestParam(value = "offender", required = true)
+		final Offender offender,
+		@RequestParam(value = "profile", required = true)
+		final boolean profile) {
+		ModelMap map = new ModelMap();
+		OffenderPhotoJoinForm form = new OffenderPhotoJoinForm();
+		List<OffenderPhotoAssociation> associations = this.offenderPhotoService
+				.findByOffender(offender);
+		for(OffenderPhotoAssociation association : associations) {
+			byte[] photoData;
+			if (association.getPhoto() != null) {
+				photoData = this.offenderPhotoRetriever.retrieve(
+						association.getPhoto());	
+			} else {
+				// TODO: Do this better - 'NotSet.jpg' should not be hard coded
+				photoData = this.offenderPhotoRetriever.retrieve("NotSet.jpg");
+			}
+			form.getPhotoItems().add(new OffenderPhotoItem(association.getId(),
+					photoData, association.getPhoto().getDate()));
+		}
+//		map.addAttribute(OFFENDER_PHOTO_JOIN_FORM, form);
+//		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+//		final Integer offenderPhotoAssociationNoteIndex;
+//		if (form.getNoteItems() != null) {
+//			offenderPhotoAssociationNoteIndex = form
+//					.getNoteItems().size(); 
+//		} else {
+//			offenderPhotoAssociationNoteIndex = 0;
+//		}
+//		map.addAttribute(NOTE_ITEM_INDEX_MODEL_KEY, 
+//				offenderPhotoAssociationNoteIndex);
+//		this.offenderSummaryModelDelegate.add(map, offender);
+//		if(this.getAllowEnhancedImageEditor()) {
+//			map.addAttribute(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
+//		}
+		//return new ModelAndView(JOIN_PHOTO_FORM_VIEW_NAME, map);
+		return this.prepareJoinMav(offender, form, map);
+	}
+	
+	private ModelAndView prepareJoinMav(final Offender offender,
+			final OffenderPhotoJoinForm form, final ModelMap map) {
+		map.addAttribute(OFFENDER_PHOTO_JOIN_FORM_MODEL_KEY, form);
+		map.addAttribute(OFFENDER_MODEL_KEY, offender);
+		final Integer offenderPhotoAssociationNoteIndex;
+		if (form.getNoteItems() != null) {
+			offenderPhotoAssociationNoteIndex = form
+					.getNoteItems().size(); 
+		} else {
+			offenderPhotoAssociationNoteIndex = 0;
+		}
+		map.addAttribute(NOTE_ITEM_INDEX_MODEL_KEY, 
+				offenderPhotoAssociationNoteIndex);
+		this.offenderSummaryModelDelegate.add(map, offender);
+		if(this.getAllowEnhancedImageEditor()) {
+			map.addAttribute(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
+		}
+		return new ModelAndView(JOIN_PHOTO_FORM_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Joins 2 images together to create one 1920 x 1080 image, used as a
+	 * mugshot for the specified offender. The profile flag helps decide whether
+	 * the newly created, stitched, image should be the new banner mugshot.
+	 * 
+	 * @param offender offender
+	 * @param profile whether profile applies
+	 * @param form offender photo join form
+	 * @param result binding result
+	 * @return redirect to offender photo list screen
+	 * @throws DuplicateEntityFoundException thrown when a duplicate photo
+	 * association is found.
+	 */
+	@PreAuthorize("hasRole('OFFENDER_PHOTO_CREATE') or hasRole('ADMIN')")
+	@RequestMapping(value = "/join.html", method = RequestMethod.POST)
+	public ModelAndView stitch(
+			@RequestParam(value = "offender", required = true)
+				final Offender offender,
+			@RequestParam(value = "profile", required = true)
+				final boolean profile, final OffenderPhotoJoinForm form,
+			final BindingResult result) throws DuplicateEntityFoundException {
+		this.offenderPhotoJoinFormValidator.validate(form, result);
+		if(result.hasErrors()) {
+			//return to form
+			ModelMap map = new ModelMap();
+			if(form.getPhotoData() != null) {
+				map.addAttribute(PHOTO_DATA_MODEL_KEY,
+						this.reencodePhotoData(form.getPhotoData()));
+			}
+			map.addAttribute(BindingResult.MODEL_KEY_PREFIX
+					+ OFFENDER_PHOTO_JOIN_FORM_MODEL_KEY, result);
+			return this.prepareJoinMav(offender, form, map);
+		}
+		String filename = this.photoFilenameGenerator.generate();
+		OffenderPhotoAssociation association;
+		if (profile) {
+			association = this.offenderPhotoService.associateProfilePhotoFile(
+					offender, filename, form.getPhotoDate());
+		} else {
+			association = this.offenderPhotoService
+					.associateNoneProfilePhotoFile(offender, filename,
+							form.getPhotoDate());
+		}
+		offenderPhotoPersister.persist(
+				association.getPhoto(), this.decodePhotoData(
+						form.getPhotoData()));
+		this.processOffenderPhotoAssociationNoteItems(
+				form.getNoteItems(), association);
+		//process offender photo items
 		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
 	}
 	
@@ -546,6 +696,9 @@ public class OffenderPhotoController {
 		mav.addObject(NOTE_ITEM_INDEX_MODEL_KEY, 
 				offenderPhotoAssociationNoteIndex);
 		this.addOffenderSummary(mav, offender);
+		if(this.getAllowEnhancedImageEditor()) {
+			mav.addObject(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
+		}
 		return mav;
 	}
 	
@@ -560,6 +713,10 @@ public class OffenderPhotoController {
 			final OffenderPhotoForm offenderPhotoForm,
 			final BindingResult result) {
 		ModelAndView mav = this.prepareEditMav(offender, offenderPhotoForm);
+		if(offenderPhotoForm.getPhotoData() != null) {
+			mav.addObject(PHOTO_DATA_MODEL_KEY,
+					this.reencodePhotoData(offenderPhotoForm.getPhotoData()));
+		}
 		mav.addObject(BindingResult.MODEL_KEY_PREFIX
 				+ OFFENDER_PHOTO_FORM_MODEL_KEY, result);
 		return mav;
@@ -587,7 +744,7 @@ public class OffenderPhotoController {
 							item.getValue());
 				} else if (OffenderPhotoAssociationNoteItemOperation.UPDATE
 						.equals(item.getOperation())) {
-					if (item.getValue() != item.getNote().getValue()
+					if (!item.getValue().equals(item.getNote().getValue())
 							|| item.getDate() != item.getNote().getDate())
 					this.offenderPhotoService
 						.updateAssociationNote(item.getNote(), item.getDate(),
@@ -599,6 +756,31 @@ public class OffenderPhotoController {
 				}
 			}
 		}
+	}
+	
+	// Returns encoded photo data as a string - not null safe
+	private String encodePhotoData(final byte[] photoData) {
+		try {
+			return new String(Base64.getEncoder().encode(photoData), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	// Returns decoded photo data - not null safe
+	private byte[] decodePhotoData(final byte[] photoData) {
+			return Base64.getDecoder().decode(photoData);
+	}
+	
+	// Re-encodes photo data - not null safe
+	private String reencodePhotoData(final byte[] photoData) {
+		return this.encodePhotoData(this.decodePhotoData(photoData));
+	}
+	
+	//Returns whether enhanced image editing is allowed via feature toggle.
+	private boolean getAllowEnhancedImageEditor() {
+		return this.featureToggles
+				.get("offenderphoto" ,"allowEnhancedImageEditor");
 	}
 	
 	/* Reports. */
@@ -652,7 +834,6 @@ public class OffenderPhotoController {
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
 	}
-	
 	
 	/* Init binder. */
 	

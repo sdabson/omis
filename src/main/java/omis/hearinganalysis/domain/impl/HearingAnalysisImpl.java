@@ -17,19 +17,21 @@
 */
 package omis.hearinganalysis.domain.impl;
 
+import java.util.Date;
+
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.hearinganalysis.domain.HearingAnalysisCategory;
-import omis.paroleboarditinerary.domain.BoardAttendee;
-import omis.paroleboarditinerary.domain.BoardMeetingSite;
+import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
 /**
  * Implementation of hearing analysis.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.3 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class HearingAnalysisImpl implements HearingAnalysis {
@@ -44,11 +46,11 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 	
 	private ParoleEligibility eligibility;
 	
-	private BoardMeetingSite boardMeetingSite;
-	
 	private HearingAnalysisCategory category;
 	
-	private BoardAttendee analyst;
+	private ParoleBoardMember analyst;
+	
+	private Date expectedCompletionDate;
 	
 	/** 
 	 * Instantiates an implementation of hearing analysis. 
@@ -83,18 +85,6 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setBoardMeetingSite(BoardMeetingSite boardMeetingSite) {
-		this.boardMeetingSite = boardMeetingSite;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public BoardMeetingSite getBoardMeetingSite() {
-		return boardMeetingSite;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public void setCategory(HearingAnalysisCategory category) {
 		this.category = category;
 	}
@@ -107,13 +97,13 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 	
 	/** {@inheritDoc} */
 	@Override
-	public void setAnalyst(BoardAttendee analyst) {
+	public void setAnalyst(ParoleBoardMember analyst) {
 		this.analyst = analyst;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public BoardAttendee getAnalyst() {
+	public ParoleBoardMember getAnalyst() {
 		return analyst;
 	}
 	
@@ -141,6 +131,18 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		return updateSignature;
 	}
 
+	/**{@inheritDoc} */
+	@Override
+	public Date getExpectedCompletionDate() {
+		return this.expectedCompletionDate;
+	}
+	
+	/**{@inheritDoc} */
+	@Override
+	public void setExpectedCompletionDate(final Date expectedCompletionDate) {
+		this.expectedCompletionDate = expectedCompletionDate;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object obj) {
@@ -162,15 +164,6 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		}
 		if (!this.getCategory().equals(that.getCategory())) {
 			return false;
-		}
-		if (this.getBoardMeetingSite() == null) { 
-			if (that.getBoardMeetingSite() != null) {
-				return false;
-			}
-		} else {
-			if (!this.getBoardMeetingSite().equals(that.getBoardMeetingSite())) {
-				return false;
-			}
 		}
 		if (this.getAnalyst() == null) { 
 			if (that.getAnalyst() != null) {
@@ -196,13 +189,9 @@ public class HearingAnalysisImpl implements HearingAnalysis {
 		int hashCode = 14;
 		hashCode = 29 * hashCode + this.getEligibility().hashCode();
 		hashCode = 29 * hashCode + this.getCategory().hashCode();
-		if (this.getBoardMeetingSite() != null) {
-			hashCode = 29 * hashCode + this.getBoardMeetingSite().hashCode();
-		}
 		if (this.getAnalyst() != null) {
 			hashCode = 29 * hashCode + this.getAnalyst().hashCode();
 		}
 		return hashCode;
 	}
-
 }

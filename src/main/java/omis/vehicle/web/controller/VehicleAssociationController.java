@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System.
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.vehicle.web.controller;
 
 import java.util.Calendar;
@@ -7,7 +24,6 @@ import java.util.List;
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.report.OffenderReportService;
@@ -22,6 +38,7 @@ import omis.vehicle.domain.VehicleLicense;
 import omis.vehicle.domain.VehicleMake;
 import omis.vehicle.domain.VehicleModel;
 import omis.vehicle.domain.VehicleOwnerAssociation;
+import omis.vehicle.exception.VehicleAssociationExistsException;
 import omis.vehicle.service.OffenderVehicleManager;
 import omis.vehicle.web.form.VehicleAssociationForm;
 import omis.vehicle.web.validator.VehicleAssociationFormValidator;
@@ -241,7 +258,7 @@ public class VehicleAssociationController {
 	 * @param vehicleAssociationForm vehicle association form
 	 * @param result binding result
 	 * @return redirect to list vehicle association by offender
-	 * @throws DuplicateEntityFoundException if the vehicle association exists
+	 * @throws VehicleAssociationExistsException if the vehicle association exists
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('VEHICLE_CREATE') or hasRole('ADMIN')")
@@ -249,7 +266,7 @@ public class VehicleAssociationController {
 		@RequestParam(value = "offender", required = true)
 			final Offender offender,
 			final VehicleAssociationForm vehicleAssociationForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result) throws VehicleAssociationExistsException {
 			this.vehicleAssociationFormValidator.validate(
 				vehicleAssociationForm, result);
 			if (result.hasErrors()) {
@@ -278,7 +295,7 @@ public class VehicleAssociationController {
 	 * @param vehicleAssociationForm vehicle association form
 	 * @param result binding result
 	 * @return redirect to list vehicle association
-	 * @throws DuplicateEntityFoundException
+	 * @throws VehicleAssociationExistsException if association already exists
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('VEHICLE_EDIT') or hasRole('ADMIN')")
@@ -286,7 +303,7 @@ public class VehicleAssociationController {
 		@RequestParam(value = "vehicleAssociation", required = true)
 			final VehicleAssociation vehicleAssociation,
 			final VehicleAssociationForm vehicleAssociationForm,
-			final BindingResult result) throws DuplicateEntityFoundException {	
+			final BindingResult result) throws VehicleAssociationExistsException {	
 			this.vehicleAssociationFormValidator.validate(
 				vehicleAssociationForm, result);
 			if (result.hasErrors()) {

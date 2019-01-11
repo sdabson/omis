@@ -50,13 +50,13 @@ import omis.presentenceinvestigation.web.validator.OffenseSectionSummaryFormVali
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * OffenseSectionSummaryController.java
+ * Offense section summary controller.
  * 
- *@author Annie Jacques 
- *@author Sheronda Vaughn
- *@version 0.1.0 (Apr 3, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Sheronda Vaughn
+ * @author Josh Divine
+ * @version 0.1.2 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/offenseSummary/")
@@ -82,7 +82,6 @@ public class OffenseSectionSummaryController {
 	private static final String OFFENSE_SECTION_SUMMARY_ACTION_MENU_VIEW_NAME =
 			"/presentenceInvestigation/offenseSummary/includes/"
 			+ "offenseSectionSummaryActionMenu";
-	
 	
 	/* Model keys. */
 
@@ -139,7 +138,6 @@ public class OffenseSectionSummaryController {
 	@Autowired
 	@Qualifier("offenseSectionSummaryService")
 	private OffenseSectionSummaryService offenseSectionSummaryService;
-	
 	
 	/* Property Editor Factories */
 	
@@ -561,7 +559,7 @@ public class OffenseSectionSummaryController {
 						presentenceInvestigationRequest);
 		
 		map.addAttribute(OFFENDER_MODEL_KEY,
-				(Offender) presentenceInvestigationRequest.getDocket().getPerson());
+				(Offender) presentenceInvestigationRequest.getPerson());
 		map.addAttribute(OFFENSE_SECTION_SUMMARY_MODEL_KEY,
 				offenseSectionSummary);
 		map.addAttribute(OFFENSE_SECTION_SUMMARY_FORM, form);
@@ -597,7 +595,7 @@ public class OffenseSectionSummaryController {
 				presentenceInvestigationRequest);
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 		

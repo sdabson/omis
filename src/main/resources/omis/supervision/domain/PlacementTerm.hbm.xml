@@ -46,17 +46,17 @@
 			</generator>
 		</id>
 		<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
-		<many-to-one name="supervisoryOrganizationTerm" entity-name="omis.supervision.domain.SupervisoryOrganizationTerm" not-null="true" column="`SUPERVISORY_ORGANZTN_TERM_ID`"/>
-		<many-to-one name="correctionalStatusTerm" entity-name="omis.supervision.domain.CorrectionalStatusTerm" not-null="true" column="`CORRECTIONAL_STATUS_TERM_ID`"/>
-		<many-to-one name="startChangeReason" entity-name="omis.supervision.domain.PlacementTermChangeReason" not-null="false" column="`START_CHANGE_REASON_ID`"/>
-		<many-to-one name="endChangeReason" entity-name="omis.supervision.domain.PlacementTermChangeReason" not-null="false" column="`END_CHANGE_REASON_ID`"/>
+		<many-to-one name="supervisoryOrganizationTerm" fetch="join" lazy="false" entity-name="omis.supervision.domain.SupervisoryOrganizationTerm" not-null="false" column="`SUPERVISORY_ORGANZTN_TERM_ID`"/>
+		<many-to-one name="correctionalStatusTerm" fetch="join" lazy="false" entity-name="omis.supervision.domain.CorrectionalStatusTerm" not-null="true" column="`CORRECTIONAL_STATUS_TERM_ID`"/>
+		<many-to-one name="startChangeReason" fetch="join" lazy="false" entity-name="omis.supervision.domain.PlacementTermChangeReason" not-null="true" column="`START_CHANGE_REASON_ID`"/>
+		<many-to-one name="endChangeReason" fetch="join" lazy="false" entity-name="omis.supervision.domain.PlacementTermChangeReason" not-null="false" column="`END_CHANGE_REASON_ID`"/>
 		<property name="status" type="placementStatus" column="`STATUS`" not-null="true"/>
 		<component name="statusDateRange" class="omis.datatype.DateRange">
 			<property name="startDate" type="java.util.Date" not-null="false" column="`STATUS_START_DATE`"/>
 			<property name="endDate" type="java.util.Date" not-null="false" column="`STATUS_END_DATE`"/>
 		</component>
 		<component name="dateRange" class="omis.datatype.DateRange">
-			<property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
+			<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
 			<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
 		</component>
 		<component name="creationSignature" class="omis.audit.domain.CreationSignature">
@@ -94,8 +94,9 @@
 		select placementTerm
 		from omis.supervision.domain.PlacementTerm placementTerm
 		where placementTerm.offender = :offender
-			and placementTerm.correctionalStatusTerm.correctionalStatus = :correctionalStatus
-			and placementTerm.supervisoryOrganizationTerm.supervisoryOrganization = :supervisoryOrganization
+			and placementTerm.correctionalStatusTerm = :correctionalStatusTerm
+			and (placementTerm.supervisoryOrganizationTerm = :supervisoryOrganizationTerm
+				or (placementTerm.supervisoryOrganizationTerm is null and :supervisoryOrganizationTerm is null))
 			and (placementTerm.dateRange.startDate = :startDate
 			  or (placementTerm.dateRange.startDate is null and :startDate is null))
 			and (placementTerm.dateRange.endDate = :endDate
@@ -107,8 +108,9 @@
 		select placementTerm
 		from omis.supervision.domain.PlacementTerm placementTerm
 		where placementTerm.offender = :offender
-			and placementTerm.correctionalStatusTerm.correctionalStatus = :correctionalStatus
-			and placementTerm.supervisoryOrganizationTerm.supervisoryOrganization = :supervisoryOrganization
+			and placementTerm.correctionalStatusTerm = :correctionalStatusTerm
+			and (placementTerm.supervisoryOrganizationTerm = :supervisoryOrganizationTerm
+				or (placementTerm.supervisoryOrganizationTerm is null and :supervisoryOrganizationTerm is null))
 			and (placementTerm.dateRange.startDate = :startDate
 			  or (placementTerm.dateRange.startDate is null and :startDate is null))
 			and (placementTerm.dateRange.endDate = :endDate
@@ -120,7 +122,8 @@
 	<query name="countPlacementTermsBetweenDatesForOffender"><![CDATA[
 		select count (placementTerm)
 		from omis.supervision.domain.PlacementTerm placementTerm
-		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null)
+		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null
+				or placementTerm.dateRange.startDate is null)
 			and (placementTerm.dateRange.endDate > :startDate or :startDate is null
 				or placementTerm.dateRange.endDate is null)
 			and placementTerm.offender = :offender
@@ -130,7 +133,8 @@
 	<query name="countPlacementTermsBetweenDatesForOffenderExcluding"><![CDATA[
 		select count (placementTerm)
 		from omis.supervision.domain.PlacementTerm placementTerm
-		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null)
+		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null
+				or placementTerm.dateRange.startDate is null)
 			and (placementTerm.dateRange.endDate > :startDate or :startDate is null
 				or placementTerm.dateRange.endDate is null)
 			and placementTerm.offender = :offender
@@ -177,12 +181,22 @@
 		where placementTerm.supervisoryOrganizationTerm = :supervisoryOrganizationTerm
 	]]></query>
 	
+	<!-- Returns placement term for offender with start date. -->
+	<query name="findPlacementTermForOffenderWithStartDate"><![CDATA[
+		select placementTerm
+		from omis.supervision.domain.PlacementTerm placementTerm
+		where placementTerm.offender = :offender
+		  and (placementTerm.dateRange.startDate = :startDate
+		    or (placementTerm.dateRange.startDate is null and :startDate is null))
+	]]></query>
+	
 	<!-- Returns placement term for offender with end date. -->
 	<query name="findPlacementTermForOffenderWithEndDate"><![CDATA[
 		select placementTerm
 		from omis.supervision.domain.PlacementTerm placementTerm
 		where placementTerm.offender = :offender
-		  and placementTerm.dateRange.endDate = :endDate
+		  and (placementTerm.dateRange.endDate = :endDate
+		    or (placementTerm.dateRange.endDate is null and :endDate is null))
 	]]></query>
 	
 	<!-- Counts placement term by offender after date. -->

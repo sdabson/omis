@@ -25,24 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
 
-import omis.address.domain.Address;
-import omis.address.domain.ZipCode;
-import omis.address.service.delegate.AddressDelegate;
-import omis.address.service.delegate.ZipCodeDelegate;
-import omis.country.domain.Country;
-import omis.country.service.delegate.CountryDelegate;
-import omis.court.domain.Court;
-import omis.court.domain.CourtCategory;
-import omis.court.service.delegate.CourtDelegate;
-import omis.datatype.DateRange;
-import omis.docket.domain.Docket;
 import omis.docket.exception.DocketExistsException;
-import omis.docket.service.delegate.DocketDelegate;
 import omis.exception.DuplicateEntityFoundException;
-import omis.location.domain.Location;
-import omis.location.service.delegate.LocationDelegate;
-import omis.organization.domain.Organization;
-import omis.organization.service.delegate.OrganizationDelegate;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationCategory;
@@ -55,10 +39,6 @@ import omis.presentenceinvestigation.service.PresentenceInvestigationTaskService
 import omis.presentenceinvestigation.service.delegate.PresentenceInvestigationCategoryDelegate;
 import omis.presentenceinvestigation.service.delegate.PresentenceInvestigationRequestDelegate;
 import omis.presentenceinvestigation.service.delegate.PresentenceInvestigationTaskSourceDelegate;
-import omis.region.domain.City;
-import omis.region.domain.State;
-import omis.region.service.delegate.CityDelegate;
-import omis.region.service.delegate.StateDelegate;
 import omis.task.domain.Task;
 import omis.task.domain.TaskAssignment;
 import omis.task.domain.TaskParameterValue;
@@ -74,9 +54,9 @@ import omis.user.service.delegate.UserAccountDelegate;
 /**
  * PresentenceInvestigationTaskServiceRemoveTests.java
  * 
- * @author Annie Jacques
+ * @author Annie Wahl
  * @author Josh Divine 
- * @version 0.1.1 (Jan 3, 2018)
+ * @version 0.1.3 (Oct 24, 2018)
  * @since OMIS 3.0
  *
  */
@@ -107,33 +87,6 @@ public class PresentenceInvestigationTaskServiceRemoveTests
 	private UserAccountDelegate userAccountDelegate;
 	
 	@Autowired
-	private CourtDelegate courtDelegate;
-	
-	@Autowired
-	private DocketDelegate docketDelegate;
-	
-	@Autowired
-	private LocationDelegate locationDelegate;
-	
-	@Autowired
-	private OrganizationDelegate organizationDelegate;
-	
-	@Autowired
-	private AddressDelegate addressDelegate;
-	
-	@Autowired
-	private CountryDelegate countryDelegate;
-	
-	@Autowired
-	private StateDelegate stateDelegate;
-	
-	@Autowired
-	private CityDelegate cityDelegate;
-	
-	@Autowired
-	private ZipCodeDelegate zipCodeDelegate;
-	
-	@Autowired
 	private TaskDelegate taskDelegate;
 	
 	@Autowired
@@ -157,25 +110,6 @@ public class PresentenceInvestigationTaskServiceRemoveTests
 		final UserAccount userAccount = this.userAccountDelegate.create(
 				user, "ROBIN34", "password1", this.parseDateText("12/12/2299"),
 				0, true);
-		final Organization organization = this.organizationDelegate.create(
-				"Batcave", "TBC", null);
-		final Country country = this.countryDelegate.create(
-				"Country", "USA", true);
-		final State state = this.stateDelegate.create(
-				"State", "ST", country, true, true);
-		final City city = this.cityDelegate.create(
-				"City", true, state, country);
-		final ZipCode zipCode = this.zipCodeDelegate.create(
-				city, "12345", null, true);
-		final Address address = this.addressDelegate.findOrCreate("123value", null,
-				null, null, zipCode);
-		final Location location = this.locationDelegate.create(organization,
-				new DateRange(this.parseDateText("01/01/2001"),
-						this.parseDateText("01/01/2020")), address);
-		final Court court = this.courtDelegate.create("Court Of Justice!",
-				CourtCategory.CITY, location);
-		final Docket docket = this.docketDelegate.create(person, court,
-				"Docketty Doo");
 		final PresentenceInvestigationCategory category =
 				this.presentenceInvestigationCategoryDelegate
 				.create("PSI Category", true);
@@ -183,7 +117,8 @@ public class PresentenceInvestigationTaskServiceRemoveTests
 				this.presentenceInvestigationRequestDelegate.create(
 						userAccount, this.parseDateText("01/01/2016"),
 						this.parseDateText("12/31/2017"),
-						docket, null, this.parseDateText("03/25/2015"), category);
+						person, this.parseDateText("03/25/2015"), category, 
+						this.parseDateText("04/01/2017"));
 		final TaskTemplateGroup group = this.taskTemplateGroupDelegate.create(
 				"TaskTemplateGroup");
 		final TaskTemplate taskTemplate = this.taskTemplateDelegate.create(

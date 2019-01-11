@@ -70,6 +70,22 @@ public class IncidentStatementFormValidator implements Validator {
 			errors.rejectValue("documenter",
 					"incidentStatement.documenter.empty");
 		}
+		if(form.getFacilityScene() != null) {  
+			
+			if(form.getFacilityScene()) {
+				if(form.getComplex() == null && form.getFacilityArea() == null) {
+					errors.rejectValue("facilityScene", "incidentStatement.complexOrFacilityArea.empty");
+				}
+				if(form.getFacility() == null) {
+					errors.rejectValue("facility", "incidentStatement.facility.empty");
+				}
+			}
+			
+		} else {
+			errors.rejectValue("facilityScene", "incidentStatement.faciltyScene.empty");
+		}
+			
+		
 		if (form.getSummary() == null || form.getSummary().isEmpty()) {
 			errors.rejectValue("summary", "incidentStatement.summary.empty");
 		} else {

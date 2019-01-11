@@ -1,0 +1,64 @@
+#assessmentCategoryRatingSummariesTable {
+	width: 50%;
+	display: inline-table;
+}
+
+#assessmentGraphContainerWrapper {
+	width: 45%;
+	height: auto;
+	padding: 2.5%;
+	float: right;
+	display: block !important;
+}
+
+#assessmentGraphContainer {
+	width: 98%;
+	overflow: hidden;
+	margin: 0 auto;
+}
+
+.graphCanvas {
+	background: white;
+}
+
+.bar {
+	display: inline;
+	width: 15px;
+	margin: 0 auto;
+	background-color: #FA840E;
+	position: relative;
+	top: 100%;
+	transform: translateY(-100%);
+}
+
+table.listTable tbody tr.pertinent td {
+	background-color: hsla(0, 0%, 70%, 1);
+}
+
+#toggleGraph {
+	width: 80%;
+	margin: 0 auto;
+	margin-bottom: 2px;
+	text-align: right;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.graphMessage {
+	text-align: center;
+	margin-top: 5%;
+	margin-bottom: 5%;
+}
+
+#toggleGraph:hover, #graphError:hover {
+	cursor: pointer;
+}
+
+.hiddenGraph {
+	z-index: -1231231;
+	position: absolute;
+	top:0; left:0;
+	opacity:0;
+}

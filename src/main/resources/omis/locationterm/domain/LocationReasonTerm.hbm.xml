@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
   - Location reason term mapping and queries.
   -
   - Author: Stephen Abson
@@ -32,9 +50,9 @@
       		<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
       	</component>
       	<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
-      	<many-to-one name="locationTerm" entity-name="omis.locationterm.domain.LocationTerm" not-null="true" column="`LOCATION_TERM_ID`"/>
+      	<many-to-one name="locationTerm" lazy="false" fetch="join" entity-name="omis.locationterm.domain.LocationTerm" not-null="true" column="`LOCATION_TERM_ID`"/>
       </properties>
-      <many-to-one name="reason" entity-name="omis.locationterm.domain.LocationReason" not-null="true" column="`REASON_ID`"/>
+      <many-to-one name="reason" lazy="false" fetch="join" entity-name="omis.locationterm.domain.LocationReason" not-null="true" column="`REASON_ID`"/>
 	</class>
 	<query name="findLocationReasonTermsByOffender"><![CDATA[
 		select locationReasonTerm
@@ -125,6 +143,12 @@
 		  and locationReasonTerm.dateRange.startDate >= :date
 		  and (locationReasonTerm <> :excludedLocationReasonTerm
 		  	or :excludedLocationReasonTerm is null)
+	]]></query>
+	<query name="findLocationReasonTermWithStartDate"><![CDATA[
+		select locationReasonTerm
+		from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+		where locationReasonTerm.locationTerm = :locationTerm
+		  and locationReasonTerm.dateRange.startDate = :startDate
 	]]></query>
 	<query name="deleteLocationReasonTermsByLocationTerm"><![CDATA[
 		delete from omis.locationterm.domain.LocationReasonTerm reasonTerm

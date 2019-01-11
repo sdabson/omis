@@ -10,11 +10,18 @@
 				<li>
 					<a class="createLink" href="${pageContext.request.contextPath}/warrant/create.html?offender=${offender.id}&warrantReasonCategory=${category}">
 						<span class="visibleLinkLabel">
-							<fmt:message key="create${category}Link" />
+							<fmt:message key="createLink.${category}" />
 						</span>
 					</a>
 				</li>
 			</c:forEach>
 		</sec:authorize>
+		<sec:authorize access="hasRole('WARRANT_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/warrant/warrantListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="warrantListingReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

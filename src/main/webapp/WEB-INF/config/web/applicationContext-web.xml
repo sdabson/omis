@@ -80,5 +80,9 @@
       <aop:pointcut id="formFieldTipControllerOperation" expression="execution(* omis.web.controller.FormFieldTipController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="formFieldTipControllerOperation"/>
   </aop:config>
+  
+  <!-- Resources -->
+  
+  <mvc:resources mapping="/webjars/**" location="/webjars/"/>
 
 </beans>

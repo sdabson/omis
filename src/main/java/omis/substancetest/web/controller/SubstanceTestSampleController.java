@@ -49,6 +49,7 @@ import org.springframework.web.servlet.ModelAndView;
  * Substance test sample controller.
  * 
  * @author Joel Norris
+ * @author Sierra Haynes
  * @version 0.1.0 (Apr 16, 2015)
  * @since OMIS 3.0
  */
@@ -161,6 +162,15 @@ public class SubstanceTestSampleController {
 
 	private static final String SUBSTANCE_TEST_DETAILS_REPORT_NAME 
 		= "/Compliance/SubstanceTests/Substance_Testing_Details";
+	
+	private static final String DRUG_ALCOHOL_SCREENING_REPORT_NAME 
+		= "/Compliance/SubstanceTests/Drug_Alcohol_Screening_Information_Form";
+	
+	private static final String SAMPLE_TAKERS_CHECKLIST_REPORT_NAME 
+		= "/Compliance/SubstanceTests/Sample_Takers_Checklist_Chain_of_Evidence";
+	
+	private static final String SUBSTANCE_ABUSE_ADMISSION_FORM_REPORT_NAME 
+		= "/Compliance/SubstanceTests/Substance_Abuse_Admission_Form";
 
 	/* Report parameter names. */
 	
@@ -414,7 +424,7 @@ public class SubstanceTestSampleController {
 	 */
 	@RequestMapping(value = "/substanceTestListingReport.html",
 			method = RequestMethod.GET)
-	@PreAuthorize("hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('SUBSTANCE_TEST_LIST') or hasRole('ADMIN')")
 	public ResponseEntity<byte []> reporSubstanceTestListing(@RequestParam(
 			value = "offender", required = true)
 			final Offender offender,
@@ -440,7 +450,7 @@ public class SubstanceTestSampleController {
 	@RequestMapping(value = "/substanceTestDetailsReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportAltIdentityDetailsFull(@RequestParam(
+	public ResponseEntity<byte []> reportSubstanceTestDetailsDetails(@RequestParam(
 			value = "substanceTestSample", required = true)
 			final SubstanceTestSample substanceTestSample,
 			@RequestParam(value = "reportFormat", required = true)
@@ -450,6 +460,84 @@ public class SubstanceTestSampleController {
 				Long.toString(substanceTestSample.getId()));
 		byte[] doc = this.reportRunner.runReport(
 				SUBSTANCE_TEST_DETAILS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+
+	/**
+	 * Returns the drug alcohol screening report for the specified substance test sample.
+	 * 
+	 * @param substanceTestSample substance test sample
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/drugAlcoholScreeningReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportDrugAlcoholScreening(@RequestParam(
+			value = "substanceTestSample", required = true)
+			final SubstanceTestSample substanceTestSample,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(SUBSTANCE_TEST_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(substanceTestSample.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				DRUG_ALCOHOL_SCREENING_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+
+	/**
+	 * Returns the sample takers checklist report for the specified substance test sample.
+	 * 
+	 * @param substanceTestSample substance test sample
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/sampleTakersChecklistReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportSampleTakersChecklist(@RequestParam(
+			value = "substanceTestSample", required = true)
+			final SubstanceTestSample substanceTestSample,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(SUBSTANCE_TEST_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(substanceTestSample.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				SAMPLE_TAKERS_CHECKLIST_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+
+	/**
+	 * Returns the substance abuse admission report for the specified substance test sample.
+	 * 
+	 * @param substanceTestSample substance test sample
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/substanceAbuseAdmissionReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportSubstanceAbuseAdmission(@RequestParam(
+			value = "substanceTestSample", required = true)
+			final SubstanceTestSample substanceTestSample,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(SUBSTANCE_TEST_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(substanceTestSample.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				SUBSTANCE_ABUSE_ADMISSION_FORM_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);

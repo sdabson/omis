@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.testng;
 
 import java.text.ParseException;
@@ -8,13 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
 
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
 import omis.stg.domain.SecurityThreatGroupActivity;
 import omis.stg.domain.SecurityThreatGroupActivityInvolvement;
+import omis.stg.exception.SecurityThreatGroupActivityExistsException;
+import omis.stg.exception.SecurityThreatGroupActivityInvolvementExistsException;
 import omis.stg.service.SecurityThreatGroupActivityService;
 import omis.stg.service.delegate.SecurityThreatGroupActivityDelegate;
 import omis.stg.service.delegate.SecurityThreatGroupActivityInvolvementDelegate;
@@ -54,8 +72,8 @@ public class SecurityThreatGroupActivityServiceUpdateInvolvementNarrativeTests
 	/* Test methods. */
 	
 	@Test
-	public void testUpdateInvolvementNarrative() 
-			throws DuplicateEntityFoundException {
+	public void testUpdateInvolvementNarrative() throws SecurityThreatGroupActivityExistsException, 
+		SecurityThreatGroupActivityInvolvementExistsException {	
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith", 
 				"John", "Jay", null);
@@ -82,8 +100,10 @@ public class SecurityThreatGroupActivityServiceUpdateInvolvementNarrativeTests
 			.performAssertions(involvement);
 	}
 
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
-	public void testDuplicateEntityFoundException() throws DuplicateEntityFoundException {
+	@Test(expectedExceptions = {SecurityThreatGroupActivityInvolvementExistsException.class})
+	public void testSecurityThreatGroupActivityInvolvementExistsException () 
+			throws SecurityThreatGroupActivityExistsException, 
+			SecurityThreatGroupActivityInvolvementExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith", 
 				"John", "Jay", null);

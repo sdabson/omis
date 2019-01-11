@@ -7,10 +7,10 @@ import omis.questionnaire.domain.QuestionnaireType;
 import omis.questionnaire.domain.SectionType;
 
 /**
- * QuestionnaireSectionImpl.java
+ * Questionnaire Section Implementation.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Sep 7, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
@@ -32,13 +32,14 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 	
 	private SectionType sectionType;
 	
-	private Integer sectionNumber;
+	private String sectionNumber;
 	
 	private String sectionHelp;
 
 	/**{@inheritDoc} */
 	@Override
-	public void setCreationSignature(CreationSignature creationSignature) {
+	public void setCreationSignature(
+			final CreationSignature creationSignature) {
 		this.creationSignature = creationSignature;
 	}
 
@@ -50,7 +51,7 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setUpdateSignature(UpdateSignature updateSignature) {
+	public void setUpdateSignature(final UpdateSignature updateSignature) {
 		this.updateSignature = updateSignature;
 	}
 
@@ -68,7 +69,7 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -80,7 +81,7 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -92,7 +93,7 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setSortOrder(Short sortOrder) {
+	public void setSortOrder(final Short sortOrder) {
 		this.sortOrder = sortOrder;
 	}
 
@@ -104,7 +105,8 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setQuestionnaireType(QuestionnaireType questionnaireType) {
+	public void setQuestionnaireType(
+			final QuestionnaireType questionnaireType) {
 		this.questionnaireType = questionnaireType;
 	}
 
@@ -116,19 +118,19 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setSectionType(SectionType sectionType) {
+	public void setSectionType(final SectionType sectionType) {
 		this.sectionType = sectionType;
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public Integer getSectionNumber() {
+	public String getSectionNumber() {
 		return this.sectionNumber;
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public void setSectionNumber(Integer sectionNumber) {
+	public void setSectionNumber(final String sectionNumber) {
 		this.sectionNumber = sectionNumber;
 	}
 	
@@ -140,42 +142,42 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 
 	/**{@inheritDoc} */
 	@Override
-	public void setSectionHelp(String sectionHelp) {
+	public void setSectionHelp(final String sectionHelp) {
 		this.sectionHelp = sectionHelp; 
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object obj) {
-		if(this == obj){
+		if (this == obj) {
 			return true;
 		}
-		if(!(obj instanceof QuestionnaireSection)){
+		if (!(obj instanceof QuestionnaireSection)) {
 			return false;
 		}
 		
 		QuestionnaireSection that = (QuestionnaireSection) obj;
 		
-		if(this.getTitle() == null){
+		if (this.getTitle() == null) {
 			throw new IllegalStateException("Title Required");
 		}
-		if(this.getSortOrder() == null){
+		if (this.getSortOrder() == null) {
 			throw new IllegalStateException("Sort Order Required");
 		}
-		if(this.getQuestionnaireType() == null){
+		if (this.getQuestionnaireType() == null) {
 			throw new IllegalStateException("Questionnaire Type Required");
 		}
-		if(this.getSectionType() == null){
+		if (this.getSectionType() == null) {
 			throw new IllegalStateException("Section Type Required");
 		}
-		if(this.getSectionNumber() == null){
+		if (this.getSectionNumber() == null) {
 			throw new IllegalStateException("Section Number Required");
 		}
 		
-		if(!this.getTitle().equals(that.getTitle())){
+		if (!this.getTitle().equals(that.getTitle())) {
 			return false;
 		}
-		if(!this.getQuestionnaireType().equals(that.getQuestionnaireType())){
+		if (!this.getQuestionnaireType().equals(that.getQuestionnaireType())) {
 			return false;
 		}
 		
@@ -185,10 +187,10 @@ public class QuestionnaireSectionImpl implements QuestionnaireSection {
 	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
-		if(this.getTitle() == null){
+		if (this.getTitle() == null) {
 			throw new IllegalStateException("Title Required");
 		}
-		if(this.getQuestionnaireType() == null){
+		if (this.getQuestionnaireType() == null) {
 			throw new IllegalStateException("Questionnaire Type Required");
 		}
 		

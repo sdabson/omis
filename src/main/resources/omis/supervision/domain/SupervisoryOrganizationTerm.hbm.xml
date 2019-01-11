@@ -41,7 +41,7 @@
 		</id>
 		<properties name="uniqueSupervisoryOrganizationTerm">
 			<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`" />
-			<many-to-one name="supervisoryOrganization" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="true" column="`SUPERVISORY_ORGANIZATION_ID`" />
+			<many-to-one name="supervisoryOrganization" lazy="false" fetch="join" entity-name="omis.supervision.domain.SupervisoryOrganization" not-null="true" column="`SUPERVISORY_ORGANIZATION_ID`" />
 			<component name="dateRange" class="omis.datatype.DateRange">
 				<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`" />
 				<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`" />

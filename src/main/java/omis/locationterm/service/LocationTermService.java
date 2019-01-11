@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.service;
 
 import java.util.Date;
@@ -5,16 +22,19 @@ import java.util.List;
 
 import omis.datatype.DateRange;
 import omis.exception.DateRangeOutOfBoundsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
 import omis.locationterm.domain.LocationTerm;
 import omis.locationterm.domain.LocationTermChangeAction;
+import omis.locationterm.domain.LocationTermChangeActionAssociation;
 import omis.locationterm.exception.LocationReasonTermConflictException;
 import omis.locationterm.exception.LocationReasonTermExistsAfterException;
+import omis.locationterm.exception.LocationReasonTermExistsException;
+import omis.locationterm.exception.LocationTermChangeActionAssociationExistsException;
 import omis.locationterm.exception.LocationTermConflictException;
 import omis.locationterm.exception.LocationTermExistsAfterException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.locationterm.exception.LocationTermLockedException;
 import omis.offender.domain.Offender;
 import omis.organization.domain.Organization;
@@ -39,17 +59,7 @@ public interface LocationTermService {
 	 * @return location terms for offender
 	 */
 	List<LocationTerm> findByOffender(Offender offender);
-	
-	/**
-	 * Returns locations.
-	 * 
-	 * <p>This method should be deprecated and replaced with one that returns
-	 * only locations active on a given date.
-	 * 
-	 * @return locations
-	 */
-	List<Location> findLocations();
-	
+
 	/**
 	 * Returns locations by organization.
 	 * 
@@ -64,19 +74,31 @@ public interface LocationTermService {
 	/**
 	 * Creates location term.
 	 * 
-	 * <p>If not null, the start and end date of the date range are prevented
-	 * from being equal by a {@code IllegalArgumentException} being thrown.
+	 * <p>Start and end date of the date range are prevented from being equal by
+	 * a {@code IllegalArgumentException} being thrown.
+	 * 
+	 * <p>If a location term for the offender is active on the start date it
+	 * will be ended with the start date.
+	 * 
+	 * <p>Updates reason term active on start date to be ended on start date.
+	 * Similarly, updates reason term active on end date to be started on
+	 * end date.
 	 * 
 	 * @param offender offender
 	 * @param location location
 	 * @param dateRange date range
+	 * @param notes notes
 	 * @return location term
-	 * @throws DuplicateEntityFoundException if location term exists
+	 * @throws LocationTermExistsException if location term exists
 	 * @throws LocationTermConflictException if conflicting location terms exist
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 * @throws LocationTermExistsAfterException if conflicting location term
+	 * exists after
 	 */
 	LocationTerm create(Offender offender, Location location,
-			DateRange dateRange)
-					throws DuplicateEntityFoundException,
+			DateRange dateRange, String notes)
+					throws LocationTermExistsException,
 						LocationTermConflictException,
 						LocationTermExistsAfterException,
 						OffenderNotUnderSupervisionException;
@@ -84,29 +106,40 @@ public interface LocationTermService {
 	/**
 	 * Updates location term.
 	 * 
-	 * <p>If not null, the start and end date of the date range are prevented
-	 * from being equal by a {@code IllegalArgumentException} being thrown.
+	 * Start and end date of the date range are prevented from being equal by
+	 * a {@code IllegalArgumentException} being thrown.
 	 * 
 	 * @param locationTerm location term
 	 * @param location location
 	 * @param dateRange date range
+	 * @param notes notes
 	 * @return location term
-	 * @throws DuplicateEntityFoundException if location term exists
+	 * @throws LocationTermExistsException if location term exists
 	 * @throws LocationTermConflictException if conflicting location terms exist
-	 * @throws DateRangeOutOfBoundsException if existing location reason terms
-	 * are out of the date range bounds of the location term
 	 * @throws LocationTermExistsAfterException if existing location terms exist 
 	 * after the start date when the end date is null
 	 * @throws LocationTermLockedException if location term is locked
 	 */
 	LocationTerm update(LocationTerm locationTerm, Location location,
-			DateRange dateRange)
-					throws DuplicateEntityFoundException,
+			DateRange dateRange, String notes)
+					throws LocationTermExistsException,
 						LocationTermConflictException,
-						DateRangeOutOfBoundsException,
 						LocationTermExistsAfterException,
 						LocationTermLockedException,
 						OffenderNotUnderSupervisionException;
+	
+	/**
+	 * Associations change action to location term.
+	 * 
+	 * @param locationTerm location term
+	 * @param changeAction change action to association
+	 * @return association of change action to location term
+	 * @throws LocationTermChangeActionAssociationExistsException if location
+	 * term is already associated with change action
+	 */
+	LocationTermChangeActionAssociation associateChangeAction(
+			LocationTerm locationTerm, LocationTermChangeAction changeAction)
+				throws LocationTermChangeActionAssociationExistsException;
 	
 	/**
 	 * Removes a location term.
@@ -124,7 +157,7 @@ public interface LocationTermService {
 	 * @param dateRange date range
 	 * @param reason reason 
 	 * @return location reason term
-	 * @throws DuplicateEntityFoundException if reason term exists
+	 * @throws LocationReasonTermExistsException if reason term exists
 	 * @throws DateRangeOutOfBoundsException if date range exists out side of 
 	 * location term date range
 	 * @throws LocationReasonTermConflictException if overlapping location 
@@ -134,7 +167,7 @@ public interface LocationTermService {
 	 */
 	LocationReasonTerm createReasonTerm(LocationTerm locationTerm,
 			DateRange dateRange, LocationReason reason)
-					throws DuplicateEntityFoundException,
+					throws LocationReasonTermExistsException,
 						LocationReasonTermConflictException,
 						LocationReasonTermExistsAfterException,
 						DateRangeOutOfBoundsException;
@@ -146,7 +179,7 @@ public interface LocationTermService {
 	 * @param dateRange date range
 	 * @param reason reason
 	 * @return updated reason term
-	 * @throws DuplicateEntityFoundException if reason term exists
+	 * @throws LocationReasonTermExistsException if reason term exists
 	 * @throws DateRangeOutOfBoundsException if date range exists out side of 
 	 * location term date range
 	 * @throws LocationReasonTermConflictException if overlapping location 
@@ -156,7 +189,7 @@ public interface LocationTermService {
 	 */
 	LocationReasonTerm updateReasonTerm(LocationReasonTerm reasonTerm,
 			DateRange dateRange, LocationReason reason)
-				throws DuplicateEntityFoundException,
+				throws LocationReasonTermExistsException,
 					LocationReasonTermExistsAfterException,
 					LocationReasonTermConflictException,
 					DateRangeOutOfBoundsException;
@@ -241,7 +274,19 @@ public interface LocationTermService {
 	 * 
 	 * @return location term change actions
 	 */
+	@Deprecated
 	List<LocationTermChangeAction> findChangeActions();
+	
+	/**
+	 * Returns location term change actions allowed for correctional status.
+	 * 
+	 * @param correctionalStatus correctional status for which to return
+	 * allowed location term change actions
+	 * @return location term change actions allowed for correctional status
+	 */
+	List<LocationTermChangeAction>
+	findAllowedChangeActionsForCorrectionalStatus(
+			CorrectionalStatus correctionalStatus);
 	
 	/**
 	 * Returns locations allowed for action while on correctional status.
@@ -276,6 +321,14 @@ public interface LocationTermService {
 	 */
 	List<LocationReason> findReasonsForChangeAction(
 			LocationTermChangeAction changeAction);
+	
+	/**
+	 * Returns reasons allowed for location.
+	 * 
+	 * @param location location
+	 * @return reasons allowed for location
+	 */
+	List<LocationReason> findReasonsAllowedForLocation(Location location);
 	
 	/**
 	 * Returns locations allowed for placement.

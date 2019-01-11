@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.residence.service.testng;
 
 import java.text.ParseException;
@@ -30,8 +47,10 @@ import omis.region.service.delegate.StateDelegate;
 import omis.residence.domain.ResidenceCategory;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
+import omis.residence.exception.NonResidenceTermExistsException;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 import omis.residence.service.ResidenceService;
 import omis.residence.service.delegate.AllowedResidentialLocationRuleDelegate;
 import omis.residence.service.delegate.NonResidenceTermDelegate;
@@ -44,6 +63,8 @@ import omis.util.PropertyValueAsserter;
  * Tests method to update residence terms.
  *
  * @author Josh Divine
+ * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -122,11 +143,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermDateRange() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			ResidenceStatusConflictException, PrimaryResidenceExistsException,
+			ResidenceTermExistsException, NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -154,11 +178,11 @@ public class ResidenceServiceUpdateResidenceTermTests
 		ResidenceTerm residenceTerm = this.residenceTermDelegate
 				.createResidenceTerm(person, dateRange, category, address, 
 						status, confirmed, notes, verificationSignature);
-		DateRange newDateRange = new DateRange(this.parseDateText("02/01/2017"), 
+		DateRange newDateRange = new DateRange(this.parseDateText("02/01/2017"),
 				this.parseDateText("06/01/2017"));
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				newDateRange, primary, address, fosterCare, confirmed, notes, 
 				verificationSignature);
 		
@@ -183,11 +207,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermResidenceCategory() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			ResidenceStatusConflictException, PrimaryResidenceExistsException,
+			ResidenceTermExistsException, NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -218,7 +245,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 		ResidenceCategory newCategory = ResidenceCategory.SECONDARY;
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, address, fosterCare, confirmed, notes, 
 				verificationSignature);
 		
@@ -243,11 +270,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermAddress() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -279,7 +309,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 				null, null, null, zipCode);
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, newAddress, fosterCare, confirmed, notes, 
 				verificationSignature);
 		
@@ -304,11 +334,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermResidenceStatus() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -339,7 +372,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 		ResidenceStatus newStatus = ResidenceStatus.FOSTER_CARE;
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, address, fosterCare, confirmed, notes, 
 				verificationSignature);
 		
@@ -364,11 +397,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermConfirmed() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -399,7 +435,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 		Boolean newConfirmed = false;
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, address, fosterCare, newConfirmed, notes, 
 				verificationSignature);
 		
@@ -424,11 +460,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testUpdateResidenceTermNotes() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -459,7 +498,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 		String newNotes = "New notes";
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, address, fosterCare, confirmed, newNotes, 
 				verificationSignature);
 		
@@ -484,11 +523,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence terms exists
 	 */
 	@Test
 	public void testUpdateResidenceTermVerificationSignature() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -522,7 +564,7 @@ public class ResidenceServiceUpdateResidenceTermTests
 						this.parseDateText("02/01/2017"), false, method);
 		
 		// Action
-		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm, 
+		residenceTerm = this.residenceService.updateResidenceTerm(residenceTerm,
 				dateRange, primary, address, fosterCare, confirmed, notes, 
 				newVerificationSignature);
 		
@@ -547,11 +589,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
+	@Test(expectedExceptions = {ResidenceTermExistsException.class})
 	public void testDuplicateEntityFoundException() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -603,11 +648,14 @@ public class ResidenceServiceUpdateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists exception
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test(expectedExceptions = {PrimaryResidenceExistsException.class})
 	public void testPrimaryResidenceExistsException() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			throws DuplicateEntityFoundException, ResidenceTermExistsException,
+			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -634,11 +682,13 @@ public class ResidenceServiceUpdateResidenceTermTests
 		this.residenceTermDelegate.createResidenceTerm(person, dateRange, 
 				category, address, status, confirmed, notes, 
 				verificationSignature);
-		
+		DateRange newDateRange = new DateRange(this.parseDateText("07/01/2017"), 
+				this.parseDateText("08/01/2017"));
 		ResidenceCategory secondCategory = ResidenceCategory.SECONDARY;
 		ResidenceTerm residenceTerm = this.residenceTermDelegate
-				.createResidenceTerm(person, dateRange, secondCategory, address, 
-						status, confirmed, notes, verificationSignature);
+				.createResidenceTerm(person, newDateRange, secondCategory, 
+						address, status, confirmed, notes, 
+						verificationSignature);
 		Boolean fosterCare = true;
 		
 		// Action
@@ -648,11 +698,11 @@ public class ResidenceServiceUpdateResidenceTermTests
 	}
 	
 	// Parses date text
-		private Date parseDateText(final String text) {
-			try {
-				return new SimpleDateFormat("MM/dd/yyyy").parse(text);
-			} catch (ParseException e) {
-				throw new RuntimeException("Parse error", e);
-			}
+	private Date parseDateText(final String text) {
+		try {
+			return new SimpleDateFormat("MM/dd/yyyy").parse(text);
+		} catch (ParseException e) {
+			throw new RuntimeException("Parse error", e);
 		}
+	}
 }

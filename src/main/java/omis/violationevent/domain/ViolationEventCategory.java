@@ -1,18 +1,35 @@
 package omis.violationevent.domain;
 
 /**
- * ViolationEventCategory.java
+ * Violation Event Category.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jan 17, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Dec 13, 2018)
  *@since OMIS 3.0
  *
  */
 public enum ViolationEventCategory {
 	
-	SUPERVISION,
+	/** 
+	 * Supervision.
+	 */
+	SUPERVISION(false),
 	
-	DISCIPLINARY;
+	/** 
+	 * Disciplinary.
+	 */
+	DISCIPLINARY(true);
+	
+	private Boolean valid;
+	
+	/**
+	 * Constructor for Violation Event Category.
+	 * 
+	 * @param valid - valid
+	 */
+	ViolationEventCategory(final Boolean valid) {
+		this.valid = valid;
+	}
 	
 	/**
 	 * Returns the instance name.
@@ -33,6 +50,13 @@ public enum ViolationEventCategory {
 	public String toString() {
 		return this.name();
 	}
-	
-	
+
+	/**
+	 * Returns the valid.
+	 *
+	 * @return valid
+	 */
+	public Boolean getValid() {
+		return this.valid;
+	}
 }

@@ -19,7 +19,9 @@
 		   			omis.supervision.domain.CorrectionalStatusTerm cTerm
 		   			inner join cTerm.offender correctionalOffender
 		   			inner join cTerm.correctionalStatus correctionalStatus
-		   		where correctionalOffender = offender),	   
+		   		where correctionalOffender = offender
+		   		and ((cTerm.dateRange.startDate is null or cTerm.dateRange.startDate <= :effectiveDate)
+				and (cTerm.dateRange.endDate is null or cTerm.dateRange.endDate > :effectiveDate))),	   
 		   				
 	   		fi.birthDate, fi.sex, (select locationAddress
 						from
@@ -33,6 +35,18 @@
 							(location = :location or :location is null))
 							and ((lTerm.dateRange.startDate is null or lTerm.dateRange.startDate <= :effectiveDate)
 							and (lTerm.dateRange.endDate is null or lTerm.dateRange.endDate > :effectiveDate))), 
+							(select organization.name
+							from
+								omis.locationterm.domain.LocationTerm lTerm
+								inner join lTerm.offender locationOffender
+								inner join lTerm.location location
+								inner join location.organization organization
+							where
+								((locationOffender = offender)
+								and
+								(location = :location or :location is null))
+								and ((location.dateRange.startDate is null or location.dateRange.startDate <= :effectiveDate)
+								and (location.dateRange.endDate is null or location.dateRange.endDate > :effectiveDate))),
 							case
 								when 
 									activePlacementTerm is not null				 
@@ -70,6 +84,76 @@
 			)
    			order by name.lastName, name.firstName
    	]]></query>   
+   	 <query name="searchForOffenderWithPlacement"><![CDATA[
+ select new omis.offender.report.OffenderSearchSummary(
+  offender, name.lastName, name.firstName, name.middleName, name.suffix,
+   
+   (select supervisoryOrganization.name
+          from
+            omis.supervision.domain.SupervisoryOrganizationTerm sTerm
+            left outer join sTerm.offender supervisoryOffender
+           left outer join sTerm.supervisoryOrganization supervisoryOrganization
+          where supervisoryOffender = offender 
+          and ((sTerm.dateRange.startDate is null or sTerm.dateRange.startDate <= :effectiveDate)
+          and (sTerm.dateRange.endDate is null or sTerm.dateRange.endDate > :effectiveDate))),
+                        
+  (select correctionalStatus.name
+          from
+            omis.supervision.domain.CorrectionalStatusTerm cTerm
+            left outer join cTerm.offender correctionalOffender
+            left outer join cTerm.correctionalStatus correctionalStatus
+          where correctionalOffender = offender
+          and ((cTerm.dateRange.startDate is null or cTerm.dateRange.startDate <= :effectiveDate)
+          and (cTerm.dateRange.endDate is null or cTerm.dateRange.endDate > :effectiveDate))),            
+  
+  fi.birthDate, fi.sex, 
+      
+  (select locationAddress
+        from
+          omis.locationterm.domain.LocationTerm lTerm
+         left outer join lTerm.offender locationOffender
+           left outer join lTerm.location location
+           left outer join location.address locationAddress
+        where
+          (locationOffender = offender)
+          and ((lTerm.dateRange.startDate is null or lTerm.dateRange.startDate <= :effectiveDate)
+          and (lTerm.dateRange.endDate is null or lTerm.dateRange.endDate > :effectiveDate))), 
+  
+  (select organization.name
+        from
+          omis.locationterm.domain.LocationTerm lTerm
+          inner join lTerm.offender locationOffender
+          inner join lTerm.location location
+           inner join location.organization organization
+        where
+          (locationOffender = offender)
+          and ((lTerm.dateRange.startDate is null or lTerm.dateRange.startDate <= :effectiveDate)
+          and (lTerm.dateRange.endDate is null or lTerm.dateRange.endDate > :effectiveDate))),
+
+case
+                when 
+                  offender is not null         
+                then
+                  true
+                else
+                  false
+              end)        
+  
+  from
+    omis.offender.domain.Offender offender  
+      inner join offender.name name
+      inner join offender.identity fi
+  where         
+    (offender.offenderNumber = :offenderNumber or :offenderNumber is null)
+    and (fi.sex = :sex or :sex is null)     
+    and (fi.birthDate = :dateOfBirth or :dateOfBirth is null)
+    and (fi.socialSecurityNumber = :socialSecurityNumber or :socialSecurityNumber is null)
+    and offender in (select personNames.person from omis.person.domain.PersonName personNames
+      where (upper(personNames.firstName) like upper(:firstName || '%' ) or :firstName is null)
+      and (upper(personNames.lastName) like upper(:lastName || '%' ) or :lastName is null)
+      and (upper(personNames.middleName) like upper(:middleName || '%' ) or :middleName is null))
+  order by name.lastName, name.firstName
+   	]]></query>
    	 <query name="searchForOffender"><![CDATA[
    		select new omis.offender.report.OffenderSearchSummary(
 	   		offender, name.lastName, name.firstName, name.middleName, name.suffix,			  

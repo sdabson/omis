@@ -17,6 +17,12 @@
 				  not-null="true"/>
 		<property name="valid" column="`VALID`" type="yes_no" not-null="true"/>
 	</class>
+	<query name="findExistingLabWorkCategory"><![CDATA[
+	from
+		omis.health.domain.LabWorkCategory category
+	where
+		category.name = :name
+	]]></query>
 	<query name="findLabWorkCategories"><![CDATA[
 	from
 		omis.health.domain.LabWorkCategory category

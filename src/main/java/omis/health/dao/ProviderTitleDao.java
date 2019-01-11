@@ -1,5 +1,19 @@
-/**
- * 
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package omis.health.dao;
 
@@ -11,8 +25,17 @@ import omis.health.domain.ProviderTitle;
  * Data access object for provider title.
  * 
  * @author Sheronda Vaughn
- * @version 0.1.0 (May 13, 2014)
+ * @author Yidong Li
+ * @version 0.1.0 (Oct 26 2018)
  * @since OMIs 3.0
  */
 public interface ProviderTitleDao extends GenericDao<ProviderTitle> {
+	/**
+	 * Returns existing provider title with the specified name.
+	 *
+	 * @param name name
+	 * @return provider title; {@code null} if no provider title
+	 * is found
+	 */
+	ProviderTitle findExisting(String name);
 }

@@ -51,7 +51,28 @@
 		<sec:authorize access="hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty substanceTestSample}">
 			<li>
-				<a href="${pageContext.request.contextPath}/substanceTest/sample/substanceTestDetailsReport.html?substanceTestSample=${substanceTestSample.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="substanceTestDetailsReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/substanceTest/sample/drugAlcoholScreeningReport.html?substanceTestSample=${substanceTestSample.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="drugAlcoholScreeningReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty substanceTestSample}">
+			<li>
+				<a href="${pageContext.request.contextPath}/substanceTest/sample/sampleTakersChecklistReport.html?substanceTestSample=${substanceTestSample.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="sampleTakersChecklistReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty substanceTestSample}">
+			<li>
+				<a href="${pageContext.request.contextPath}/substanceTest/sample/substanceAbuseAdmissionReport.html?substanceTestSample=${substanceTestSample.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="substanceAbuseAdmissionReportLinkLabel"/></a>
+			</li>
+			</c:if>
+		</sec:authorize>						
+		<sec:authorize access="hasRole('SUBSTANCE_TEST_VIEW') or hasRole('ADMIN')">
+			<c:if test="${not empty substanceTestSample}">
+			<li>
+				<a href="${pageContext.request.contextPath}/substanceTest/sample/substanceTestDetailsReport.html?substanceTestSample=${substanceTestSample.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="substanceTestDetailsReportLinkLabel"/></a>
 			</li>
 			</c:if>
 		</sec:authorize>

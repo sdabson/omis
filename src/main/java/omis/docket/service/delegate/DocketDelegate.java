@@ -34,7 +34,8 @@ import omis.person.domain.Person;
  * Delegate for dockets.
  *
  * @author Stephen Abson
- * @version 0.0.1
+ * @author Josh Divine
+ * @version 0.1.1 (Aug 15, 2018)
  * @since OMIS 3.0
  */
 public class DocketDelegate {
@@ -77,18 +78,13 @@ public class DocketDelegate {
 			throw new DocketExistsException("Docket exists");
 		}
 		Docket docket = this.docketInstanceFactory.createInstance();
-		docket.setPerson(person);
-		docket.setCourt(court);
-		docket.setValue(value);
 		docket.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
-		docket.setUpdateSignature(new UpdateSignature(
-				this.auditComponentRetriever.retrieveUserAccount(),
-				this.auditComponentRetriever.retrieveDate()));
+		populateDocket(docket, person, court, value);
 		return this.docketDao.makePersistent(docket);
 	}
-	
+
 	/**
 	 * Updates docket.
 	 * 
@@ -105,11 +101,7 @@ public class DocketDelegate {
 				docket.getPerson(), court, value, docket) != null) {
 			throw new DocketExistsException("Docket exists");
 		}
-		docket.setCourt(court);
-		docket.setValue(value);
-		docket.setUpdateSignature(new UpdateSignature(
-				this.auditComponentRetriever.retrieveUserAccount(),
-				this.auditComponentRetriever.retrieveDate()));
+		populateDocket(docket, docket.getPerson(), court, value);
 		return this.docketDao.makePersistent(docket);
 	}
 	
@@ -123,11 +115,33 @@ public class DocketDelegate {
 	}
 	
 	/**
-	 * Returns a list of dockets for the specified Person
-	 * @param person - person
-	 * @return List of dockets for the specified person
+	 * Returns a list of dockets for the specified person.
+	 * 
+	 * @param person person
+	 * @return list of dockets
 	 */
 	public List<Docket> findByPerson(final Person person){
 		return this.docketDao.findByPerson(person);
 	}
+
+	/**
+	 * Returns a list of dockets for the specified value.
+	 * 
+	 * @param value value
+	 * @return list of dockets
+	 */
+	public List<Docket> findByValue(final String value) {
+		return this.docketDao.findByValue(value);
+	}
+	
+	// Populates a docket
+		private void populateDocket(final Docket docket, final Person person,
+				final Court court, final String value) {
+			docket.setPerson(person);
+			docket.setCourt(court);
+			docket.setValue(value);
+			docket.setUpdateSignature(new UpdateSignature(
+					this.auditComponentRetriever.retrieveUserAccount(),
+					this.auditComponentRetriever.retrieveDate()));
+		}
 }

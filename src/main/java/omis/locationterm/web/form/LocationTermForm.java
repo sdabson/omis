@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.web.form;
 
 import java.io.Serializable;
@@ -7,6 +24,7 @@ import java.util.List;
 
 import omis.location.domain.Location;
 import omis.locationterm.domain.LocationReason;
+import omis.locationterm.domain.LocationTermChangeAction;
 import omis.region.domain.State;
 
 /**
@@ -39,11 +57,17 @@ public class LocationTermForm
 	
 	private Date endTime;
 	
+	private String notes;
+	
 	private Boolean allowMultipleReasonTerms;
 	
 	private Boolean allowSingleReasonTerm;
 	
 	private Boolean associateMultipleReasonTerms;
+	
+	private Boolean allowNextChangeAction;
+	
+	private LocationTermChangeAction nextChangeAction;
 	
 	private List<LocationReasonTermItem> reasonTermItems
 		= new ArrayList<LocationReasonTermItem>();
@@ -216,6 +240,24 @@ public class LocationTermForm
 	}
 	
 	/**
+	 * Returns notes.
+	 * 
+	 * @return notes
+	 */
+	public String getNotes() {
+		return this.notes;
+	}
+	
+	/**
+	 * Sets notes.
+	 * 
+	 * @param notes notes
+	 */
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+	
+	/**
 	 * Returns whether multiple reason terms are allowed.
 	 * 
 	 * @return whether multiple reason terms are allowed
@@ -290,5 +332,42 @@ public class LocationTermForm
 	public void setReasonTermItems(
 			final List<LocationReasonTermItem> reasonTermItems) {
 		this.reasonTermItems = reasonTermItems;
+	}
+	
+	/**
+	 * Returns whether next change action is allowed.
+	 * 
+	 * @return whether next change action is allowed
+	 */
+	public Boolean getAllowNextChangeAction() {
+		return this.allowNextChangeAction;
+	}
+	
+	/**
+	 * Sets whether next change action is allowed.
+	 * 
+	 * @param allowNextChangeAction whether next change action is allowed
+	 */
+	public void setAllowNextChangeAction(final Boolean allowNextChangeAction) {
+		this.allowNextChangeAction = allowNextChangeAction;
+	}
+	
+	/**
+	 * Returns next change action.
+	 * 
+	 * @return next change action
+	 */
+	public LocationTermChangeAction getNextChangeAction() {
+		return this.nextChangeAction;
+	}
+	
+	/**
+	 * Sets next change action.
+	 * 
+	 * @param nextChangeAction next change action
+	 */
+	public void setNextChangeAction(
+			final LocationTermChangeAction nextChangeAction) {
+		this.nextChangeAction = nextChangeAction;
 	}
 }

@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
+  - Person search queries hibernate implementation.
+  -
+  - Author: Ryan Johns
+  - Author: Sheronda Vaughn
+  - Author: Josh Divine
+  - Version: 0.1.20 (Aug 29, 2018)
+  - Since: OMIS 3.0
+  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
@@ -58,11 +84,12 @@
 
 <!--   Offender/Name searches -->
 	<query name="findAllOffenderNameByFirstLastNameSearch"><![CDATA[
-	  SELECT new omis.search.report.OffenderSearchResult(an.id, 
+	  SELECT distinct new omis.search.report.OffenderSearchResult(an.id, 
 	         an.person.id, o.offenderNumber, an.firstName, an.middleName, an.lastName, an.suffix)
 	 	FROM omis.person.domain.PersonName an,
 		     omis.offender.domain.Offender o
-	   WHERE utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name2)) >= 85
+	   WHERE (utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name2)) >= 85
+	   		 OR upper(an.firstName) like upper(:name2)||'%')
 	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name1)) >= 90
 		 AND an.person = o 
     ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name2)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name1)) DESC
@@ -80,14 +107,14 @@
 	         OR an.middleName like '')
 	     AND utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:first)) >= 85
 	     AND an.person = o
-	ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:name1)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:name2)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.middleName), upper(:middle)) DESC
+	ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(an.firstName),upper(:first)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.lastName),upper(:last)) + utl_match.JARO_WINKLER_SIMILARITY(upper(an.middleName), upper(:middle)) DESC
 	]]></query>
 	
 	<query name="findOffenderNameByOffenderNumberSearch"><![CDATA[
 	  SELECT new omis.search.report.OffenderSearchResult(n.id, 
 	         o.id, o.offenderNumber, n.firstName, n.middleName, n.lastName, n.suffix )
 	    FROM omis.offender.domain.Offender o
-LEFT OUTER JOIN o.name n
+   LEFT JOIN o.name n
 	   WHERE :offenderNumber = o.offenderNumber
 	ORDER BY o.name.lastName, o.name.firstName
 	]]></query>
@@ -97,7 +124,8 @@ LEFT OUTER JOIN o.name n
 	         o.id, o.offenderNumber, o.name.firstName, o.name.middleName, o.name.lastName, o.name.suffix )
 	    FROM omis.offender.domain.Offender o
 	   WHERE upper(o.name.lastName) like upper(:name || '%')
-	ORDER BY o.name.lastName, o.name.firstName
+	      OR utl_match.JARO_WINKLER_SIMILARITY(upper(o.name.lastName),upper(:name)) >= 90
+	ORDER BY utl_match.JARO_WINKLER_SIMILARITY(upper(o.name.lastName),upper(:name)) DESC, o.name.lastName, o.name.firstName
 	]]></query>
 	
 	<query name="findOffenderSearchById"><![CDATA[

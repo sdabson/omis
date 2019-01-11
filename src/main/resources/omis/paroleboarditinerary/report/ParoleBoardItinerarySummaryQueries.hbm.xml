@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
  - Queries for reporting parole board itineraries.
  -
  - Author: Josh Divine
  - Author: Annie Jacques
- - Version: 0.1.1 (Jan 24, 2018)
+ - Version: 0.1.2 (Apr 11, 2018)
  - Since: OMIS 3.0
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
@@ -51,11 +68,16 @@
 	 			paroleBoardItinerary.id,
 	 			paroleBoardItinerary.dateRange.startDate,
 	 			paroleBoardItinerary.dateRange.endDate,
-	 			organization.name)
+	 			organization.name,
+	 			(select count(hearing)
+	 				from omis.boardhearing.domain.BoardHearing as hearing
+	 				where hearing.itinerary = paroleBoardItinerary
+	 			)
+	 		  )
 		FROM omis.paroleboarditinerary.domain.ParoleBoardItinerary as paroleBoardItinerary
-		INNER JOIN paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
-		INNER JOIN paroleBoardLocation.location location
-		INNER JOIN location.organization organization
+		LEFT JOIN paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		LEFT JOIN paroleBoardLocation.location location
+		LEFT JOIN location.organization organization
         WHERE
         		paroleBoardItinerary = :boardItinerary
 	]]></query>
@@ -65,12 +87,14 @@
 	 			name.lastName,
 	 			name.firstName,
 	 			name.middleName,
+	 			title.name,
 	 			boardAttendee.role)
 		FROM omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
 		INNER JOIN boardAttendee.boardMember boardMember
 		INNER JOIN boardMember.staffAssignment staffAssignment
 		INNER JOIN staffAssignment.staffMember staffMember
-		INNER JOIN staffMember.name name  
+		INNER JOIN staffMember.name name
+		INNER JOIN staffAssignment.title title
 		where
 			boardAttendee.boardItinerary = :boardItinerary
 	]]></query>

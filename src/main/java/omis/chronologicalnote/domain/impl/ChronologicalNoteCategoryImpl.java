@@ -19,9 +19,11 @@
 package omis.chronologicalnote.domain.impl;
 
 import omis.chronologicalnote.domain.ChronologicalNoteCategory;
+import omis.chronologicalnote.domain.ChronologicalNoteCategoryGroup;
 
 /** Implementation of chronological note category.
  * @author Yidong Li
+ * @author Stephen Abson
  * @version 0.1.0 (Jan 29, 2018)
  * @since OMIS 3.0 */
 public class ChronologicalNoteCategoryImpl
@@ -29,11 +31,13 @@ public class ChronologicalNoteCategoryImpl
 	private static final long serialVersionUID = 1L;
 	private Long id;
 	private String name;
+	private ChronologicalNoteCategoryGroup group;
 	private String shortName;
 	private Boolean valid;
 	
 	/** Constructor. */
 	public ChronologicalNoteCategoryImpl() {
+		
 	}
 	
 	/** {@inheritDoc} */
@@ -58,6 +62,18 @@ public class ChronologicalNoteCategoryImpl
 	@Override
 	public void setName(final String name) {
 		this.name = name;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ChronologicalNoteCategoryGroup getGroup() {
+		return this.group;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public void setGroup(final ChronologicalNoteCategoryGroup group) {
+		this.group = group;
 	}
 
 	/** {@inheritDoc} */
@@ -100,6 +116,12 @@ public class ChronologicalNoteCategoryImpl
 		if (!this.getName().equals(that.getName())) {
 			return false;
 		}
+		if (this.getGroup() == null) {
+			throw new IllegalStateException("Group required");
+		}
+		if (!this.getGroup().equals(that.getGroup())) {
+			return false;
+		}
 		return true;
 	}
 	
@@ -112,7 +134,22 @@ public class ChronologicalNoteCategoryImpl
 		if (this.getName() == null) {
 			throw new IllegalStateException("Name required");
 		}
-		hashCode += 29 * this.getName().hashCode();
+		if (this.getGroup() == null) {
+			throw new IllegalStateException("Group required");
+		}
+		hashCode = 29 * hashCode + this.getName().hashCode();
+		hashCode = 29 * hashCode + this.getGroup().hashCode();
 		return hashCode;
+	}
+	
+	/**
+	 * Returns string representation of {@code this} including name and group.
+	 * 
+	 * @return string representation of {@code this} including name and group
+	 */
+	@Override
+	public String toString() {
+		return String.format("#%d: \"%s\"; [%s]",
+				this.getId(), this.getName(), this.getGroup());
 	}
 }

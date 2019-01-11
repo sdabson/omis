@@ -64,6 +64,8 @@ public class OffenderRelationshipSummary
 	
 	private final TelephoneNumberSummaryDelegate telephoneNumberSummaryDelegate;
 	
+	private final Long relationshipCount;
+	
 	/**
 	 * Instantiates an offender relationship summary.
 	 * 
@@ -86,7 +88,8 @@ public class OffenderRelationshipSummary
 			final Long victimCount,
 			final Long visitorCount,
 			final Address address,
-			final TelephoneNumber telephoneNumber) {
+			final TelephoneNumber telephoneNumber,
+			final Long relationshipCount) {
 		this.id = relation.getId();
 		this.lastName = relation.getName().getLastName();
 		this.firstName = relation.getName().getFirstName();
@@ -128,6 +131,7 @@ public class OffenderRelationshipSummary
 		} else {
 			this.telephoneNumber = false;
 		}
+		this.relationshipCount = relationshipCount;
 	}
 	
 	/**
@@ -161,7 +165,8 @@ public class OffenderRelationshipSummary
 			final Long victimCount,
 			final Long visitorCount,
 			final Address address,
-			final TelephoneNumber telephoneNumber) {
+			final TelephoneNumber telephoneNumber,
+			final Long relationshipCount) {
 		this.id = id;
 		this.lastName = lastName;
 		this.firstName = firstName;
@@ -195,6 +200,39 @@ public class OffenderRelationshipSummary
 		} else {
 			this.telephoneNumber = false;
 		}
+		this.relationshipCount = relationshipCount;
+	}
+
+	public OffenderRelationshipSummary(
+			final Long id, final String lastName, final String firstName, 
+			final String middleName, final String suffix, final Date birthDate,
+			final Sex sex, final Integer socialSecurityNumber,
+			final Integer offenderNumber, final Address address) {
+		this.id = id;
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.suffix = suffix;
+		this.birthDate = birthDate;
+		this.sex = sex;
+		this.socialSecurityNumber = socialSecurityNumber;			
+		this.offenderNumber = offenderNumber;
+		this.offender = null;
+		this.offenderAssociationCount = null;
+		this.criminalAssociationCount = null;
+		this.familyMemberCount = null;
+		this.victimCount = null;
+		this.visitorCount = null;
+		this.addressSummaryDelegate = new AddressSummaryDelegate(address);		
+		if (address != null) {
+			this.address = true;
+		} else {
+			this.address = false;
+		}
+		this.telephoneNumber = null;
+		this.telephoneNumberSummaryDelegate
+		= null;
+		this.relationshipCount = null;
 	}
 	
 	/**
@@ -343,6 +381,15 @@ public class OffenderRelationshipSummary
 		return this.telephoneNumber;
 	}
 
+	/**
+	 * Returns relationship count.
+	 * 
+	 * @return relationship count
+	 */
+	public Long getRelationshipCount() {
+		return this.relationshipCount;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public Long getTelephoneNumberValue() {
@@ -415,7 +462,7 @@ public class OffenderRelationshipSummary
 	/** {@inheritDoc} */
 	@Override
 	public String getAddressStateName() {
-		return this.addressSummaryDelegate.getStateName();
+			return this.addressSummaryDelegate.getStateName();
 	}
 
 	/** {@inheritDoc} */

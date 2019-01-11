@@ -23,15 +23,14 @@ import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.hearinganalysis.dao.HearingAnalysisDao;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.hearinganalysis.domain.HearingAnalysisCategory;
-import omis.paroleboarditinerary.domain.BoardAttendee;
-import omis.paroleboarditinerary.domain.BoardMeetingSite;
+import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
 /**
  * Hibernate implementation of the hearing analysis data access object.
  *
  * @author Josh Divine
- * @version 0.1.0 (Dec 18, 2017)
+ * @version 0.1.2 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class HearingAnalysisDaoHibernateImpl 
@@ -51,8 +50,6 @@ public class HearingAnalysisDaoHibernateImpl
 	/* Parameters. */
 	
 	private static final String ELIGIBILITY_PARAM_NAME = "eligibility";
-	
-	private static final String MEETING_SITE_PARAM_NAME = "meetingSite";
 	
 	private static final String CATEGORY_PARAM_NAME = "category";
 	
@@ -75,14 +72,12 @@ public class HearingAnalysisDaoHibernateImpl
 	/** {@inheritDoc} */
 	@Override
 	public HearingAnalysis find(final ParoleEligibility eligibility, 
-			final BoardMeetingSite boardMeetingSite, 
 			final HearingAnalysisCategory category,
-			final BoardAttendee analyst) {
+			final ParoleBoardMember analyst) {
 		HearingAnalysis hearingAnalysis = (HearingAnalysis) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_QUERY_NAME)
 				.setParameter(ELIGIBILITY_PARAM_NAME, eligibility)
-				.setParameter(MEETING_SITE_PARAM_NAME, boardMeetingSite)
 				.setParameter(CATEGORY_PARAM_NAME, category)
 				.setParameter(ANALYST_PARAM_NAME, analyst)
 				.uniqueResult();
@@ -92,14 +87,13 @@ public class HearingAnalysisDaoHibernateImpl
 	/** {@inheritDoc} */
 	@Override
 	public HearingAnalysis findExcluding(final ParoleEligibility eligibility, 
-			final BoardMeetingSite boardMeetingSite,
-			final HearingAnalysisCategory category, final BoardAttendee analyst, 
+			final HearingAnalysisCategory category, 
+			final ParoleBoardMember analyst, 
 			final HearingAnalysis excludedHearingAnalysis) {
 		HearingAnalysis hearingAnalysis = (HearingAnalysis) this
 				.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_EXCLUDING_QUERY_NAME)
 				.setParameter(ELIGIBILITY_PARAM_NAME, eligibility)
-				.setParameter(MEETING_SITE_PARAM_NAME, boardMeetingSite)
 				.setParameter(CATEGORY_PARAM_NAME, category)
 				.setParameter(ANALYST_PARAM_NAME, analyst)
 				.setParameter(EXCLUDED_HEARING_ANALYSIS_PARAM_NAME, 
@@ -119,5 +113,4 @@ public class HearingAnalysisDaoHibernateImpl
 				.uniqueResult();
 		return hearingAnalysis;
 	}
-
 }

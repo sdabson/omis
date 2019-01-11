@@ -2,28 +2,54 @@
  * Cascading style sheet for interactive images.
  *
  * Author: Joel Norris
- * Version: 0.1.0 (4/6/2017)
+ * Version: 0.1.1 (01/04/2019)
  */
  
- /* Hoverable image styling */
- img.hoverableImage:hover {
-	opacity: .5;
-	cursor: pointer;
-}
-
-/* Viewable image wrapper styling */
-span.viewableImageWrapper {
-	display: inline-block;
-}
-
-span.viewableImageWrapper:hover {
-	background-image: url('../images/whiteMagnifyingGlass.png');
-	background-color: hsla(255, 100%, 0%, 1);
-	background-repeat: no-repeat;
-	padding: 0px;
-	overflow: auto;
-}
-
-body span.viewableImageWrapper img.viewableImage {
+div.interactiveImageWrapper img.viewableImage {
 	display: block;
+	padding: none;
+}
+
+div.interactiveImageWrapper .hoverableImageAfter.viewableImageAfter {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+div.interactiveImageWrapper:hover .hoverableImageAfter.viewableImageAfter {
+    display: block;
+    background: rgba(0, 0, 0, .5);
+    background-image: url('../images/whiteMagnifyingGlass.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    padding: none;
+}
+
+/* Image hover for joined image preview styling*/
+
+div.interactiveImageWrapper {
+    position: relative;
+    display:inline-block;
+    padding: none;
+}
+
+div.interactiveImageWrapper .hoverableImageAfter.editableImageAfter {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: none;
+}
+
+div.interactiveImageWrapper .hoverableImageAfter.editableImageAfter.show {
+    display: block;
+    background: rgba(0, 0, 0, .5);
+    background-image: url('../images/whiteEditImage.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    padding: none;
 }

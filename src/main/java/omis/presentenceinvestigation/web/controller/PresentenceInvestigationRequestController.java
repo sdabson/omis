@@ -1,30 +1,25 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.presentenceinvestigation.web.controller;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import omis.beans.factory.PropertyEditorFactory;
-import omis.beans.factory.spring.CustomDateEditorFactory;
-import omis.court.domain.Court;
-import omis.docket.domain.Docket;
-import omis.docket.exception.DocketExistsException;
-import omis.exception.DuplicateEntityFoundException;
-import omis.offender.beans.factory.OffenderPropertyEditorFactory;
-import omis.offender.domain.Offender;
-import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
-import omis.person.domain.Person;
-import omis.person.domain.Suffix;
-import omis.presentenceinvestigation.domain.PresentenceInvestigationCategory;
-import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
-import omis.presentenceinvestigation.domain.PresentenceInvestigationRequestNote;
-import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
-import omis.presentenceinvestigation.web.form.PresentenceInvestigationItemOperation;
-import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestForm;
-import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestNoteItem;
-import omis.presentenceinvestigation.web.validator.PresentenceInvestigationRequestFormValidator;
-import omis.user.domain.UserAccount;
-import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,12 +38,44 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 
-/** Controller for presentence investigation request related operations.
+import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.court.domain.Court;
+import omis.docket.domain.Docket;
+import omis.docket.exception.DocketExistsException;
+import omis.exception.DuplicateEntityFoundException;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
+import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.person.domain.Person;
+import omis.person.domain.Suffix;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationCategory;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationDelay;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationDelayCategory;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationDocketAssociation;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationRequestNote;
+import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationDelayItem;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationDocketAssociationItem;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationItemOperation;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestForm;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestNoteItem;
+import omis.presentenceinvestigation.web.validator.PresentenceInvestigationRequestFormValidator;
+import omis.user.domain.UserAccount;
+import omis.util.DateManipulator;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
+
+/** 
+ * Controller for presentence investigation request related operations.
+ * 
  * @author Ryan Johns
  * @author Joel Norris
- * @author Annie Jacques
- * @version 0.1.4 (May 16, 2017)
- * @since OMIS 3.0 */
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.8 (Oct 24, 2018)
+ * @since OMIS 3.0
+ */
 @Controller
 @RequestMapping("/presentenceInvestigation/request")
 @PreAuthorize("hasRole('USER')")
@@ -56,17 +83,27 @@ public class PresentenceInvestigationRequestController {
 	
 	/* View names. */
 	
-	private static final String EDIT_VIEW_NAME 
-					= "/presentenceInvestigation/request/edit";
+	private static final String EDIT_VIEW_NAME = 
+			"/presentenceInvestigation/request/edit";
 	
-	private static final String INVESTIGATION_REQUEST_ACTION_MENU_VIEW_NAME
-					= "/presentenceInvestigation/request/includes/"
-							+ "presentenceInvestigationRequestActionMenu";
+	private static final String INVESTIGATION_REQUEST_ACTION_MENU_VIEW_NAME = 
+					"/presentenceInvestigation/request/includes/"
+					+ "presentenceInvestigationRequestActionMenu";
 
+	private static final String 
+			PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_ROW_VIEW_NAME =
+					"/presentenceInvestigation/request/includes/"
+					+ "presentenceInvestigationRequestNoteTableRow";
+	
 	private static final String
-		PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_ROW_VIEW_NAME =
-				"/presentenceInvestigation/request/includes/"
-				+ "presentenceInvestigationRequestNoteTableRow";
+			PRESENTENCE_INVESTIGATION_DELAY_ITEM_ROW_VIEW_NAME =
+			"/presentenceInvestigation/request/includes/"
+			+ "presentenceInvestigationDelayTableRow";
+	
+	private static final String
+			PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_ROW_VIEW_NAME =
+			"/presentenceInvestigation/request/includes/"
+			+ "presentenceInvestigationDocketAssociationTableRow";
 	
 	private static final String PERSON_SEARCH_FIELDS_VIEW_NAME =
 			"/presentenceInvestigation/request/includes/searchFields";
@@ -76,19 +113,32 @@ public class PresentenceInvestigationRequestController {
 				"/presentenceInvestigation/request/includes/"
 				+ "presentenceInvestigationRequestNoteItemsActionMenu";
 	
+	private static final String
+		PRESENTENCE_INVESTIGATION_DELAY_ITEMS_ACTION_MENU_VIEW_NAME =
+				"/presentenceInvestigation/request/includes/"
+				+ "presentenceInvestigationDelayItemsActionMenu";
+	
+	private static final String
+			PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEMS_ACTION_MENU_VIEW_NAME =
+			"/presentenceInvestigation/request/includes/" + 
+			"presentenceInvestigationDocketAssociationItemsActionMenu";
+	
+	private static final String COURT_OPTIONS_VIEW_NAME = 
+			"presentenceInvestigation/request/includes/courtOptions";
+	
 	/* Redirect view names. */
 	
-	private static final String LIST_REDIRECT_BY_USER 
-					= "redirect:/presentenceInvestigation/request/"
-							+ "list.html?assignedUser=%d";
+	private static final String LIST_REDIRECT_BY_USER = 
+			"redirect:/presentenceInvestigation/request/"
+			+ "list.html?assignedUser=%d";
 	
-	private static final String LIST_REDIRECT_BY_OFFENDER 
-					= "redirect:/presentenceInvestigation/request/"
-							+ "list.html?offender=%d";
+	private static final String LIST_REDIRECT_BY_OFFENDER = 
+			"redirect:/presentenceInvestigation/request/"
+			+ "list.html?offender=%d";
 	
-	private static final String HOME_REDIRECT 
-					= "redirect:/presentenceInvestigation/"
-							+ "home.html?presentenceInvestigationRequest=%d";
+	private static final String HOME_REDIRECT = 
+			"redirect:/presentenceInvestigation/"
+			+ "home.html?presentenceInvestigationRequest=%d";
 
 	/* Model keys. */
 	
@@ -99,63 +149,84 @@ public class PresentenceInvestigationRequestController {
 	
 	private static final String OFFENDER_MODEL_KEY = "offender";
 	
-	private static final String PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY 
-					= "presentenceInvestigationRequest";
+	private static final String PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY = 
+			"presentenceInvestigationRequest";
 	
 	private static final String SUFFIXES_MODEL_KEY = "suffixes";
 	
 	private static final String COURTS_MODEL_KEY = "courts";
 	
+	private static final String COURT_MODEL_KEY = "court";
+	
 	private static final String CATEGORIES_MODEL_KEY = "categories";
 	
 	private static final String
-		PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_INDEX_MODEL_KEY =
-			"presentenceInvestigationRequestNoteItemIndex";
+			PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_INDEX_MODEL_KEY =
+					"presentenceInvestigationRequestNoteItemIndex";
 
 	private static final String
-		PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_MODEL_KEY =
-			"presentenceInvestigationRequestNoteItem";
+			PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_MODEL_KEY =
+					"presentenceInvestigationRequestNoteItem";
 	
 	private static final String USER_ACCOUNT_MODEL_KEY =
 			"AuditComponentRetrieverSpringMvcImpl#auditUserAccount";
 	
+	private static final String
+			PRESENTENCE_INVESTIGATION_DELAY_ITEM_INDEX_MODEL_KEY =
+					"presentenceInvestigationDelayItemIndex";
+
+	private static final String
+			PRESENTENCE_INVESTIGATION_DELAY_ITEM_MODEL_KEY =
+					"presentenceInvestigationDelayItem";
+	
+	private static final String DELAY_CATEGORIES_MODEL_KEY = "delayCategories";
+	
+	private static final String DOCKETS_MODEL_KEY = "dockets";
+	
+	private static final String
+			PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_INDEX_MODEL_KEY =
+			"presentenceInvestigationDocketAssociationItemIndex";
+
+	private static final String
+			PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_MODEL_KEY =
+			"presentenceInvestigationDocketAssociationItem";
+
 	/* Message Keys */
 	
 	private static final String 
-					PRESENTENCE_INVESTIGATION_REQUEST_EXISTS_MESSAGE_KEY
-						= "presentenceInvestigationRequest.exists";
+			PRESENTENCE_INVESTIGATION_REQUEST_EXISTS_MESSAGE_KEY = 
+					"presentenceInvestigationRequest.exists";
 	
 	private static final String DOCKET_EXISTS_MESSAGE_KEY =
 			"request.docket.exists";
 	
-	
 	/* Bundles */
 	
-	private static final String ERROR_BUNDLE_NAME
-					= "omis.presentenceinvestigation.msgs.form";
+	private static final String ERROR_BUNDLE_NAME = 
+			"omis.presentenceinvestigation.msgs.form";
 
 	/* Services. */
 	
 	@Autowired
 	private PresentenceInvestigationRequestService 
-					presentenceInvestigationRequestService;
+			presentenceInvestigationRequestService;
 	
 	/* Property editors. */
 	
 	@Autowired
 	@Qualifier("presentenceInvestigationRequestPropertyEditorFactory")
 	private PropertyEditorFactory 
-					presentenceInvestigationRequestPropertyEditorFctry;
+			presentenceInvestigationRequestPropertyEditorFctry;
 	
 	@Autowired
 	@Qualifier("presentenceInvestigationRequestNotePropertyEditorFactory")
 	private PropertyEditorFactory 
-					presentenceInvestigationRequestNotePropertyEditorFactory;
+			presentenceInvestigationRequestNotePropertyEditorFactory;
 
 	@Autowired
 	@Qualifier("presentenceInvestigationCategoryPropertyEditorFactory")
 	private PropertyEditorFactory 
-					presentenceInvestigationCategoryPropertyEditorFactory;
+			presentenceInvestigationCategoryPropertyEditorFactory;
 	
 	@Autowired
 	@Qualifier("docketPropertyEditorFactory")
@@ -180,10 +251,25 @@ public class PresentenceInvestigationRequestController {
 	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
 	private OffenderPropertyEditorFactory 
-					offenderPropertyEditorFactory;
+			offenderPropertyEditorFactory;
 	
 	@Autowired
 	private CustomDateEditorFactory customDateEditorFactory;
+	
+	@Autowired
+	@Qualifier("presentenceInvestigationDelayPropertyEditorFactory")
+	private PropertyEditorFactory 
+			presentenceInvestigationDelayPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("presentenceInvestigationDelayCategoryPropertyEditorFactory")
+	private PropertyEditorFactory 
+			presentenceInvestigationDelayCategoryPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("presentenceInvestigationDocketAssociationPropertyEditorFactory")
+	private PropertyEditorFactory 
+			presentenceInvestigationDocketAssociationPropertyEditorFactory;
 	
 	/* Helpers. */
 	
@@ -198,7 +284,7 @@ public class PresentenceInvestigationRequestController {
 	
 	@Autowired
 	private PresentenceInvestigationRequestFormValidator
-					presentenceInvestigationRequestFormValidator;
+			presentenceInvestigationRequestFormValidator;
 	
 	/** Screen for creation of presentence investigation request.
 	 * @param assignedUser - assigned user user account.
@@ -258,30 +344,32 @@ public class PresentenceInvestigationRequestController {
 		if (bindingResult.hasErrors()) {
 			return this.prepareEditMav(new ModelMap(), form,
 					assignedUser, offender);
-		} else {
-			Person person = form.getPerson();
-			if(form.getCreatePerson() != null && form.getCreatePerson() == true){
-				person = this.presentenceInvestigationRequestService.createPerson(
-						form.getLastName(), form.getFirstName(), 
-						form.getMiddleName(), form.getSuffix());
-			}
-			
-			Docket docket = this.presentenceInvestigationRequestService
-					.createDocket(person, form.getCourt(),
-							form.getDocketValue());
-			PresentenceInvestigationRequest presentenceInvestigationRequest 
-							= this.presentenceInvestigationRequestService
-								.create(form.getAssignedUserAccount(),
-								form.getRequestDate(),
-								form.getExpectedCompletionDate(), docket, null,
-								form.getSentenceDate(), form.getCategory());
-			this.processItems(form.getPresentenceInvestigationRequestNoteItems(),
-					presentenceInvestigationRequest);
-			
-			return new ModelAndView(String.format(
-						HOME_REDIRECT, 
-							presentenceInvestigationRequest.getId()));
+		} 
+		Person person = form.getPerson();
+		if(form.getCreatePerson() != null && form.getCreatePerson()){
+			person = this.presentenceInvestigationRequestService
+					.createPerson(form.getLastName(), form.getFirstName(), 
+							form.getMiddleName(), form.getSuffix());
 		}
+		DateManipulator dateManipulator = new DateManipulator(
+				form.getRequestDate());
+		dateManipulator.changeDate(30);
+		PresentenceInvestigationRequest presentenceInvestigationRequest 
+						= this.presentenceInvestigationRequestService
+							.create(form.getAssignedUserAccount(),
+							form.getRequestDate(), dateManipulator.getDate(), 
+							person, form.getSentenceDate(), 
+							form.getCategory(), form.getSubmissionDate());
+		this.processDocketItems(
+				form.getPresentenceInvestigationDocketAssociationItems(), 
+				presentenceInvestigationRequest);
+		this.processItems(form.getPresentenceInvestigationRequestNoteItems(),
+				presentenceInvestigationRequest);
+		this.processDelayItems(form.getPresentenceInvestigationDelayItems(), 
+				presentenceInvestigationRequest);
+		return new ModelAndView(String.format(
+					HOME_REDIRECT, 
+						presentenceInvestigationRequest.getId()));
 	}
 	
 	/** Screen to view/edit a presentence investigation request.
@@ -308,21 +396,34 @@ public class PresentenceInvestigationRequestController {
 		
 		PresentenceInvestigationRequestForm form
 						= new PresentenceInvestigationRequestForm();
-		form.setDocketValue(
-				presentenceInvestigationRequest.getDocket().getValue());
-		form.setCourt(
-				presentenceInvestigationRequest.getDocket().getCourt());
-		form.setExpectedCompletionDate(
-				presentenceInvestigationRequest.getExpectedCompletionDate());
 		form.setRequestDate(
 				presentenceInvestigationRequest.getRequestDate());
 		form.setAssignedUserAccount(
 				presentenceInvestigationRequest.getAssignedUser());
 		form.setPerson(
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		form.setSentenceDate(
 				presentenceInvestigationRequest.getSentenceDate());
 		form.setCategory(presentenceInvestigationRequest.getCategory());
+		form.setSubmissionDate(presentenceInvestigationRequest
+				.getSubmissionDate());
+		List<PresentenceInvestigationDocketAssociationItem> docketItems = 
+				new ArrayList<PresentenceInvestigationDocketAssociationItem>();
+		for (PresentenceInvestigationDocketAssociation association : 
+			this.presentenceInvestigationRequestService
+			.findPresentenceInvestigationDocketAssociationsByPresentenceInvestigationRequest(
+					presentenceInvestigationRequest)) {
+			PresentenceInvestigationDocketAssociationItem docketItem = 
+					new PresentenceInvestigationDocketAssociationItem();
+			docketItem.setUseExisting(true);
+			docketItem.setExistingDocket(association.getDocket());
+			docketItem.setCourt(association.getDocket().getCourt());
+			docketItem.setPresentenceInvestigationDocketAssociation(association);
+			docketItem.setItemOperation(
+					PresentenceInvestigationItemOperation.UPDATE);
+			docketItems.add(docketItem);
+		}
+		form.setPresentenceInvestigationDocketAssociationItems(docketItems);
 		List<PresentenceInvestigationRequestNoteItem> noteItems =
 				new ArrayList<PresentenceInvestigationRequestNoteItem>();
 		for(PresentenceInvestigationRequestNote note :
@@ -338,10 +439,24 @@ public class PresentenceInvestigationRequestController {
 			noteItems.add(item);
 		}
 		form.setPresentenceInvestigationRequestNoteItems(noteItems);
-		
+		List<PresentenceInvestigationDelayItem> delayItems = new ArrayList<>();
+		for (PresentenceInvestigationDelay delay : this
+				.presentenceInvestigationRequestService
+				.findPresentenceInvestigationDelays(
+						presentenceInvestigationRequest)) {
+			PresentenceInvestigationDelayItem delayItem = 
+					new PresentenceInvestigationDelayItem();
+			delayItem.setDate(delay.getDate());
+			delayItem.setReason(delay.getReason());
+			delayItem.setPresentenceInvestigationDelay(delay);
+			delayItem.setItemOperation(
+					PresentenceInvestigationItemOperation.UPDATE);
+			delayItems.add(delayItem);
+		}
+		form.setPresentenceInvestigationDelayItems(delayItems);
 		return this.prepareEditMav(new ModelMap(),
 				presentenceInvestigationRequest, form, assignedUser,
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 	}
 	 
 	
@@ -381,28 +496,29 @@ public class PresentenceInvestigationRequestController {
 		if (bindingResult.hasErrors()) {
 			return this.prepareEditMav(new ModelMap(),
 					presentenceInvestigationRequest, form, assignedUser,
-					offender);
-		} else {
-			Docket docket = this.presentenceInvestigationRequestService
-					.updateDocket(presentenceInvestigationRequest.getDocket(),
-							form.getCourt(),
-							form.getDocketValue());
-			
-			this.presentenceInvestigationRequestService.update(
-							presentenceInvestigationRequest,
-							form.getAssignedUserAccount(),
-							form.getRequestDate(),
-							presentenceInvestigationRequest.getCompletionDate(),
-							form.getExpectedCompletionDate(), docket,
-							form.getSentenceDate(),
-							presentenceInvestigationRequest.getCategory());
-			this.processItems(form.getPresentenceInvestigationRequestNoteItems(),
-					presentenceInvestigationRequest);
-			
-			return new ModelAndView(String.format(
-						HOME_REDIRECT, 
-							presentenceInvestigationRequest.getId()));
-		}
+					presentenceInvestigationRequest.getPerson());
+		} 
+		DateManipulator dateManipulator = new DateManipulator(
+				form.getRequestDate());
+		dateManipulator.changeDate(30);
+		this.presentenceInvestigationRequestService.update(
+						presentenceInvestigationRequest,
+						form.getAssignedUserAccount(),
+						form.getRequestDate(),
+						dateManipulator.getDate(), form.getPerson(),
+						form.getSentenceDate(), 
+						presentenceInvestigationRequest.getCategory(),
+						form.getSubmissionDate());
+		this.processDocketItems(
+				form.getPresentenceInvestigationDocketAssociationItems(), 
+				presentenceInvestigationRequest);
+		this.processItems(form.getPresentenceInvestigationRequestNoteItems(),
+				presentenceInvestigationRequest);
+		this.processDelayItems(form.getPresentenceInvestigationDelayItems(), 
+				presentenceInvestigationRequest);
+		return new ModelAndView(String.format(
+					HOME_REDIRECT, 
+						presentenceInvestigationRequest.getId()));
 	}
 	
 	/**
@@ -429,6 +545,16 @@ public class PresentenceInvestigationRequestController {
 						final Person offender,
 						@RequestParam(value = "onReturn", required = true) 
 						final String onReturn) {
+		Long redirectId;
+		String redirectUrl;
+		if ("byOffender".equals(onReturn)) {
+			redirectId = presentenceInvestigationRequest.getPerson().getId();
+			redirectUrl = LIST_REDIRECT_BY_OFFENDER;
+		} else {
+			redirectId = presentenceInvestigationRequest.getAssignedUser()
+					.getId();
+			redirectUrl = LIST_REDIRECT_BY_USER;
+		}
 		for(PresentenceInvestigationRequestNote note :
 			this.presentenceInvestigationRequestService
 			.findPresentenceInvestigationRequestNotesByPresentenceInvestigationRequest(
@@ -436,24 +562,25 @@ public class PresentenceInvestigationRequestController {
 			this.presentenceInvestigationRequestService
 				.removePresentenceInvestigationRequestNote(note);
 		}
+		for (PresentenceInvestigationDelay delay : this
+				.presentenceInvestigationRequestService
+				.findPresentenceInvestigationDelays(
+						presentenceInvestigationRequest)) {
+			this.presentenceInvestigationRequestService
+			.removePresentenceInvestigationDelay(delay);
+		}
+		for (PresentenceInvestigationDocketAssociation assoc : this
+				.presentenceInvestigationRequestService
+				.findPresentenceInvestigationDocketAssociationsByPresentenceInvestigationRequest(
+						presentenceInvestigationRequest)) {
+			this.presentenceInvestigationRequestService
+				.removePresentenceInvestigationDocketAssociation(assoc);
+		}
 		//TODO remove all the things.
 		this.presentenceInvestigationRequestService.remove(
 						presentenceInvestigationRequest);
 		
-		if ("byUser".equals(onReturn)) {
-			return new ModelAndView(String.format(
-					LIST_REDIRECT_BY_USER, presentenceInvestigationRequest
-						.getAssignedUser().getId()));
-		} else if ("byOffender".equals(onReturn)) {
-			return new ModelAndView(String.format(
-						LIST_REDIRECT_BY_OFFENDER, 
-						presentenceInvestigationRequest.getDocket().getPerson()
-							.getId()));
-		} else {
-			return new ModelAndView(String.format(
-						LIST_REDIRECT_BY_USER, presentenceInvestigationRequest
-							.getAssignedUser().getId()));
-		}
+		return new ModelAndView(String.format(redirectUrl, redirectId));
 	}
 	
 	/**
@@ -483,6 +610,82 @@ public class PresentenceInvestigationRequestController {
 	}
 	
 	/**
+	 * Returns the model and view for a presentence investigation delay item.
+	 * 
+	 * @param presentenceInvestigationDelayItemIndex presentence investigation 
+	 * delay item index
+	 * @return model and view for a presentence investigation delay item
+	 */
+	@RequestMapping(value = "createPresentenceInvestigationDelayItem.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayPresentenceInvestigationDelayItem(@RequestParam(
+			value = "presentenceInvestigationDelayItemIndex", required = true)
+				final Integer presentenceInvestigationDelayItemIndex){
+		ModelMap map = new ModelMap();
+		
+		PresentenceInvestigationDelayItem item =
+				new PresentenceInvestigationDelayItem();
+		
+		item.setItemOperation(PresentenceInvestigationItemOperation.CREATE);
+		map.addAttribute(PRESENTENCE_INVESTIGATION_DELAY_ITEM_MODEL_KEY, item);
+		map.addAttribute(
+				PRESENTENCE_INVESTIGATION_DELAY_ITEM_INDEX_MODEL_KEY,
+				presentenceInvestigationDelayItemIndex);
+		map.addAttribute(DELAY_CATEGORIES_MODEL_KEY, 
+				this.presentenceInvestigationRequestService
+				.findPresentenceInvestigationDelayCategories());
+		return new ModelAndView(
+				PRESENTENCE_INVESTIGATION_DELAY_ITEM_ROW_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Returns the model and view for a presentence investigation docket 
+	 * association item.
+	 * 
+	 * @param presentenceInvestigationDocketAssociationItemIndex presentence 
+	 * investigation docket association item index
+	 * @param useExisting use existing dockets for the offender
+	 * @param offender offender
+	 * @return model and view for a presentence investigation docket association 
+	 * item
+	 */
+	@RequestMapping(value = 
+			"createPresentenceInvestigationDocketAssociationItem.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayPresentenceInvestigationDocketAssociationItem(
+			@RequestParam(value = 
+				"presentenceInvestigationDocketAssociationItemIndex", 
+				required = true)
+				final Integer presentenceInvestigationDocketAssociationItemIndex,
+			@RequestParam(value = "useExisting", required = true)
+				final Boolean useExisting,
+			@RequestParam(value = "offender", required = false)
+				final Offender offender){
+		ModelMap map = new ModelMap();
+		
+		PresentenceInvestigationDocketAssociationItem item =
+				new PresentenceInvestigationDocketAssociationItem();
+		item.setUseExisting(useExisting);
+		item.setItemOperation(PresentenceInvestigationItemOperation.CREATE);
+		map.addAttribute(
+				PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_MODEL_KEY, 
+				item);
+		map.addAttribute(
+				PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_INDEX_MODEL_KEY,
+				presentenceInvestigationDocketAssociationItemIndex);
+		if (useExisting && offender != null) {
+			map.addAttribute(DOCKETS_MODEL_KEY, this
+					.presentenceInvestigationRequestService
+					.findDocketsByOffender(offender));
+		}
+		map.addAttribute(COURTS_MODEL_KEY, 
+				this.presentenceInvestigationRequestService.findCourts());
+		return new ModelAndView(
+				PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_ROW_VIEW_NAME, 
+				map);
+	}
+	
+	/**
 	 * Returns the ModelAndView for Person Search Fields
 	 * @return ModelAndView for Person Search Fields
 	 */
@@ -491,7 +694,7 @@ public class PresentenceInvestigationRequestController {
 	public ModelAndView displayPersonSearch(){
 		return new ModelAndView(PERSON_SEARCH_FIELDS_VIEW_NAME);
 	}
-	
+
 	/**
 	 * Displays the presentence investigation request action menu.
 	 * 
@@ -532,6 +735,59 @@ public class PresentenceInvestigationRequestController {
 				PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEMS_ACTION_MENU_VIEW_NAME);
 	}
 	
+	/**
+	 * Returns the model and view for the presentence investigation delay items 
+	 * action menu.
+	 * 
+	 * @return model and view for the presentence investigation delay items 
+	 * action menu
+	 */
+	@RequestMapping(value="/presentenceInvestigationDelayItemsActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayPresentenceInvestigationDelayItemsActionMenu(){
+		return new ModelAndView(
+				PRESENTENCE_INVESTIGATION_DELAY_ITEMS_ACTION_MENU_VIEW_NAME);
+	}
+	
+	/**
+	 * Returns the model and view for the presentence investigation docket 
+	 * association items action menu.
+	 * 
+	 * @return model and view for the presentence investigation docket 
+	 * association items action menu
+	 */
+	@RequestMapping(value = 
+			"/presentenceInvestigationDocketAssociationItemsActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView 
+			displayPresentenceInvestigationDocketAssociationItemsActionMenu(
+					@RequestParam(value = "offender", required = false)
+						final Offender offender){
+		ModelAndView mav = new ModelAndView(
+				PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEMS_ACTION_MENU_VIEW_NAME);
+		mav.addObject(OFFENDER_MODEL_KEY, offender);
+		return mav;
+	}
+	
+	/**
+	 * Displays court options for the specified docket.
+	 * 
+	 * @param docket docket
+	 * @return court options
+	 */
+	@RequestMapping(value = "/findCourtForDocket.html", 
+			method = RequestMethod.GET)
+	public ModelAndView findBoardMembersOnDate(
+			@RequestParam(value = "docket", required = true) 
+				final Docket docket) {
+		ModelAndView mav = new ModelAndView(COURT_OPTIONS_VIEW_NAME);
+		List<Court> courts = new ArrayList<>();
+		courts.add(docket.getCourt());
+		mav.addObject(COURTS_MODEL_KEY, courts);
+		mav.addObject(COURT_MODEL_KEY, docket.getCourt());
+		return mav;
+	}
+	
 	/* Helper methods. */
 	
 	/**
@@ -548,6 +804,9 @@ public class PresentenceInvestigationRequestController {
 		if (offender != null &&
 				this.presentenceInvestigationRequestService.isOffender(offender)) {
 			this.offenderSummaryModelDelegate.add(modelMap, (Offender) offender);
+			modelMap.addAttribute(DOCKETS_MODEL_KEY, this
+					.presentenceInvestigationRequestService
+					.findDocketsByOffender((Offender) offender));
 		}
 		modelMap.addAttribute(CATEGORIES_MODEL_KEY,
 				this.presentenceInvestigationRequestService
@@ -559,9 +818,18 @@ public class PresentenceInvestigationRequestController {
 				this.presentenceInvestigationRequestService.findCourts());
 		modelMap.addAttribute(SUFFIXES_MODEL_KEY,
 				this.presentenceInvestigationRequestService.findSuffixes());
+		modelMap.addAttribute(DELAY_CATEGORIES_MODEL_KEY, 
+				this.presentenceInvestigationRequestService
+				.findPresentenceInvestigationDelayCategories());
 		modelMap.addAttribute(
 				PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_INDEX_MODEL_KEY,
 				form.getPresentenceInvestigationRequestNoteItems().size());
+		modelMap.addAttribute(
+				PRESENTENCE_INVESTIGATION_DELAY_ITEM_INDEX_MODEL_KEY,
+				form.getPresentenceInvestigationDelayItems().size());
+		modelMap.addAttribute(
+				PRESENTENCE_INVESTIGATION_DOCKET_ASSOCIATION_ITEM_INDEX_MODEL_KEY,
+				form.getPresentenceInvestigationDocketAssociationItems().size());
 		return new ModelAndView(EDIT_VIEW_NAME, modelMap);
 	}
 	
@@ -621,6 +889,64 @@ public class PresentenceInvestigationRequestController {
 				this.presentenceInvestigationRequestService
 				.removePresentenceInvestigationRequestNote(
 						item.getPresentenceInvestigationRequestNote());
+			}
+		}
+	}
+	
+	private void processDelayItems(
+			final List<PresentenceInvestigationDelayItem> items,
+			final PresentenceInvestigationRequest 
+					presentenceInvestigationRequest) 
+							throws DuplicateEntityFoundException{
+		for(PresentenceInvestigationDelayItem item : items){
+			if(PresentenceInvestigationItemOperation.CREATE.equals(
+					item.getItemOperation())){
+				this.presentenceInvestigationRequestService
+				.createPresentenceInvestigationDelay(
+						presentenceInvestigationRequest, item.getDate(), 
+						item.getReason());
+			}
+			else if(PresentenceInvestigationItemOperation.UPDATE.equals(
+					item.getItemOperation())){
+				this.presentenceInvestigationRequestService
+				.updatePresentenceInvestigationDelay(
+						item.getPresentenceInvestigationDelay(), item.getDate(), 
+						item.getReason());
+			}
+			else if(PresentenceInvestigationItemOperation.REMOVE.equals(
+					item.getItemOperation())){
+				this.presentenceInvestigationRequestService
+				.removePresentenceInvestigationDelay(
+						item.getPresentenceInvestigationDelay());
+			}
+		}
+	}
+	
+	private void processDocketItems(
+			final List<PresentenceInvestigationDocketAssociationItem> items,
+			final PresentenceInvestigationRequest 
+			presentenceInvestigationRequest) 
+					throws DocketExistsException, DuplicateEntityFoundException {
+		for (PresentenceInvestigationDocketAssociationItem item : items) {
+			if (PresentenceInvestigationItemOperation.CREATE.equals(
+					item.getItemOperation())) {
+				Docket docket;
+				if (item.getUseExisting()) {
+					docket = item.getExistingDocket();
+				} else {
+					docket = this.presentenceInvestigationRequestService
+							.createDocket(
+									presentenceInvestigationRequest.getPerson(),
+									item.getCourt(), item.getDocketValue());
+				}
+				this.presentenceInvestigationRequestService
+					.createPresentenceInvestigationDocketAssociation(
+							presentenceInvestigationRequest, docket);
+			} else if (PresentenceInvestigationItemOperation.REMOVE.equals(
+					item.getItemOperation())) {
+				this.presentenceInvestigationRequestService
+					.removePresentenceInvestigationDocketAssociation(
+							item.getPresentenceInvestigationDocketAssociation());
 			}
 		}
 	}
@@ -734,5 +1060,14 @@ public class PresentenceInvestigationRequestController {
 		binder.registerCustomEditor(PresentenceInvestigationCategory.class, 
 				this.presentenceInvestigationCategoryPropertyEditorFactory
 					.createPropertyEditor());
+		binder.registerCustomEditor(PresentenceInvestigationDelay.class, 
+				this.presentenceInvestigationDelayPropertyEditorFactory
+					.createPropertyEditor());
+		binder.registerCustomEditor(PresentenceInvestigationDelayCategory.class, 
+				this.presentenceInvestigationDelayCategoryPropertyEditorFactory
+					.createPropertyEditor());
+		binder.registerCustomEditor(PresentenceInvestigationDocketAssociation.class, 
+				this.presentenceInvestigationDocketAssociationPropertyEditorFactory
+					.createPropertyEditor());
 	}
-} 
+}

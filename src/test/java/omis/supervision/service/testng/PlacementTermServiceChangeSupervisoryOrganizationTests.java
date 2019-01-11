@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
 import omis.supervision.domain.CorrectionalStatus;
@@ -35,12 +34,18 @@ import omis.supervision.domain.PlacementTerm;
 import omis.supervision.domain.PlacementTermChangeReason;
 import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
+import omis.supervision.exception.CorrectionalStatusExistsException;
 import omis.supervision.exception.CorrectionalStatusTermConflictException;
+import omis.supervision.exception.CorrectionalStatusTermExistsException;
 import omis.supervision.exception.OffenderNotUnderSupervisionException;
+import omis.supervision.exception.PlacementTermChangeReasonExistsException;
 import omis.supervision.exception.PlacementTermConflictException;
 import omis.supervision.exception.PlacementTermExistsAfterException;
 import omis.supervision.exception.PlacementTermExistsBeforeException;
+import omis.supervision.exception.PlacementTermExistsException;
+import omis.supervision.exception.SupervisoryOrganizationExistsException;
 import omis.supervision.exception.SupervisoryOrganizationTermConflictException;
+import omis.supervision.exception.SupervisoryOrganizationTermExistsException;
 import omis.supervision.service.PlacementTermService;
 import omis.supervision.service.delegate.CorrectionalStatusDelegate;
 import omis.supervision.service.delegate.CorrectionalStatusTermDelegate;
@@ -55,6 +60,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to change supervisory organization.
  *
  * @author Josh Divine
+ * @author Stephen Abson
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -109,7 +115,6 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	/**
 	 * Tests creation of placement term.
 	 * 
-	 * @throws DuplicateEntityFoundException if placement term exists
 	 * @throws PlacementTermConflictException if placement term conflicts
 	 * @throws SupervisoryOrganizationTermConflictException if supervisory
 	 * organization term conflicts
@@ -121,18 +126,33 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	 * and end date is null
 	 * @throws OffenderNotUnderSupervisionException if offender not under 
 	 * supervision
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws CorrectionalStatusExistsException if correctional status exists 
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 * @throws SupervisoryOrganizationTermExistsException if supervisory
+	 * organization term exists 
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists 
+	 * @throws PlacementTermExistsException if placement term exists 
 	 */
 	public void testChangeSupervisoryOrganization()
-			throws DuplicateEntityFoundException,
-				CorrectionalStatusTermConflictException,
+			throws CorrectionalStatusTermConflictException,
 				SupervisoryOrganizationTermConflictException,
 				PlacementTermConflictException, 
 				OffenderNotUnderSupervisionException, 
 				PlacementTermExistsAfterException, 
-				PlacementTermExistsBeforeException {
+				PlacementTermExistsBeforeException,
+				SupervisoryOrganizationExistsException,
+				CorrectionalStatusExistsException,
+				PlacementTermChangeReasonExistsException,
+				SupervisoryOrganizationTermExistsException,
+				CorrectionalStatusTermExistsException,
+				PlacementTermExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
-				"Blofeld", "Ernst", null, null);
+				"Blofeld", "Julius", null, null);
 		SupervisoryOrganization supervisoryOrganization 
 			= this.supervisoryOrganizationDelegate.create(
 					"Parole Office", "PAROFF", null);
@@ -182,7 +202,6 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	/**
 	 * Tests {@code OffenderNotUnderSupervisionException} is thrown.
 	 * 
-	 * @throws DuplicateEntityFoundException if placement term exists
 	 * @throws PlacementTermConflictException if placement term conflicts
 	 * @throws SupervisoryOrganizationTermConflictException if supervisory
 	 * organization term conflicts
@@ -194,19 +213,34 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	 * and end date is null
 	 * @throws OffenderNotUnderSupervisionException if offender not under 
 	 * supervision
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws CorrectionalStatusExistsException if correctional status exists 
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 * @throws SupervisoryOrganizationTermExistsException if supervisory
+	 * organization term exists 
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists 
+	 * @throws PlacementTermExistsException if placement term exists 
 	 */
 	@Test(expectedExceptions = {OffenderNotUnderSupervisionException.class})
 	public void testOffenderNotUnderSupervisionException()
-			throws DuplicateEntityFoundException,
-				CorrectionalStatusTermConflictException,
+			throws CorrectionalStatusTermConflictException,
 				SupervisoryOrganizationTermConflictException,
 				PlacementTermConflictException, 
 				OffenderNotUnderSupervisionException, 
 				PlacementTermExistsAfterException, 
-				PlacementTermExistsBeforeException {
+				PlacementTermExistsBeforeException,
+				SupervisoryOrganizationExistsException,
+				CorrectionalStatusExistsException,
+				PlacementTermChangeReasonExistsException,
+				SupervisoryOrganizationTermExistsException,
+				CorrectionalStatusTermExistsException,
+				PlacementTermExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
-				"Blofeld", "Ernst", null, null);
+				"Blofeld", "Julius", null, null);
 		SupervisoryOrganization supervisoryOrganization 
 			= this.supervisoryOrganizationDelegate.create(
 					"Parole Office", "PAROFF", null);
@@ -233,7 +267,8 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 				startChangeReason, endChangeReason, false);
 		SupervisoryOrganization newOrg = this.supervisoryOrganizationDelegate
 				.create("NewOrg", "NO", null);
-		DateRange newDateRange = new DateRange(null, 
+		DateRange newDateRange = new DateRange(
+				this.parseDateText("12/12/2011"), 
 				this.parseDateText("03/21/2017"));
 		
 		// Action
@@ -258,7 +293,6 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	/**
 	 * Tests {@code PlacementTermExistsAfterException} is thrown.
 	 * 
-	 * @throws DuplicateEntityFoundException if placement term exists
 	 * @throws PlacementTermConflictException if placement term conflicts
 	 * @throws SupervisoryOrganizationTermConflictException if supervisory
 	 * organization term conflicts
@@ -270,19 +304,33 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 	 * and end date is null
 	 * @throws OffenderNotUnderSupervisionException if offender not under 
 	 * supervision
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws CorrectionalStatusExistsException if correctional status exists 
+	 * @throws PlacementTermChangeReasonExistsException if placement term exists
+	 * @throws SupervisoryOrganizationTermExistsException if supervisory
+	 * organization term exists
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists 
+	 * @throws PlacementTermExistsException if placement term exists 
 	 */
 	@Test(expectedExceptions = {PlacementTermExistsAfterException.class})
 	public void testPlacementTermExistsAfterException()
-			throws DuplicateEntityFoundException,
-				CorrectionalStatusTermConflictException,
+			throws CorrectionalStatusTermConflictException,
 				SupervisoryOrganizationTermConflictException,
 				PlacementTermConflictException, 
 				OffenderNotUnderSupervisionException, 
 				PlacementTermExistsAfterException, 
-				PlacementTermExistsBeforeException {
+				PlacementTermExistsBeforeException,
+				SupervisoryOrganizationExistsException,
+				CorrectionalStatusExistsException,
+				PlacementTermChangeReasonExistsException,
+				SupervisoryOrganizationTermExistsException,
+				CorrectionalStatusTermExistsException,
+				PlacementTermExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
-				"Blofeld", "Ernst", null, null);
+				"Blofeld", "Julius", null, null);
 		SupervisoryOrganization supervisoryOrganization 
 			= this.supervisoryOrganizationDelegate.create(
 					"Parole Office", "PAROFF", null);
@@ -334,6 +382,68 @@ public class PlacementTermServiceChangeSupervisoryOrganizationTests
 						+ ".supervisoryOrganization",
 					newOrg)
 			.performAssertions(placementTerm);
+	}
+	
+	/**
+	 * Tests that attempts to change supervisory organizations starting when
+	 * ending are prevented with {@code IllegalArgumentException}s.
+	 * 
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 * @throws CorrectionalStatusExistsException if correctional status exists 
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists
+	 * @throws PlacementTermExistsException if placement term exists 
+	 * @throws PlacementTermExistsBeforeException if placement term exists
+	 * before
+	 * @throws PlacementTermExistsAfterException if placement term exists
+	 * after 
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision 
+	 * @throws PlacementTermConflictException if conflicting placement terms
+	 * exist 
+	 * @throws SupervisoryOrganizationTermConflictException if conflicting
+	 * supervisory organization terms exist 
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists 
+	 */
+	@Test(expectedExceptions = {IllegalArgumentException.class})
+	public void testIllegalArgumentExceptionWhenStartDateEqualsEndDate()
+			throws PlacementTermExistsException,
+				CorrectionalStatusTermExistsException,
+				CorrectionalStatusExistsException,
+				PlacementTermChangeReasonExistsException,
+				SupervisoryOrganizationExistsException,
+				SupervisoryOrganizationTermConflictException,
+				PlacementTermConflictException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermExistsAfterException,
+				PlacementTermExistsBeforeException {
+	
+		// Arranges offender in securely in prison
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"Blofeld", "Julius", null, "IV");
+		this.placementTermDelegate.create(offender,
+				new DateRange(this.parseDateText("12/12/2014"),
+						this.parseDateText("12/12/2016")), null,
+				this.correctionalStatusTermDelegate.create(offender,
+						new DateRange(this.parseDateText("12/12/2014"),
+								this.parseDateText("12/12/2018")),
+						this.correctionalStatusDelegate.create(
+								"Secure", "SEC", true, (short) 1, true)),
+				this.placementTermChangeReasonDelegate.create(
+						"Initial Sentence", (short) 1, true, true),
+				null, false);
+		
+		// Attempts to place offender
+		this.placementTermService.changeSupervisoryOrganization(offender, 
+				this.supervisoryOrganizationDelegate.create(
+						"State Prison", "Prison", null),
+				new DateRange(this.parseDateText("12/12/2015"),
+						this.parseDateText("12/12/2015")),
+				this.placementTermChangeReasonDelegate.create(
+						"Facility Transfer", (short) 1, true, true),
+				null);
 	}
 	
 	/* Helper methods. */

@@ -11,11 +11,37 @@
 		<fmt:message key="${summary.violationEventCategory}CategoryLabel"/>
 	</td>
 	<td>
-		<span class="violationDescriptionNoOverflow">
-			<c:out value="${summary.violationEventDetails}" />
-			<span class="hideOverflow"></span>
-		</span>
-		<span class="showOverflow"></span>
+		<fmt:formatDate value="${summary.violationEventDate}" pattern="MM/dd/yyyy" />
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${not empty summary.disciplinaryCodeDescription}">
+				<c:choose>
+					<c:when test="${not empty summary.modifiedDisciplinaryCode}">
+						<fmt:message key="modifiedViolationDetailsLabel">
+							<fmt:param value="${summary.modifiedDisciplinaryCode}"/>
+							<fmt:param value="${summary.disciplinaryCodeDescription}"/>
+						</fmt:message>
+					</c:when>
+					<c:otherwise>
+						<c:out value="${summary.disciplinaryCodeDescription}"/>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
+			<c:when test="${not empty summary.conditionClause}">
+				<c:choose>
+					<c:when test="${not empty summary.modifiedConditionClause}">
+						<fmt:message key="modifiedViolationDetailsLabel">
+							<fmt:param value="${summary.modifiedConditionClause}"/>
+							<fmt:param value="${summary.conditionTitle}"/>
+						</fmt:message>
+					</c:when>
+					<c:otherwise>
+						<c:out value="${summary.conditionTitle}"/>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
+		</c:choose>
 	</td>
 	<td>
 		<c:out value="${summary.decision}${not empty summary.decision and not empty summary.decisionReason ? ' - ' : ''}${summary.decisionReason}"/>
@@ -27,6 +53,9 @@
 	</td>
 	<td>
 		<fmt:message key="${summary.resolutionCategory}ResolutionLabel"/>
+	</td>
+	<td>
+		<fmt:formatDate value="${summary.appealDate}" pattern="MM/dd/yyyy" />
 	</td>
 	<td>
 		<c:out value="${summary.sanctionDescription}"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- - Author: Ryan Johns
- - Version: 0.1.0 (Apr 21, 2014)
+ - Author: Ryan Johns, Yidong Li
+ - Version: 0.1.0 (Oct 23, 2018)
  - Since: OMIS 3.0
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
@@ -60,5 +60,33 @@
 		    or ha.status is not null)
 		    
 		order by ha.date desc
+	]]></query>
+	
+	<query name="countScheduledInternalReferralSummaryByFacility"><![CDATA[
+		select count(pira.id) 
+          from omis.health.domain.ProviderInternalReferralAssociation as pira
+          join pira.internalReferral as ir
+          join ir.offenderAppointmentAssociation as oaa
+          join oaa.appointment as ha
+          left join ir.statusReason sr
+		 where ha.facility = :facility
+		   and (ir.statusReason is null
+		    or sr.appointmentStatus = omis.health.domain.HealthAppointmentStatus.KEPT)
+		   and (pira.cancelled is null
+		    or pira.cancelled = false)
+           and ha.status is null 
+	]]></query>
+	
+	<query name="countResolvedInternalReferralSummaryByFacility"><![CDATA[
+		select count(ha.id)
+          from omis.health.domain.ProviderInternalReferralAssociation as pira
+          join pira.internalReferral as ir
+          join ir.offenderAppointmentAssociation as oaa
+          join oaa.appointment as ha
+		 where ha.facility = :facility
+		   and (ir.statusReason is not null
+		    or pira.cancelled is not null
+		    or ir.rescheduleRequired = true
+		    or ha.status is not null)
 	]]></query>
 </hibernate-mapping>

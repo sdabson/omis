@@ -16,6 +16,7 @@
 			<th><fmt:message key="endDateLabel"/></th>
 			<th><fmt:message key="locationLabel"/></th>
 			<th><fmt:message key="boardMembersLabel"/></th>
+			<th><fmt:message key="hearingCountLabel"/></th>
 		</tr>
 	</thead>
 	<tbody id="paroleBoardItineraries">

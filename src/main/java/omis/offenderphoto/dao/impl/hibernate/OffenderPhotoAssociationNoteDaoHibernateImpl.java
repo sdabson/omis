@@ -14,7 +14,7 @@ import omis.offenderphoto.domain.OffenderPhotoAssociationNote;
  * Offender photo association note data access object hibernate implementation.
  * 
  * @author Joel Norris
- * @version 0.1.0 (Dec 15, 2016)
+ * @version 0.1.1 (Dec 5, 2018)
  * @since OMIS 3.0
  */
 public class OffenderPhotoAssociationNoteDaoHibernateImpl 
@@ -25,12 +25,12 @@ public class OffenderPhotoAssociationNoteDaoHibernateImpl
 	
 	private static final String FIND_ASSOCIATION_NOTES_BY_ASSOCIATION_QUERY_NAME
 		= "findOffenderPhotoAssociationNotesByAssociation";
-	
 	private static final String FIND_QUERY_NAME
 		= "findOffenderPhotoAssociationNote";
-	
 	private static final String FIND_EXCLUDING_QUERY_NAME
 		= "findOffenderPhotoAssociaitonNoteExcluding";
+	private static final String DELETE_BY_ASSOCIATION_QUERY_NAME
+		= "deleteOffenderPhotoAssociationNotesByAssociation";
 	
 	/* Parameter names. */
 	
@@ -97,5 +97,14 @@ public class OffenderPhotoAssociationNoteDaoHibernateImpl
 				.setDate(DATE_PARAM_NAME, date)
 				.uniqueResult();
 		return associationNote;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public int removeByAssociation(OffenderPhotoAssociation association) {
+		return this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(DELETE_BY_ASSOCIATION_QUERY_NAME)
+				.setParameter(ASSOCIATION_PARAM_NAME, association)
+				.executeUpdate();
 	}
 }

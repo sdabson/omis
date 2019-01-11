@@ -113,8 +113,8 @@ window.onload = function() {
 			if (!ui.hasClass(mailingAddressFields, "hidden")) {
 				ui.addClass(mailingAddressFields, "hidden");
 			}
-			existingMailingAddressQuery = document.getElementById("existingMailingAddress");
-			existingMailingAddressQuery.disabled = false;
+			existingMailingAddress = document.getElementById("existingMailingAddressQuery");
+			existingMailingAddress.disabled = false;
 		};
 		createNewMailingAddressButton = document.getElementById("createNewMailingAddressButton");
 		createNewMailingAddressButton.onclick = function() {
@@ -122,14 +122,23 @@ window.onload = function() {
 			if (ui.hasClass(mailingAddressFields, "hidden")) {
 				ui.removeClass(mailingAddressFields, "hidden");
 			}
-			existingMailingAddressQuery = document.getElementById("existingMailingAddress");
-			existingMailingAddressQuery.disabled = true;
+			existingMailingAddress = document.getElementById("existingMailingAddressQuery");
+			existingMailingAddress.disabled = true;
 		};
 		var existingMailingAddressQuery = document.getElementById("existingMailingAddressQuery");
 		var existingMailingAddress = document.getElementById("existingMailingAddress");
 		var findAddressesByQueryUrl = config.ServerConfig.getContextPath() + "/offenderContact/findAddressesByQuery.json";
 		applyValueLabelAutoComplete(existingMailingAddressQuery, existingMailingAddress, findAddressesByQueryUrl); 
 		applyAddressFieldsOnClick("mailingAddressFields", "mailingAddressFields/findStates.html", "mailingAddressFields/findCities.html", "mailingAddressFields/findZipCodes.html");
+		var allowResidenceAtMailingAddress = config.FeatureToggles.get("offendercontact", "allowResidenceAtMailingAddress");
+		if (allowResidenceAtMailingAddress == true) {
+			var residentAtMailingAddress = document.getElementById("residentAtMailingAddress");
+			residentAtMailingAddress.onclick = function(event) {
+				var residentAtMailingAddressEffectiveDate = document.getElementById("residentAtMailingAddressEffectiveDate");
+				residentAtMailingAddressEffectiveDate.disabled = !event.target.checked;
+			};
+			applyDatePicker(document.getElementById("residentAtMailingAddressEffectiveDate"));
+		}
 	}
 	
 	// Apply ZIP code behavior

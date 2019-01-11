@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.violationevent.web.controller;
 
 import java.io.IOException;
@@ -32,12 +49,20 @@ import omis.condition.domain.Condition;
 import omis.disciplinaryCode.domain.DisciplinaryCode;
 import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
+import omis.document.exception.DocumentTagExistsException;
 import omis.document.io.DocumentPersister;
 import omis.document.io.DocumentRetriever;
 import omis.document.io.impl.DocumentFilenameGenerator;
 import omis.document.web.form.DocumentTagItem;
 import omis.document.web.form.DocumentTagOperation;
 import omis.exception.DuplicateEntityFoundException;
+import omis.facility.domain.Unit;
+import omis.hearing.domain.Hearing;
+import omis.hearing.domain.HearingNote;
+import omis.hearing.domain.HearingStatus;
+import omis.hearing.domain.ImposedSanction;
+import omis.hearing.domain.Infraction;
+import omis.hearing.domain.UserAttendance;
 import omis.incident.domain.IncidentStatement;
 import omis.io.FileRemover;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
@@ -54,6 +79,10 @@ import omis.violationevent.domain.ViolationEvent;
 import omis.violationevent.domain.ViolationEventCategory;
 import omis.violationevent.domain.ViolationEventDocument;
 import omis.violationevent.domain.ViolationEventNote;
+import omis.violationevent.exception.ConditionViolationExistsException;
+import omis.violationevent.exception.DisciplinaryCodeViolationExistsException;
+import omis.violationevent.exception.ViolationEventExistsException;
+import omis.violationevent.exception.ViolationEventNoteExistsException;
 import omis.violationevent.service.ViolationEventService;
 import omis.violationevent.web.form.ConditionViolationItem;
 import omis.violationevent.web.form.DisciplinaryCodeViolationItem;
@@ -66,12 +95,13 @@ import omis.violationevent.web.validator.ViolationEventFormValidator;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * ViolationEventController.java
+ * Violation event controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Aug 30, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @author Sierra Haynes
+ * @version 0.1.1 (May 23, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/violationEvent/")
@@ -89,7 +119,8 @@ public class ViolationEventController {
 		DISCIPLINARY_CODE_VIOLATION_ITEMS_ACTION_MENU_VIEW_NAME =
 			"/violationEvent/includes/disciplinaryCodeViolationItemsActionMenu";
 	
-	private static final String CONDITION_VIOLATION_ITEMS_ACTION_MENU_VIEW_NAME =
+	private static final String
+		CONDITION_VIOLATION_ITEMS_ACTION_MENU_VIEW_NAME =
 			"/violationEvent/includes/conditionViolationItemsActionMenu";
 	
 	private static final String VIOLATION_EVENT_NOTE_ITEMS_ACTION_MENU_VIEW_NAME
@@ -124,6 +155,9 @@ public class ViolationEventController {
 	
 	private static final String DOCUMENT_TAG_ITEM_ROW_VIEW_NAME =
 			"/violationEvent/includes/documentTagItemContent";
+	
+	private static final String UNIT_OPTIONS_VIEW_NAME =
+			"/violationEvent/includes/unitOptions";
 	
 	/* Model Keys */
 	
@@ -184,6 +218,8 @@ public class ViolationEventController {
 	
 	private static final String DOCUMENT_TAG_ITEM_MODEL_KEY = "documentTagItem";
 	
+	private static final String UNITS_MODEL_KEY = "units";
+	
 	private static final String POSITIVE_SUBSTANCE_TEST_MSG_KEY =
 			"Positive Substance Test Result";
 	
@@ -197,16 +233,48 @@ public class ViolationEventController {
 	private static final String ENTITY_EXISTS_MESSAGE_KEY =
 			"entity.exists";
 	
+	private static final String VIOLATION_EVENT_EXISTS_MESSAGE_KEY =
+			"violationEvent.exists";
+	
+	private static final String VIOLATION_EVENT_NOTE_EXISTS_MESSAGE_KEY =
+			"violationEventNote.exists";
+	
+	private static final String DISCIPLINARY_CODE_VIOLATION_EXISTS_MESSAGE_KEY =
+			"disciplinaryCodeViolation.exists";
+	
+	private static final String CONDITION_VIOLATION_EXISTS_MESSAGE_KEY =
+			"conditionViolation.exists";
+	
+	private static final String DOCUMENT_TAG_EXISTS_MESSAGE_KEY =
+			"documentTag.exists";
+	
 	private static final String ERROR_WRITING_FILE_MSG = 
 			"Error writing file: %s";
 	
-    /* Report names */
+	/* Bundles */
+	
+	private static final String ERROR_BUNDLE_NAME =
+			"omis.violationevent.msgs.form";
+	
+	/* Report names */
 	
 	private static final String VIOLATION_EVENT_LISTING_REPORT_NAME 
 		= "/Compliance/ViolationEvents/Violation_Event_Listing";
 
 	private static final String VIOLATION_EVENT_DETAILS_REPORT_NAME 
 		= "/Compliance/ViolationEvents/Violation_Event_Details";
+	
+	private static final String SUMMARY_ACTION_CELL_SEARCH_REPORT_NAME 
+		= "/Compliance/ViolationEvents/Summary_Action_Cell_Search_Property_Receipt";	
+	
+	private static final String DISCIPLINARY_INFRACTION_NOH_REPORT_NAME 
+		= "/Compliance/ViolationEvents/Disciplinary_Infraction_Report_Notice_of_Hearing";
+	
+	private static final String DISCIPLINARY_WITNESS_REQUEST_REPORT_NAME 
+		= "/Compliance/ViolationEvents/Disciplinary_Witness_Request";	
+	
+	private static final String AGREEMENT_WAIVER_REFUSAL_REPORT_NAME 
+		= "/Compliance/ViolationEvents/Agreement_Waiver_Refusal_Form";
 
 	/* Report parameter names */
 	
@@ -227,11 +295,6 @@ public class ViolationEventController {
 	@Autowired
 	@Qualifier("reportControllerDelegate")
 	private ReportControllerDelegate reportControllerDelegate;
-	
-	/* Bundles */
-	
-	private static final String ERROR_BUNDLE_NAME =
-			"omis.violationevent.msgs.form";
 	
 	/* Service */
 	
@@ -255,7 +318,8 @@ public class ViolationEventController {
 	
 	@Autowired
 	@Qualifier("disciplinaryCodeViolationPropertyEditorFactory")
-	private PropertyEditorFactory disciplinaryCodeViolationPropertyEditorFactory;
+	private PropertyEditorFactory
+		disciplinaryCodeViolationPropertyEditorFactory;
 	
 	@Autowired
 	@Qualifier("conditionViolationPropertyEditorFactory")
@@ -296,6 +360,10 @@ public class ViolationEventController {
 	@Autowired
 	private CustomDateEditorFactory customDateEditorFactory;
 	
+	@Autowired
+	@Qualifier("unitPropertyEditorFactory")
+	private PropertyEditorFactory unitPropertyEditorFactory;
+	
 	/* Helpers. */
 	
 	@Autowired
@@ -319,7 +387,7 @@ public class ViolationEventController {
 	
 	@Autowired
 	@Qualifier("violationEventDocumentRemover")
-	private FileRemover violationEventDocumentRemover;	
+	private FileRemover violationEventDocumentRemover;
 	
 	/* Validator */
 	
@@ -328,7 +396,7 @@ public class ViolationEventController {
 	private ViolationEventFormValidator violationEventFormValidator;
 	
 	/**
-	 * Default Constructor for ViolationEventController
+	 * Default Constructor for ViolationEventController.
 	 */
 	public ViolationEventController() {
 	}
@@ -336,7 +404,7 @@ public class ViolationEventController {
 	/* Views */
 	
 	/**
-	 * Returns a model and view for violationEvent creation
+	 * Returns a model and view for violationEvent creation.
 	 * @param offender - Offender
 	 * @param category - ViolationEventCategory
 	 * @param incidentStatement - IncidentStatement (optional to prepopulate
@@ -350,16 +418,16 @@ public class ViolationEventController {
 	public ModelAndView create(
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
-			@RequestParam(value="category", required=true)
+			@RequestParam(value = "category", required = true)
 				final ViolationEventCategory category,
-			@RequestParam(value="incidentStatement", required=false)
+			@RequestParam(value = "incidentStatement", required = false)
 				final IncidentStatement incidentStatement,
-			@RequestParam(value="substanceTest", required=false)
-				final SubstanceTest substanceTest){
+			@RequestParam(value = "substanceTest", required = false)
+				final SubstanceTest substanceTest) {
 		
 		ViolationEventForm form = new ViolationEventForm();
 		
-		if(incidentStatement != null){
+		if (incidentStatement != null) {
 			List<SupervisoryOrganization> supervisoryOrganizations =
 					this.violationEventService.findSupervisoryOrganizations();
 			
@@ -367,11 +435,11 @@ public class ViolationEventController {
 			form.setEventDetails(incidentStatement.getSummary());
 			SupervisoryOrganization jurisdiction = (SupervisoryOrganization)
 					incidentStatement.getJurisdiction().getOrganization();
-			if(supervisoryOrganizations.contains(jurisdiction)){
+			if (supervisoryOrganizations.contains(jurisdiction)) {
 				form.setJurisdiction(jurisdiction);
 			}
 		}
-		if(substanceTest != null){
+		if (substanceTest != null) {
 			form.setEventDate(substanceTest.getResultDate());
 			form.setEventDetails(POSITIVE_SUBSTANCE_TEST_MSG_KEY);
 		}
@@ -380,38 +448,53 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Saves a ViolationEvent and returns to the list screen
+	 * Saves a ViolationEvent and returns to the list screen.
 	 * @param offender - Offender
 	 * @param category - ViolationEventCategory
 	 * @param form - VioaltionEventForm
 	 * @param bindingResult - BindingResult
 	 * @return ModelAndView - back to the create screen on validation error,
 	 * or to the list screen on successful save
-	 * @throws DuplicateEntityFoundException - when ViolationEvent, 
-	 * ViolationEventNote, ViolationEventDocument, DocumentTag,
-	 * DisciplinaryCodeViolation, or ConditionViolation already exist
+	 * @throws DuplicateEntityFoundException - when ViolationEventDocument or
+	 * DocumentTag already exist
+	 * @throws ViolationEventExistsException - When a Violation Event already
+	 * exists for the given Offender with the given properties.
+	 * @throws ConditionViolationExistsException - When a Condition Violation
+	 * already exists for the given Violation Event with the provided Condition
+	 * and Details.
+	 * @throws DisciplinaryCodeViolationExistsException - When a Disciplinary
+	 * Code Violation already exists for the given Violation Event with the
+	 * provided Disciplinary Code and Details.
+	 * @throws ViolationEventNoteExistsException - When a Violation Event Note
+	 * already exists for the given Violation Event.
+	 * @throws DocumentTagExistsException - When a Document Tag already exists
+	 * for the given Document with the given value.
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('VIOLATION_EVENT_CREATE') or hasRole('ADMIN')")
 	public ModelAndView save(
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
-			@RequestParam(value="category", required=true)
+			@RequestParam(value = "category", required = true)
 				final ViolationEventCategory category,
 				final ViolationEventForm form,
 				final BindingResult bindingResult)
-						throws DuplicateEntityFoundException{
+						throws DuplicateEntityFoundException,
+						ViolationEventExistsException,
+						DisciplinaryCodeViolationExistsException,
+						ConditionViolationExistsException,
+						ViolationEventNoteExistsException,
+						DocumentTagExistsException {
 		
 		this.violationEventFormValidator.validate(form, bindingResult);
 		
-		if(bindingResult.hasErrors()){
+		if (bindingResult.hasErrors()) {
 			return prepareEditMav(offender, category, form, new ModelMap());
-		}
-		else{
+		} else {
 			ViolationEvent violationEvent = this.violationEventService
 					.createViolationEvent(offender, form.getJurisdiction(),
-							form.getEventDate(), form.getEventDetails(),
-							category);
+							form.getUnit(), form.getEventDate(), 
+							form.getEventDetails(), category);
 			
 			this.processItems(violationEvent, form);
 			
@@ -422,7 +505,7 @@ public class ViolationEventController {
 	
 	
 	/**
-	 * Returns a model and view for violationEvent editing
+	 * Returns a model and view for violationEvent editing.
 	 * @param violationEvent - ViolationEvent being edited
 	 * @param category - ViolationEventCategory
 	 * @return ModelAndView - model and view for violationEvent editing
@@ -432,8 +515,8 @@ public class ViolationEventController {
 	public ModelAndView edit(
 			@RequestParam(value = "violationEvent", required = true)
 				final ViolationEvent violationEvent,
-			@RequestParam(value="category", required=true)
-				final ViolationEventCategory category){
+			@RequestParam(value = "category", required = true)
+				final ViolationEventCategory category) {
 		
 		ModelMap map = new ModelMap();
 		map.addAttribute(VIOLATION_EVENT_MODEL_KEY, violationEvent);
@@ -442,42 +525,57 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Updates a ViolationEvent and returns to the list screen
+	 * Updates a ViolationEvent and returns to the list screen.
 	 * @param violationEvent - ViolationEvent being updated
 	 * @param category - ViolationEventCategory
 	 * @param form - ViolationEventForm
 	 * @param bindingResult - BindingResult
 	 * @return ModelAndView - back to ViolationEvent Edit screen on form
 	 * validation error, or to the list screen on successful update
-	 * @throws DuplicateEntityFoundException - when ViolationEvent, 
-	 * ViolationEventNote, ViolationEventDocument, DocumentTag,
-	 * DisciplinaryCodeViolation, or ConditionViolation already exist
+	 * @throws DuplicateEntityFoundException - when ViolationEventDocument or
+	 * DocumentTag already exist
+	 * @throws ViolationEventExistsException - When a Violation Event already
+	 * exists for the given Offender with the given properties.
+	 * @throws ConditionViolationExistsException - When a Condition Violation
+	 * already exists for the given Violation Event with the provided Condition
+	 * and Details.
+	 * @throws DisciplinaryCodeViolationExistsException - When a Disciplinary
+	 * Code Violation already exists for the given Violation Event with the
+	 * provided Disciplinary Code and Details.
+	 * @throws ViolationEventNoteExistsException - When a Violation Event Note
+	 * already exists for the given Violation Event.
+	 * @throws DocumentTagExistsException - When a Document Tag already exists
+	 * for the given Document with the given value.
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('VIOLATION_EVENT_EDIT') or hasRole('ADMIN')")
 	public ModelAndView update(
 				@RequestParam(value = "violationEvent", required = true)
 					final ViolationEvent violationEvent,
-				@RequestParam(value="category", required=true)
+				@RequestParam(value = "category", required = true)
 					final ViolationEventCategory category,
 					final ViolationEventForm form,
 					final BindingResult bindingResult)
-							throws DuplicateEntityFoundException{
+							throws DuplicateEntityFoundException,
+							ViolationEventExistsException,
+							DisciplinaryCodeViolationExistsException,
+							ConditionViolationExistsException,
+							ViolationEventNoteExistsException,
+							DocumentTagExistsException {
 		this.violationEventFormValidator.validate(form, bindingResult);
 		
-		if(bindingResult.hasErrors()){
+		if (bindingResult.hasErrors()) {
 			ModelMap map = new ModelMap();
 			map.addAttribute(VIOLATION_EVENT_MODEL_KEY, violationEvent);
 			return prepareEditMav(violationEvent.getOffender(), category, form,
 					map);
-		}
-		else{
+		} else {
 			this.processItems(violationEvent, form);
 			
 			this.violationEventService.updateViolationEvent(
 						violationEvent, form.getJurisdiction(),
-						form.getEventDate(), form.getEventDetails(),
-						category);
+						form.getUnit(), form.getEventDate(), 
+						form.getEventDetails(), category);
 			
 			return new ModelAndView(String.format(LIST_REDIRECT,
 					violationEvent.getOffender().getId()));
@@ -486,7 +584,7 @@ public class ViolationEventController {
 	
 	/**
 	 * Removes a violationEvent and its child entities and returns to the
-	 * violationEvent list screen
+	 * violationEvent list screen.
 	 * @param violationEvent - ViolationEvent to remove
 	 * @return ModelAndView - redirect to violationEvent list screen
 	 */
@@ -494,7 +592,7 @@ public class ViolationEventController {
 	@PreAuthorize("hasRole('VIOLATION_EVENT_REMOVE') or hasRole('ADMIN')")
 	public ModelAndView remove(
 			@RequestParam(value = "violationEvent", required = true)
-				final ViolationEvent violationEvent){
+				final ViolationEvent violationEvent) {
 		
 		List<DisciplinaryCodeViolation> disciplinaryCodeViolations =
 				this.violationEventService
@@ -512,25 +610,53 @@ public class ViolationEventController {
 				this.violationEventService
 				.findViolationEventDocumentsByViolationEvent(violationEvent);
 		
-		for(DisciplinaryCodeViolation violation : disciplinaryCodeViolations){
-			this.violationEventService.removeDisciplinaryCodeViolation(violation);
+		for (Hearing hearing : this.violationEventService
+				.findHearingsByViolationEvent(violationEvent)) {
+			for (Infraction infraction : this.violationEventService
+					.findInfractionsByHearing(hearing)) {
+				ImposedSanction imposedSanction = this.violationEventService
+						.findImposedSanctionByInfraction(infraction);
+				if (imposedSanction != null) {
+					this.violationEventService.removeImposedSanction(
+							imposedSanction);
+				}
+				this.violationEventService.removeInfraction(infraction);
+			}
+			for (HearingNote hearingNote : this.violationEventService
+					.findHearingNotesByHearing(hearing)) {
+				this.violationEventService.removeHearingNote(hearingNote);
+			}
+			for (HearingStatus hearingStatus : this.violationEventService
+					.findHearingStatusesByHearing(hearing)) {
+				this.violationEventService.removeHearingStatus(hearingStatus);
+			}
+			for (UserAttendance userAttendance : this.violationEventService
+					.findUserAttendedByHearing(hearing)) {
+				this.violationEventService.removeUserAttended(userAttendance);
+			}
+			this.violationEventService.removeHearing(hearing);
 		}
 		
-		for(ConditionViolation violation : conditionViolations){
+		for (DisciplinaryCodeViolation violation : disciplinaryCodeViolations) {
+			this.violationEventService.removeDisciplinaryCodeViolation(
+					violation);
+		}
+		
+		for (ConditionViolation violation : conditionViolations) {
 			this.violationEventService.removeConditionViolation(violation);
 		}
 		
-		for(ViolationEventNote note : violationEventNotes){
+		for (ViolationEventNote note : violationEventNotes) {
 			this.violationEventService.removeViolationEventNote(note);
 		}
 		
-		for(ViolationEventDocument violationEventDocument :
-				violationEventDocuments){
+		for (ViolationEventDocument violationEventDocument
+				: violationEventDocuments) {
 			List<DocumentTag> tags = this.violationEventService
 					.findDocumentTagsByDocument(
 							violationEventDocument.getDocument());
 			
-			for(DocumentTag tag : tags){
+			for (DocumentTag tag : tags) {
 				this.violationEventService.removeDocumentTag(tag);
 			}
 			
@@ -551,7 +677,7 @@ public class ViolationEventController {
 	/* Item Row Views */
 	
 	/**
-	 * Displays a disciplinary code violation item row
+	 * Displays a disciplinary code violation item row.
 	 * @param disciplinaryCodeViolationItemIndex - Integer
 	 * @param jurisdiction - SupervisoryOrganization
 	 * @param eventDate - Date
@@ -582,8 +708,8 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays a condition violation item row
-	 * @param conditionViolationItemIndex - Itenger
+	 * Displays a condition violation item row.
+	 * @param conditionViolationItemIndex - Integer
 	 * @param offender - Offender
 	 * @param eventDate - Date
 	 * @return ModelAndView - view for a condition violation item row
@@ -612,7 +738,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays a violation event note item row
+	 * Displays a violation event note item row.
 	 * @param violationEventNoteItemIndex - Integer
 	 * @return ModelAndView - view for a violation event note item row
 	 */
@@ -631,7 +757,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays a violation event Document item row
+	 * Displays a violation event Document item row.
 	 * @param violationEventDocumentItemIndex - Integer
 	 * @return ModelAndView - view for a violation event Document item row
 	 */
@@ -651,8 +777,10 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays a Document Tag item row
-	 * @param documentTagItemIndex - Integer
+	 * Displays a Document Tag item row.
+	 * @param violationEventDocumentItemIndex - Violation Event Document Item
+	 * Index
+	 * @param documentTagItemIndex - Document Tag Item Index
 	 * @return ModelAndView - view for a Document Tag item row
 	 */
 	@RequestMapping(value = "createDocumentTagItem.html",
@@ -677,14 +805,14 @@ public class ViolationEventController {
 	/* Action Menu Views */
 	
 	/**
-	 * Returns the model and view for violationEvent action menu
+	 * Returns the model and view for violationEvent action menu.
 	 * @param offender - Offender
 	 * @return ModelAndView - model and view for violationEvent action menu
 	 */
 	@RequestMapping(value = "/violationEventActionMenu.html", 
 			method = RequestMethod.GET)
 	public ModelAndView displayViolationEventActionMenu(@RequestParam
-			(value = "offender", required = true) final Offender offender){
+			(value = "offender", required = true) final Offender offender) {
 		ModelMap map = new ModelMap();
 		map.addAttribute(OFFENDER_MODEL_KEY, offender);
 		
@@ -692,9 +820,10 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Returns a model and view of disciplinary code violation items action menu
-	 * @return ModelAndView - model and view of disciplinary code violation items
-	 * action menu
+	 * Returns a model and view of disciplinary code violation
+	 * items action menu.
+	 * @return ModelAndView - model and view of disciplinary code violation
+	 * items action menu
 	 */
 	@RequestMapping(value = "disciplinaryCodeViolationItemsActionMenu.html",
 			method = RequestMethod.GET)
@@ -705,7 +834,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Returns a model and view of condition violation items action menu
+	 * Returns a model and view of condition violation items action menu.
 	 * @return ModelAndView - model and view of condition violation items
 	 * action menu
 	 */
@@ -718,7 +847,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Returns a model and view of violation event note items action menu
+	 * Returns a model and view of violation event note items action menu.
 	 * @return ModelAndView - model and view of violation event note items
 	 * action menu
 	 */
@@ -733,11 +862,10 @@ public class ViolationEventController {
 	/* AJAX views */
 	
 	/**
-	 * Displays the jurisdiction options
-	 * @param secureJurisdiction - Boolean, whether to filter by secure
-	 * jurisdictions or not
-	 * @param currentJurisdiction - SupervisoryOrganization, current jurisdiction
-	 * being used on the form
+	 * Displays the jurisdiction options.
+	 * @param jurisdictionFilter - jurisdiction filter
+	 * @param currentJurisdiction - SupervisoryOrganization, current
+	 * jurisdiction being used on the form
 	 * @return ModelAndView - jurisdiction options
 	 */
 	@RequestMapping(value = "/showJurisdictionOptions.html",
@@ -746,40 +874,40 @@ public class ViolationEventController {
 			@RequestParam(value = "jurisdictionFilter", required = true)
 				final JurisdictionFilter jurisdictionFilter,
 			@RequestParam(value = "currentJurisdiction", required = false)
-				final SupervisoryOrganization currentJurisdiction){
+				final SupervisoryOrganization currentJurisdiction) {
 		ModelMap map = new ModelMap();
 		
 		List<SupervisoryOrganization> jurisdictions =
 				new ArrayList<SupervisoryOrganization>();
 		
-		switch(jurisdictionFilter){
-		case SECURE_FACILITY:
-			jurisdictions = this.violationEventService
-				.findFacilitySupervisoryOrganizations();
-			break;
-		case TREATMENT_CENTER:
-			jurisdictions = this.violationEventService
-				.findTreatmentCenterSupervisoryOrganizations();
-			break;
-		case PRERELEASE_CENTER:
-			jurisdictions = this.violationEventService
-				.findPreReleaseCenterSupervisoryOrganizations();
-			break;
-		case COMMUNITY_SUPERVISION_OFFICE:
-			jurisdictions = this.violationEventService
-				.findCommunitySupervisionOfficeSupervisoryOrganizations();
-			break;
-		case ASSESSMENT_SANCTION_AND_RECOVATION_CENTER:
-			jurisdictions = this.violationEventService
-			.findAssessmentSanctionRevocationCenterSupervisoryOrganizations();
-			break;
-		default:
-			jurisdictions = this.violationEventService
-				.findSupervisoryOrganizations();
-			break;
+		switch (jurisdictionFilter) {
+			case SECURE_FACILITY:
+				jurisdictions = this.violationEventService
+					.findFacilitySupervisoryOrganizations();
+				break;
+			case TREATMENT_CENTER:
+				jurisdictions = this.violationEventService
+					.findTreatmentCenterSupervisoryOrganizations();
+				break;
+			case PRERELEASE_CENTER:
+				jurisdictions = this.violationEventService
+					.findPreReleaseCenterSupervisoryOrganizations();
+				break;
+			case COMMUNITY_SUPERVISION_OFFICE:
+				jurisdictions = this.violationEventService
+					.findCommunitySupervisionOfficeSupervisoryOrganizations();
+				break;
+			case ASSESSMENT_SANCTION_AND_RECOVATION_CENTER:
+				jurisdictions = this.violationEventService
+				.findAssessmentSanctionRevocationCenterSupervisoryOrganizations();
+				break;
+			default:
+				jurisdictions = this.violationEventService
+					.findSupervisoryOrganizations();
+				break;
 		}
 			
-		if(currentJurisdiction != null){
+		if (currentJurisdiction != null) {
 			map.addAttribute(JURISDICTION_MODEL_KEY, currentJurisdiction);
 		}
 		map.addAttribute(JURISDICTIONS_MODEL_KEY, jurisdictions);
@@ -788,8 +916,26 @@ public class ViolationEventController {
 	}
 	
 	/**
+	 * Displays the unit options based on given jurisdiction.
+	 * 
+	 * @param jurisdiction supervisory organization
+	 * @return model and view
+	 */
+	@RequestMapping(value = "/showUnitOptions.html",
+			method = RequestMethod.GET)
+	public ModelAndView showUnitOptions(
+			@RequestParam(value = "jurisdiction", required = true)
+				final SupervisoryOrganization jurisdiction) {
+		ModelMap map = new ModelMap();
+		map.put(UNITS_MODEL_KEY, this.violationEventService
+				.findUnitsBySupervisoryOrganization(jurisdiction));
+		
+		return new ModelAndView(UNIT_OPTIONS_VIEW_NAME, map);
+	}
+	
+	/**
 	 * Displays the disciplinary code options based on given jurisdiction
-	 * and event date
+	 * and event date.
 	 * @param jurisdiction - SupervisoryOrganization
 	 * @param eventDate - Date
 	 * @return ModelAndView - DisciplinaryCode options
@@ -800,7 +946,7 @@ public class ViolationEventController {
 			@RequestParam(value = "jurisdiction", required = true)
 				final SupervisoryOrganization jurisdiction,
 			@RequestParam(value = "eventDate", required = true)
-				final Date eventDate){
+				final Date eventDate) {
 		ModelMap map = new ModelMap();
 		List<DisciplinaryCode> disciplinaryCodes = this.violationEventService
 				.findDisciplinaryCodesByJurisdictionAndEventDate(
@@ -811,7 +957,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays the description of the selected disciplinary code
+	 * Displays the description of the selected disciplinary code.
 	 * @param disciplinaryCode - DisciplinaryCode
 	 * @return ModelAndView - View of DisciplinaryCode description
 	 */
@@ -819,7 +965,7 @@ public class ViolationEventController {
 			method = RequestMethod.GET)
 	public ModelAndView showDisciplinaryCodeDescription(
 			@RequestParam(value = "disciplinaryCode", required = true)
-				final DisciplinaryCode disciplinaryCode){
+				final DisciplinaryCode disciplinaryCode) {
 		ModelMap map = new ModelMap();
 		
 		map.put(DISCIPLINARY_CODE_DESCRIPTION_MODEL_KEY,
@@ -829,7 +975,7 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Displays the condition options based on current Offender and Event Date
+	 * Displays the condition options based on current Offender and Event Date.
 	 * @param offender - Offender
 	 * @param eventDate - Date
 	 * @return ModelAndView - Condition options
@@ -840,7 +986,7 @@ public class ViolationEventController {
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
 			@RequestParam(value = "eventDate", required = true)
-				final Date eventDate){
+				final Date eventDate) {
 		ModelMap map = new ModelMap();
 		List<Condition> conditions = this.violationEventService
 				.findConditionsByOffenderAndEventDate(
@@ -849,7 +995,7 @@ public class ViolationEventController {
 		return new ModelAndView(CONDITION_OPTIONS_VIEW_NAME, map);
 	}
 	
-	/**
+	/**.
 	 * Displays the description of the selected condition
 	 * @param condition - Condition
 	 * @return ModelAndView - view of Condition description
@@ -858,7 +1004,7 @@ public class ViolationEventController {
 			method = RequestMethod.GET)
 	public ModelAndView showConditionDescription(
 			@RequestParam(value = "condition", required = true)
-				final Condition condition){
+				final Condition condition) {
 		ModelMap map = new ModelMap();
 		
 		map.put(CONDITION_DESCRIPTION_MODEL_KEY,
@@ -878,7 +1024,7 @@ public class ViolationEventController {
 	 */
 	@RequestMapping(value = "/violationEventListingReport.html",
 			method = RequestMethod.GET)
-	@PreAuthorize("hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('VIOLATION_EVENT_LIST') or hasRole('ADMIN')")
 	public ResponseEntity<byte []> reportViolationEventListing(@RequestParam(
 			value = "offender", required = true)
 			final Offender offender,
@@ -889,6 +1035,31 @@ public class ViolationEventController {
 				Long.toString(offender.getOffenderNumber()));
 		byte[] doc = this.reportRunner.runReport(
 				VIOLATION_EVENT_LISTING_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the summary action cell search report for the specified violation event.
+	 * 
+	 * @param violationEvent violation event
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/summaryActionCellSearchReport.rtf",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportSummaryActionCellSearch(@RequestParam(
+			value = "violationEvent", required = true)
+			final ViolationEvent violationEvent,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VIOLATION_EVENT_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(violationEvent.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				SUMMARY_ACTION_CELL_SEARCH_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
@@ -919,10 +1090,85 @@ public class ViolationEventController {
 				doc, reportFormat);
 	}
 	
+	/**
+	 * Returns the report for the specified offender disciplinary witness request.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/disciplinaryWitnessRequestReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VIOLATION_EVENT_LIST') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportDisciplinaryWitnessRequest(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VIOLATION_EVENT_LISTING_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getOffenderNumber()));
+		byte[] doc = this.reportRunner.runReport(
+				DISCIPLINARY_WITNESS_REQUEST_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the disciplinary infraction notice of hearing report for the specified violation event.
+	 * 
+	 * @param violationEvent violation event
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/disciplinaryInfractionNOHReport.rtf",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportDisciplinaryInfractionNOH(@RequestParam(
+			value = "violationEvent", required = true)
+			final ViolationEvent violationEvent,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VIOLATION_EVENT_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(violationEvent.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				DISCIPLINARY_INFRACTION_NOH_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}	
+	
+	/**
+	 * Returns the agreement waiver refusal form for the specified violation event.
+	 * 
+	 * @param violationEvent violation event
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/agreementWaiverRefusalReport.rtf",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportAgreementWaiverRefusal(@RequestParam(
+			value = "violationEvent", required = true)
+			final ViolationEvent violationEvent,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VIOLATION_EVENT_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(violationEvent.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				AGREEMENT_WAIVER_REFUSAL_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
 	/* Helper Methods */
 	
 	/**
-	 * Prepares and returns a ModelAndView for ViolationEvent creation/editing
+	 * Prepares and returns a ModelAndView for ViolationEvent creation/editing.
 	 * @param offender - Offender
 	 * @param category - ViolationEventCategory
 	 * @param form - ViolationEventForm
@@ -932,62 +1178,60 @@ public class ViolationEventController {
 	 */
 	private ModelAndView prepareEditMav(final Offender offender,
 			final ViolationEventCategory category,
-			final ViolationEventForm form, final ModelMap map){
-		
-		
+			final ViolationEventForm form, final ModelMap map) {
 		List<SupervisoryOrganization> jurisdictions =
 				new ArrayList<SupervisoryOrganization>();
-		if(form.getJurisdiction() != null && ViolationEventCategory.DISCIPLINARY
-				.equals(category) && form.getEventDate() != null){
-			map.addAttribute(DISCIPLINARY_CODES_MODEL_KEY,
-					this.violationEventService
-					.findDisciplinaryCodesByJurisdictionAndEventDate(
-							form.getJurisdiction(), form.getEventDate()));
-		}
-		else if(form.getEventDate() != null && ViolationEventCategory.SUPERVISION
-				.equals(category)){
+		if (form.getJurisdiction() != null
+				&& ViolationEventCategory.DISCIPLINARY
+				.equals(category) && form.getEventDate() != null) {
+			if (form.getJurisdiction() instanceof SupervisoryOrganization) {
+				map.addAttribute(DISCIPLINARY_CODES_MODEL_KEY,
+						this.violationEventService
+						.findDisciplinaryCodesByJurisdictionAndEventDate(
+								(SupervisoryOrganization) form
+								.getJurisdiction(), form.getEventDate()));
+			} else {
+				map.addAttribute(DISCIPLINARY_CODES_MODEL_KEY, null);
+			}
+		} else if (form.getEventDate() != null
+				&& ViolationEventCategory.SUPERVISION
+				.equals(category)) {
 			map.addAttribute(CONDITIONS_MODEL_KEY, this.violationEventService
 					.findConditionsByOffenderAndEventDate(offender,
 							form.getEventDate()));
 		}
-		if(JurisdictionFilter.SECURE_FACILITY.equals(form.getJurisdictionFilter())){
+		if (JurisdictionFilter.SECURE_FACILITY.equals(
+				form.getJurisdictionFilter())) {
 			jurisdictions = this.violationEventService
 					.findFacilitySupervisoryOrganizations();
-		}
-		else if(JurisdictionFilter.TREATMENT_CENTER.equals(
-				form.getJurisdictionFilter())){
+		} else if (JurisdictionFilter.TREATMENT_CENTER.equals(
+				form.getJurisdictionFilter())) {
 			jurisdictions = this.violationEventService
 					.findTreatmentCenterSupervisoryOrganizations();
-		}
-		else if(JurisdictionFilter.PRERELEASE_CENTER.equals(
-				form.getJurisdictionFilter())){
+		} else if (JurisdictionFilter.PRERELEASE_CENTER.equals(
+				form.getJurisdictionFilter())) {
 			jurisdictions = this.violationEventService
 					.findPreReleaseCenterSupervisoryOrganizations();
-		}
-		else if(JurisdictionFilter.COMMUNITY_SUPERVISION_OFFICE
-				.equals(form.getJurisdictionFilter())){
+		} else if (JurisdictionFilter.COMMUNITY_SUPERVISION_OFFICE
+				.equals(form.getJurisdictionFilter())) {
 			jurisdictions = this.violationEventService
 					.findCommunitySupervisionOfficeSupervisoryOrganizations();
-		}
-		else if(JurisdictionFilter.ASSESSMENT_SANCTION_AND_RECOVATION_CENTER
-				.equals(form.getJurisdictionFilter())){
+		} else if (JurisdictionFilter.ASSESSMENT_SANCTION_AND_RECOVATION_CENTER
+				.equals(form.getJurisdictionFilter())) {
 			jurisdictions = this.violationEventService
-					.findAssessmentSanctionRevocationCenterSupervisoryOrganizations();
-		}
-		else {
-			if(ViolationEventCategory.SUPERVISION.equals(category)){
+			.findAssessmentSanctionRevocationCenterSupervisoryOrganizations();
+		} else {
+			if (ViolationEventCategory.SUPERVISION.equals(category)) {
 				jurisdictions = this.violationEventService
-						.findCommunitySupervisionOfficeSupervisoryOrganizations();
+					.findCommunitySupervisionOfficeSupervisoryOrganizations();
 				form.setJurisdictionFilter(
 						JurisdictionFilter.COMMUNITY_SUPERVISION_OFFICE);
-			}
-			else if(ViolationEventCategory.DISCIPLINARY.equals(category)){
+			} else if (ViolationEventCategory.DISCIPLINARY.equals(category)) {
 				jurisdictions = this.violationEventService
 						.findFacilitySupervisoryOrganizations();
 				form.setJurisdictionFilter(
 						JurisdictionFilter.SECURE_FACILITY);
-			}
-			else{
+			} else {
 				throw new UnsupportedOperationException(
 						"Violation Event Category Not Supported");
 			}
@@ -998,29 +1242,33 @@ public class ViolationEventController {
 		int vedIndex = 0;
 		int venIndex = 0;
 		List<Integer> dtIndexes = new ArrayList<Integer>();
-		if(form.getDisciplinaryCodeViolationItems() != null){
+		if (form.getDisciplinaryCodeViolationItems() != null) {
 			dcvIndex = form.getDisciplinaryCodeViolationItems().size();
 		}
-		if(form.getConditionViolationItems() != null){
+		if (form.getConditionViolationItems() != null) {
 			cvIndex = form.getConditionViolationItems().size();
 		}
-		if(form.getViolationEventDocumentItems() != null){
+		if (form.getViolationEventDocumentItems() != null) {
 			vedIndex = form.getViolationEventDocumentItems().size();
 			
 			int vedCounter = 0;
-			for(ViolationEventDocumentItem item :
-					form.getViolationEventDocumentItems()){
-				if(item.getTagItems() != null){
+			for (ViolationEventDocumentItem item
+					: form.getViolationEventDocumentItems()) {
+				if (item.getTagItems() != null) {
 					dtIndexes.add(vedCounter, item.getTagItems().size());
-				}
-				else{
+				} else {
 					dtIndexes.add(vedCounter, 0);
 				}
 				vedCounter++;
 			}
 		}
-		if(form.getViolationEventNoteItems() != null){
+		if (form.getViolationEventNoteItems() != null) {
 			venIndex = form.getViolationEventNoteItems().size();
+		}
+		if (form.getUnit() != null) {
+			map.addAttribute(UNITS_MODEL_KEY, this.violationEventService
+					.findUnitsBySupervisoryOrganization(
+							form.getJurisdiction()));
 		}
 		map.addAttribute(DISCIPLINARY_CODE_VIOLATION_ITEM_INDEX_MODEL_KEY,
 				dcvIndex);
@@ -1031,7 +1279,7 @@ public class ViolationEventController {
 		map.addAttribute(DOCUMENT_TAG_ITEM_INDEXES_MODEL_KEY, dtIndexes);
 		map.addAttribute(CATEGORY_MODEL_KEY, category);
 		map.addAttribute(CATEGORY_NAME_MODEL_KEY,
-				category.getName().substring(0,1).toUpperCase()
+				category.getName().substring(0, 1).toUpperCase()
 				.concat(category.getName().substring(1).toLowerCase()));
 		map.addAttribute(JURISDICTIONS_MODEL_KEY, jurisdictions);
 		map.addAttribute(OFFENDER_MODEL_KEY, offender);
@@ -1042,13 +1290,14 @@ public class ViolationEventController {
 	}
 	
 	/**
-	 * Returns a prepared ViolationEventForm populated by supplied ViolationEvent
+	 * Returns a prepared ViolationEventForm populated by supplied
+	 * ViolationEvent.
 	 * @param violationEvent - ViolationEvent
 	 * @return ViolationEventForm - prepared ViolationEventForm populated by
 	 * supplied ViolationEvent
 	 */
 	private ViolationEventForm prepareEditForm(
-			final ViolationEvent violationEvent){
+			final ViolationEvent violationEvent) {
 		
 		ViolationEventForm form = new ViolationEventForm();
 		
@@ -1076,27 +1325,29 @@ public class ViolationEventController {
 		List<ViolationEventDocumentItem> vedItems =
 				new ArrayList<ViolationEventDocumentItem>();
 		
-		for(DisciplinaryCodeViolation violation : disciplinaryCodeViolations){
+		for (DisciplinaryCodeViolation violation : disciplinaryCodeViolations) {
 			DisciplinaryCodeViolationItem item = new
 					DisciplinaryCodeViolationItem();
 			item.setDisciplinaryCode(violation.getDisciplinaryCode());
 			item.setDisciplinaryCodeViolation(violation);
+			item.setDetails(violation.getDetails());
 			item.setItemOperation(ViolationEventItemOperation.UPDATE);
 			
 			dcvItems.add(item);
 		}
 		
-		for(ConditionViolation violation : conditionViolations){
+		for (ConditionViolation violation : conditionViolations) {
 			ConditionViolationItem item = new ConditionViolationItem();
 			
 			item.setCondition(violation.getCondition());
 			item.setConditionViolation(violation);
+			item.setDetails(violation.getDetails());
 			item.setItemOperation(ViolationEventItemOperation.UPDATE);
 			
 			cvItems.add(item);
 		}
 		
-		for(ViolationEventNote note : violationEventNotes){
+		for (ViolationEventNote note : violationEventNotes) {
 			ViolationEventNoteItem item = new ViolationEventNoteItem();
 			item.setDate(note.getDate());
 			item.setDescription(note.getDescription());
@@ -1106,12 +1357,12 @@ public class ViolationEventController {
 			venItems.add(item);
 		}
 		
-		for(ViolationEventDocument document : violationEventDocuments){
+		for (ViolationEventDocument document : violationEventDocuments) {
 			ViolationEventDocumentItem item = new ViolationEventDocumentItem();
 			List<DocumentTag> documentTags = this.violationEventService
 					.findDocumentTagsByDocument(document.getDocument());
 			List<DocumentTagItem> tagItems = new ArrayList<DocumentTagItem>();
-			for(DocumentTag tag : documentTags){
+			for (DocumentTag tag : documentTags) {
 				DocumentTagItem tagItem = new DocumentTagItem();
 				tagItem.setDocumentTag(tag);
 				tagItem.setDocumentTagOperation(DocumentTagOperation.UPDATE);
@@ -1133,40 +1384,40 @@ public class ViolationEventController {
 			vedItems.add(item);
 		}
 		
-		if(this.violationEventService
+		if (this.violationEventService
 			.findFacilitySupervisoryOrganizations().contains(
-					violationEvent.getJurisdiction())){
+					violationEvent.getJurisdiction())) {
 			form.setJurisdictionFilter(JurisdictionFilter.SECURE_FACILITY);
-		}
-		else if(this.violationEventService
+		} else if (this.violationEventService
 					.findTreatmentCenterSupervisoryOrganizations().contains(
-							violationEvent.getJurisdiction())){
+							violationEvent.getJurisdiction())) {
 			form.setJurisdictionFilter(JurisdictionFilter.TREATMENT_CENTER);
-		}
-		else if(this.violationEventService
+		} else if (this.violationEventService
 					.findPreReleaseCenterSupervisoryOrganizations().contains(
-							violationEvent.getJurisdiction())){
+							violationEvent.getJurisdiction())) {
 			form.setJurisdictionFilter(JurisdictionFilter.PRERELEASE_CENTER);
-		}
-		else if(this.violationEventService
+		} else if (this.violationEventService
 					.findCommunitySupervisionOfficeSupervisoryOrganizations()
-					.contains(violationEvent.getJurisdiction())){
+					.contains(violationEvent.getJurisdiction())) {
 			form.setJurisdictionFilter(JurisdictionFilter
 					.COMMUNITY_SUPERVISION_OFFICE);
-		}
-		else if(this.violationEventService
+		} else if (this.violationEventService
 			.findAssessmentSanctionRevocationCenterSupervisoryOrganizations()
-			.contains(violationEvent.getJurisdiction())){
+			.contains(violationEvent.getJurisdiction())) {
 			form.setJurisdictionFilter(JurisdictionFilter
 					.ASSESSMENT_SANCTION_AND_RECOVATION_CENTER);
-		}
-		else {
+		} else {
 			form.setJurisdictionFilter(JurisdictionFilter.SECURE_FACILITY);
 		}
 		
 		form.setEventDate(violationEvent.getEvent().getDate());
 		form.setEventDetails(violationEvent.getEvent().getDetails());
-		form.setJurisdiction(violationEvent.getJurisdiction());
+		if (violationEvent.getJurisdiction()
+				instanceof SupervisoryOrganization) {
+			form.setJurisdiction((SupervisoryOrganization) violationEvent
+					.getJurisdiction());
+		}
+		form.setUnit(violationEvent.getUnit());
 		form.setViolationEventDocumentItems(vedItems);
 		form.setViolationEventNoteItems(venItems);
 		form.setDisciplinaryCodeViolationItems(dcvItems);
@@ -1178,18 +1429,23 @@ public class ViolationEventController {
 	/**
 	 * Creates, updates, or removes DisciplinaryCodeViolations,
 	 * ViolationEventNotes, and ViolationEventDocuments based on the given item
-	 * lists
+	 * lists.
 	 * @param violationEvent - ViolationEvent items are are being processed for
 	 * @param form - ViolationEventForm
 	 * @throws DuplicateEntityFoundException - When a DiscplinaryCodeViolation,
 	 * ConditionViolation, ViolationEventNote, ViolationEventDocument, or
 	 * DocumentTag already exist
+	 * @throws DocumentTagExistsException - When a Document Tag already exists
+	 * for the given Document with the given value.
 	 */
 	private void processItems(
 			final ViolationEvent violationEvent,
 			final ViolationEventForm form)
-					throws DuplicateEntityFoundException{
-		
+					throws DuplicateEntityFoundException,
+						DisciplinaryCodeViolationExistsException,
+						ConditionViolationExistsException,
+						ViolationEventNoteExistsException,
+						DocumentTagExistsException {
 		List<DisciplinaryCodeViolationItem> disciplinaryCodeViolationItems =
 				form.getDisciplinaryCodeViolationItems();
 		List<ConditionViolationItem> conditionViolationItems =
@@ -1199,147 +1455,130 @@ public class ViolationEventController {
 		List<ViolationEventDocumentItem> violationEventDocumentItems =
 				form.getViolationEventDocumentItems();
 		
-		
-		if(disciplinaryCodeViolationItems != null){
-			for(DisciplinaryCodeViolationItem item :
-					disciplinaryCodeViolationItems){
-				if(ViolationEventItemOperation.CREATE.equals(
-						item.getItemOperation())){
-					this.violationEventService.createDisciplinaryCodeViolation(
-							item.getDisciplinaryCode(), violationEvent);
-				}
-				if(ViolationEventItemOperation.UPDATE.equals(
-						item.getItemOperation())){
-					this.violationEventService.updateDisciplinaryCodeViolation(
-							item.getDisciplinaryCodeViolation(),
-							item.getDisciplinaryCode());
-				}
-				if(ViolationEventItemOperation.REMOVE.equals(
-						item.getItemOperation())){
-					this.violationEventService.removeDisciplinaryCodeViolation(
-							item.getDisciplinaryCodeViolation());
-				}
+		for (DisciplinaryCodeViolationItem item
+				: disciplinaryCodeViolationItems) {
+			if (ViolationEventItemOperation.CREATE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.createDisciplinaryCodeViolation(
+						item.getDisciplinaryCode(), violationEvent,
+						item.getDetails());
+			}
+			if (ViolationEventItemOperation.UPDATE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.updateDisciplinaryCodeViolation(
+						item.getDisciplinaryCodeViolation(),
+						item.getDisciplinaryCode(), item.getDetails());
+			}
+			if (ViolationEventItemOperation.REMOVE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.removeDisciplinaryCodeViolation(
+						item.getDisciplinaryCodeViolation());
 			}
 		}
 		
-		if(conditionViolationItems != null){
-			for(ConditionViolationItem item :
-					conditionViolationItems){
-				if(ViolationEventItemOperation.CREATE.equals(
-						item.getItemOperation())){
-					this.violationEventService.createConditionViolation(
-							item.getCondition(), violationEvent);
-				}
-				if(ViolationEventItemOperation.UPDATE.equals(
-						item.getItemOperation())){
-					this.violationEventService.updateConditionViolation(
-							item.getConditionViolation(),
-							item.getCondition());
-				}
-				if(ViolationEventItemOperation.REMOVE.equals(
-						item.getItemOperation())){
-					this.violationEventService.removeConditionViolation(
-							item.getConditionViolation());
-				}
+		for (ConditionViolationItem item : conditionViolationItems) {
+			if (ViolationEventItemOperation.CREATE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.createConditionViolation(
+						item.getCondition(), violationEvent, item.getDetails());
+			}
+			if (ViolationEventItemOperation.UPDATE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.updateConditionViolation(
+						item.getConditionViolation(),
+						item.getCondition(), item.getDetails());
+			}
+			if (ViolationEventItemOperation.REMOVE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.removeConditionViolation(
+						item.getConditionViolation());
 			}
 		}
 		
-		if(violationEventNoteItems != null){
-			for(ViolationEventNoteItem item : violationEventNoteItems){
-				if(ViolationEventItemOperation.CREATE.equals(
-						item.getItemOperation())){
-					this.violationEventService.createViolationEventNote(
-							item.getDate(), item.getDescription(),
-							violationEvent);
+		for (ViolationEventNoteItem item : violationEventNoteItems) {
+			if (ViolationEventItemOperation.CREATE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.createViolationEventNote(
+						item.getDate(), item.getDescription(), violationEvent);
+			}
+			if (ViolationEventItemOperation.UPDATE.equals(
+					item.getItemOperation())) {
+				if (this.isNoteChanged(item.getViolationEventNote(),
+						item.getDate(), item.getDescription())) {
+					this.violationEventService.updateViolationEventNote(
+							item.getViolationEventNote(), item.getDate(),
+							item.getDescription());
 				}
-				if(ViolationEventItemOperation.UPDATE.equals(
-						item.getItemOperation())){
-					if(this.isNoteChanged(item.getViolationEventNote(),
-							item.getDate(), item.getDescription())) {
-						this.violationEventService.updateViolationEventNote(
-								item.getViolationEventNote(), item.getDate(),
-								item.getDescription());
-					}
-				}
-				if(ViolationEventItemOperation.REMOVE.equals(
-						item.getItemOperation())){
-					this.violationEventService.removeViolationEventNote(
-							item.getViolationEventNote());
-				}
+			}
+			if (ViolationEventItemOperation.REMOVE.equals(
+					item.getItemOperation())) {
+				this.violationEventService.removeViolationEventNote(
+						item.getViolationEventNote());
 			}
 		}
 		
-		if(violationEventDocumentItems != null){
-			for(ViolationEventDocumentItem item : violationEventDocumentItems){
-				if(ViolationEventItemOperation.CREATE.equals(
-						item.getItemOperation())){
-					final String fileExtension = item.getFileExtension();
-					this.documentFilenameGenerator
-							.setExtension(fileExtension);
-					final String filename =
-							this.documentFilenameGenerator.generate();
-					Document document = this.violationEventService
-							.createDocument(item.getDate(),
-									filename, item.getFileExtension(),
-									item.getTitle());
-					this.violationEventDocumentPersister
-							.persist(document, item.getData());
-					
-					this.violationEventService.createViolationEventDocument(
-							document, violationEvent);
-					
-					if(item.getTagItems() != null){
-						for(DocumentTagItem tagItem : item.getTagItems()){
-							if(DocumentTagOperation.CREATE.equals(
-									tagItem.getDocumentTagOperation())){
-								this.violationEventService.createDocumentTag(
-										document, tagItem.getName());
-							}
+		for (ViolationEventDocumentItem item : violationEventDocumentItems) {
+			if (ViolationEventItemOperation.CREATE.equals(
+					item.getItemOperation())) {
+				final String fileExtension = item.getFileExtension();
+				this.documentFilenameGenerator.setExtension(fileExtension);
+				final String filename =
+						this.documentFilenameGenerator.generate();
+				Document document = this.violationEventService
+						.createDocument(item.getDate(), filename,
+								item.getFileExtension(), item.getTitle());
+				this.violationEventDocumentPersister
+						.persist(document, item.getData());
+				this.violationEventService.createViolationEventDocument(
+						document, violationEvent);
+				if (item.getTagItems() != null) {
+					for (DocumentTagItem tagItem : item.getTagItems()) {
+						if (DocumentTagOperation.CREATE.equals(
+								tagItem.getDocumentTagOperation())) {
+							this.violationEventService.createDocumentTag(
+									document, tagItem.getName());
 						}
 					}
 				}
-				if(ViolationEventItemOperation.UPDATE.equals(
-						item.getItemOperation())){
-					Document document = this.violationEventService
-							.updateDocument(item.getDocument(),
-									item.getTitle(), item.getDate());
-					this.violationEventService
-						.updateViolationEventDocument(
-							item.getViolationEventDocument(), document);
-					if(item.getTagItems() != null){
-						for(DocumentTagItem tagItem : item.getTagItems()){
-							if(DocumentTagOperation.CREATE.equals(
-									tagItem.getDocumentTagOperation())){
-								this.violationEventService.createDocumentTag(
-										document, tagItem.getName());
-							}
-							if(DocumentTagOperation.UPDATE.equals(
-									tagItem.getDocumentTagOperation())){
-								this.violationEventService.updateDocumentTag(
-										tagItem.getDocumentTag(),
-										tagItem.getName());
-							}
-							if(DocumentTagOperation.REMOVE.equals(
-									tagItem.getDocumentTagOperation())){
-								this.violationEventService.removeDocumentTag(
-										tagItem.getDocumentTag());
-							}
-						}
+			}
+			if (ViolationEventItemOperation.UPDATE.equals(
+					item.getItemOperation())) {
+				Document document = this.violationEventService
+						.updateDocument(item.getDocument(), item.getTitle(),
+								item.getDate());
+				this.violationEventService
+					.updateViolationEventDocument(
+						item.getViolationEventDocument(), document);
+				for (DocumentTagItem tagItem : item.getTagItems()) {
+					if (DocumentTagOperation.CREATE.equals(
+							tagItem.getDocumentTagOperation())) {
+						this.violationEventService.createDocumentTag(
+								document, tagItem.getName());
+					}
+					if (DocumentTagOperation.UPDATE.equals(
+							tagItem.getDocumentTagOperation())) {
+						this.violationEventService.updateDocumentTag(
+								tagItem.getDocumentTag(), tagItem.getName());
+					}
+					if (DocumentTagOperation.REMOVE.equals(
+							tagItem.getDocumentTagOperation())) {
+						this.violationEventService.removeDocumentTag(
+								tagItem.getDocumentTag());
 					}
 				}
-				if(ViolationEventItemOperation.REMOVE.equals(
-						item.getItemOperation())){
-					for(DocumentTag tag : this.violationEventService
-							.findDocumentTagsByDocument(item.getDocument())){
-						this.violationEventService.removeDocumentTag(tag);
-					}
-					this.violationEventService.removeViolationEventDocument(
-							item.getViolationEventDocument());
-					this.violationEventDocumentRemover.remove(
-							item.getDocument().getFilename());
-					this.violationEventService.removeDocument(
-							item.getDocument());
+			}
+			if (ViolationEventItemOperation.REMOVE.equals(
+					item.getItemOperation())) {
+				for (DocumentTag tag : this.violationEventService
+						.findDocumentTagsByDocument(item.getDocument())) {
+					this.violationEventService.removeDocumentTag(tag);
 				}
+				this.violationEventService.removeViolationEventDocument(
+						item.getViolationEventDocument());
+				this.violationEventDocumentRemover.remove(
+						item.getDocument().getFilename());
+				this.violationEventService.removeDocument(
+						item.getDocument());
 			}
 		}
 	}
@@ -1354,7 +1593,8 @@ public class ViolationEventController {
 			@RequestParam(value = "document", required = true) 
 			final Document document, 
 			final HttpServletResponse httpServletResponse) {
-		final byte[] bytes = this.violationEventDocumentRetriever.retrieve(document);
+		final byte[] bytes = this.violationEventDocumentRetriever
+				.retrieve(document);
 		httpServletResponse.setContentType("application/octet-stream");
 		httpServletResponse.setHeader("Content-Disposition", 
 				"attachment; filename=\"" + document.getFilename() + "\"");
@@ -1378,26 +1618,97 @@ public class ViolationEventController {
 	@ExceptionHandler(DuplicateEntityFoundException.class)
 	public ModelAndView handleDuplicateEntityFoundException(
 			final DuplicateEntityFoundException exception) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView
-		(ENTITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				ENTITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
+				exception);
+	}
+	
+	/**
+	 * Handles violation event exists exceptions.
+	 * 
+	 * @param exception violation event exists exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(ViolationEventExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final ViolationEventExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				VIOLATION_EVENT_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles violation event note exists exceptions.
+	 * 
+	 * @param exception violation event note exists exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(ViolationEventNoteExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final ViolationEventNoteExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				VIOLATION_EVENT_NOTE_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				exception);
+	}
+	
+	/**
+	 * Handles disciplinary code violation exists exceptions.
+	 * 
+	 * @param exception disciplinary code violation exists exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(DisciplinaryCodeViolationExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final DisciplinaryCodeViolationExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				DISCIPLINARY_CODE_VIOLATION_EXISTS_MESSAGE_KEY,
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Handles condition violation exists exceptions.
+	 * 
+	 * @param exception condition violation exists exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(ConditionViolationExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final ConditionViolationExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				CONDITION_VIOLATION_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				exception);
+	}
+
+	/**
+	 * Handles document tag exists exceptions.
+	 * 
+	 * @param exception document tag exists exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(DocumentTagExistsException.class)
+	public ModelAndView handleDuplicateEntityFoundException(
+			final DocumentTagExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				DOCUMENT_TAG_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
 				exception);
 	}
 	
 	/**
 	 * Checks if a Violation Event Note has been changed and returns true if it
-	 * has
+	 * has.
 	 * @param note - Violation Event Note to check for change
 	 * @param date - Note Date from Form
 	 * @param value - Note Value from Form
-	 * @return Boolean - true if either the form's note date or value is different
+	 * @return Boolean - true if either the form's note date or value is
+	 * different
 	 * from the original Note's, false otherwise.
 	 */
 	private boolean isNoteChanged(final ViolationEventNote note,
 			final Date date, final String value) {
-		if(!note.getDescription().equals(value)) {
+		if (!note.getDescription().equals(value)) {
 			return true;
 		}
-		if(!(note.getDate().getTime() == date.getTime())) {
+		if (!(note.getDate().getTime() == date.getTime())) {
 			return true;
 		}
 		return false;
@@ -1406,12 +1717,12 @@ public class ViolationEventController {
 	/* InitBinder */
 	
 	/**
-	 * Sets up and registers property editors
+	 * Sets up and registers property editors.
 	 * 
 	 * @param binder - web binder
 	 */
 	@InitBinder
-	protected void initBinder(final WebDataBinder binder){
+	protected void initBinder(final WebDataBinder binder) {
 		binder.registerCustomEditor(
 				Offender.class,
 				this.offenderPropertyEditorFactory
@@ -1468,6 +1779,8 @@ public class ViolationEventController {
 				.createPropertyEditor());
 		binder.registerCustomEditor(byte[].class,
 				new ByteArrayMultipartFileEditor());
+		binder.registerCustomEditor(Unit.class, 
+				this.unitPropertyEditorFactory.createPropertyEditor());
 	}
 	
 }

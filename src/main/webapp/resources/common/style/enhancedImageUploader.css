@@ -1,0 +1,86 @@
+/*
+ * Cascading style sheet for enhanced image uploader
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0 (September 10, 2018)
+ */
+ 
+ div.enhancedImageUploaderWrapper {
+ }
+ 
+ div.enhancedImageUploaderWrapper canvas {
+ 	display: block;
+ 	clear:both;
+ 	margin-left: 22%;
+ 	margin-top: 5px;
+ }
+ div.enhancedImageUploaderWrapper img.enhancedImageUploaderResultImage {
+ 	display: block;
+ 	clear:both;
+ 	margin-left: 22%;
+ 	margin-top: 5px;
+ }
+ 
+ div.modalCanvasWrapper {
+ 	display:inline-block;
+ 	width: 50%;
+ 	text-align: center;
+ }
+ 
+ div.modalContainer canvas {
+ 	display: inline-block;
+ 	max-width: 98%;
+ 	max-height: 525px;
+ 	margin: 0 1% 0 1%;
+ 	border: 1px solid;
+ }
+
+img.hoverableUploadImage .after {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+img.hoverableUploadImage:hover .after {
+    display: inline-block;
+    background: rgba(0, 0, 0, .6);
+}
+ 
+/* Form image CSS */
+
+div.editableImageWrapper img.editableImage {
+	display: block;
+}
+
+div.editableImageWrapper {
+    position: relative;
+    display:inline-block;
+    padding: none;
+}
+
+div.editableImageWrapper .editableImageAfter {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+div.editableImageWrapper:hover .editableImageAfter {
+    display: block;
+    background: rgba(0, 0, 0, .5);
+    background-image: url('../images/whiteMagnifyingGlass.png');
+    background-repeat: no-repeat;
+    cursor: pointer;
+    padding: none;
+}
+
+div.modalContainer a.imageEditAccept:before {
+	content: url('../images/imageEditAccept.png');
+	position: absolute;
+	left: 50%;
+  	top: 75%;
+  	transform: translate(-50%, -50%);
+	/* display: inline-block; */
+	cursor: pointer;
+}

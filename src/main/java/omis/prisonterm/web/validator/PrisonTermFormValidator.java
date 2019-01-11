@@ -1,8 +1,13 @@
 package omis.prisonterm.web.validator;
 
+import java.util.List;
+
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import omis.document.validator.DocumentTagItemValidator;
+import omis.document.web.form.DocumentTagItem;
 import omis.prisonterm.web.form.PrisonTermForm;
 
 /**
@@ -10,16 +15,24 @@ import omis.prisonterm.web.form.PrisonTermForm;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Oct 17, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Dec 24, 2018)
  * @since OMIS 3.0
  */
 
 public class PrisonTermFormValidator implements Validator {
 
+	private static final String DATE_REQUIRED_MSG = "date.empty";
+	
+	private static final String TITLE_REQUIRED_MSG = "document.title.empty";
+	
+	private static final String DOCUMENT_REQUIRED_MSG = "document.required";
+
+	private final DocumentTagItemValidator documentTagItemValidator =
+			new DocumentTagItemValidator();
+	
 	/**
 	 * Instantiates a default prison term form validator.
-	 * 
-	 * @param stringLengthChecks check for string length
 	 */
 	public PrisonTermFormValidator() {
 		// Default instantiation
@@ -34,13 +47,48 @@ public class PrisonTermFormValidator implements Validator {
 	/** {@inheritDoc} */
 	@Override
 	public void validate(final Object target, final Errors errors) {
-		PrisonTermForm prisonTermForm = (PrisonTermForm) target;
+		PrisonTermForm form = (PrisonTermForm) target;
 		
-		if (prisonTermForm.getActionDate() == null) {
+		if (form.getActionDate() == null) {
 			errors.rejectValue("actionDate", "prisonTerm.actionDate.empty");
 		}
-		if (prisonTermForm.getStatus() == null) {
+		if (form.getStatus() == null) {
 			errors.rejectValue("status", "prisonTerm.status.empty");
 		}
-	}	
+		if (((form.getTitle() != null && !form.getTitle().isEmpty())
+				|| form.getDate() != null
+				|| form.getData().length > 0)
+				&& (form.getRemoveSentenceCalculation() == null
+				 || !form.getRemoveSentenceCalculation())) {
+			ValidationUtils.rejectIfEmpty(errors, "date",
+					DATE_REQUIRED_MSG);
+			ValidationUtils.rejectIfEmpty(errors, "title",
+					TITLE_REQUIRED_MSG);
+			ValidationUtils.rejectIfEmpty(errors, "data",
+					DOCUMENT_REQUIRED_MSG);
+			List<DocumentTagItem> documentTagItems = form.getDocumentTagItems();
+			if (documentTagItems != null) {
+				this.documentTagItemValidator.validate(
+						documentTagItems, errors);
+			}
+		} 
+		if (((form.getTitle() != null && !form.getTitle().isEmpty())
+				|| form.getDate() != null
+				|| (form.getReplaceData() != null 
+					&& form.getReplaceData().length > 0))
+				&& (form.getRemoveSentenceCalculation() != null
+					&& form.getRemoveSentenceCalculation())) {
+			ValidationUtils.rejectIfEmpty(errors, "date",
+					DATE_REQUIRED_MSG);
+			ValidationUtils.rejectIfEmpty(errors, "title",
+					TITLE_REQUIRED_MSG);
+			ValidationUtils.rejectIfEmpty(errors, "replaceData",
+					DOCUMENT_REQUIRED_MSG);
+			List<DocumentTagItem> documentTagItems = form.getDocumentTagItems();
+			if (documentTagItems != null) {
+				this.documentTagItemValidator.validate(
+						documentTagItems, errors);
+			}
+		}
+	}
 }

@@ -2,38 +2,31 @@ package omis.warrant.web.form;
 
 import java.util.Date;
 
-import omis.facility.domain.Facility;
 import omis.person.domain.Person;
-import omis.region.domain.County;
 
 /**
- * WarrantReleaseForm.java
+ * Warrant release form.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (May 9, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Jacques 
+ * @author Joel Norris
+ * @version 0.1.1 (May 21, 2018)
+ * @since OMIS 3.0
  */
 public class WarrantReleaseForm {
 	
-	public String addressee;
+	private String addressee;
 	
-	public Facility facility;
+	private Date releaseDate;
 	
-	public County county;
-	
-	public Date releaseDate;
-	
-	public String instructions;
+	private String instructions;
 	
 	private Person clearedBy;
 	
 	private Date clearedByDate;
 	
-	/**
-	 * 
-	 */
+	/** Instantiates a default warrant release form. */
 	public WarrantReleaseForm() {
+		//Default constructor.
 	}
 
 	/**
@@ -50,38 +43,6 @@ public class WarrantReleaseForm {
 	 */
 	public void setAddressee(final String addressee) {
 		this.addressee = addressee;
-	}
-
-	/**
-	 * Returns the facility
-	 * @return facility - Facility
-	 */
-	public Facility getFacility() {
-		return facility;
-	}
-
-	/**
-	 * Sets the facility
-	 * @param facility - Facility
-	 */
-	public void setFacility(final Facility facility) {
-		this.facility = facility;
-	}
-
-	/**
-	 * Returns the county
-	 * @return county - County
-	 */
-	public County getCounty() {
-		return county;
-	}
-
-	/**
-	 * Sets the county
-	 * @param county - County
-	 */
-	public void setCounty(final County county) {
-		this.county = county;
 	}
 
 	/**

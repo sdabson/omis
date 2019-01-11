@@ -79,4 +79,10 @@
 		where placementTermNote.placementTerm = :placementTerm
 		order by placementTermNote.date, placementTermNote.value
 	]]></query>
+	
+	<!-- Delete all placement term notes by placement term -->
+	<query name="deletePlacementTermNotesByPlacementTerm"><![CDATA[
+		delete from omis.supervision.domain.PlacementTermNote placementTermNote
+		where placementTermNote.placementTerm = :placementTerm
+	]]></query>
 </hibernate-mapping>

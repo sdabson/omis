@@ -18,6 +18,7 @@
 package omis.paroleeligibility.service.delegate;
 
 import java.util.Date;
+import java.util.List;
 
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
@@ -34,7 +35,9 @@ import omis.paroleeligibility.domain.component.ParoleEligibilityStatus;
  * Delegate for the parole eligibility.
  *
  * @author Trevor Isles
- * @version 0.1.0 (Nov 9, 2017)
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.3 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class ParoleEligibilityDelegate {
@@ -136,6 +139,30 @@ public class ParoleEligibilityDelegate {
 	}
 	
 	/**
+	 * Returns a list of Parole Eligibilities for an offender after the
+	 * given date.
+	 * 
+	 * @param offender Offender
+	 * @param date Date
+	 * @return List of Parole Eligibilities for an offender after the
+	 * given date.
+	 */
+	public List<ParoleEligibility> findByOffenderAfterDate(
+			Offender offender, Date date) {
+		return this.paroleEligibilityDao
+				.findByOffenderAfterDate(offender, date);
+	}
+	
+	/**
+	 * Returns a list of Parole Eligibilities that have no scheduled hearing.
+	 * 
+	 * @return List of Parole Eligibilities that have no scheduled hearing.
+	 */
+	public List<ParoleEligibility> findUnscheduled() {
+		return this.paroleEligibilityDao.findUnscheduled();
+	}
+	
+	/**
 	 * Populates the specified parole eligibility.
 	 * 
 	 * @param paroleEligibility
@@ -159,5 +186,6 @@ public class ParoleEligibilityDelegate {
 				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
 	}
-
+	
+	
 }

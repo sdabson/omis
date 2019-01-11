@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!-- 
+  - Hearing configuration.
+  -
+  - Author: Annie Wahl
+  - Author: Sheronda Vaughn
+  - Author: Josh Divine
+  - Version: 0.1.9 (Jul 17, 2018)
+  - Since: OMIS 3.0
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,7 +37,7 @@
 		<bean id="hearingService" class="omis.hearing.service.impl.HearingServiceImpl">
 			<constructor-arg name="hearingDelegate" ref="hearingDelegate" />
 			<constructor-arg name="hearingNoteDelegate" ref="hearingNoteDelegate" />
-			<constructor-arg name="staffAttendanceDelegate" ref="staffAttendanceDelegate" />
+			<constructor-arg name="userAttendanceDelegate" ref="userAttendanceDelegate" />
 			<constructor-arg name="hearingStatusDelegate" ref="hearingStatusDelegate" />
 			<constructor-arg name="infractionDelegate" ref="infractionDelegate" />
 			<constructor-arg name="imposedSanctionDelegate" ref="imposedSanctionDelegate" />
@@ -20,11 +46,13 @@
 			<constructor-arg name="disciplinaryCodeViolationDelegate" ref="disciplinaryCodeViolationDelegate" />
 			<constructor-arg name="jailDelegate" ref="jailDelegate" />
 			<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
-			<constructor-arg name="locationDelegate" ref="locationDelegate" />
-			<constructor-arg name="treatmentCenterDao" ref="treatmentCenterDao" />
-			<constructor-arg name="preReleaseCenterDao" ref="preReleaseCenterDao" />
-			<constructor-arg name="communitySupervisionOfficeDao" ref="communitySupervisionOfficeDao" />
-			<constructor-arg name="supervisoryOrganizationDao" ref="supervisoryOrganizationDao" />
+			<constructor-arg name="treatmentCenterDelegate" ref="treatmentCenterDelegate" />
+			<constructor-arg name="preReleaseCenterDelegate" ref="preReleaseCenterDelegate" />
+			<constructor-arg name="communitySupervisionOfficeDelegate" ref="communitySupervisionOfficeDelegate" />
+			<constructor-arg name="supervisoryOrganizationDelegate" ref="supervisoryOrganizationDelegate" />
+			<constructor-arg name="assessmentSanctionRevocationCenterDelegate" ref="assessmentSanctionRevocationCenterDelegate" />
+			<constructor-arg name="disciplinaryCodeDelegate" ref="disciplinaryCodeDelegate" />
+			<constructor-arg name="conditionDelegate" ref="conditionDelegate" />
 		</bean>
 		
 		<bean id="resolutionService" class="omis.hearing.service.impl.ResolutionServiceImpl">
@@ -33,6 +61,7 @@
 			<constructor-arg name="imposedSanctionDelegate" ref="imposedSanctionDelegate" />
 			<constructor-arg name="conditionViolationDelegate" ref="conditionViolationDelegate" />
 			<constructor-arg name="disciplinaryCodeViolationDelegate" ref="disciplinaryCodeViolationDelegate" />
+			<constructor-arg name="infractionPleaDelegate" ref="infractionPleaDelegate" />
 		</bean>
 		
 		<bean id="hearingProfileItemService" class="omis.hearing.report.impl.hibernate.HearingProfileItemServiceHibernateImpl">
@@ -55,9 +84,9 @@
 			<constructor-arg name="entityName" value="omis.hearing.domain.HearingNote" />
 		</bean>
 		
-		<bean id="staffAttendanceDao" class="omis.hearing.dao.impl.hibernate.StaffAttendanceDaoHibernateImpl">
+		<bean id="userAttendanceDao" class="omis.hearing.dao.impl.hibernate.UserAttendanceDaoHibernateImpl">
 			<constructor-arg name="sessionFactory" ref="sessionFactory" />
-			<constructor-arg name="entityName" value="omis.hearing.domain.StaffAttendance" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.UserAttendance" />
 		</bean>
 		
 		<bean id="hearingStatusDao" class="omis.hearing.dao.impl.hibernate.HearingStatusDaoHibernateImpl">
@@ -75,6 +104,11 @@
 			<constructor-arg name="entityName" value="omis.hearing.domain.ImposedSanction" />
 		</bean>
 		
+		<bean id="infractionPleaDao" class="omis.hearing.dao.impl.hibernate.InfractionPleaDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.InfractionPlea" />
+		</bean>
+		
 		<!-- Delegate -->
 		
 		<bean id="hearingDelegate" class="omis.hearing.service.delegate.HearingDelegate">
@@ -89,9 +123,9 @@
 			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
 		</bean>
 		
-		<bean id="staffAttendanceDelegate" class="omis.hearing.service.delegate.StaffAttendanceDelegate">
-			<constructor-arg name="staffAttendanceDao" ref="staffAttendanceDao" />
-			<constructor-arg name="staffAttendanceInstanceFactory" ref="staffAttendanceInstanceFactory" />
+		<bean id="userAttendanceDelegate" class="omis.hearing.service.delegate.UserAttendanceDelegate">
+			<constructor-arg name="userAttendanceDao" ref="userAttendanceDao" />
+			<constructor-arg name="userAttendanceInstanceFactory" ref="userAttendanceInstanceFactory" />
 			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
 		</bean>
 		
@@ -113,6 +147,12 @@
 			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
 		</bean>
 		
+		<bean id="infractionPleaDelegate" class="omis.hearing.service.delegate.InfractionPleaDelegate">
+			<constructor-arg name="infractionPleaDao" ref="infractionPleaDao" />
+			<constructor-arg name="infractionPleaInstanceFactory" ref="infractionPleaInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
 		<!-- Instance Factory -->
 		
 		<bean id="hearingInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
@@ -125,9 +165,9 @@
 			<constructor-arg name="entityName" value="omis.hearing.domain.HearingNote" />
 		</bean>
 		
-		<bean id="staffAttendanceInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<bean id="userAttendanceInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
 			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
-			<constructor-arg name="entityName" value="omis.hearing.domain.StaffAttendance" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.UserAttendance" />
 		</bean>
 		
 		<bean id="hearingStatusInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
@@ -143,6 +183,11 @@
 		<bean id="imposedSanctionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
 			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
 			<constructor-arg name="entityName" value="omis.hearing.domain.ImposedSanction" />
+		</bean>
+		
+		<bean id="infractionPleaInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.hearing.domain.InfractionPlea" />
 		</bean>
 		
 		<!-- Property Editor Factory -->
@@ -163,11 +208,11 @@
 			<constructor-arg name="configuration" ref="hibernateConfiguration" />
 		</bean>
 		
-		<bean id="staffAttendancePropertyEditorFactory"
+		<bean id="userAttendancePropertyEditorFactory"
 		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-			<constructor-arg name="dao" ref="staffAttendanceDao" />
+			<constructor-arg name="dao" ref="userAttendanceDao" />
 			<constructor-arg name="entityName"
-				value="omis.hearing.domain.StaffAttendance" />
+				value="omis.hearing.domain.UserAttendance" />
 			<constructor-arg name="configuration" ref="hibernateConfiguration" />
 		</bean>
 		
@@ -195,4 +240,11 @@
 			<constructor-arg name="configuration" ref="hibernateConfiguration" />
 		</bean>
 		
+		<bean id="infractionPleaPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="infractionPleaDao" />
+			<constructor-arg name="entityName"
+				value="omis.hearing.domain.InfractionPlea" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
 </beans>

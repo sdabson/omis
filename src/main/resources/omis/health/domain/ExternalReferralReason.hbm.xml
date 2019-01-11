@@ -20,4 +20,8 @@
 	  select reason from omis.health.domain.ExternalReferralReason reason
 	  order by reason.sortOrder, reason.name
 	]]></query>
+	<query name="findExistingExternalReferralReason"><![CDATA[
+	  select reason from omis.health.domain.ExternalReferralReason reason
+	  where reason.name = :name
+	]]></query>
 </hibernate-mapping>

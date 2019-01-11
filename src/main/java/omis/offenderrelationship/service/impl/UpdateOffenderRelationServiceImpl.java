@@ -46,8 +46,9 @@ import omis.contact.service.delegate.TelephoneNumberDelegate;
 import omis.country.domain.Country;
 import omis.country.service.delegate.CountryDelegate;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
+import omis.family.service.delegate.FamilyAssociationDelegate;
 import omis.offender.domain.Offender;
+import omis.offender.service.delegate.OffenderDelegate;
 import omis.offenderrelationship.service.UpdateOffenderRelationService;
 import omis.person.domain.Person;
 import omis.person.domain.PersonIdentity;
@@ -69,6 +70,9 @@ import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.relationship.service.delegate.RelationshipDelegate;
 import omis.relationship.service.delegate.RelationshipNoteCategoryDesignatorDelegate;
 import omis.relationship.service.delegate.RelationshipNoteDelegate;
+import omis.victim.service.delegate.VictimAssociationDelegate;
+import omis.victim.service.delegate.VictimNoteDelegate;
+import omis.visitation.service.delegate.VisitationAssociationDelegate;
 
 /**
  * Update offender relation service implementation.
@@ -76,6 +80,7 @@ import omis.relationship.service.delegate.RelationshipNoteDelegate;
  * @author Joel Norris
  * @author Yidong Li
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.1.1 (Nov 8, 2017)
  * @since OMIS 3.0
  */
@@ -100,7 +105,12 @@ public class UpdateOffenderRelationServiceImpl
 	private final RelationshipDelegate relationshipDelegate;
 	private final RelationshipNoteDelegate relationshipNoteDelegate;
 	private final RelationshipNoteCategoryDesignatorDelegate
-	relationshipNoteCategoryDesignatorDelegate;
+		relationshipNoteCategoryDesignatorDelegate;
+	private final OffenderDelegate offenderDelegate;
+	private final FamilyAssociationDelegate familyAssociationDelegate;
+	private final VictimNoteDelegate victimNoteDelegate;
+	private final VictimAssociationDelegate victimAssociationDelegate;
+	private final VisitationAssociationDelegate visitationAssociationDelegate;
 	
 	/**
 	 * Instantiates implementation of service to update offender relations.
@@ -123,6 +133,11 @@ public class UpdateOffenderRelationServiceImpl
 	 * @param relationshipNoteDelegate delegate for relationship notes
 	 * @param relationshipNoteCategoryDesignatorDelegate delegate for
 	 * relationship note category designators
+	 * @param offenderDelegate delegate for offenders
+	 * @param familyAssociationDelegate delegate for family associations
+	 * @param victimNoteDelegate delegate for victim notes
+	 * @param victimAssociationDelegate delegate for victim associations
+	 * @param visitationAssociationDelegate delegate for visitation associations
 	 */
 	public UpdateOffenderRelationServiceImpl(
 			final AddressDelegate addressDelegate,
@@ -142,7 +157,12 @@ public class UpdateOffenderRelationServiceImpl
 			final RelationshipDelegate relationshipDelegate,
 			final RelationshipNoteDelegate relationshipNoteDelegate,
 			final RelationshipNoteCategoryDesignatorDelegate
-			relationshipNoteCategoryDesignatorDelegate) {
+			relationshipNoteCategoryDesignatorDelegate,
+			final OffenderDelegate offenderDelegate,
+			final FamilyAssociationDelegate familyAssociationDelegate,
+			final VictimNoteDelegate victimNoteDelegate,
+			final VictimAssociationDelegate victimAssociationDelegate,
+			final VisitationAssociationDelegate visitationAssociationDelegate) {
 		this.addressDelegate = addressDelegate;
 		this.personDelegate = personDelegate;
 		this.personIdentityDelegate = personIdentityDelegate;
@@ -161,6 +181,11 @@ public class UpdateOffenderRelationServiceImpl
 		this.relationshipNoteDelegate = relationshipNoteDelegate;
 		this.relationshipNoteCategoryDesignatorDelegate
 				= relationshipNoteCategoryDesignatorDelegate;
+		this.offenderDelegate = offenderDelegate;
+		this.familyAssociationDelegate = familyAssociationDelegate;
+		this.victimNoteDelegate = victimNoteDelegate;
+		this.victimAssociationDelegate = victimAssociationDelegate;
+		this.visitationAssociationDelegate = visitationAssociationDelegate;
 	}
 	
 	/** {@inheritDoc} */
@@ -173,20 +198,21 @@ public class UpdateOffenderRelationServiceImpl
 		final Boolean deceased, final Date deathDate) 
 		throws PersonNameExistsException,
 		PersonIdentityExistsException {
+		this.checkIfRelationIsOffender(person);
 		Person updatedPerson = this.personDelegate.update(
 				person, lastName, firstName, middleName, suffix);
-		if(person.getIdentity()!=null){
+		if (person.getIdentity() != null) {
 			this.personIdentityDelegate.update(person.getIdentity(), sex, 
 				birthDate,	birthCountry, birthState, birthCity, 
 				socialSecurityNumber, stateId, deceased, deathDate);
-		}
-		else {
-			if(sex!=null || birthDate!=null || birthCountry!=null || 
-				birthState!=null || birthCity!=null || 
-				socialSecurityNumber!=null || stateId!=null || deceased!=null
-				|| deathDate!=null ){
+		} else {
+			if (sex != null || birthDate != null || birthCountry != null 
+					|| birthState != null || birthCity != null 
+					|| socialSecurityNumber != null || stateId != null 
+				|| deceased != null || deathDate != null) {
 				PersonIdentity identity = this.personIdentityDelegate.create(
-					person, sex, birthDate, birthCountry, birthState, birthCity, 
+					person, sex, birthDate, birthCountry, birthState, 
+					birthCity, 
 					socialSecurityNumber, stateId, deceased, deathDate);
 				person.setIdentity(identity);
 			}
@@ -196,7 +222,38 @@ public class UpdateOffenderRelationServiceImpl
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<Suffix> findNameSuffixes(){
+	public Person updateRelationWithoutSsn(final Person person, final String lastName, 
+		final String firstName,	final String middleName, final String suffix, 
+		final Sex sex, final Date birthDate, final Country birthCountry,
+		final State birthState, final City birthCity, final String stateId, 
+		final Boolean deceased, final Date deathDate) 
+		throws PersonNameExistsException,
+		PersonIdentityExistsException {
+		Person updatedPerson = this.personDelegate.update(
+				person, lastName, firstName, middleName, suffix);
+		this.checkIfRelationIsOffender(person);
+		if (person.getIdentity() != null) {
+			this.personIdentityDelegate.update(person.getIdentity(), sex, 
+				birthDate,	birthCountry, birthState, birthCity, 
+				person.getIdentity().getSocialSecurityNumber(), 
+				stateId, deceased, deathDate);
+		} else {
+			if (sex != null || birthDate != null || birthCountry != null 
+					|| birthState != null || birthCity != null 
+					|| stateId != null || deceased != null || deathDate != null) {
+				PersonIdentity identity = this.personIdentityDelegate.create(
+					person, sex, birthDate, birthCountry, birthState, 
+					birthCity, 
+					null, stateId, deceased, deathDate);
+				person.setIdentity(identity);
+			}
+		}
+		return updatedPerson;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<Suffix> findNameSuffixes() {
 		return this.suffixDelegate.findAll();
 	}
 	
@@ -209,6 +266,7 @@ public class UpdateOffenderRelationServiceImpl
 	}
 
 	/** {@inheritDoc} */
+	@SuppressWarnings("deprecation")
 	@Override
 	public List<Address> findAddresses(String addressQuery) {
 		return this.addressDelegate.findAddressesByValue(addressQuery);
@@ -264,7 +322,8 @@ public class UpdateOffenderRelationServiceImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public City createCity(final String name, final State state, final Country country) 
+	public City createCity(final String name, final State state, 
+			final Country country) 
 		throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
@@ -272,7 +331,7 @@ public class UpdateOffenderRelationServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public ZipCode createZipCode(final String value, final String extension, 
-		final City city) throws ZipCodeExistsException{
+		final City city) throws ZipCodeExistsException {
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 	
@@ -295,24 +354,24 @@ public class UpdateOffenderRelationServiceImpl
 	@Override
 	public Address findMailingAddress(final Person relation) {
 		Contact contact = this.contactDelegate.find(relation);
-		if(contact != null){
+		if (contact != null) {
 			Address address = contact.getMailingAddress();
 			return address;
-		}
-		else 
+		} else {
 			return null;
+		}
 	}
 	
 	/** {@inheritDoc} */
 	@Override
 	public PoBox findPoBox(final Person relation) {
 		Contact contact = this.contactDelegate.find(relation);
-		if(contact != null){
+		if (contact != null) {
 			PoBox poBox = contact.getPoBox();
 			return poBox;
-		}
-		else 
+		} else  {
 			return null;
+		}
 	}
 	
 	/** {@inheritDoc} */
@@ -344,7 +403,7 @@ public class UpdateOffenderRelationServiceImpl
 	@Override
 	public TelephoneNumber updateTelephoneNumber(
 		final TelephoneNumber telephoneNumber, final Long value, 
-		final Integer extension, final Boolean primary, Boolean active, 
+		final Integer extension, final Boolean primary, final Boolean active, 
 		final TelephoneNumberCategory category)
 		throws TelephoneNumberExistsException {
 		return this.telephoneNumberDelegate.update(telephoneNumber, value, 
@@ -364,8 +423,8 @@ public class UpdateOffenderRelationServiceImpl
 		final Boolean active) 
 		throws OnlineAccountExistsException {
 		Contact contact = this.contactDelegate.find(relation);
-		return this.onlineAccountDelegate.create(contact, name, active, primary, 
-			host); 
+		return this.onlineAccountDelegate.create(contact, name, 
+				active, primary, host); 
 	}
 	
 	/** {@inheritDoc} */
@@ -398,8 +457,15 @@ public class UpdateOffenderRelationServiceImpl
 	
 	/** {@inheritDoc} */
 	@Override
-	public void removeRelationship(final Offender offender, final Person relation) {
-		Relationship relationship = this.relationshipDelegate.find(offender, relation);
+	public void removeRelationship(final Offender offender, 
+			final Person relation) {
+		Relationship relationship = this.relationshipDelegate.find(offender, 
+				relation);
+		this.familyAssociationDelegate.removeByRelationship(relationship);
+		this.victimNoteDelegate.removeByRelationship(relationship);
+		this.victimAssociationDelegate.removeByRelationship(relationship);
+		this.visitationAssociationDelegate.removeByRelationship(relationship);
+		this.relationshipNoteDelegate.removeByRelationship(relationship);
 		this.relationshipDelegate.remove(relationship);
 	}
 	
@@ -456,5 +522,15 @@ public class UpdateOffenderRelationServiceImpl
 	@Override
 	public List<RelationshipNote> findNotes(final Relationship relationship) {
 		return this.relationshipNoteDelegate.findByRelationship(relationship);
+	}
+	
+	/* Helper methods. */
+	
+	// Throws exception if relation is an offender
+	private void checkIfRelationIsOffender(final Person relation) {
+		if (this.offenderDelegate.isOffender(relation)) {
+			throw new IllegalArgumentException(
+					"Cannot update if relation is an offender");
+		}
 	}
 }

@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <!-- 
   - Task configuration.
   -
   - Author: Stephen Abson
+  - Author: Annie Wahl
+  - Author: Josh Divine
+  - Version: 0.1.7 (Sep 19, 2018)
+  - Since: OMIS 3.0
   -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
@@ -18,6 +39,9 @@
 
 	<bean id="taskInvocationService" class="omis.task.service.impl.TaskInvocationServiceImpl">
 		<constructor-arg name="taskParameterValueDelegate" ref="taskParameterValueDelegate"/>
+		<constructor-arg name="taskAssignmentDelegate" ref="taskAssignmentDelegate"/>
+		<constructor-arg name="taskDelegate" ref="taskDelegate"/>
+		<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
 	</bean>
 	
 	<!-- Report services -->

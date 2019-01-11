@@ -18,10 +18,7 @@
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/colors.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/fonts.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/application/style/layout.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
-		
-		<script src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js" type="text/javascript"></script>
+		<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
   	    <script src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js" type="text/javascript"></script>
 		<script src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js" type="text/javascript"></script>
 		<script src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.lookup.offenderSearch.js"></script>

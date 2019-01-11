@@ -1,17 +1,35 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.violationevent.web.form;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import omis.facility.domain.Unit;
 import omis.supervision.domain.SupervisoryOrganization;
 
 /**
- * ViolationEventForm.java
+ * Violation event form.
  * 
- *@author Annie Jacques 
- *@version 0.1.1 (Aug 3, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.2 (May 23, 2018)
+ * @since OMIS 3.0
  */
 public class ViolationEventForm {
 	
@@ -23,23 +41,29 @@ public class ViolationEventForm {
 	
 	private String eventDetails;
 	
-	private List<DisciplinaryCodeViolationItem> disciplinaryCodeViolationItems;
+	private Unit unit;
 	
-	private List<ConditionViolationItem> conditionViolationItems;
+	private List<DisciplinaryCodeViolationItem> disciplinaryCodeViolationItems =
+			new ArrayList<DisciplinaryCodeViolationItem>();;
 	
-	private List<ViolationEventNoteItem> violationEventNoteItems;
+	private List<ConditionViolationItem> conditionViolationItems =
+			new ArrayList<ConditionViolationItem>();
 	
-	private List<ViolationEventDocumentItem> violationEventDocumentItems;
+	private List<ViolationEventNoteItem> violationEventNoteItems =
+			new ArrayList<ViolationEventNoteItem>();
+	
+	private List<ViolationEventDocumentItem> violationEventDocumentItems =
+			new ArrayList<ViolationEventDocumentItem>();
 	
 	/**
-	 * Default Constructor for ViolationEventForm 
+	 * Default Constructor for ViolationEventForm.
 	 */
 	public ViolationEventForm() {
 	}
 
 	
 	/**
-	 * Returns the jurisdiction
+	 * Returns the jurisdiction.
 	 * @return jurisdiction - SupervisoryOrganization
 	 */
 	public SupervisoryOrganization getJurisdiction() {
@@ -47,7 +71,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the jurisdiction
+	 * Sets the jurisdiction.
 	 * @param jurisdiction - SupervisoryOrganization
 	 */
 	public void setJurisdiction(final SupervisoryOrganization jurisdiction) {
@@ -55,7 +79,27 @@ public class ViolationEventForm {
 	}
 	
 	/**
-	 * Returns the jurisdictionFilter
+	 * Returns the unit.
+	 *
+	 * @return unit
+	 */
+	public Unit getUnit() {
+		return unit;
+	}
+
+
+	/**
+	 * Sets the unit.
+	 *
+	 * @param unit unit
+	 */
+	public void setUnit(final Unit unit) {
+		this.unit = unit;
+	}
+
+
+	/**
+	 * Returns the jurisdictionFilter.
 	 * @return jurisdictionFilter - JurisdictionFilter
 	 */
 	public JurisdictionFilter getJurisdictionFilter() {
@@ -63,7 +107,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the jurisdictionFilter
+	 * Sets the jurisdictionFilter.
 	 * @param jurisdictionFilter - JurisdictionFilter
 	 */
 	public void setJurisdictionFilter(
@@ -72,7 +116,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Returns the eventDate
+	 * Returns the eventDate.
 	 * @return eventDate - Date
 	 */
 	public Date getEventDate() {
@@ -80,7 +124,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the eventDate
+	 * Sets the eventDate.
 	 * @param eventDate - Date
 	 */
 	public void setEventDate(final Date eventDate) {
@@ -88,7 +132,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Returns the eventDetails
+	 * Returns the eventDetails.
 	 * @return eventDetails - String
 	 */
 	public String getEventDetails() {
@@ -96,7 +140,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the eventDetails
+	 * Sets the eventDetails.
 	 * @param eventDetails - String
 	 */
 	public void setEventDetails(final String eventDetails) {
@@ -104,16 +148,17 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Returns the disciplinaryCodeViolationItems
+	 * Returns the disciplinaryCodeViolationItems.
 	 * @return disciplinaryCodeViolationItems -
 	 * 	 List<DisciplinaryCodeViolationItem>
 	 */
-	public List<DisciplinaryCodeViolationItem> getDisciplinaryCodeViolationItems() {
+	public List<DisciplinaryCodeViolationItem>
+			getDisciplinaryCodeViolationItems() {
 		return disciplinaryCodeViolationItems;
 	}
 
 	/**
-	 * Sets the disciplinaryCodeViolationItems
+	 * Sets the disciplinaryCodeViolationItems.
 	 * @param disciplinaryCodeViolationItems -
 	 * 	 List<DisciplinaryCodeViolationItem>
 	 */
@@ -124,7 +169,7 @@ public class ViolationEventForm {
 	}
 	
 	/**
-	 * Returns the conditionViolationItems
+	 * Returns the conditionViolationItems.
 	 * @return conditionViolationItems - List<ConditionViolationItem>
 	 */
 	public List<ConditionViolationItem> getConditionViolationItems() {
@@ -132,7 +177,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the conditionViolationItems
+	 * Sets the conditionViolationItems.
 	 * @param conditionViolationItems - List<ConditionViolationItem>
 	 */
 	public void setConditionViolationItems(
@@ -141,7 +186,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Returns the violationEventNoteItems
+	 * Returns the violationEventNoteItems.
 	 * @return violationEventNoteItems - List<ViolationEventNoteItem>
 	 */
 	public List<ViolationEventNoteItem> getViolationEventNoteItems() {
@@ -149,7 +194,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the violationEventNoteItems
+	 * Sets the violationEventNoteItems.
 	 * @param violationEventNoteItems - List<ViolationEventNoteItem>
 	 */
 	public void setViolationEventNoteItems(final List<ViolationEventNoteItem>
@@ -158,7 +203,7 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Returns the violationEventDocumentItems
+	 * Returns the violationEventDocumentItems.
 	 * @return violationEventDocumentItems - List<ViolationEventDocumentItem>
 	 */
 	public List<ViolationEventDocumentItem> getViolationEventDocumentItems() {
@@ -166,11 +211,12 @@ public class ViolationEventForm {
 	}
 
 	/**
-	 * Sets the violationEventDocumentItems
+	 * Sets the violationEventDocumentItems.
 	 * @param violationEventDocumentItems - List<ViolationEventDocumentItem>
 	 */
 	public void setViolationEventDocumentItems(
-			final List<ViolationEventDocumentItem> violationEventDocumentItems) {
+			final List<ViolationEventDocumentItem>
+				violationEventDocumentItems) {
 		this.violationEventDocumentItems = violationEventDocumentItems;
 	}
 	

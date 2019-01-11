@@ -39,12 +39,12 @@ import omis.util.DateManipulator;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * PresentenceInvestigationTaskController.java
+ * Presentence investigation task controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jun 12, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/task")
@@ -256,7 +256,7 @@ public class PresentenceInvestigationTaskController {
 			else if(TaskItemOperation.UPDATE.equals(item.getTaskItemOperation())) {
 				this.presentenceInvestigationTaskService.updateTaskAssignment(
 						item.getTaskAssignment(), item.getAssignedDate(),
-						item.getAssigneeAccount());
+						item.getAssigneeAccount(), new Date());
 			}
 			else if(TaskItemOperation.REMOVE.equals(item.getTaskItemOperation())) {
 				this.presentenceInvestigationTaskService.removeTaskAssignment(
@@ -282,8 +282,7 @@ public class PresentenceInvestigationTaskController {
 				form.getTaskFields().getTaskAssignmentItems().size());
 		map.addAttribute(TASK_FIELDS_PROPERTY_NAME_MODEL_KEY, "taskFields");
 		this.offenderSummaryModelDelegate.add(map,
-				(Offender) presentenceInvestigationRequest.getDocket()
-				.getPerson());
+				(Offender) presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 		

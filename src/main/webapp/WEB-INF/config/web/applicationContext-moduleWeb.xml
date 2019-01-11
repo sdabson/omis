@@ -1,4 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
+  - Module web configuration file.
+  -
+  - Author: Stephen Abson
+  - Author: Ryan Johns
+  - Author: Joel Norris
+  - Author: Annie Wahl
+  - Author: Yidong Li
+  - Author: Trevor Isles
+  - Author: Sheronda Vaughn
+  - Author: Josh Divine
+  - Version: 0.1.0 (Aug 9, 2018)
+  - Since: OMIS 3.0
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
@@ -24,19 +55,27 @@
   
   <import resource="applicationContext-alertWeb.xml"/>
   
+  <import resource="applicationContext-assessmentWeb.xml"/>
+  
   <import resource="applicationContext-bedPlacementWeb.xml"/>
   
   <import resource="applicationContext-biographicAndContactSectionWeb.xml"/>
   
+  <import resource="applicationContext-boardConsiderationWeb.xml"/>
+  
   <import resource="applicationContext-boardHearingWeb.xml"/>
   
   <import resource="applicationContext-boardHearingDecisionWeb.xml"/>
+  
+  <import resource="applicationContext-boppWeb.xml"/>
   
   <import resource="applicationContext-cautionWeb.xml"/>
   
   <import resource="applicationContext-caseloadWeb.xml"/>
   
   <import resource="applicationContext-citationWeb.xml"/>
+  
+  <import resource="applicationContext-chronologicalNoteWeb.xml"/>
   
   <import resource="applicationContext-commitStatusWeb.xml"/>
   
@@ -54,7 +93,7 @@
   
   <import resource="applicationContext-courtCaseConditionWeb.xml"/>
   
-  <import resource="applicationContext-courtCaseDocumentWeb.xml"/>
+  <import resource="applicationContext-courtDocumentWeb.xml"/>
   
   <import resource="applicationContext-criminalAssociationWeb.xml"/>
   
@@ -102,6 +141,10 @@
   
   <import resource="applicationContext-mediaWeb.xml"/>
   
+  <import resource="applicationContext-medicalReviewWeb.xml"/>
+  
+  <import resource="applicationContext-mentalHealthReviewWeb.xml"/>
+  
   <import resource="applicationContext-militaryWeb.xml"/>
   
   <import resource="applicationContext-nocrWeb.xml"/>
@@ -128,9 +171,15 @@
   
   <import resource="applicationContext-paroleBoardItineraryWeb.xml"/>
   
+  <import resource="applicationContext-paroleBoardLocationWeb.xml"/>
+  
   <import resource="applicationContext-paroleBoardMemberWeb.xml"/>
   
   <import resource="applicationContext-paroleEligibilityWeb.xml"/>
+  
+  <import resource="applicationContext-parolePlanWeb.xml"/>
+  
+  <import resource="applicationContext-paroleReviewWeb.xml"/>
   
   <import resource="applicationContext-personFieldsWeb.xml"/>
   
@@ -145,6 +194,8 @@
   <import resource="applicationContext-presentenceInvestigationWeb.xml"/>
   
   <import resource="applicationContext-prisonTermWeb.xml"/>
+  
+  <import resource="applicationContext-probationParoleWeb.xml"/>
   
   <import resource="applicationContext-probationTermWeb.xml"/>
   
@@ -187,9 +238,9 @@
   <import resource="applicationContext-tierDesignationWeb.xml"/>
   
   <import resource="applicationContext-trackedDocumentWeb.xml"/>
-
-  <import resource="applicationContext-unitManagerReviewWeb.xml"/>
   
+  <import resource="applicationContext-travelPermitWeb.xml"/>
+
   <import resource="applicationContext-userWeb.xml"/>
   
   <import resource="applicationContext-userPreferenceWeb.xml"/>

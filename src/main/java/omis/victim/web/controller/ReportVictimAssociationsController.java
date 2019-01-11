@@ -21,6 +21,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
 import omis.beans.factory.PropertyEditorFactory;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
@@ -34,23 +47,12 @@ import omis.victim.report.VictimAssociationReportService;
 import omis.victim.report.VictimAssociationSummary;
 import omis.victim.web.controller.delegate.VictimSummaryModelDelegate;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-
 /**
  * Controller for listing victim associations.
  *
  * @author Stephen Abson
  * @author Sheronda Vaughn
+ * @author Sierra Haynes
  * @version 0.0.1 (Jun 3, 2015)
  * @since OMIS 3.0
  */
@@ -66,6 +68,11 @@ public class ReportVictimAssociationsController {
 
 	private static final String ACTION_MENU_VIEW_NAME
 		= "victim/association/includes/victimAssociationsActionMenu";
+	
+	private static final String 
+		VICTIM_ASSOCIATION_SEARCH_ROW_ACTION_MENU_VIEW_NAME
+			= "victim/association/includes"
+					+ "/victimAssociationSearchRowActionMenu";
 	
 	/* Model Keys */
 	
@@ -85,6 +92,9 @@ public class ReportVictimAssociationsController {
 		= "victimAssociationHasNotes";
 	
 	private static final String OFFENDER_YES_NO_MODEL_KEY = "offenderYesNo";
+	
+	private static final String VICTIM_ASSOCIATION_EXISTS_MODEL_KEY 
+		= "victimAssociationExists";
 	
 	/* Services */
 	
@@ -122,27 +132,36 @@ public class ReportVictimAssociationsController {
 		= "/Relationships/Victims/Victims_Listing";
 	
 	private static final String VICTIM_LISTING_LEGACY_REPORT_NAME 
-	= "/Relationships/Victims/Victim_Listing_Legacy";
+		= "/Relationships/Victims/Victim_Listing_Legacy";
 
-	private static final String VICTIM_DETAILS_REPORT_NAME 
-		= "/Relationships/Victims/Victims_Details";
+	private static final String VICTIM_PERS_DETAILS_REPORT_NAME 
+		= "/Relationships/Victims/Victim_Personal_Details";
 	
-	private static final String VICTIM_DETAILS_REDACTED_REPORT_NAME 
-		= "/Relationships/Victims/Victims_Details_Redacted";
+	private static final String VICTIM_PERS_DETAILS_REDACTED_REPORT_NAME 
+		= "/Relationships/Victims/Victim_Personal_Details_Redacted";
+	
+	private static final String VICTIM_ASSOC_DETAILS_REPORT_NAME 
+		= "/Relationships/Victims/Victim_Association_Details";
+
+    private static final String VICTIM_ASSOC_DETAILS_REDACTED_REPORT_NAME 
+		= "/Relationships/Victims/Victim_Association_Details_Redacted";	
 
 	private static final String VICTIM_IMPACT_REPORT_NAME 
-	    ="/Relationships/Victims/Victim_Impact_Statement";
+	    = "/Relationships/Victims/Victim_Impact_Statement";
 
     private static final String VICTIM_IMPACT_KID_REPORT_NAME 
-	    ="/Relationships/Victims/Victim_Impact_for_Kids";
+	    = "/Relationships/Victims/Victim_Impact_for_Kids";
+	
+	private static final String BOPP_VICTIM_NOTIFICATION_REPORT_NAME 
+		= "/Relationships/Victims/BOPP_Pending_Hearing_Victim_Notification";    
+	
+	private static final String BOPP_VICTIM_STATEMENT_REPORT_NAME 
+	= "/Relationships/Victims/BOPP_Victim_Witness_Statement";  
     
 	/* Report parameter names. */
 	
 	private static final String VICTIM_LISTING_ID_REPORT_PARAM_NAME 
 		= "DOC_ID";
-	
-	private static final String VICTIM_LISTING_LEGACY_ID_REPORT_PARAM_NAME 
-	= "DOC_ID";
 
 	private static final String VICTIM_DETAILS_ID_REPORT_PARAM_NAME 
 		= "VICTIM_ASSOC_ID";
@@ -240,7 +259,7 @@ public class ReportVictimAssociationsController {
 		mav.addObject(VICTIM_ASSOCIATION_MODEL_KEY, victimAssociation);
 		mav.addObject(REDIRECT_TARGET_MODEL_KEY, redirectTarget);
 		if (victimAssociation != null) {
-			if(this.victimAssociationReportService
+			if (this.victimAssociationReportService
 					.hasNotes(victimAssociation)) {
 				mav.addObject(HAS_NOTES_MODEL_KEY, true);
 			}
@@ -249,6 +268,36 @@ public class ReportVictimAssociationsController {
 						victimAssociation.getRelationship().getSecondPerson()));
 		}
 		return mav;
+	}
+	
+	/**
+	 * Model and view of victim association search row action menu.
+	 *
+	 *
+	 * @param offender offender
+	 * @param victim victim
+	 * @return model and view of action menu
+	 */
+	@RequestMapping(value = "victimAssociationSearchRowActionMenu.html", 
+			method = RequestMethod.GET)
+	public ModelAndView victimAssociationSearchRowActionMenu(
+		@RequestParam(value = "offender", required = true)
+		final Offender offender,
+		@RequestParam(value = "victim", required = true)
+		final Person victim) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_YES_NO_MODEL_KEY, 
+			this.victimAssociationReportService.isOffender(victim));
+		map.addAttribute(OFFENDER_MODEL_KEY,  offender);	
+		map.addAttribute(VICTIM_MODEL_KEY, victim);
+		map.addAttribute(VICTIM_ASSOCIATION_EXISTS_MODEL_KEY, 
+			this.victimAssociationReportService
+			.victimAssociationExists(offender, victim));
+		map.addAttribute(VICTIM_ASSOCIATION_MODEL_KEY, 
+			this.victimAssociationReportService
+			.findVictimAssociation(offender, victim));
+		return new ModelAndView(
+				VICTIM_ASSOCIATION_SEARCH_ROW_ACTION_MENU_VIEW_NAME, map);
 	}
 	
 	/* Reports. */
@@ -279,6 +328,31 @@ public class ReportVictimAssociationsController {
 	}
 	
 	/**
+	 * Returns the bopp victim statement for the specified offenders victims.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/bOPPVictimStatementReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportBOPPVictimStatement(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VICTIM_LISTING_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getOffenderNumber()));
+		byte[] doc = this.reportRunner.runReport(
+				BOPP_VICTIM_STATEMENT_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
 	 * Returns the legacy report for the specified offenders victims.
 	 * 
 	 * @param offender offender
@@ -294,10 +368,36 @@ public class ReportVictimAssociationsController {
 			@RequestParam(value = "reportFormat", required = true)
 			final ReportFormat reportFormat) {
 		Map<String, String> reportParamMap = new HashMap<String, String>();
-		reportParamMap.put(VICTIM_LISTING_LEGACY_ID_REPORT_PARAM_NAME,
+		reportParamMap.put(VICTIM_LISTING_ID_REPORT_PARAM_NAME,
 				Long.toString(offender.getOffenderNumber()));
 		byte[] doc = this.reportRunner.runReport(
 				VICTIM_LISTING_LEGACY_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	
+	/**
+	 * Returns the bopp notification report for the specified offenders victims.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/boppVictimNotificationReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportBoppVictimNotification(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VICTIM_LISTING_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getOffenderNumber()));
+		byte[] doc = this.reportRunner.runReport(
+				BOPP_VICTIM_NOTIFICATION_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
@@ -323,7 +423,7 @@ public class ReportVictimAssociationsController {
 		reportParamMap.put(VICTIM_DETAILS_ID_REPORT_PARAM_NAME,
 				Long.toString(victimAssociation.getId()));
 		byte[] doc = this.reportRunner.runReport(
-				VICTIM_DETAILS_REPORT_NAME,
+				VICTIM_PERS_DETAILS_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
@@ -348,20 +448,73 @@ public class ReportVictimAssociationsController {
 		reportParamMap.put(VICTIM_DETAILS_ID_REPORT_PARAM_NAME,
 				Long.toString(victimAssociation.getId()));
 		byte[] doc = this.reportRunner.runReport(
-				VICTIM_DETAILS_REDACTED_REPORT_NAME,
+				VICTIM_PERS_DETAILS_REDACTED_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
 	}
+	
 	/**
-	 * Returns the victim impact statement
-	 * @param reportFormat
-	 * @return
+	 * Returns the report for the specified victim association.
+	 * 
+	 * @param victimAssociation victim association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/victimAssocDetailsReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("(hasRole('VICTIM_ASSOCIATION_VIEW') and "
+			+ "hasRole('OFFENDER_SSN_VIEW')) or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportVictimAssocDetails(@RequestParam(
+			value = "victimAssociation", required = true)
+			final VictimAssociation victimAssociation,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VICTIM_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(victimAssociation.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				VICTIM_ASSOC_DETAILS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+
+	/**
+	 * Returns the redacted report for the specified victim association.
+	 * 
+	 * @param victimAssociation victim association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/victimAssocDetailsRedactedReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportVictimAssocDetailsRedacted(
+			@RequestParam(value = "victimAssociation", required = true)
+			final VictimAssociation victimAssociation,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(VICTIM_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(victimAssociation.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				VICTIM_ASSOC_DETAILS_REDACTED_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the victim impact statement.
+	 * @param reportFormat report format
+	 * @return statement
 	 */
 	@RequestMapping(value = "/victimImpactStatementReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportVictimImpactStatement(@RequestParam(value = "reportFormat", required = true)
+	public ResponseEntity<byte []> reportVictimImpactStatement(
+			@RequestParam(value = "reportFormat", required = true)
 			final ReportFormat reportFormat) {
 		Map<String, String> reportParamMap = new HashMap<String, String>();
 		byte[] doc = this.reportRunner.runReport(
@@ -370,16 +523,18 @@ public class ReportVictimAssociationsController {
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
 	}
+	
 	/**
-	 * Returns the victim impact statement for kids
-	 * @param reportFormat
-	 * @return
+	 * Returns the victim impact statement for kids.
+	 * @param reportFormat report format
+	 * @return kids statement
 	 */
 	@RequestMapping(value = "/victimImpactStatementKidReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('VICTIM_ASSOCIATION_VIEW') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportVictimImpactStatementKids(@RequestParam(value = "reportFormat", required = true)
-			final ReportFormat reportFormat){
+	public ResponseEntity<byte []> reportVictimImpactStatementKids(
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
 		Map<String, String> reportParamMap = new HashMap<String, String>();
 		byte[] doc = this.reportRunner.runReport(
 				VICTIM_IMPACT_KID_REPORT_NAME,

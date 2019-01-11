@@ -21,4 +21,9 @@
 	  from omis.health.domain.InternalReferralReason reason
 	  order by reason.sortOrder, reason.name
 	</query>
+	<query name="findExistingInternalReferralReasons">
+	  select reason
+	  from omis.health.domain.InternalReferralReason reason
+	  where reason.name = :name
+	</query>
 </hibernate-mapping>

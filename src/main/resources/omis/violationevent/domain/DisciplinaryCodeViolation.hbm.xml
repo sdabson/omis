@@ -14,6 +14,7 @@
 			</id>
 			<many-to-one name="disciplinaryCode" column="`DISCIPLINARY_CODE_ID`" entity-name="omis.disciplinaryCode.domain.DisciplinaryCode" not-null="true" />
 			<many-to-one name="violationEvent" column="`VIOLATION_EVENT_ID`" entity-name="omis.violationevent.domain.ViolationEvent" not-null="true" />
+			<property name="details" column="`DETAILS`" type="java.lang.String" not-null="false" />
 			<component name="creationSignature">
 				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
 				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
@@ -31,6 +32,9 @@
 			disciplinaryCodeViolation.disciplinaryCode = :disciplinaryCode
 		and
 			disciplinaryCodeViolation.violationEvent = :violationEvent
+		and
+			(disciplinaryCodeViolation.details = :details
+			or (disciplinaryCodeViolation.details is null and :details is null))
 	]]></query>
 	<query name="findDisciplinaryCodeViolationExcluding"><![CDATA[
 		select disciplinaryCodeViolation
@@ -40,6 +44,9 @@
 			disciplinaryCodeViolation.disciplinaryCode = :disciplinaryCode
 		and
 			disciplinaryCodeViolation.violationEvent = :violationEvent
+		and
+			(disciplinaryCodeViolation.details = :details
+			or (disciplinaryCodeViolation.details is null and :details is null))
 		and
 			disciplinaryCodeViolation != :disciplinaryCodeViolation
 	]]></query>

@@ -14,7 +14,7 @@
 		<fmt:message var="noPhotoLabel" key="noPhotoFoundLabel"/>
 		<div class="inlineBlock"><img src="#" data-src="${pageContext.request.contextPath}/offenderPhoto/displayProfilePhoto.html?offender=${offender.personId}&amp;contentType=image/jpeg" class="profileImage viewable" alt="${noPhotoLabel}"/></div>
 		<div class="inlineBlock">
-		<c:out value="${offender.lastName},"/><c:out value=" ${offender.firstName} "/><c:if test="${not empty offender.middleName}"><c:out value="${fn:substring(offender.middleName, 0,1)}. "/></c:if><c:if test="${not empty offender.suffixName}"> <c:out value="${offender.suffixName} "/></c:if><c:out value="#${offender.offenderNumber}"/>
+		<c:out value="${offender.lastName},"/><c:out value=" ${offender.firstName} "/><c:if test="${not empty offender.middleName}"><c:out value="${offender.middleName} "/></c:if><c:if test="${not empty offender.suffixName}"> <c:out value="${offender.suffixName} "/></c:if><c:out value="#${offender.offenderNumber}"/>
 		<div>
 		<a class="offenderProfileLink newTab" href="${pageContext.request.contextPath}/offender/profile.html?offender=${offender.personId}"></a>
 		</div>

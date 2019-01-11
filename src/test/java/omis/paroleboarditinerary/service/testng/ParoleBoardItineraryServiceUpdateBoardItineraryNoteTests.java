@@ -20,11 +20,11 @@ import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.domain.ParoleBoardItineraryNote;
-import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryNoteDelegate;
-import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
+import omis.paroleboardlocation.domain.ParoleBoardLocation;
+import omis.paroleboardlocation.service.delegate.ParoleBoardLocationDelegate;
 import omis.region.domain.City;
 import omis.region.service.delegate.CityDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
@@ -34,7 +34,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to update parole board itinerary notes.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.1 (Apr 18, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryServiceUpdateBoardItineraryNoteTests
@@ -110,7 +110,7 @@ public class ParoleBoardItineraryServiceUpdateBoardItineraryNoteTests
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
+				.create(paroleBoardLocation, true, startDate, endDate);
 		String description = "Description";
 		Date date = this.parseDateText("01/05/2017");
 		ParoleBoardItineraryNote itineraryNote = this
@@ -154,7 +154,7 @@ public class ParoleBoardItineraryServiceUpdateBoardItineraryNoteTests
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
+				.create(paroleBoardLocation, true, startDate, endDate);
 		String description = "Description";
 		Date date = this.parseDateText("01/05/2017");
 		ParoleBoardItineraryNote itineraryNote = this
@@ -198,7 +198,7 @@ public class ParoleBoardItineraryServiceUpdateBoardItineraryNoteTests
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
+				.create(paroleBoardLocation, true, startDate, endDate);
 		String description = "Description";
 		Date date = this.parseDateText("01/05/2017");
 		this.paroleBoardItineraryNoteDelegate.create(boardItinerary, 

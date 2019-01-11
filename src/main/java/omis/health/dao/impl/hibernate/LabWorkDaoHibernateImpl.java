@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/ 
 package omis.health.dao.impl.hibernate;
 
 import java.util.Date;
@@ -20,7 +37,7 @@ import org.hibernate.SessionFactory;
  * 
  * @author Joel Norris
  * @author Yidong Li
- * @version 0.1.0 (May 5, 2014)
+ * @version 0.1.0 (Nov. 8, 2018)
  * @since OMIS 3.0
  */
 public class LabWorkDaoHibernateImpl 
@@ -57,6 +74,8 @@ public class LabWorkDaoHibernateImpl
 	private static final String SAMPLE_MUST_BE_TAKEN_PARAMETER_NAME 
 		= "sampleMustBeTaken";
 	
+	private static final String OFFENDER_APPOINTMENT_ASSO_PARAMETER_NAME = "offenderAppointmentAssociation";
+	
 	/* Query names. */
 	
 	private static final String 
@@ -88,6 +107,9 @@ public class LabWorkDaoHibernateImpl
 	
 	private static final String FIND_IMCOMPLETE_LAB_WORKS_BY_FACILITY_QUERY_NAME
 		="findIncompleteLabWorkByFacility";
+	
+	private static final String FIND_EXISTING_LAB_WORK_QUERY_NAME
+		= "findExistingLabWork";
 	
 	/**
 	 * Instantiates an instance of lab work DAO with the specified session
@@ -261,5 +283,18 @@ public class LabWorkDaoHibernateImpl
 		.setParameter(SAMPLE_MUST_BE_TAKEN_PARAMETER_NAME, sampleMustBeTaken)
 		.list();
 		return labWorks;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public LabWork findExisting(final OffenderAppointmentAssociation
+			offenderAppointmentAssociation) {
+		LabWork labWork = (LabWork) this.getSessionFactory()
+			.getCurrentSession()
+			.getNamedQuery(FIND_EXISTING_LAB_WORK_QUERY_NAME)
+			.setParameter(OFFENDER_APPOINTMENT_ASSO_PARAMETER_NAME, offenderAppointmentAssociation)
+			.setReadOnly(true)
+			.uniqueResult();
+		return labWork;
 	}
 }

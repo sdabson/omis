@@ -34,7 +34,7 @@
 		</li>
 		</c:if>
 	</sec:authorize>
-	<sec:authorize access="hasRole('SUPERVISION_PROFILE_VIEW') or hasRole('ADMIN')">
+	<sec:authorize access="hasRole('DISABLED') and (hasRole('SUPERVISION_PROFILE_VIEW') or hasRole('ADMIN'))">
 		<c:if test="${not empty offender}">
 		<li>
 			<a class="supervisionProfileLink" href="${pageContext.request.contextPath}/supervision/profile.html?offender=${offender.id}"><span class="visibleLinkLabel"><fmt:message key="supervisionProfileHeader" bundle="${profileBundle}"/></span></a>

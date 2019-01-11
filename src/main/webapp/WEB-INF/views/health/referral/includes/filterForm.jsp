@@ -85,4 +85,43 @@
 		<button type="submit" name="searchType" value="REFERRAL"><fmt:message key="searchLabel" bundle="${commonBundle}"/></button>
 	</p>
 </div>
+<br>
+<br>
+<br>
+<div>
+	<c:if test="${enableSearchResultCountLimit && not empty exceededSearchResultType}">
+		<c:choose>
+			<c:when test="${exceededSearchResultType eq 'AUTHORIZED_REFERRAL_REQUEST'}">
+				<fmt:message key="warningMessageLabelAR" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+			<c:when test="${exceededSearchResultType eq 'EXTERNAL_REFERRAL_REQUEST'}">
+				<fmt:message key="warningMessageLabelER" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+			<c:when test="${exceededSearchResultType eq 'HEALTH_REQUEST'}">
+				<fmt:message key="warningMessageLabelH" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+			<c:when test="${exceededSearchResultType eq 'INTERNAL_REFERRAL_REQUEST'}">
+				<fmt:message key="warningMessageLabelIR" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+			<c:when test="${exceededSearchResultType eq 'PENDING_REFERRAL_AUTHORIZATION_REQUEST'}">
+				<fmt:message key="warningMessageLabelPRA" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+			<c:when test="${exceededSearchResultType eq 'REFERRAL_REQUEST'}">
+				<fmt:message key="warningMessageLabelR" bundle="${healthBundle}">
+					<fmt:param value="${countLimit}"/>
+				</fmt:message>
+			</c:when>
+		</c:choose>
+	</c:if>
+</div>
 </form>

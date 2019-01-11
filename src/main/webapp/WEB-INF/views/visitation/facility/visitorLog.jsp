@@ -14,10 +14,8 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"> </script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"> </script>
+<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
+<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/visitation/scripts/visitorLog.js"> </script>
 	<title>
 		<fmt:message key="facilityVisitationLogHeader">

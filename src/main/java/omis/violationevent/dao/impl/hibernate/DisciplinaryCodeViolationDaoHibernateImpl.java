@@ -1,9 +1,7 @@
 package omis.violationevent.dao.impl.hibernate;
 
 import java.util.List;
-
 import org.hibernate.SessionFactory;
-
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.disciplinaryCode.domain.DisciplinaryCode;
 import omis.violationevent.dao.DisciplinaryCodeViolationDao;
@@ -11,10 +9,10 @@ import omis.violationevent.domain.DisciplinaryCodeViolation;
 import omis.violationevent.domain.ViolationEvent;
 
 /**
- * DisciplinaryCodeViolationDaoHibernateImpl.java
+ * Disciplinary Code Violation Dao Hibernate Implementation.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jan 17, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Jul 26, 2018)
  *@since OMIS 3.0
  *
  */
@@ -37,15 +35,15 @@ public class DisciplinaryCodeViolationDaoHibernateImpl
 			"findDisciplinaryCodeViolationsByViolationEvent";
 	
 	private static final String
-	FIND_UNRESOLVED_DISCIPLINARY_CODE_VIOLATIONS_BY_VIOLATION_EVENT_QUERY_NAME =
-		"findUnresolvedDisciplinaryCodeViolationsByViolationEvent";
-	
-	
+	FIND_UNRESOLVED_DISCIPLINARY_CODE_VIOLATIONS_BY_VIOLATION_EVENT_QUERY_NAME
+		= "findUnresolvedDisciplinaryCodeViolationsByViolationEvent";
 	
 	private static final String DISCIPLINARY_CODE_PARAM_NAME =
 			"disciplinaryCode";
 	
 	private static final String VIOLATION_EVENT_PARAM_NAME = "violationEvent";
+	
+	private static final String DETAILS_PARAM_NAME = "details";
 	
 	private static final String DISCIPLINARY_CODE_VIOLATION_PARAM_NAME =
 			"disciplinaryCodeViolation";
@@ -53,8 +51,8 @@ public class DisciplinaryCodeViolationDaoHibernateImpl
 	
 	
 	/**
-	 * @param sessionFactory
-	 * @param entityName
+	 * @param sessionFactory - session factory
+	 * @param entityName - entity name
 	 */
 	protected DisciplinaryCodeViolationDaoHibernateImpl(
 			final SessionFactory sessionFactory, final String entityName) {
@@ -65,13 +63,14 @@ public class DisciplinaryCodeViolationDaoHibernateImpl
 	@Override
 	public DisciplinaryCodeViolation find(
 			final DisciplinaryCode disciplinaryCode,
-			final ViolationEvent violationEvent) {
+			final ViolationEvent violationEvent, final String details) {
 		DisciplinaryCodeViolation disciplinaryCodeViolation =
 				(DisciplinaryCodeViolation) this.getSessionFactory()
 				.getCurrentSession()
 				.getNamedQuery(FIND_DISCIPLINARY_CODE_VIOLATION_QUERY_NAME)
 				.setParameter(DISCIPLINARY_CODE_PARAM_NAME, disciplinaryCode)
 				.setParameter(VIOLATION_EVENT_PARAM_NAME, violationEvent)
+				.setParameter(DETAILS_PARAM_NAME, details)
 				.uniqueResult();
 		
 		return disciplinaryCodeViolation;
@@ -82,7 +81,7 @@ public class DisciplinaryCodeViolationDaoHibernateImpl
 	public DisciplinaryCodeViolation findExcluding(
 			final DisciplinaryCodeViolation excludedDisciplinaryCodeViolation,
 			final DisciplinaryCode disciplinaryCode,
-			final ViolationEvent violationEvent) {
+			final ViolationEvent violationEvent, final String details) {
 		DisciplinaryCodeViolation disciplinaryCodeViolation =
 				(DisciplinaryCodeViolation) this.getSessionFactory()
 				.getCurrentSession()
@@ -90,6 +89,7 @@ public class DisciplinaryCodeViolationDaoHibernateImpl
 						FIND_DISCIPLINARY_CODE_VIOLATION_EXCLUDING_QUERY_NAME)
 				.setParameter(DISCIPLINARY_CODE_PARAM_NAME, disciplinaryCode)
 				.setParameter(VIOLATION_EVENT_PARAM_NAME, violationEvent)
+				.setParameter(DETAILS_PARAM_NAME, details)
 				.setParameter(DISCIPLINARY_CODE_VIOLATION_PARAM_NAME,
 						excludedDisciplinaryCodeViolation)
 				.uniqueResult();

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.service.delegate;
 
 import java.util.Date;
@@ -7,12 +24,12 @@ import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.locationterm.dao.LocationReasonTermDao;
 import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
 import omis.locationterm.domain.LocationTerm;
+import omis.locationterm.exception.LocationReasonTermExistsException;
 import omis.offender.domain.Offender;
 
 /**
@@ -64,17 +81,17 @@ public class LocationReasonTermDelegate {
 	 * @param dateRange date range
 	 * @param reason reason
 	 * @return created location reason term
-	 * @throws DuplicateEntityFoundException if location reason term exists
+	 * @throws LocationReasonTermExistsException if location reason term exists
 	 */
 	public LocationReasonTerm create(
 			final LocationTerm locationTerm, final DateRange dateRange,
 			final LocationReason reason)
-				throws DuplicateEntityFoundException {
+				throws LocationReasonTermExistsException {
 		if (this.locationReasonTermDao.find(
 				locationTerm.getOffender(), locationTerm,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new LocationReasonTermExistsException(
 					"Location reason term exists");
 		}
 		LocationReasonTerm reasonTerm = this.locationReasonTermInstanceFactory
@@ -99,19 +116,19 @@ public class LocationReasonTermDelegate {
 	 * @param dateRange date range
 	 * @param reason reason
 	 * @return updated location reason term
-	 * @throws DuplicateEntityFoundException if location reason term exists
+	 * @throws LocationReasonTermExistsException if location reason term exists
 	 */
 	public LocationReasonTerm update(
 			final LocationReasonTerm reasonTerm, final DateRange dateRange,
 			final LocationReason reason)
-				throws DuplicateEntityFoundException {
+				throws LocationReasonTermExistsException {
 		if (this.locationReasonTermDao.findExcluding(
 				reasonTerm.getOffender(),
 				reasonTerm.getLocationTerm(),
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange),
 				reasonTerm) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new LocationReasonTermExistsException(
 					"Location reason term exists");
 		}
 		reasonTerm.setDateRange(dateRange);
@@ -173,18 +190,18 @@ public class LocationReasonTermDelegate {
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return updated reason term
-	 * @throws DuplicateEntityFoundException if location reason term with
+	 * @throws LocationReasonTermExistsException if location reason term with
 	 * date rang exists for offender
 	 */
 	public LocationReasonTerm changeDateRange(
 			final LocationReasonTerm reasonTerm, final Date startDate,
 			final Date endDate)
-					throws DuplicateEntityFoundException {
+					throws LocationReasonTermExistsException {
 		if (this.locationReasonTermDao
 				.find(reasonTerm.getOffender(),
 					reasonTerm.getLocationTerm(),
 					startDate, endDate) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new LocationReasonTermExistsException(
 					"Location reason term exists");
 		}
 		reasonTerm.setDateRange(new DateRange(startDate, endDate));
@@ -309,6 +326,19 @@ public class LocationReasonTermDelegate {
 				startDate, endDate, excludedLocationReasonTerms);
 	}
 
+	/**
+	 * Returns reason term with start date.
+	 * 
+	 * @param locationTerm location term
+	 * @param startDate start date
+	 * @return reason term with start date
+	 */
+	public LocationReasonTerm findWithStartDate(
+			final LocationTerm locationTerm, final Date startDate) {
+		return this.locationReasonTermDao.findWithStartDate(
+				locationTerm, startDate);
+	}
+	
 	/**
 	 * Removes location reason terms by location term.
 	 * 

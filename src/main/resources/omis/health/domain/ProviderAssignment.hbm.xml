@@ -148,4 +148,11 @@
 	    and providerAssignment.contracted is false
 	    and providerAssignment.facility = :facility
 	]]></query>
+	<query name="findExistingProviderAssignment"><![CDATA[
+	  select providerAssignment
+	  from omis.health.domain.ProviderAssignment providerAssignment
+	  where providerAssignment.title = :title
+	    and providerAssignment.provider = :provider
+	    and providerAssignment.facility = :facility
+	]]></query>
 </hibernate-mapping>

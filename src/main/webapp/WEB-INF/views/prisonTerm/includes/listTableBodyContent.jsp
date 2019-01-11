@@ -16,6 +16,18 @@
 		<td><fmt:formatDate value="${prisonTerm.actionDate}" pattern="MM/dd/yyyy"/></td>
 		<td><fmt:formatDate value="${prisonTerm.paroleEligibilityDate}" pattern="MM/dd/yyyy"/></td>
 		<td><fmt:formatDate value="${prisonTerm.projectedDischargeDate}" pattern="MM/dd/yyyy"/></td>
+		<td><c:choose>
+				<c:when test="${paroleElgibilitySummary.sentenceToFollow}">
+					<fmt:message key="yesLabel" bundle="${commonBundle}"/>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="noLabel" bundle="${commonBundle}"/>
+				</c:otherwise>
+			</c:choose>
+		</td>
+		<td><c:if test="${not empty prisonTermSummary.verificationUserUsername}">
+			<c:out value="${prisonTermSummary.verificationUserLastName}, ${prisonTermSummary.verificationUserFirstName} (${prisonTermSummary.verificationUserUsername})"/></c:if></td>
+		<td><fmt:formatDate value="${prisonTerm.verificationDate}" pattern="MM/dd/yyyy"/></td>
 		<td><c:if test="${not empty prisonTerm.status}"><fmt:message key="prisonTermStatusLabel.${prisonTerm.status}"/></c:if></td>
 	</tr>
 </c:forEach>

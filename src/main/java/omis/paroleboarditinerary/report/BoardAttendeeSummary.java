@@ -23,15 +23,19 @@ public class BoardAttendeeSummary implements Serializable {
 	
 	private final String memberMiddleName;
 	
+	private final String staffTitle;
+	
 	private final AttendeeRoleCategory memberRole;
 	
 	public BoardAttendeeSummary(final Long id, final String memberLastName,
 			final String memberFirstName, final String memberMiddleName,
+			final String staffTitle,
 			final AttendeeRoleCategory memberRole) {
 		this.id = id;
 		this.memberLastName = memberLastName;
 		this.memberFirstName = memberFirstName;
 		this.memberMiddleName = memberMiddleName;
+		this.staffTitle = staffTitle;
 		this.memberRole = memberRole;
 	}
 
@@ -68,6 +72,14 @@ public class BoardAttendeeSummary implements Serializable {
 	 */
 	public String getMemberMiddleName() {
 		return memberMiddleName;
+	}
+	
+	/**
+	 * Returns the board member staff title
+	 * @return staff title
+	 */
+	public String getStaffTitle() {
+		return staffTitle;
 	}
 
 	/**

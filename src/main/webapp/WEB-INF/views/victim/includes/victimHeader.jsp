@@ -10,7 +10,7 @@
 <fmt:setBundle basename="omis.victim.msgs.victim" var="victimBundle"/>
 <fmt:setBundle basename="omis.demographics.msgs.demographics" var="demographicsBundle"/>
 <fmt:setBundle basename="omis.person.msgs.person" var="personBundle"/>
-<div id="victimSummary" class="summaryHeader">
+<div id="victimSummary" class="summaryHeader foreground">
 	<p>
 		<sec:authorize access="hasRole('ADMIN') or hasRole('VICTIM_PROFILE_VIEW')">
 			<a class="victimProfileLink" href="${pageContext.request.contextPath}/victim/profile.html?victim=${victimSummary.id}" class="victimProfileLink" title="<fmt:message key='victimProfileLink' bundle='${victimBundle}'/>"><span class="linkLabel"><fmt:message key="victimProfileLink" bundle="${victimBundle}"/></span></a>

@@ -1,4 +1,5 @@
 <%-- Author: Ryan Johns
+   - Author: Sheronda Vaughn
    - Version: 0.1.0 (Jun 3, 2014)
    - Since OMIS 3.0--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -18,16 +19,14 @@
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery.ptTimeSelect.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/health/style/scheduleProviderForm.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/health/style/health.css"/>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"></script>
+	<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery.ptTimeSelect.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/EventRunner.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/health/scripts/JQuery/jquery.omis.scheduleProvider.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/health/scripts/scheduleProvider.js"></script>
 </head>

@@ -12,6 +12,7 @@ import omis.audit.domain.VerificationMethod;
 import omis.contact.web.form.PoBoxFields;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.web.controller.FamilyAddressOperation;
+import omis.offenderrelationship.web.form.OffenderRelationshipNoteItem;
 import omis.person.web.form.PersonFields;
 import omis.user.domain.UserAccount;
 
@@ -22,13 +23,6 @@ import omis.user.domain.UserAccount;
  * @author Yidong Li
  * @author Sheronda Vaughn
  * @version 0.1.0 (Jun 17, 2015)
- * @since OMIS 3.0
- */
-/**
- * 
- *
- * @author Sheronda Vaughn
- * @version 0.1.0 (Dec 5, 2017)
  * @since OMIS 3.0
  */
 public class FamilyAssociationForm implements Serializable {
@@ -52,8 +46,8 @@ public class FamilyAssociationForm implements Serializable {
 	private Boolean emergencyContact;
 	private Boolean dependent;
 	private Boolean cohabitant;
-	private List<FamilyAssociationNoteItem> familyAssociationNoteItems 
-		= new ArrayList<FamilyAssociationNoteItem>();
+	private List<OffenderRelationshipNoteItem> familyAssociationNoteItems 
+		= new ArrayList<OffenderRelationshipNoteItem>();
 	private FamilyAddressOperation addressOperation;
 	private Address address;
 	private String addressQuery;
@@ -63,6 +57,7 @@ public class FamilyAssociationForm implements Serializable {
 	private VerificationMethod verificationMethod;
 	private Boolean enterAddress;
 	private Boolean enterPoBox;
+	private boolean validateSocialSecurityNumber;
 	
 	/**
 	 * Instantiates a default instance of family association fields.
@@ -357,7 +352,7 @@ public class FamilyAssociationForm implements Serializable {
 	 *
 	 * @return the familyAssociationNoteItems
 	 */
-	public List<FamilyAssociationNoteItem> getFamilyAssociationNoteItems() {
+	public List<OffenderRelationshipNoteItem> getFamilyAssociationNoteItems() {
 		return this.familyAssociationNoteItems;
 	}
 
@@ -367,7 +362,7 @@ public class FamilyAssociationForm implements Serializable {
 	 * @param familyAssociationNoteItems family association note items
 	 */
 	public void setFamilyAssociationNoteItems(
-			final List<FamilyAssociationNoteItem> familyAssociationNoteItems) {
+		final List<OffenderRelationshipNoteItem> familyAssociationNoteItems) {
 		this.familyAssociationNoteItems = familyAssociationNoteItems;
 	}
 
@@ -534,5 +529,25 @@ public class FamilyAssociationForm implements Serializable {
 	 */
 	public void setEnterPoBox(final Boolean enterPoBox) {
 		this.enterPoBox = enterPoBox;
+	}	
+	
+	/**
+	 * Returns whether to validate social security number.
+	 * 
+	 * @return whether to validate social security number
+	 */
+	public boolean getValidateSocialSecurityNumber() {
+		return this.validateSocialSecurityNumber;
+	}
+
+	/**
+	 * Sets whether to validate social security number.
+	 * 
+	 * @param validateSocialSecurityNumber whether to validate social security
+	 * number
+	 */
+	public void setValidateSocialSecurityNumber(
+			final boolean validateSocialSecurityNumber) {
+		this.validateSocialSecurityNumber = validateSocialSecurityNumber;
 	}	
 }

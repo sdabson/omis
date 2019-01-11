@@ -20,9 +20,9 @@
      <constructor-arg name="stateDelegate" ref="stateDelegate"/>
      <constructor-arg name="zipCodeDelegate" ref="zipCodeDelegate"/>
      <constructor-arg name="countryDelegate" ref="countryDelegate"/>
-     <constructor-arg name="streetSuffixDelegate" ref="streetSuffixDelegate"/>
-     <constructor-arg name="addressUnitDesignatorDelegate" ref="addressUnitDesignatorDelegate"/>
      <constructor-arg name="onlineAccountHostDelegate" ref="onlineAccountHostDelegate"/>
+     <constructor-arg name="residenceTermDelegate" ref="residenceTermDelegate"/>
+     <constructor-arg name="nonResidenceTermDelegate" ref="nonResidenceTermDelegate"/>
   </bean>
   
   </beans>

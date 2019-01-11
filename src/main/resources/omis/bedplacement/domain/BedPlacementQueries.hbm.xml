@@ -74,7 +74,4 @@ right outer join bp.offender o
 		and
 			(bp.dateRange.endDate is null or bp.dateRange.endDate >= :date)
 	]]></query>
-<sql-query name="findLegacyUnitNameByOffender">
-	select LEGACY_FIND_OFNDR_UNIT_NAME(:offenderNumber) from dual
-</sql-query>
 </hibernate-mapping>

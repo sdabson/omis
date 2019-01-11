@@ -22,5 +22,8 @@
 			</select>
 			<form:errors path="disciplinaryCodeViolationItems[${disciplinaryCodeViolationItemIndex}].disciplinaryCode" cssClass="error"/>
 		</td>
+		<td>
+			<input style="width: 95%; max-width: 95%;" type="text" value="${disciplinaryCodeViolationItem.details}" name="disciplinaryCodeViolationItems[${disciplinaryCodeViolationItemIndex}].details" id="disciplinaryCodeViolationItems[${disciplinaryCodeViolationItemIndex}].details" />
+		</td>
 	</tr>
 </fmt:bundle>

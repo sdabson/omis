@@ -22,6 +22,8 @@ public class ParoleBoardItinerarySummary implements Serializable {
 	
 	private final String locationOrganizationName;
 	
+	private final Long count;
+	
 	/**
 	 * Instantiates an implementation of parole board itinerary summary.
 	 * 
@@ -32,11 +34,13 @@ public class ParoleBoardItinerarySummary implements Serializable {
 	 * @param eligibilityCount eligibility count
 	 */
 	public ParoleBoardItinerarySummary(final Long id, final Date startDate,
-			final Date endDate, final String locationOrganizationName) {
+			final Date endDate, final String locationOrganizationName,
+			final Long count) {
 		this.id = id;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.locationOrganizationName = locationOrganizationName;
+		this.count = count;
 	}
 
 	/**
@@ -73,5 +77,14 @@ public class ParoleBoardItinerarySummary implements Serializable {
 	 */
 	public String getLocationOrganizationName() {
 		return locationOrganizationName;
+	}
+	
+	/**
+	 * Returns count of board hearings for each itinerary.
+	 * 
+	 * @return count count
+	 */
+	public Long getCount() {
+		return this.count;
 	}
 }

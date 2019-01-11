@@ -17,18 +17,20 @@
  */
 package omis.supervision.service.delegate;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.supervision.dao.CorrectionalStatusTermDao;
 import omis.supervision.domain.CorrectionalStatus;
 import omis.supervision.domain.CorrectionalStatusTerm;
+import omis.supervision.exception.CorrectionalStatusTermExistsException;
 
 /**
  * Delegate for correctional status terms.
@@ -96,19 +98,20 @@ public class CorrectionalStatusTermDelegate {
 	 * @param dateRange date range
 	 * @param correctionalStatus correctional status
 	 * @return newly created correctional status term
-	 * @throws DuplicateEntityFoundException if correctional status term exists
+	 * @throws CorrectionalStatusTermExistsException if correctional status term
+	 * exists
 	 */
 	public CorrectionalStatusTerm create(
 			final Offender offender,
 			final DateRange dateRange,
 			final CorrectionalStatus correctionalStatus)
-				 throws DuplicateEntityFoundException {
+				 throws CorrectionalStatusTermExistsException {
 		if (this.correctionalStatusTermDao.find(
 				offender,
 				correctionalStatus,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new CorrectionalStatusTermExistsException(
 					"Correctional status term exists");
 		}
 		CorrectionalStatusTerm correctionalStatusTerm
@@ -130,20 +133,21 @@ public class CorrectionalStatusTermDelegate {
 	 * @param dateRange date range
 	 * @param correctionalStatus correctional status
 	 * @return updated correctional status term
-	 * @throws DuplicateEntityFoundException if correctional status term exists
+	 * @throws CorrectionalStatusTermExistsException if correctional status term
+	 * exists
 	 */
 	public CorrectionalStatusTerm update(
 			final CorrectionalStatusTerm correctionalStatusTerm,
 			final DateRange dateRange,
 			final CorrectionalStatus correctionalStatus)
-				throws DuplicateEntityFoundException {
+				throws CorrectionalStatusTermExistsException {
 		if (this.correctionalStatusTermDao.findExcluding(
 				correctionalStatusTerm.getOffender(),
 				correctionalStatus,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange),
 				correctionalStatusTerm) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new CorrectionalStatusTermExistsException(
 					"Correctional status term exists");
 		}
 		this.populateCorrectionalStatusTerm(
@@ -159,6 +163,47 @@ public class CorrectionalStatusTermDelegate {
 	 */
 	public void remove(final CorrectionalStatusTerm correctionalStatusTerm) {
 		this.correctionalStatusTermDao.makeTransient(correctionalStatusTerm);
+	}
+	
+	/**
+	 * Counts correctional status terms for offender between dates with option
+	 * of excluding terms.
+	 * 
+	 * <p>Ignores excluded terms that are {@code null}.
+	 * 
+	 * @param offender offender
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @param excluded excluded terms; {@code null}s are ignored
+	 * @return count of correctional status terms for offender between dates
+	 * with option of excluding terms
+	 */
+	public long countForOffenderBetweenDatesExcluding(
+			final Offender offender,
+			final Date startDate,
+			final Date endDate,
+			final CorrectionalStatusTerm... excluded) {
+		if (excluded.length > 0) {
+			List<CorrectionalStatusTerm> notNullTerms
+				= new ArrayList<CorrectionalStatusTerm>();
+			for (CorrectionalStatusTerm term : excluded) {
+				if (term != null) {
+					notNullTerms.add(term);
+				}
+			}
+			if (notNullTerms.size() > 0) {
+				return this.correctionalStatusTermDao
+					.countForOffenderBetweenDatesExcluding(
+						offender, startDate, endDate,
+						notNullTerms.toArray(new CorrectionalStatusTerm[] { }));
+			} else {
+				return this.correctionalStatusTermDao
+					.countForOffenderBetweenDates(offender, startDate, endDate);
+			}
+		} else {
+			return this.correctionalStatusTermDao
+				.countForOffenderBetweenDates(offender, startDate, endDate);
+		}
 	}
 	
 	/* Helper methods. */

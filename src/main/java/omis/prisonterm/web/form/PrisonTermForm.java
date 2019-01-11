@@ -1,8 +1,11 @@
 package omis.prisonterm.web.form;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.List;
+import omis.document.domain.Document;
+import omis.document.web.form.DocumentTagItem;
 import omis.prisonterm.domain.PrisonTerm;
 import omis.prisonterm.domain.PrisonTermStatus;
 import omis.user.domain.UserAccount;
@@ -12,7 +15,8 @@ import omis.user.domain.UserAccount;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Oct 17, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Dec 20, 2018)
  * @since OMIS 3.0
  */
 
@@ -49,6 +53,23 @@ public class PrisonTermForm implements Serializable {
 	private String verificationUserInput;
 	
 	private Date verificationDate;
+	
+	private Document document;
+	
+	private String title;
+	
+	private List<DocumentTagItem> documentTagItems =
+			new ArrayList<DocumentTagItem>();
+	
+	private Date date;
+	
+	private String fileExtension;
+	
+	private byte[] data;
+	
+	private Boolean removeSentenceCalculation;
+	
+	private byte[] replaceData;
 	
 	/**
 	 * Instantiates a default prison term form. */
@@ -262,8 +283,156 @@ public class PrisonTermForm implements Serializable {
 	/**
 	 * @param verificationUserInput the verificationUserInput to set
 	 */
-	public void setVerificationUserInput(String verificationUserInput) {
+	public void setVerificationUserInput(
+			final String verificationUserInput) {
 		this.verificationUserInput = verificationUserInput;
 	}
 
+	/**
+	 * Returns the document.
+	 *
+	 * @return document
+	 */
+	public Document getDocument() {
+		return this.document;
+	}
+
+	/**
+	 * Sets the document.
+	 *
+	 * @param document - document
+	 */
+	public void setDocument(final Document document) {
+		this.document = document;
+	}
+
+	/**
+	 * Returns the title.
+	 *
+	 * @return title
+	 */
+	public String getTitle() {
+		return this.title;
+	}
+
+	/**
+	 * Sets the title.
+	 *
+	 * @param title - title
+	 */
+	public void setTitle(final String title) {
+		this.title = title;
+	}
+
+	/**
+	 * Returns the documentTagItems.
+	 *
+	 * @return documentTagItems
+	 */
+	public List<DocumentTagItem> getDocumentTagItems() {
+		return this.documentTagItems;
+	}
+
+	/**
+	 * Sets the documentTagItems.
+	 *
+	 * @param documentTagItems - documentTagItems
+	 */
+	public void setDocumentTagItems(
+			final List<DocumentTagItem> documentTagItems) {
+		this.documentTagItems = documentTagItems;
+	}
+
+	/**
+	 * Returns the date.
+	 *
+	 * @return date
+	 */
+	public Date getDate() {
+		return this.date;
+	}
+
+	/**
+	 * Sets the date.
+	 *
+	 * @param date - date
+	 */
+	public void setDate(final Date date) {
+		this.date = date;
+	}
+
+	/**
+	 * Returns the fileExtension.
+	 *
+	 * @return fileExtension
+	 */
+	public String getFileExtension() {
+		return this.fileExtension;
+	}
+
+	/**
+	 * Sets the fileExtension.
+	 *
+	 * @param fileExtension - fileExtension
+	 */
+	public void setFileExtension(final String fileExtension) {
+		this.fileExtension = fileExtension;
+	}
+	
+	/**
+	 * Returns the removeSentenceCalculation.
+	 *
+	 * @return removeSentenceCalculation
+	 */
+	public Boolean getRemoveSentenceCalculation() {
+		return this.removeSentenceCalculation;
+	}
+
+	/**
+	 * Sets the removeSentenceCalculation.
+	 *
+	 * @param removeSentenceCalculation - removeSentenceCalculation
+	 */
+	public void setRemoveSentenceCalculation(
+			final Boolean removeSentenceCalculation) {
+		this.removeSentenceCalculation = removeSentenceCalculation;
+	}
+
+	/**
+	 * Returns the data.
+	 *
+	 * @return data
+	 */
+	public byte[] getData() {
+		return this.data;
+	}
+
+	/**
+	 * Sets the data.
+	 *
+	 * @param data - data
+	 */
+	public void setData(final byte[] data) {
+		this.data = data;
+	}
+
+	/**
+	 * Returns the replaceData.
+	 *
+	 * @return replaceData
+	 */
+	public byte[] getReplaceData() {
+		return this.replaceData;
+	}
+
+	/**
+	 * Sets the replaceData.
+	 *
+	 * @param replaceData - replaceData
+	 */
+	public void setReplaceData(final byte[] replaceData) {
+		this.replaceData = replaceData;
+	}
+	
+	
 }

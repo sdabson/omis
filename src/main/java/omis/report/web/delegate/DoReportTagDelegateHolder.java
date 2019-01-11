@@ -11,7 +11,7 @@ package omis.report.web.delegate;
  */
 public final class DoReportTagDelegateHolder {
 
-	private static DoReportTagDelegateHolder instance;
+	private static DoReportTagDelegateHolder instance = null;
 	
 	private final DoReportTagDelegate doReportTagDelegate;
 	
@@ -39,7 +39,7 @@ public final class DoReportTagDelegateHolder {
 	 * @return instance
 	 */
 	public static DoReportTagDelegateHolder getInstance() {
-		if (DoReportTagDelegateHolder.instance != null) {
+		if (DoReportTagDelegateHolder.instance == null) {
 			throw new IllegalStateException("Instance does not exist");
 		}
 		return DoReportTagDelegateHolder.instance;

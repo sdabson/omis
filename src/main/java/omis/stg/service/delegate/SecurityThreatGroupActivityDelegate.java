@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.stg.service.delegate;
 
 import java.util.Date;
@@ -5,11 +22,11 @@ import java.util.Date;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.person.domain.Person;
 import omis.stg.dao.SecurityThreatGroupActivityDao;
 import omis.stg.domain.SecurityThreatGroupActivity;
+import omis.stg.exception.SecurityThreatGroupActivityExistsException;
 
 /**
  * Security threat group activity.
@@ -53,15 +70,15 @@ public class SecurityThreatGroupActivityDelegate {
 	 * @param String - summary
 	 * @param  - 
 	 * @return Creates a security threat group activity. 
-	 * @throws DuplicateEntityFoundException - when an activity already exists.
+	 * @throws SecurityThreatGroupActivityExistsException - when an activity already exists.
 	 */
 	public SecurityThreatGroupActivity create(
 			final Date reportDate, 
 			final Person reportedBy,
 			final String summary)
-		throws DuplicateEntityFoundException {
+		throws SecurityThreatGroupActivityExistsException {
 		if (this.activityDao.find(reportDate, reportedBy, summary) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new SecurityThreatGroupActivityExistsException (
 					"Duplicate security threat group activity found");
 		}
 		
@@ -81,17 +98,17 @@ public class SecurityThreatGroupActivityDelegate {
 	 * @param String - summary
 	 * @param  - 
 	 * @return Updates a security threat group activity. 
-	 * @throws DuplicateEntityFoundException - when an activity already exists.
+	 * @throws SecurityThreatGroupActivityExistsException - when an activity already exists.
 	 */
 	public SecurityThreatGroupActivity update(
 			final SecurityThreatGroupActivity activity,
 			final Date reportDate, 
 			final Person reportedBy, 
 			final String summary) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityExistsException {
 				if (this.activityDao.findExcluding(
 					activity, reportDate, reportedBy, summary) != null) {
-					throw new DuplicateEntityFoundException(
+					throw new SecurityThreatGroupActivityExistsException(
 							"Duplicate security threat group activity found");
 		}
 		this.populateSecurityThreatGroupActivity(activity, reportDate, reportedBy,
@@ -103,7 +120,7 @@ public class SecurityThreatGroupActivityDelegate {
 	 * @param SecurityThreatGroupActivity - activity
 	 * @param  - .
 	 * @return Removes a security threat group activity.
-	 * @throws DuplicateEntityFoundException - when security threat group 
+	 * @throws SecurityThreatGroupActivityExistsException - when security threat group 
 	 * activity already exists. 
 	 */
 	public void remove(final SecurityThreatGroupActivity activity) {
@@ -131,6 +148,5 @@ public class SecurityThreatGroupActivityDelegate {
 			activity.setUpdateSignature(new UpdateSignature(
 					this.auditComponentRetriever.retrieveUserAccount(),
 					this.auditComponentRetriever.retrieveDate()));
-	}
-	
+	}	
 }

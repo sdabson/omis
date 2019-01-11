@@ -108,6 +108,7 @@ ul.tabs li.tab_li.active{
 	z-index:100;
 	background-color:#fff;
 	opacity: 1;
+	color: black;
 }
 
 ul.tabs li.tab_li:nth-child(n+2) {
@@ -125,7 +126,7 @@ ul.tabs li.tab_li span a.remove {
 }
 
 ul.tabs li.tab_li span a.remove:after {
-	content: url('../images/close.png');
+	content: url('../images/tabClose.png');
 }
 
 ul.tabs li span {
@@ -181,7 +182,7 @@ ul.tabs li.tab_li a.swap {
 #offenderTabs.split ul.tabs {
 	background-color#f00;
 	max-width:60%;
-	max-width:calc(90% - 280px);
+	max-width:calc(90% - 451px);
 }
 .split:last-child {
 	width: 50%;

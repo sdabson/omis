@@ -1,7 +1,27 @@
 <%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
+<%--
   - Action menu for tasks.
   -
   - Author: Stephen Abson
+  - Author: Josh Divine
+  - Version: 0.1.1 (Sep 18, 2018)
+  - Since: OMIS 3.0
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -10,7 +30,7 @@
 <ul>
 	<sec:authorize access="hasRole('ADMIN') or hasRole('TASK_INVOKE')">
 		<li>
-			<a class="invokeLink" href="${pageContext.request.contextPath}/task/invoke.html?task=${task.id}" title="<fmt:message key='invokeTaskLabel' bundle='${taskBundle}'/>"><fmt:message key="invokeTaskLabel" bundle="${taskBundle}"/></a>
+			<a class="invokeLink" href="${pageContext.request.contextPath}/task/invokeForCompletion.html?task=${task.id}" title="<fmt:message key='invokeTaskLabel' bundle='${taskBundle}'/>"><fmt:message key="invokeTaskLabel" bundle="${taskBundle}"/></a>
 		</li>
 	</sec:authorize>
 </ul>

@@ -61,6 +61,7 @@ import omis.offender.report.OffenderSummary;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.offense.domain.Offense;
 import omis.offenseterm.service.OffenseTermService;
+import omis.offenseterm.web.controller.delegate.OffenseItemSortDelegate;
 import omis.offenseterm.web.form.OffenseItem;
 import omis.offenseterm.web.form.OffenseItemConnection;
 import omis.offenseterm.web.form.OffenseItemConnectionClassification;
@@ -80,6 +81,7 @@ import omis.sentence.exception.ConnectedSentenceExistsException;
 import omis.sentence.exception.SentenceExistsException;
 import omis.sentence.report.SentenceReportService;
 import omis.sentence.report.SentenceSummary;
+import omis.sentence.web.form.SentenceFields;
 import omis.sentence.web.form.SentenceOperation;
 import omis.term.domain.component.Term;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
@@ -90,7 +92,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * @author Stephen Abson
  * @author Joel Norris
  * @author Josh Divine
- * @version 0.0.3 (Sept 15, 2017)
+ * @version 0.0.4 (Apr 14, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -325,6 +327,9 @@ public class ManageOffenseTermController {
 	@Qualifier("businessExceptionHandlerDelegate")
 	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
 	
+	@Autowired
+	@Qualifier("offenseItemSortDelegate")
+	private OffenseItemSortDelegate offenseItemSortDelegate;
 	
 	/* Constructors. */
 	
@@ -644,8 +649,9 @@ public class ManageOffenseTermController {
 		
 		// Processes offense item in order of dependency of consecutive
 		// sentences
-		List<OffenseItem> orderedOffenseItems = this.orderItemsDependently(
-				offenseTermForm.getOffenseItems());
+		List<OffenseItem> orderedOffenseItems
+			= this.offenseItemSortDelegate.sort(offenseTermForm
+					.getOffenseItems());
 		for (int index = 0; index < orderedOffenseItems.size(); index++) {
 			OffenseItem offenseItem = orderedOffenseItems.get(index);
 			
@@ -890,8 +896,9 @@ public class ManageOffenseTermController {
 		
 		// Processes offense item in order of dependency of consecutive
 		// sentences
-		List<OffenseItem> orderedOffenseItems = this.orderItemsDependently(
-				offenseTermForm.getOffenseItems());
+		List<OffenseItem> orderedOffenseItems
+			= this.offenseItemSortDelegate.sort(offenseTermForm
+					.getOffenseItems());
 		for (int index = 0; index < orderedOffenseItems.size(); index++) {
 			OffenseItem offenseItem = orderedOffenseItems.get(index);
 			if (OffenseItemOperation.CREATE.equals(
@@ -1209,6 +1216,10 @@ public class ManageOffenseTermController {
 		OffenseItem offenseItem = new OffenseItem();
 		offenseItem.setExpanded(true);
 		offenseItem.setOperation(OffenseItemOperation.CREATE);
+		SentenceFields sentenceFields = new SentenceFields();
+		sentenceFields.setLengthClassification(
+				SentenceLengthClassification.NOT_LIFE);
+		offenseItem.setSentenceFields(sentenceFields);
 		ModelAndView mav = new ModelAndView(OFFENSE_ITEM_VIEW_NAME);
 		mav.addObject(OFFENSE_ITEM_MODEL_KEY, offenseItem);
 		mav.addObject(OFFENSE_ITEM_INDEX_MODEL_KEY, itemIndex);
@@ -1592,57 +1603,6 @@ public class ManageOffenseTermController {
 			this.contactSummaryModelDelegate.add(mav.getModelMap(), person);
 		}
 		return mav;
-	}
-	
-	// Returns a copy of items orders according to dependence
-	// The dependence is based one one sentence's connection to another when
-	// consecutive
-	// None consecutive and consecutive to other docket sentence offense items
-	// are ordered at the beginning in the order that they appear in the
-	// unordered items
-	private List<OffenseItem> orderItemsDependently(
-			final List<OffenseItem> unorderedItems) {
-		List<OffenseItem> orderedItems = new ArrayList<OffenseItem>();
-		int consecutivelyConnectedCount = 0;
-		int notConsecutivelyConnectedCount = 0;
-		for (OffenseItem offenseItem : unorderedItems) {
-			if ((SentenceOperation.CREATE
-						.equals(offenseItem.getSentenceOperation())
-					|| SentenceOperation.AMEND
-						.equals(offenseItem.getSentenceOperation())
-					|| SentenceOperation.UPDATE
-						.equals(offenseItem.getSentenceOperation()))
-					&& (OffenseItemConnectionClassification.CONSECUTIVE
-							.equals(offenseItem.getConnection()
-									.getClassification()))) {
-				int totalCount = consecutivelyConnectedCount
-						+ notConsecutivelyConnectedCount;
-				if (offenseItem.getConnection().getIndex()
-						< totalCount || totalCount == 0) {
-					orderedItems.add(offenseItem);
-				} else if (offenseItem.getConnection().getIndex()
-						> totalCount) {
-					int referencedOrderedIndex = orderedItems.indexOf(
-							unorderedItems.get(offenseItem
-									.getConnection().getIndex().intValue()));
-					if (referencedOrderedIndex > -1) {
-						orderedItems.add(referencedOrderedIndex, offenseItem);
-					} else {
-						orderedItems.add(offenseItem);
-					}
-				} else {
-					throw new IllegalArgumentException(
-							"Offense term cannot be consecutive to itself");
-				}
-				consecutivelyConnectedCount++;
-			} else {
-				
-				// Adds unconnected offense items first
-				orderedItems.add(notConsecutivelyConnectedCount, offenseItem);
-				notConsecutivelyConnectedCount++;
-			}
-		}
-		return orderedItems;
 	}
 	
 	// Returns true if value is true; false otherwise

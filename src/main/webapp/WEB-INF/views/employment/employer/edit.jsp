@@ -13,12 +13,11 @@
 		<meta http-equiv="cache-control" content="no-cache"/>
 		<meta http-equiv="expires" content="0"/>
 		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/common/style/general.css" type="text/css" media="all" />
-		<script src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js" type="text/javascript"></script>
+		<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
 		<script src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery.ptTimeSelect.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/common/scripts/EventRunner.js" type="text/javascript"></script>
 		<script src="${pageContext.request.contextPath}/resources/common/scripts/Edit.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js" type="text/javascript"></script>
 		<script src="${pageContext.request.contextPath}/resources/common/scripts/userSearch.js" type="text/javascript"></script>
 		                                               
 		

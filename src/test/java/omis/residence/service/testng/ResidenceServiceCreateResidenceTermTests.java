@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.residence.service.testng;
 
 import java.text.ParseException;
@@ -20,6 +37,7 @@ import omis.country.service.delegate.CountryDelegate;
 import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
+import omis.location.exception.LocationNotAllowedException;
 import omis.location.service.delegate.LocationDelegate;
 import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
@@ -29,11 +47,15 @@ import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
+import omis.residence.domain.NonResidenceTerm;
 import omis.residence.domain.ResidenceCategory;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
+import omis.residence.exception.AllowedResidentialLocationRuleExistsException;
+import omis.residence.exception.NonResidenceTermExistsException;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 import omis.residence.service.ResidenceService;
 import omis.residence.service.delegate.AllowedResidentialLocationRuleDelegate;
 import omis.residence.service.delegate.NonResidenceTermDelegate;
@@ -46,6 +68,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create residence terms.
  *
  * @author Josh Divine
+ * @author Yidong Li
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -124,11 +147,14 @@ public class ResidenceServiceCreateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException  if primary residence already 
 	 * exists
+	 * @throws ResidenceTermExistsException residence term exists
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test
 	public void testCreateResidenceTerm() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			ResidenceStatusConflictException, PrimaryResidenceExistsException,
+			ResidenceTermExistsException, NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -171,18 +197,21 @@ public class ResidenceServiceCreateResidenceTermTests
 	}
 	
 	/**
-	 * Tests {@code DuplicateEntityFoundException} is thrown.
+	 * Tests {@code ResidenceTermExistsException} is thrown.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws PrimaryResidenceExistsException if primary residence already 
+	 * @throws ResidenceTermExistsException residence term exists exception
 	 * exists
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
+	@Test(expectedExceptions = {ResidenceTermExistsException.class})
 	public void testDuplicateEntityFoundException() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			ResidenceStatusConflictException, PrimaryResidenceExistsException,
+			ResidenceTermExistsException, NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -232,44 +261,132 @@ public class ResidenceServiceCreateResidenceTermTests
 	 * exists
 	 * @throws PrimaryResidenceExistsException if primary residence exists 
 	 * @throws LocationNotAllowedException if location is not allowed
-	 *//*
+	 * @throws ResidenceTermExistsException 
+	 * @throws AllowedResidentialLocationRuleExistsException 
+	 * @throws NonResidenceTermExistsException 
+	 */	
 	@Test(expectedExceptions = {ResidenceStatusConflictException.class})
 	public void testResidenceStatusConflictException() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException, 
-			LocationNotAllowedException {
-		// Arrangements
-		Person person = this.personDelegate.create("Smith", "John", "Jay", 
-				null);
-		DateRange dateRange = new DateRange(this.parseDateText("01/01/2017"), 
-				this.parseDateText("06/01/2017"));
-		Country country = this.countryDelegate.create("Country", "C", true);
-		State state = this.stateDelegate.create("State", "ST", country, true, 
-				true);
-		City city = this.cityDelegate.create("City", true, state, country);
-		String notes = "Notes";
-		ZipCode zipCode = this.zipCodeDelegate.create(city, "00001", null, 
-				true);
-		Address address = this.addressDelegate.findOrCreate("1 A Street", null, 
-				null, null, zipCode);
-		this.nonResidenceTermDelegate.createHomelessTerm(person, dateRange, 
-				city, state, notes);
-		Boolean primary = true;
-		Boolean fosterCare = false;
-		Boolean confirmed = false;
-		VerificationMethod method = this.verificationMethodDelegate.create(
-				"Method", (short) 1, true);
-		VerificationSignature verificationSignature = new VerificationSignature(
-				this.accountDelegate.findByUsername("AUDIT"), 
-				this.parseDateText("02/01/2017"), true, method);
-//		this.residenceTermDelegate.createResidenceTerm(person, dateRange, 
-//				ResidenceCategory.PRIMARY, address, ResidenceStatus.RESIDENT, 
-//				confirmed, notes, verificationSignature);
-		
-		// Action
-		this.residenceService.createResidenceTerm(person, dateRange, primary, 
-				address, fosterCare, confirmed, notes, verificationSignature);
-	}*/
+			throws ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			LocationNotAllowedException, ResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException, NonResidenceTermExistsException, 
+			DuplicateEntityFoundException {
+			// Arrangements		
+			Person person = this.personDelegate.create("Smith", "John", "Jay", 
+					null);
+			DateRange dateRange = new DateRange(this.parseDateText("01/01/2017"), 
+					this.parseDateText("06/01/2017"));
+			Country country = this.countryDelegate.create("Country", "C", true);
+			State state = this.stateDelegate.create("State", "ST", country, true, 
+					true);
+			City city = this.cityDelegate.create("City", true, state, country);
+			String notes = "Notes";
+			ZipCode zipCode = this.zipCodeDelegate.create(city, "00001", null, 
+					true);
+			Address address = this.addressDelegate.findOrCreate("1 A Street", null, 
+					null, null, zipCode);		
+			Boolean primary = true;
+			Boolean fosterCare = false;
+			Boolean confirmed = false;
+			ResidenceCategory category = ResidenceCategory.PRIMARY;
+			VerificationMethod method = this.verificationMethodDelegate.create(
+					"Method", (short) 1, true);
+			VerificationSignature verificationSignature = new VerificationSignature(
+					this.accountDelegate.findByUsername("AUDIT"), 
+					this.parseDateText("02/01/2017"), true, method);
+			DateRange newDateRange = new DateRange(this.parseDateText("07/01/2017"), 
+					null);			
+			ResidenceStatus currentStatus = ResidenceStatus.RESIDENT;
+			this.residenceTermDelegate.createResidenceTerm(
+					person, dateRange, category, address, currentStatus, confirmed, notes, verificationSignature);
+			this.nonResidenceTermDelegate.createHomelessTerm(
+					person, newDateRange, city, state, notes, confirmed);
+			DateRange dateRange2 = new DateRange(this.parseDateText("06/01/2017"), 
+					this.parseDateText("08/01/2017"));
+				
+			// Action
+			this.residenceService.createResidenceTerm(
+					person, dateRange2, primary, address, fosterCare, confirmed, 
+					notes, verificationSignature);
+		}
+	
+	/**
+	 * Tests {@code ResidenceStatusConflictException} is thrown.
+	 * 
+	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws ResidenceStatusConflictException if residence term conflict 
+	 * exists
+	 * @throws PrimaryResidenceExistsException if primary residence exists 
+	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws ResidenceTermExistsException 
+	 * @throws AllowedResidentialLocationRuleExistsException 
+	 * @throws NonResidenceTermExistsException 
+	 */	
+	@Test
+	public void testExistingNonResidenceTermHomelessUpdate() 
+			throws ResidenceStatusConflictException, PrimaryResidenceExistsException, 
+			LocationNotAllowedException, ResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException, NonResidenceTermExistsException, 
+			DuplicateEntityFoundException {
+			// Arrangements		
+			Person person = this.personDelegate.create("Smith", "John", "Jay", 
+					null);						
+			DateRange dateRange = new DateRange(this.parseDateText("04/01/2017"), 
+					this.parseDateText("06/01/2017"));
+			Country country = this.countryDelegate.create("Country", "C", true);
+			State state = this.stateDelegate.create("State", "ST", country, true, 
+					true);
+			City city = this.cityDelegate.create("City", true, state, country);
+			String notes = "Notes";
+			ZipCode zipCode = this.zipCodeDelegate.create(city, "00001", null, 
+					true);
+			Address address = this.addressDelegate.findOrCreate("1 A Street", null, 
+					null, null, zipCode);		
+			Boolean primary = true;
+			Boolean fosterCare = false;
+			Boolean confirmed = false;
+			ResidenceCategory category = ResidenceCategory.PRIMARY;
+			VerificationMethod method = this.verificationMethodDelegate.create(
+					"Method", (short) 1, true);
+			VerificationSignature verificationSignature = new VerificationSignature(
+					this.accountDelegate.findByUsername("AUDIT"), 
+					this.parseDateText("02/01/2017"), true, method);
+			DateRange newDateRange = new DateRange(this.parseDateText("07/01/2017"), 
+					null);		
+			DateRange newDateRange2 = new DateRange(this.parseDateText("07/01/2016"), 
+					this.parseDateText("12/01/2016"));
+			ResidenceStatus status = ResidenceStatus.RESIDENT;
+			ResidenceStatus currentStatus = ResidenceStatus.GROUP_HOME;
+			this.residenceTermDelegate.createResidenceTerm(
+					person, dateRange, category, address, status, confirmed, notes, verificationSignature);				
+			Organization organization = this.organizationDelegate.create("Org", 
+					null, null);
+			Location location = this.locationDelegate.create(organization, 
+					newDateRange, address);			
+			this.nonResidenceTermDelegate.createNonResidenceTerm(
+					person, newDateRange2, currentStatus, location, confirmed, notes, verificationSignature);		
+			NonResidenceTerm nTerm = this.nonResidenceTermDelegate.createHomelessTerm(
+					person, newDateRange, city, state, notes, confirmed);
+			DateRange dateRange2 = new DateRange(this.parseDateText("08/01/2017"), 
+					this.parseDateText("10/01/2017"));
+			newDateRange = new DateRange(this.parseDateText("07/01/2017"), 
+					this.parseDateText("08/01/2017"));			
+				
+			// Action			
+			this.residenceService.createResidenceTerm(
+					person, dateRange2, primary, address, fosterCare, confirmed, 
+					notes, verificationSignature);		
+			
+			// Assertions
+			PropertyValueAsserter.create()
+				.addExpectedValue("person", person)
+				.addExpectedValue("dateRange", newDateRange)
+				.addExpectedValue("city", city)				
+				.addExpectedValue("state", state)
+				.addExpectedValue("notes", notes)
+				.addExpectedValue("confirmed", confirmed)
+				.performAssertions(nTerm);
+	}
 	
 	/**
 	 * Tests {@code PrimaryResidenceExistsException} is thrown.
@@ -278,12 +395,15 @@ public class ResidenceServiceCreateResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws PrimaryResidenceExistsException if primary residence already 
+	 * @throws ResidenceTermExistsException residence term exists exception
 	 * exists
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test(expectedExceptions = {PrimaryResidenceExistsException.class})
 	public void testPrimaryResidenceExistsException() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, PrimaryResidenceExistsException {
+			ResidenceStatusConflictException, PrimaryResidenceExistsException,
+			ResidenceTermExistsException, NonResidenceTermExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -307,7 +427,7 @@ public class ResidenceServiceCreateResidenceTermTests
 				this.accountDelegate.findByUsername("AUDIT"), 
 				this.parseDateText("02/01/2017"), true, method);
 		this.residenceTermDelegate.createResidenceTerm(person, dateRange, 
-				ResidenceCategory.PRIMARY, address, ResidenceStatus.FOSTER_CARE, 
+				ResidenceCategory.PRIMARY, address, ResidenceStatus.FOSTER_CARE,
 				confirmed, notes, verificationSignature);
 		
 		// Action
@@ -316,11 +436,11 @@ public class ResidenceServiceCreateResidenceTermTests
 	}
 	
 	// Parses date text
-		private Date parseDateText(final String text) {
-			try {
-				return new SimpleDateFormat("MM/dd/yyyy").parse(text);
-			} catch (ParseException e) {
-				throw new RuntimeException("Parse error", e);
-			}
+	private Date parseDateText(final String text) {
+		try {
+			return new SimpleDateFormat("MM/dd/yyyy").parse(text);
+		} catch (ParseException e) {
+			throw new RuntimeException("Parse error", e);
 		}
+	}
 }

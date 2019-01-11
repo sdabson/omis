@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offendercontact.web.validator;
 
 import org.springframework.validation.Errors;
@@ -20,6 +37,7 @@ import omis.offendercontact.web.form.OffenderContactTelephoneNumberOperation;
  * Validator for form for offender contact.
  *
  * @author Josh Divine
+ * @author Sheronda Vaughn
  * @version 0.0.2 (Oct 27, 2017)
  * @since OMIS 3.0
  */
@@ -77,9 +95,26 @@ public class OffenderContactFormValidator implements Validator {
 							.validateAddressFields(
 								offenderContactForm.getMailingAddressFields(),
 								"mailingAddressFields", errors);
+					}  else if (offenderContactForm.getMailingAddressOperation().equals(
+							OffenderContactMailingAddressOperation.USE_EXISTING)) {	 						
+						if (offenderContactForm.getExistingMailingAddress() == null) {
+							errors.rejectValue("existingMailingAddressQuery", "existingMailingAddressQuery.empty");
+						}
+					} else {						
+							errors.rejectValue("mailingAddressOperation", "mailingAddressOperation.empty");			
 					}
-				}
-			}
+				}				
+			}			
+		}
+		
+		// Ensures that if primary residence is to be created at mailing
+		// address, effective date is supplied
+		if (offenderContactForm.getResidentAtMailingAddress() != null
+				&& offenderContactForm.getResidentAtMailingAddress()
+				&& offenderContactForm
+					.getResidentAtMailingAddressEffectiveDate() == null) {
+			errors.rejectValue("residentAtMailingAddressEffectiveDate",
+					"residentAtMailingAddressEffectiveDate.empty");
 		}
 		
 		// Validates po box fields

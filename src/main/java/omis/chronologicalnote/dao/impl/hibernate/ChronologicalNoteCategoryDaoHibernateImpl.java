@@ -21,6 +21,7 @@ import java.util.List;
 
 import omis.chronologicalnote.dao.ChronologicalNoteCategoryDao;
 import omis.chronologicalnote.domain.ChronologicalNoteCategory;
+import omis.chronologicalnote.domain.ChronologicalNoteCategoryGroup;
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 
 import org.hibernate.SessionFactory;
@@ -31,16 +32,29 @@ import org.hibernate.SessionFactory;
  * 
  * @author Yidong Li
  * @author Joel Norris
+ * @author Stephen Abson
  * @version 0.1.1 (Jan 31, 2018)
  * @since OMIS 3.0
  */
 public class ChronologicalNoteCategoryDaoHibernateImpl
 		extends GenericHibernateDaoImpl<ChronologicalNoteCategory>
 		implements ChronologicalNoteCategoryDao {
+	
 	/* Query names. */
+	
 	private static final String FIND_CATEGORIES_QUERY_NAME
 		= "findChronologicalNoteCategories";
-	private static final String FIND_ALL_CATEGORIES_QUERY_NAME = "findValidChronologicalNoteCategories";
+	private static final String FIND_ALL_CATEGORIES_QUERY_NAME
+		= "findValidChronologicalNoteCategories";
+	private static final String FIND_CATEGORY_QUERY_NAME
+		= "findChronologicalNoteCategory";
+	private static final String FIND_CATEGORIES_BY_GROUP_QUERY_NAME
+		= "findChronologicalNoteCategoriesByGroup";
+	
+	/* Parameter names. */
+	
+	private static final String NAME_PARAM_NAME = "name";
+	private static final String GROUP_PARAM_NAME = "group";
 	
 	/* Constructors. */
 	/**
@@ -70,9 +84,39 @@ public class ChronologicalNoteCategoryDaoHibernateImpl
 	@Override
 	public List<ChronologicalNoteCategory> findAll() {
 		@SuppressWarnings("unchecked")
-		List<ChronologicalNoteCategory> categories = this.getSessionFactory().getCurrentSession()
+		List<ChronologicalNoteCategory> categories = this.getSessionFactory()
+			.getCurrentSession()
 				.getNamedQuery(FIND_ALL_CATEGORIES_QUERY_NAME)
 				.list();
+		return categories;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ChronologicalNoteCategory find(
+			final String name,
+			final ChronologicalNoteCategoryGroup group) {
+		ChronologicalNoteCategory category = (ChronologicalNoteCategory)
+				this.getSessionFactory()
+				.getCurrentSession()
+				.getNamedQuery(FIND_CATEGORY_QUERY_NAME)
+				.setParameter(NAME_PARAM_NAME, name)
+				.setParameter(GROUP_PARAM_NAME, group)
+				.uniqueResult();
+		return category;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<ChronologicalNoteCategory> findCategoriesByGroup(
+	final ChronologicalNoteCategoryGroup group) {
+		@SuppressWarnings("unchecked")
+		List<ChronologicalNoteCategory> categories = 
+			(List<ChronologicalNoteCategory>) this.getSessionFactory()
+			.getCurrentSession()
+			.getNamedQuery(FIND_CATEGORIES_BY_GROUP_QUERY_NAME)
+			.setParameter(GROUP_PARAM_NAME, group)
+			.list();
 		return categories;
 	}
 }

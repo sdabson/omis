@@ -20,15 +20,10 @@ package omis.hearinganalysis.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
-import omis.address.domain.Address;
-import omis.address.domain.ZipCode;
-import omis.address.service.delegate.AddressDelegate;
-import omis.address.service.delegate.ZipCodeDelegate;
-import omis.country.domain.Country;
-import omis.country.service.delegate.CountryDelegate;
+
 import omis.datatype.DateRange;
 import omis.exception.DateConflictException;
 import omis.exception.DuplicateEntityFoundException;
@@ -39,21 +34,8 @@ import omis.hearinganalysis.service.HearingAnalysisService;
 import omis.hearinganalysis.service.delegate.HearingAnalysisCategoryDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisDelegate;
 import omis.hearinganalysis.service.delegate.HearingAnalysisNoteDelegate;
-import omis.location.domain.Location;
-import omis.location.service.delegate.LocationDelegate;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
-import omis.organization.domain.Organization;
-import omis.organization.service.delegate.OrganizationDelegate;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
-import omis.paroleboarditinerary.domain.BoardAttendee;
-import omis.paroleboarditinerary.domain.BoardMeetingSite;
-import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
-import omis.paroleboarditinerary.domain.ParoleBoardLocation;
-import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
-import omis.paroleboarditinerary.service.delegate.BoardMeetingSiteDelegate;
-import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
-import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 import omis.paroleeligibility.domain.AppearanceCategory;
@@ -66,8 +48,6 @@ import omis.paroleeligibility.service.delegate.EligibilityStatusReasonDelegate;
 import omis.paroleeligibility.service.delegate.ParoleEligibilityDelegate;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
-import omis.region.domain.City;
-import omis.region.service.delegate.CityDelegate;
 import omis.staff.domain.StaffAssignment;
 import omis.staff.domain.StaffTitle;
 import omis.staff.service.delegate.StaffAssignmentDelegate;
@@ -81,7 +61,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create hearing analysis notes.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.4 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 @Test
@@ -91,97 +71,44 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 	/* Delegates. */
 
 	@Autowired
-	@Qualifier("offenderDelegate")
 	private OffenderDelegate offenderDelegate;
 	
 	@Autowired
-	@Qualifier("appearanceCategoryDelegate")
 	private AppearanceCategoryDelegate appearanceCategoryDelegate;
 	
 	@Autowired
-	@Qualifier("eligibilityStatusReasonDelegate")
 	private EligibilityStatusReasonDelegate eligibilityStatusReasonDelegate;
 	
 	@Autowired
-	@Qualifier("paroleEligibilityDelegate")
 	private ParoleEligibilityDelegate paroleEligibilityDelegate;
 	
 	@Autowired
-	@Qualifier("organizationDelegate")
-	private OrganizationDelegate organizationDelegate;
-	
-	@Autowired
-	@Qualifier("countryDelegate")
-	private CountryDelegate countryDelegate;
-	
-	@Autowired
-	@Qualifier("cityDelegate")
-	private CityDelegate cityDelegate;
-	
-	@Autowired
-	@Qualifier("zipCodeDelegate")
-	private ZipCodeDelegate zipCodeDelegate;
-	
-	@Autowired
-	@Qualifier("addressDelegate")
-	private AddressDelegate addressDelegate;
-	
-	@Autowired
-	@Qualifier("locationDelegate")
-	private LocationDelegate locationDelegate;
-	
-	@Autowired
-	@Qualifier("paroleBoardItineraryDelegate")
-	private ParoleBoardItineraryDelegate paroleBoardItineraryDelegate;
-	
-	@Autowired
-	@Qualifier("boardMeetingSiteDelegate")
-	private BoardMeetingSiteDelegate boardMeetingSiteDelegate;
-	
-	@Autowired
-	@Qualifier("staffAssignmentDelegate")
 	private StaffAssignmentDelegate staffAssignmentDelegate;
 	
 	@Autowired
-	@Qualifier("personDelegate")
 	private PersonDelegate personDelegate;
 	
 	@Autowired
-	@Qualifier("supervisoryOrganizationDelegate")
 	private SupervisoryOrganizationDelegate supervisoryOrganizationDelegate;
 	
 	@Autowired
-	@Qualifier("staffTitleDelegate")
 	private StaffTitleDelegate staffTitleDelegate;
 	
 	@Autowired
-	@Qualifier("paroleBoardMemberDelegate")
 	private ParoleBoardMemberDelegate paroleBoardMemberDelegate;
 
 	@Autowired
-	@Qualifier("boardAttendeeDelegate")
-	private BoardAttendeeDelegate boardAttendeeDelegate;
-	
-	@Autowired
-	@Qualifier("hearingAnalysisDelegate")
 	private HearingAnalysisDelegate hearingAnalysisDelegate;
 	
 	@Autowired
-	@Qualifier("hearingAnalysisNoteDelegate")
 	private HearingAnalysisNoteDelegate hearingAnalysisNoteDelegate;
 
 	@Autowired
-	@Qualifier("hearingAnalysisCategoryDelegate")
 	private HearingAnalysisCategoryDelegate hearingAnalysisCategoryDelegate;
-	
-	@Autowired
-	@Qualifier("paroleBoardLocationDelegate")
-	private ParoleBoardLocationDelegate paroleBoardLocationDelegate;
 	
 	/* Services. */
 
 	@Autowired
-	@Qualifier("hearingAnalysisService")
 	private HearingAnalysisService hearingAnalysisService;
 
 	/* Test methods. */
@@ -205,7 +132,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 				EligibilityStatusCategory.APPEARING;
 		Date statusDate = this.parseDateText("01/01/2017");
 		EligibilityStatusReason statusReason = eligibilityStatusReasonDelegate
-				.create("Reason", true);
+				.create("Reason", statusCategory, true);
 		String statusComment = "Comment";
 		ParoleEligibilityStatus paroleEligibilityStatus = 
 				new ParoleEligibilityStatus(statusDate, statusComment, 
@@ -215,31 +142,6 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 		ParoleEligibility eligibility = this.paroleEligibilityDelegate.create(
 				offender, hearingEligibilityDate, reviewDate, 
 				paroleEligibilityStatus, appearanceCategory);
-		Organization organization = this.organizationDelegate.create("Org", "O",
-				null);
-		Country country = this.countryDelegate.create("Country", "C", true);
-		City city = this.cityDelegate.create("City", true, null, country);
-		ZipCode zipCode = this.zipCodeDelegate.create(city, "12345", null, 
-				true);
-		Address address = this.addressDelegate.findOrCreate("123 Some St.", 
-				null, null, null, zipCode);
-		Location location = this.locationDelegate.create(organization, 
-				new DateRange(this.parseDateText("01/01/2000"), null), address);
-		ParoleBoardLocation paroleBoardLocation = this
-				.paroleBoardLocationDelegate.create(location, true);
-		Date startDate = this.parseDateText("01/01/2017");
-		Date endDate = this.parseDateText("12/31/2017");
-		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
-		Organization secondOrganization = this.organizationDelegate.create(
-				"Org2", "O2", null);
-		Location secondLocation = this.locationDelegate.create(
-				secondOrganization, new DateRange(
-						this.parseDateText("01/01/2000"), null), address);
-		Date siteDate = this.parseDateText("01/01/2005");
-		Integer order = 1;
-		BoardMeetingSite meetingSite = this.boardMeetingSiteDelegate.create(
-				boardItinerary, secondLocation, siteDate, order);
 		Date memberStartDate = this.parseDateText("01/01/2017");
 		Date memberEndDate = null;
 		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
@@ -254,14 +156,11 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 				true, null, null, null, null, null);
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
-		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
-		BoardAttendee analyst = this.boardAttendeeDelegate.create(
-				boardItinerary, boardMember, number, role);
 		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
 				.create("Category", true);
 		HearingAnalysis hearingAnalysis = this.hearingAnalysisDelegate.create(
-				eligibility, meetingSite, category, analyst);
+				eligibility, category, boardMember, 
+				this.parseDateText("01/01/2017"));
 		Date date = this.parseDateText("01/01/2017");
 		String description = "Description";
 
@@ -296,7 +195,7 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 				EligibilityStatusCategory.APPEARING;
 		Date statusDate = this.parseDateText("01/01/2017");
 		EligibilityStatusReason statusReason = eligibilityStatusReasonDelegate
-				.create("Reason", true);
+				.create("Reason", statusCategory, true);
 		String statusComment = "Comment";
 		ParoleEligibilityStatus paroleEligibilityStatus = 
 				new ParoleEligibilityStatus(statusDate, statusComment, 
@@ -306,31 +205,6 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 		ParoleEligibility eligibility = this.paroleEligibilityDelegate.create(
 				offender, hearingEligibilityDate, reviewDate, 
 				paroleEligibilityStatus, appearanceCategory);
-		Organization organization = this.organizationDelegate.create("Org", "O",
-				null);
-		Country country = this.countryDelegate.create("Country", "C", true);
-		City city = this.cityDelegate.create("City", true, null, country);
-		ZipCode zipCode = this.zipCodeDelegate.create(city, "12345", null, 
-				true);
-		Address address = this.addressDelegate.findOrCreate("123 Some St.", 
-				null, null, null, zipCode);
-		Location location = this.locationDelegate.create(organization, 
-				new DateRange(this.parseDateText("01/01/2000"), null), address);
-		ParoleBoardLocation paroleBoardLocation = this
-				.paroleBoardLocationDelegate.create(location, true);
-		Date startDate = this.parseDateText("01/01/2017");
-		Date endDate = this.parseDateText("12/31/2017");
-		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
-		Organization secondOrganization = this.organizationDelegate.create(
-				"Org2", "O2", null);
-		Location secondLocation = this.locationDelegate.create(
-				secondOrganization, new DateRange(
-						this.parseDateText("01/01/2000"), null), address);
-		Date siteDate = this.parseDateText("01/01/2005");
-		Integer order = 1;
-		BoardMeetingSite meetingSite = this.boardMeetingSiteDelegate.create(
-				boardItinerary, secondLocation, siteDate, order);
 		Date memberStartDate = this.parseDateText("01/01/2017");
 		Date memberEndDate = null;
 		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
@@ -345,14 +219,11 @@ public class HearingAnalysisServiceCreateHearingAnalysisNoteTests
 				true, null, null, null, null, null);
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
-		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
-		BoardAttendee analyst = this.boardAttendeeDelegate.create(
-				boardItinerary, boardMember, number, role);
 		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
 				.create("Category", true);
 		HearingAnalysis hearingAnalysis = this.hearingAnalysisDelegate.create(
-				eligibility, meetingSite, category, analyst);
+				eligibility, category, boardMember, 
+				this.parseDateText("01/01/2017"));
 		Date date = this.parseDateText("01/01/2017");
 		String description = "Description";
 		this.hearingAnalysisNoteDelegate.create(hearingAnalysis, description, 

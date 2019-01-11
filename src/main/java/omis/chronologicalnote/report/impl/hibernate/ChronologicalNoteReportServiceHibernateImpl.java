@@ -19,13 +19,13 @@ package omis.chronologicalnote.report.impl.hibernate;
 
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-
-import omis.chronologicalnote.domain.ChronologicalNote;
 import omis.chronologicalnote.domain.ChronologicalNoteCategory;
+import omis.chronologicalnote.domain.ChronologicalNoteCategoryGroup;
 import omis.chronologicalnote.report.ChronologicalNoteReportService;
 import omis.chronologicalnote.report.ChronologicalNoteSummary;
 import omis.offender.domain.Offender;
+
+import org.hibernate.SessionFactory;
 
 /**
  * Hibernate implementation of report service for chronological notes.
@@ -39,17 +39,19 @@ public class ChronologicalNoteReportServiceHibernateImpl
 	/* Query names. */
 	private static final String FIND_BY_OFFENDER_QUERY_NAME
 		= "findChronologicalNoteSummaryByOffender";
-	private static final String
-		FIND_BY_OFFENDER_AND_CATEGORIES_QUERY_NAME
+	private static final String FIND_CATEGORIES_QUERY_NAME
+		= "findChronologicalNoteCategories";
+	private static final String FIND_CATEGORY_NAMES_BY_NOTE_ID_QUERY_NAME
+		= "findCategoryNamesByNoteId";
+	private static final String FIND_BY_OFFENDER_AND_CATEGORIES_QUERY_NAME
 		= "findChronologicalNoteSummaryByOffenderAndCategories";
-	private static final String FIND_CATEGORIES_QUERY_NAME = "findCategories";
-	private static final String FIND_CATEGORY_NAME_BY_NOTE_QUERY_NAME
-		= "findCategoryNamesByNote";
+	private static final String FIND_CHRONO_NOTE_CAT_GROUPS_QUERY_NAME 
+		= "findChronologicalNoteCategoryGroups";
 	
 	/* Parameter names. */
 	private static final String OFFENDER_PARAM_NAME = "offender";
+	private static final String NOTE_ID_PARAM_NAME = "noteId";
 	private static final String CATEGORIES_PARAM_NAME = "categories";
-	private static final String NOTE_PARAM_NAME = "note";
 	
 	/* Resources. */
 	private final SessionFactory sessionFactory;
@@ -76,7 +78,12 @@ public class ChronologicalNoteReportServiceHibernateImpl
 			.getCurrentSession()
 			.getNamedQuery(FIND_BY_OFFENDER_QUERY_NAME)
 			.setParameter(OFFENDER_PARAM_NAME, offender)
+			.setReadOnly(true)
 			.list();
+		for (ChronologicalNoteSummary summary : summaries) {
+			summary.getCategoryNames().addAll(this.findCategoryNamesByNoteId(
+				summary.getId()));
+		}
 		return summaries;
 	}
 	
@@ -87,11 +94,16 @@ public class ChronologicalNoteReportServiceHibernateImpl
 		final List<ChronologicalNoteCategory> categories) {
 		@SuppressWarnings("unchecked")
 		List<ChronologicalNoteSummary> summaries = this.sessionFactory
-			.getCurrentSession()
-			.getNamedQuery(FIND_BY_OFFENDER_AND_CATEGORIES_QUERY_NAME)
-			.setParameter(OFFENDER_PARAM_NAME, offender)
-			.setParameter(CATEGORIES_PARAM_NAME, categories)
-			.list();
+		.getCurrentSession()
+		.getNamedQuery(FIND_BY_OFFENDER_AND_CATEGORIES_QUERY_NAME)
+		.setParameter(OFFENDER_PARAM_NAME, offender)
+		.setParameterList(CATEGORIES_PARAM_NAME, categories)
+		.setReadOnly(true)
+		.list();
+		for (ChronologicalNoteSummary summary : summaries) {
+			summary.getCategoryNames().addAll(
+			this.findCategoryNamesByNoteId(summary.getId()));
+		}
 		return summaries;
 	}
 	
@@ -102,19 +114,30 @@ public class ChronologicalNoteReportServiceHibernateImpl
 		List<ChronologicalNoteCategory> categories = this.sessionFactory
 			.getCurrentSession()
 			.getNamedQuery(FIND_CATEGORIES_QUERY_NAME)
+			.setReadOnly(true)
 			.list();
 		return categories;
 	}
 	
-	/** {@inheritDoc} */
-	@Override
-	public List<String> findCategoryNamesByNote(final ChronologicalNote note) {
+	private List<String> findCategoryNamesByNoteId(final Long noteId) {
 		@SuppressWarnings("unchecked")
 		List<String> categoryNames = this.sessionFactory
 			.getCurrentSession()
-			.getNamedQuery(FIND_CATEGORY_NAME_BY_NOTE_QUERY_NAME)
-			.setParameter(NOTE_PARAM_NAME, note)
+			.getNamedQuery(FIND_CATEGORY_NAMES_BY_NOTE_ID_QUERY_NAME)
+			.setParameter(NOTE_ID_PARAM_NAME, noteId)
+			.setReadOnly(true)
 			.list();
 		return categoryNames;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<ChronologicalNoteCategoryGroup> findGroups() {
+		@SuppressWarnings("unchecked")
+		List<ChronologicalNoteCategoryGroup> groups = this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(FIND_CHRONO_NOTE_CAT_GROUPS_QUERY_NAME)
+				.list();
+		return groups;
 	}
 }

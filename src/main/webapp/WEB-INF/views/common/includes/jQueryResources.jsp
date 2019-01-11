@@ -7,7 +7,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 	<c:if test="${empty jqueryLIB}">
 		<c:set var="jqueryLIB" value="true" scope="request"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css?VERSION=1"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.js?VERSION=1"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js?VERSION=1"></script>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/webjars/jquery-ui/1.10.2/themes/base/jquery-ui.css?VERSION=1"/>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/webjars/jquery/1.7.2/jquery.min.js?VERSION=1"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/webjars/jquery-ui/1.10.2/ui/jquery-ui.js?VERSION=1"></script>
 	</c:if>

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.web.validator;
 
 import java.util.Date;
@@ -9,6 +26,7 @@ import omis.locationterm.web.form.LocationReasonTermItem;
 import omis.locationterm.web.form.LocationReasonTermItemOperation;
 import omis.locationterm.web.form.LocationTermForm;
 import omis.util.DateManipulator;
+import omis.web.validator.StringLengthChecks;
 
 /**
  * Validator for form for location terms.
@@ -19,23 +37,32 @@ import omis.util.DateManipulator;
  */
 public class LocationTermFormValidator
 		implements Validator {
+	
+	private final StringLengthChecks stringLengthChecks;
 
-	/** Instantiates a validator for form for location terms. */
-	public LocationTermFormValidator() {
-		// Default instantiation
+	/**
+	 * Instantiates a validator for form for location terms.
+	 * 
+	 * @param stringLengthChecks string length checks
+	 */
+	public LocationTermFormValidator(
+			final StringLengthChecks stringLengthChecks) {
+		this.stringLengthChecks = stringLengthChecks;
 	}
 	
-	/** {@inheritDoc{ */
+	/** {@inheritDoc} */
 	@Override
 	public boolean supports(final Class<?> clazz) {
 		return LocationTermForm.class.isAssignableFrom(clazz);
 	}
 
-	/** {@inheritDoc{ */
+	/** {@inheritDoc} */
 	@Override
 	public void validate(final Object target, final Errors errors) {
 		LocationTermForm locationTermForm = (LocationTermForm) target;
-		if (locationTermForm.getLocation() == null) {
+		if (locationTermForm.getAllowLocation() != null
+				&& locationTermForm.getAllowLocation()
+				&& locationTermForm.getLocation() == null) {
 			errors.rejectValue("location", "location.empty");
 		}
 		if (locationTermForm.getStartDate() != null
@@ -70,6 +97,8 @@ public class LocationTermFormValidator
 				locationTermForm.getEndTime())) {
 			errors.rejectValue("endDate", "endDateTime.equalsStartDateTime");
 		}
+		this.stringLengthChecks.getVeryLargeCheck().check("notes",
+				locationTermForm.getNotes(), errors);
 		if (locationTermForm.getAssociateMultipleReasonTerms() != null
 				&& locationTermForm.getAssociateMultipleReasonTerms()) {
 			boolean atLeastOne;
@@ -195,6 +224,22 @@ public class LocationTermFormValidator
 			if (!atLeastOne) {
 				errors.rejectValue("reasonTermItems",
 						"locationTerm.atLeastOneReasonTermRequired");
+			}
+		} else {
+			if (locationTermForm.getReason() == null) {
+				errors.rejectValue("reason", "locationReason.empty");
+			}
+		}
+		if (locationTermForm.getAllowNextChangeAction() != null
+				&& locationTermForm.getAllowNextChangeAction()
+				&& locationTermForm.getNextChangeAction() != null) {
+			if (locationTermForm.getEndDate() == null) {
+				errors.rejectValue("endDate",
+						"locationTerm.endDate.requiredWithNextChangeAction");
+			}
+			if (locationTermForm.getEndTime() == null) {
+				errors.rejectValue("endTime",
+						"locationTerm.endTime.requiredWithNextChangeAction");
 			}
 		}
 	}

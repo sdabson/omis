@@ -21,10 +21,6 @@
         </bean>
         
         <!-- Delegates -->
-        <bean id="legacyLocationLookupDelegate"
-        	class="omis.separationneed.report.delegate.impl.hibernate.LegacyLocationLookupDelegateHibernateImpl">
-        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-        </bean>
         
         <bean id="separationNeedDelegate"
         	class="omis.separationneed.service.delegate.SeparationNeedDelegate">

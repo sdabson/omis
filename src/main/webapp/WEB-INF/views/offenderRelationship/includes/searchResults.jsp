@@ -2,6 +2,7 @@
   - Search results for offender relationships
   -
   - Author: Stephen Abson
+  - Author: Sheronda Vaughn
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -29,28 +30,36 @@
 	<c:forEach var="offenderRelationshipSummary" items="${offenderRelationshipSummaries}">
 		<tr>
 			<td>
-			<c:forEach var="option" items="${options}">
+			<c:set var="relationshipCount" value="${offenderRelaitonshipSummary.relationshipCount}"/>
 			<c:choose>
-				<c:when test="${option.name eq 'CRIMINAL'}">
-					<a href="${pageContext.request.contextPath}/criminalAssociation/create.html?associate=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}" title="<fmt:message key='createCriminalAssociationLink' bundle='${criminalAssociationBundle}'/>"><span class="invisibleLinkLabel"><fmt:message key='createCriminalAssociationLink' bundle='${criminalAssociationBundle}'/></span></a>
-				</c:when>
-				<c:when test="${option.name eq 'FAMILY_MEMBER'}">
-					<a href="${pageContext.request.contextPath}/family/create.html?familyMember=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}" ><span class="invisibleLinkLabel"><fmt:message key="createFamilyAssociationLink" bundle="${familyBundle}"/></span></a>
-				</c:when>
-				<c:when test="${option.name eq 'VICTIM'}">
-					<a href="${pageContext.request.contextPath}/victim/association/create.html?victim=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}&amp;redirectTarget=OFFENDER" title="<fmt:message key='createVictimAssociationLink' bundle='${victimBundle}'/>"><span class="invisibleLinkLabel"><fmt:message key='createVictimAssociationLink' bundle='${victimBundle}'/></span></a>
-				</c:when>
-				<c:when test="${option.name eq 'VISITOR'}">
-					<a href="${pageContext.request.contextPath}/visitation/create.html?visitor=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}" title="<fmt:message key='createVisitationAssociationLink' bundle='${visitationBundle}'/>"><span class="invisibleLinkLabel"><fmt:message key='createVisitationAssociationLink' bundle='${visitationBundle}'/></span></a>
-				</c:when>
-				<c:when test="${option.name eq 'NEW_RELATION'}">
-					<a href="${pageContext.request.contextPath}/offenderRelationship/create.html?relation=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}" title="<fmt:message key='createOffenderRelationshipLink' bundle='${offenderRelationshipBundle}'/>"><span class="invisibleLinkLabel"><fmt:message key='createOffenderRelationshipLink' bundle='${offenderRelationshipBundle}'/></span></a>
+				<c:when test="${not empty options}">
+					<c:forEach var="option" items="${options}">
+					<c:choose>
+						<c:when test="${option.name eq 'CRIMINAL'}">
+							<a href="${pageContext.request.contextPath}/criminalAssociation/create.html?associate=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}" title="<fmt:message key='createCriminalAssociationLink' bundle='${criminalAssociationBundle}'/>"><span class="invisibleLinkLabel"><fmt:message key='createCriminalAssociationLink' bundle='${criminalAssociationBundle}'/></span></a>
+						</c:when>
+						<c:when test="${option.name eq 'FAMILY_MEMBER'}">
+							<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/family/familyAssociationSearchRowActionMenu.html?familyMember=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}"></a>
+						</c:when>
+						<c:when test="${option.name eq 'VICTIM'}">
+							<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/victim/association/victimAssociationSearchRowActionMenu.html?offender=${offenderSummary.id}&amp;victim=${offenderRelationshipSummary.id}"></a>
+						</c:when>
+						<c:when test="${option.name eq 'VISITOR'}">
+							<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/visitation/visitationAssociationRowSearchActionMenu.html?visitor=${offenderRelationshipSummary.id}&amp;offender=${offenderSummary.id}"></a>
+						</c:when>
+						<c:when test="${option.name eq 'NEW_RELATION'}">
+							<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/offenderRelationship/offenderRelationshipSearchRowActionMenu.html?offender=${offenderSummary.id}&amp;relation=${offenderRelationshipSummary.id}&amp;relationIsOffender=${offenderRelationshipSummary.offender}"></a>
+						</c:when>
+						<c:otherwise>
+							Error - unknown option: <c:out value="${option}"/>
+						</c:otherwise>
+					</c:choose>
+					</c:forEach>
 				</c:when>
 				<c:otherwise>
-					Error - unknown option: <c:out value="${option}"/>
+					<a class="actionMenuItem rowActionMenuItem" id="actionMenuLink${status.index}" href="${pageContext.request.contextPath}/offenderRelationship/offenderRelationshipSearchRowActionMenu.html?offender=${offenderSummary.id}&amp;relation=${offenderRelationshipSummary.id}&amp;relationIsOffender=${offenderRelationshipSummary.offender}"></a>
 				</c:otherwise>
 			</c:choose>
-			</c:forEach>
 			</td>
 			<td>
 				<c:out value="${offenderRelationshipSummary.lastName}"/>,

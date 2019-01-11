@@ -1,27 +1,45 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.hearing.domain.component;
 
 import java.io.Serializable;
 import java.util.Date;
-
+import omis.condition.domain.Condition;
+import omis.disciplinaryCode.domain.DisciplinaryCode;
 import omis.hearing.domain.DispositionCategory;
 import omis.hearing.domain.ResolutionClassificationCategory;
 import omis.person.domain.Person;
 
 /**
- * Resolution.java
+ * Resolution.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Aug 17, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.3 (Jul 17, 2018)
+ * @since OMIS 3.0
  */
-public class Resolution implements Serializable{
+public class Resolution implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private Date date;
 	
-	private String descision;
+	private String decision;
 	
 	private String reason;
 	
@@ -33,6 +51,10 @@ public class Resolution implements Serializable{
 	
 	private ResolutionClassificationCategory category;
 	
+	private DisciplinaryCode adjustedCode;
+	
+	private Condition adjustedCondition;
+	
 	/**
 	 * 
 	 */
@@ -40,7 +62,31 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Returns the date
+	 * Instantiates a resolution with all properties.
+	 *  
+	 * @param date date
+	 * @param decision decision
+	 * @param reason reason
+	 * @param authority authority
+	 * @param appealDate appeal date
+	 * @param disposition disposition category
+	 * @param category resolution classification category
+	 */
+	public Resolution(final Date date, final String decision, 
+			final String reason, final Person authority, final Date appealDate, 
+			final DispositionCategory disposition, 
+			final ResolutionClassificationCategory category) {
+		this.date = date;
+		this.decision = decision;
+		this.reason = reason;
+		this.authority = authority;
+		this.appealDate = appealDate;
+		this.disposition = disposition;
+		this.category = category;
+	}
+	
+	/**
+	 * Returns the date.
 	 * @return date - Date
 	 */
 	public Date getDate() {
@@ -48,31 +94,33 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the date
+	 * Sets the date.
 	 * @param date - Date
 	 */
-	public void setDate(Date date) {
+	public void setDate(final Date date) {
 		this.date = date;
 	}
 
 	/**
-	 * Returns the descision
-	 * @return descision - String
+	 * Returns the decision.
+	 * 
+	 * @return decision
 	 */
-	public String getDescision() {
-		return descision;
+	public String getDecision() {
+		return decision;
 	}
 
 	/**
-	 * Sets the descision
-	 * @param descision - String
+	 * Sets the decision.
+	 * 
+	 * @param decision decision
 	 */
-	public void setDescision(String descision) {
-		this.descision = descision;
+	public void setDecision(final String decision) {
+		this.decision = decision;
 	}
 
 	/**
-	 * Returns the reason
+	 * Returns the reason.
 	 * @return reason - String
 	 */
 	public String getReason() {
@@ -80,15 +128,15 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the reason
+	 * Sets the reason.
 	 * @param reason - String
 	 */
-	public void setReason(String reason) {
+	public void setReason(final String reason) {
 		this.reason = reason;
 	}
 	
 	/**
-	 * Returns the authority
+	 * Returns the authority.
 	 * @return authority - Person
 	 */
 	public Person getAuthority() {
@@ -96,7 +144,7 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the authority
+	 * Sets the authority.
 	 * @param authority - Person
 	 */
 	public void setAuthority(final Person authority) {
@@ -104,7 +152,7 @@ public class Resolution implements Serializable{
 	}
 	
 	/**
-	 * Returns the appeal date
+	 * Returns the appeal date.
 	 * @return appealDate - Date of appeal
 	 */
 	public Date getAppealDate() {
@@ -112,7 +160,7 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the appeal date
+	 * Sets the appeal date.
 	 * @param appealDate - Date appeal
 	 */
 	public void setAppealDate(final Date appealDate) {
@@ -120,7 +168,7 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Returns the disposition
+	 * Returns the disposition.
 	 * @return disposition - DispositionCategory
 	 */
 	public DispositionCategory getDisposition() {
@@ -128,15 +176,15 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the disposition
+	 * Sets the disposition.
 	 * @param disposition - DispositionCategory
 	 */
-	public void setDisposition(DispositionCategory disposition) {
+	public void setDisposition(final DispositionCategory disposition) {
 		this.disposition = disposition;
 	}
 
 	/**
-	 * Returns the category
+	 * Returns the category.
 	 * @return category - ResolutionClassificationCategory
 	 */
 	public ResolutionClassificationCategory getCategory() {
@@ -144,13 +192,38 @@ public class Resolution implements Serializable{
 	}
 
 	/**
-	 * Sets the category
+	 * Sets the category.
 	 * @param category - ResolutionClassificationCategory
 	 */
-	public void setCategory(ResolutionClassificationCategory category) {
+	public void setCategory(final ResolutionClassificationCategory category) {
 		this.category = category;
 	}
-	
-	
 
+	/**
+	 * @return the adjustedCode
+	 */
+	public DisciplinaryCode getAdjustedCode() {
+		return this.adjustedCode;
+	}
+
+	/**
+	 * @param adjustedCode the adjustedCode to set
+	 */
+	public void setAdjustedCode(final DisciplinaryCode adjustedCode) {
+		this.adjustedCode = adjustedCode;
+	}
+
+	/**
+	 * @return the adjustedCondition
+	 */
+	public Condition getAdjustedCondition() {
+		return this.adjustedCondition;
+	}
+
+	/**
+	 * @param adjustedCondition the adjustedCondition to set
+	 */
+	public void setAdjustedCondition(final Condition adjustedCondition) {
+		this.adjustedCondition = adjustedCondition;
+	}
 }

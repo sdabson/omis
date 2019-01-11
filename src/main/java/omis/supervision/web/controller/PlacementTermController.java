@@ -43,8 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.config.util.FeatureToggles;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.locationterm.domain.LocationTerm;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
@@ -65,7 +65,9 @@ import omis.supervision.exception.OffenderNotUnderSupervisionException;
 import omis.supervision.exception.PlacementTermConflictException;
 import omis.supervision.exception.PlacementTermExistsAfterException;
 import omis.supervision.exception.PlacementTermExistsBeforeException;
+import omis.supervision.exception.PlacementTermExistsException;
 import omis.supervision.exception.PlacementTermLockedException;
+import omis.supervision.exception.PlacementTermNoteExistsException;
 import omis.supervision.exception.SupervisoryOrganizationTermConflictException;
 import omis.supervision.report.PlacementTermReportService;
 import omis.supervision.report.PlacementTermSummary;
@@ -219,7 +221,8 @@ public class PlacementTermController {
 	private static final String CORRECTIONAL_STATUS_TERM_CONFLICT_MESSAGE_KEY
 			= "placementTerm.correctionalStatusTermConflicts";
 
-	private static final String SUPERVISORY_ORGANIZATION_TERM_CONFLICT_MESSAGE_KEY
+	private static final String
+	SUPERVISORY_ORGANIZATION_TERM_CONFLICT_MESSAGE_KEY
 			= "placementTerm.supervisoryOrganizationTermConflicts";
 
 	private static final String PLACEMENT_TERM_CONFLICT_MESSAGE_KEY
@@ -237,13 +240,23 @@ public class PlacementTermController {
 	private static final String OFFENDER_NOT_UNDER_SUPERVISION_MESSAGE_KEY
 			= "offender.notUnderSupervision";
 	
+	private static final String PLACEMENT_TERM_EXISTS_MESSAGE_KEY
+			= "placementTerm.exists";
+
+	private static final String PLACEMENT_TERM_NOTE_EXISTS_MESSAGE_KEY
+			= "placementTermNote.exists";
+
+	
 	/* Report names. */
 	
 	private static final String PLACEMENT_LISTING_REPORT_NAME 
-		= "/Placement/PlacementTerms/Placement_Listing";
+		= "/Placement/CorrectionalStatus/Correctional_Status_Listing";
+	
+	private static final String PLACEMENT_BY_SUP_ORG_LISTING_REPORT_NAME 
+	    = "/Placement/PlacementTerms/Placement_Term_by_Supervisory_Organization_Listing";	
 	
 	private static final String PLACEMENT_DETAILS_REPORT_NAME 
-		= "/Placement/PlacementTerms/Placement_Term_Details";	
+		= "/Placement/CorrectionalStatus/Correctional_Status_Details";	
 
 	/* Report parameter names. */
 	
@@ -252,6 +265,22 @@ public class PlacementTermController {
 	
 	private static final String PLACEMENT_TERM_DETAILS_ID_REPORT_PARAM_NAME 
 		= "PLACEMENT_TERM_ID";
+	
+	/* Module name. */
+	
+	private static final String MODULE_NAME = "supervision";
+	
+	/* Feature toggle names. */
+	
+	private static final String ALLOW_SUPERVISORY_ORGANIZATION_TERM_TOGGLE_NAME
+		= "allowSupervisoryOrganizationTerm";
+	
+	private static final String ALLOW_PLACEMENT_TERM_STATUS_TOGGLE_NAME
+		= "allowPlacementTermStatus";
+	
+	private static final String
+	ALLOW_PLACEMENT_TERM_END_CHANGE_REASON_TOGGLE_NAME
+		= "allowPlacementTermEndChangeReason";
 	
 	/* Services. */
 	
@@ -328,6 +357,13 @@ public class PlacementTermController {
 	@Autowired
 	@Qualifier("reportControllerDelegate")
 	private ReportControllerDelegate reportControllerDelegate;
+	
+	/* Feature toggles. */
+	
+	@Autowired
+	@Qualifier("featureToggles")
+	private FeatureToggles featureToggles;
+	
 	/* Constructor. */
 	
 	/** Instantiates a default controller for placement terms. */
@@ -401,9 +437,18 @@ public class PlacementTermController {
 				final Boolean allowCorrectionalStatusChange) {
 		Date effectiveDate = new Date();
 		PlacementTermForm placementTermForm = new PlacementTermForm();
-		placementTermForm.setAllowStatusFields(false);
+		placementTermForm.setAllowStatusFields(
+				this.getAllowPlacementTermStatus());
+		placementTermForm.setAllowSupervisoryOrganization(
+				this.getAllowSupervisoryOrganizationTerm());
+		placementTermForm.setAllowState(
+				this.getAllowSupervisoryOrganizationTerm());
+		placementTermForm.setAllowStartDate(true);
+		placementTermForm.setAllowStartTime(true);
 		placementTermForm.setStartDate(effectiveDate);
 		placementTermForm.setStartTime(effectiveDate);
+		placementTermForm.setAllowEndChangeReason(
+				this.getAllowPlacementTermEndChangeReason());
 		if (allowCorrectionalStatusChange != null
 				&& allowCorrectionalStatusChange) {
 			placementTermForm.setAllowCorrectionalStatus(true);
@@ -423,11 +468,13 @@ public class PlacementTermController {
 			}
 			placementTermForm.setAllowCorrectionalStatus(false);
 		}
-		placementTermForm.setState(this.placementTermService
-				.findHomeState());
-		placementTermForm.setAllowSendToLocation(true);
+		if (placementTermForm.getAllowState()) {
+			placementTermForm.setState(this.placementTermService
+					.findHomeState());
+		}
+		placementTermForm.setAllowSendToLocation(false);
 		placementTermForm.setSendToLocation(true);
-		return this.prepareEditMav(placementTermForm, offender,
+		return this.prepareCreateMav(placementTermForm, offender,
 				effectiveDate);
 	}
 	
@@ -444,14 +491,25 @@ public class PlacementTermController {
 			@RequestParam(value = "placementTerm", required = true)
 				final PlacementTerm placementTerm) {
 		PlacementTermForm placementTermForm = new PlacementTermForm();
-		placementTermForm.setAllowStatusFields(true);
+		placementTermForm.setAllowStatusFields(
+				this.getAllowPlacementTermStatus());
 		placementTermForm.setAllowCorrectionalStatus(false);
+		placementTermForm.setAllowSupervisoryOrganization(
+				this.getAllowSupervisoryOrganizationTerm());
+		placementTermForm.setAllowState(
+				this.getAllowSupervisoryOrganizationTerm());
+		placementTermForm.setAllowStartDate(false);
+		placementTermForm.setAllowStartTime(false);
+		placementTermForm.setAllowEndChangeReason(
+				this.getAllowPlacementTermEndChangeReason());
 		placementTermForm.setCorrectionalStatus(
 				placementTerm.getCorrectionalStatusTerm()
 					.getCorrectionalStatus());
-		placementTermForm.setSupervisoryOrganization(
-				placementTerm.getSupervisoryOrganizationTerm()
-					.getSupervisoryOrganization());
+		if (placementTerm.getSupervisoryOrganizationTerm() != null) {
+			placementTermForm.setSupervisoryOrganization(
+					placementTerm.getSupervisoryOrganizationTerm()
+						.getSupervisoryOrganization());
+		}
 		if (placementTerm.getDateRange() != null) {
 			placementTermForm.setStartDate(
 					placementTerm.getDateRange().getStartDate());
@@ -496,12 +554,14 @@ public class PlacementTermController {
 		// location - this might not be the State used to originally set the
 		// supervisory organization. States must be ordered in order for the
 		// State selected to not vary between requests - SA
-		List<State> states = this.placementTermService
-				.findStatesForSupervisoryOrganization(
-						placementTerm.getSupervisoryOrganizationTerm()
-							.getSupervisoryOrganization());
-		if (states.size() > 0) {
-			placementTermForm.setState(states.get(0));
+		if (placementTerm.getSupervisoryOrganizationTerm() != null) {
+			List<State> states = this.placementTermService
+					.findStatesForSupervisoryOrganization(
+							placementTerm.getSupervisoryOrganizationTerm()
+								.getSupervisoryOrganization());
+			if (states.size() > 0) {
+				placementTermForm.setState(states.get(0));
+			}
 		}
 		
 		// Adds note items
@@ -523,15 +583,77 @@ public class PlacementTermController {
 		
 		// Prepares and returns model and view
 		ModelAndView mav = this.prepareEditMav(
-				placementTermForm, placementTerm.getOffender(), new Date());
+				placementTermForm, placementTerm.getOffender(), new Date(),
+				placementTerm);
 		mav.addObject(PLACEMENT_TERM_MODEL_KEY, placementTerm);
 		return mav;
 	}
 	
-	// Prepares edit form model and view
-	private ModelAndView prepareEditMav(
+	// Prepares create form model and view
+	public ModelAndView prepareCreateMav(
 			final PlacementTermForm placementTermForm,
 			final Offender offender, final Date effectiveDate) {
+		
+		// Effective placement term is on effective date
+		PlacementTerm effectivePlacementTerm = this.placementTermService
+				.findPlacementTerm(offender, effectiveDate);
+		
+		// Adds start change reasons
+		CorrectionalStatus fromCorrectionalStatus;
+		if (effectivePlacementTerm != null) {
+			fromCorrectionalStatus = effectivePlacementTerm
+				.getCorrectionalStatusTerm().getCorrectionalStatus();
+		} else {
+			fromCorrectionalStatus = null;
+		}
+		List<PlacementTermChangeReason> startChangeReasons
+			= this.placementTermService.findAllowedStartChangeReasons(
+				fromCorrectionalStatus,
+				placementTermForm.getCorrectionalStatus());
+		
+		// Returns model and view
+		return this.prepareEditMavImpl(
+			placementTermForm, effectivePlacementTerm, offender, effectiveDate,
+			startChangeReasons);
+	}
+	
+	// Prepares edit form model and view
+	public ModelAndView prepareEditMav(
+			final PlacementTermForm placementTermForm,
+			final Offender offender, final Date effectiveDate,
+			final PlacementTerm effectivePlacementTerm) {
+		
+		// Adds start change reasons
+		CorrectionalStatus fromCorrectionalStatus;
+		PlacementTerm previousPlacementTerm = this.placementTermService
+				.findPlacementTermForOffenderWithEndDate(offender,
+						DateRange.getStartDate(effectivePlacementTerm
+								.getDateRange()));
+		if (previousPlacementTerm != null) {
+			fromCorrectionalStatus = previousPlacementTerm
+					.getCorrectionalStatusTerm()
+						.getCorrectionalStatus();
+		} else {
+			fromCorrectionalStatus = null;
+		}
+		List<PlacementTermChangeReason> startChangeReasons
+			= this.placementTermService.findAllowedStartChangeReasons(
+					fromCorrectionalStatus,
+					effectivePlacementTerm.getCorrectionalStatusTerm()
+						.getCorrectionalStatus());
+		
+		// Returns model and view
+		return this.prepareEditMavImpl(
+			placementTermForm, effectivePlacementTerm, offender, effectiveDate,
+			startChangeReasons);
+	}
+	
+	// Prepares edit form model and view implementation
+	private ModelAndView prepareEditMavImpl(
+			final PlacementTermForm placementTermForm,
+			final PlacementTerm effectivePlacementTerm,
+			final Offender offender, final Date effectiveDate,
+			final List<PlacementTermChangeReason> startChangeReasons) {
 		ModelAndView mav = new ModelAndView(EDIT_FORM_VIEW_NAME);
 		mav.addObject(PLACEMENT_TERM_FORM_MODEL_KEY, placementTermForm);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
@@ -550,10 +672,6 @@ public class PlacementTermController {
 		// Adds home States
 		List<State> states = this.placementTermService.findHomeStates();
 		mav.addObject(STATES_MODEL_KEY, states);
-		
-		// Effective placement term is on effective date
-		PlacementTerm effectivePlacementTerm = this.placementTermService
-				.findPlacementTerm(offender, effectiveDate);
 		
 		// Adds correctional statuses that can be changed to based off
 		// correctional status on effective date
@@ -602,28 +720,6 @@ public class PlacementTermController {
 		}
 		mav.addObject(SUPERVISORY_ORGANIZATIONS_MODEL_KEY,
 				supervisoryOrganizations);
-		
-		// Adds start change reasons
-		CorrectionalStatus fromCorrectionalStatus;
-		if (effectivePlacementTerm != null) {
-			PlacementTerm previousPlacementTerm = this.placementTermService
-					.findPlacementTermForOffenderWithEndDate(offender,
-							DateRange.getStartDate(effectivePlacementTerm
-									.getDateRange()));
-			if (previousPlacementTerm != null) {
-				fromCorrectionalStatus = previousPlacementTerm
-						.getCorrectionalStatusTerm()
-							.getCorrectionalStatus();
-			} else {
-				fromCorrectionalStatus = null;
-			}
-		} else {
-			fromCorrectionalStatus = null;
-		}
-		List<PlacementTermChangeReason> startChangeReasons
-			= this.placementTermService.findAllowedStartChangeReasons(
-					fromCorrectionalStatus,
-					placementTermForm.getCorrectionalStatus());
 
 		mav.addObject(PLACEMENT_TERM_START_CHANGE_REASONS_MODEL_KEY,
 				startChangeReasons);
@@ -680,6 +776,7 @@ public class PlacementTermController {
 	 * terms exist before end date
 	 * @throws PlacementTermExistsAfterException if end date is null and terms 
 	 * exist after start date 
+	 * @throws PlacementTermNoteExistsException if placement term note exists
 	 */
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('ADMIN') or hasRole('PLACEMENT_TERM_CREATE')")
@@ -692,17 +789,26 @@ public class PlacementTermController {
 				final Boolean allowCorrectionalStatusChange,
 			final PlacementTermForm placementTermForm,
 			final BindingResult result,
-			final HttpSession session) throws DuplicateEntityFoundException,
+			final HttpSession session) throws PlacementTermExistsException,
 				CorrectionalStatusTermConflictException,
 				SupervisoryOrganizationTermConflictException,
 				PlacementTermConflictException, 
 				OffenderNotUnderSupervisionException, 
 				PlacementTermExistsAfterException, 
-				PlacementTermExistsBeforeException {
+				PlacementTermExistsBeforeException,
+				PlacementTermNoteExistsException {
 		this.placementTermFormValidator.validate(placementTermForm, result);
 		if (result.hasErrors()) {
-			return this.prepareRedisplayMav(
-					offender, placementTermForm, result);
+			Date effectiveDate;
+			if (placementTermForm.getStartDate() != null) {
+				effectiveDate = DateManipulator.getDateAtTimeOfDay(
+						placementTermForm.getStartDate(),
+						placementTermForm.getStartTime());
+			} else {
+				effectiveDate = new Date();
+			}
+			return this.prepareCreateRedisplayMav(
+					offender, effectiveDate, placementTermForm, result);
 		}
 		DateRange dateRange = this.createDateRange(
 				placementTermForm.getStartDate(),
@@ -712,8 +818,6 @@ public class PlacementTermController {
 		PlacementTerm placementTerm;
 		if (allowCorrectionalStatusChange != null
 				&& allowCorrectionalStatusChange) {
-			
-			// TODO Remove status and statusDate parameters - SA
 			placementTerm = this.placementTermService
 				.create(offender,
 						placementTermForm.getSupervisoryOrganization(),
@@ -808,6 +912,7 @@ public class PlacementTermController {
 	 * @throws SupervisoryOrganizationTermConflictException if conflicting
 	 * supervisory organization terms exist
 	 * @throws PlacementTermLockedException if placement term is locked
+	 * @throws PlacementTermNoteExistsException if placement term note exists
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('ADMIN') or hasRole('PLACEMENT_TERM_EDIT')")
@@ -816,14 +921,23 @@ public class PlacementTermController {
 				final PlacementTerm placementTerm,
 			final PlacementTermForm placementTermForm,
 			final BindingResult result)
-					throws DuplicateEntityFoundException,
-						CorrectionalStatusTermConflictException,
-						SupervisoryOrganizationTermConflictException,
-						PlacementTermLockedException {
+						throws CorrectionalStatusTermConflictException,
+							SupervisoryOrganizationTermConflictException,
+							PlacementTermLockedException,
+							PlacementTermNoteExistsException {
 		this.placementTermFormValidator.validate(placementTermForm, result);
 		if (result.hasErrors()) {
-			ModelAndView mav = prepareRedisplayMav(
-					placementTerm.getOffender(), placementTermForm, result);
+			Date effectiveDate;
+			if (placementTermForm.getStartDate() != null) {
+				effectiveDate = DateManipulator.getDateAtTimeOfDay(
+						placementTermForm.getStartDate(),
+						placementTermForm.getStartTime());
+			} else {
+				effectiveDate = new Date();
+			}
+			ModelAndView mav = prepareEditRedisplayMav(
+					placementTerm.getOffender(), effectiveDate,
+					placementTerm, placementTermForm, result);
 			mav.addObject(PLACEMENT_TERM_MODEL_KEY, placementTerm);
 			return mav;
 		}
@@ -859,13 +973,10 @@ public class PlacementTermController {
 			statusDateRange = null;
 		}
 		this.placementTermService.update(placementTerm,
-						placementTermForm.getSupervisoryOrganization(),
-						status, statusDateRange,
-						this.createDateRange(
-								placementTermForm.getStartDate(),
-								placementTermForm.getStartTime(),
+						this.calculateDateTime(
 								placementTermForm.getEndDate(),
 								placementTermForm.getEndTime()),
+						status, statusDateRange,
 						placementTermForm.getStartChangeReason(),
 						placementTermForm.getEndChangeReason());
 		
@@ -897,14 +1008,31 @@ public class PlacementTermController {
 		}
 		return prepareListRedirect(placementTerm.getOffender());
 	}
+
+	// Returns a model and view to redisplay create screen
+	private ModelAndView prepareCreateRedisplayMav(
+			final Offender offender,
+			final Date effectiveDate,
+			final PlacementTermForm placementTermForm,
+			final BindingResult result) {
+		ModelAndView mav = this.prepareCreateMav(
+				placementTermForm, offender, effectiveDate);
+		mav.addObject(
+			BindingResult.MODEL_KEY_PREFIX + PLACEMENT_TERM_FORM_MODEL_KEY,
+			result);
+		return mav;
+	}
 	
 	// Returns a model and view to redisplay edit screen
-	private ModelAndView prepareRedisplayMav(
+	private ModelAndView prepareEditRedisplayMav(
 			final Offender offender,
+			final Date effectiveDate,
+			final PlacementTerm placementTerm,
 			final PlacementTermForm placementTermForm,
 			final BindingResult result) {
 		ModelAndView mav = this.prepareEditMav(
-				placementTermForm, offender, new Date());
+				placementTermForm, offender, effectiveDate,
+				placementTerm);
 		mav.addObject(
 			BindingResult.MODEL_KEY_PREFIX + PLACEMENT_TERM_FORM_MODEL_KEY,
 			result);
@@ -923,16 +1051,22 @@ public class PlacementTermController {
 			final Organization organization,
 			final Date startDate,
 			final Date endDate) {
+		Long organizationId;
+		if (organization != null) {
+			organizationId = organization.getId();
+		} else {
+			organizationId = null;
+		}
 		if (endDate != null) {
 			return new ModelAndView(String.format(
 				CREATE_LOCATION_TERM_REDIRECT,
-				offender.getId(), organization.getId(),
+				offender.getId(), organizationId,
 				this.formatDate(startDate), this.formatTime(startDate),
 				this.formatDate(endDate), this.formatTime(endDate)));
 		} else {
 			return new ModelAndView(String.format(
 				CREATE_LOCATION_TERM_WITHOUT_END_DATE_REDIRECT,
-				offender.getId(), organization.getId(),
+				offender.getId(), organizationId,
 				this.formatDate(startDate), this.formatTime(startDate)));			
 		}
 	}
@@ -1224,6 +1358,31 @@ public class PlacementTermController {
 	}
 	
 	/**
+	 * Returns the report for the specified offenders placements by sup org.
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/placementSupOrgListingReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PLACEMENT_TERM_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportPlacementSupOrgListing(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(PLACEMENT_LISTING_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getOffenderNumber()));
+		byte[] doc = this.reportRunner.runReport(
+				PLACEMENT_BY_SUP_ORG_LISTING_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}	
+	
+	/**
 	 * Returns the report for the specified placement term.
 	 * 
 	 * @param placementTerm placement term
@@ -1324,6 +1483,38 @@ public class PlacementTermController {
 	}
 	
 	/* Exception handlers. */
+	
+	/**
+	 * Handles {@code PlacementTermExistsException}.
+	 * 
+	 * @param placementTermExistsException exception to handle
+	 * @return model and view to handle {@code PlacementTermExistsException}.
+	 */
+	@ExceptionHandler(PlacementTermExistsException.class)
+	public ModelAndView handlePlacementTermExistsException(
+			final PlacementTermExistsException
+				placementTermExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				PLACEMENT_TERM_EXISTS_MESSAGE_KEY,
+				ERROR_MESSAGE_BUNDLE_NAME,
+				placementTermExistsException);
+	}
+	
+	/**
+	 * Handles {@code PlacementTermNoteExistsException}.
+	 * 
+	 * @param placementTermNoteExistsException exception to handle
+	 * @return model and view to handle {@code PlacementTermNoteExistsException}
+	 */
+	@ExceptionHandler(PlacementTermNoteExistsException.class)
+	public ModelAndView handlePlacementTermNotExistsException(
+			final PlacementTermNoteExistsException
+				placementTermNoteExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				PLACEMENT_TERM_NOTE_EXISTS_MESSAGE_KEY,
+				ERROR_MESSAGE_BUNDLE_NAME,
+				placementTermNoteExistsException);
+	}
 	
 	/**
 	 * Handles {@code CorrectionalStatusTermConflictException}.
@@ -1440,6 +1631,27 @@ public class PlacementTermController {
 				OFFENDER_NOT_UNDER_SUPERVISION_MESSAGE_KEY,
 				ERROR_MESSAGE_BUNDLE_NAME,
 				offenderNotUnderSupervisionException);
+	}
+	
+	/* Feature toggle lookup helpers. */
+	
+	// Returns whether supervisory organization term is part of placement
+	private boolean getAllowSupervisoryOrganizationTerm() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_SUPERVISORY_ORGANIZATION_TERM_TOGGLE_NAME);
+	}
+	
+	// Returns whether status is part of placement term
+	private boolean getAllowPlacementTermStatus() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_PLACEMENT_TERM_STATUS_TOGGLE_NAME);
+	}
+	
+	// Returns whether end change reason is allowed
+	private boolean getAllowPlacementTermEndChangeReason() {
+		return this.featureToggles.get(
+				MODULE_NAME,
+				ALLOW_PLACEMENT_TERM_END_CHANGE_REASON_TOGGLE_NAME);
 	}
 	
 	/* Init binder. */

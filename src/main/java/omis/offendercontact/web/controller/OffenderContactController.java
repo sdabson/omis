@@ -1,7 +1,25 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offendercontact.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,23 +39,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import omis.address.domain.Address;
-import omis.address.domain.AddressUnitDesignator;
-import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
+import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.web.controller.delegate.AddressFieldsControllerDelegate;
+import omis.address.web.form.AddressFields;
 import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.config.util.FeatureToggles;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
 import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
+import omis.contact.exception.OnlineAccountExistsException;
+import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
 import omis.contact.web.form.OnlineAccountFields;
 import omis.contact.web.form.PoBoxFields;
 import omis.contact.web.form.TelephoneNumberFields;
 import omis.country.domain.Country;
-import omis.exception.DuplicateEntityFoundException;
+import omis.datatype.DateRange;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -51,9 +75,13 @@ import omis.offendercontact.web.form.OffenderContactTelephoneNumberOperation;
 import omis.offendercontact.web.validator.OffenderContactFormValidator;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
+import omis.residence.domain.ResidenceTerm;
+import omis.residence.exception.NonResidenceTermConflictException;
+import omis.residence.exception.ResidenceTermConflictException;
 import omis.util.StringUtility;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
@@ -62,6 +90,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  *
  * @author Josh Divine
  * @author Yidong Li
+ * @author Stephen Abson
  * @version 0.0.1 (Dec 13, 2016)
  * @since OMIS 3.0
  */
@@ -117,7 +146,7 @@ public class OffenderContactController {
 		= "onlineAccountItemIndex";
 	
 	private static final String OFFENDER_CONTACT_FORM_MODEL_KEY 
-		= "offenderContactForm";
+		= "offenderContactForm";	
 	
 	private static final String ADDRESSES_MODEL_KEY = "addresses";
 	
@@ -130,6 +159,11 @@ public class OffenderContactController {
 	
 	private static final String PO_BOX_FIELDS_NAME = "poBoxFields";
 
+	/* Toggle keys. */
+	
+	private static final String ALLOW_RESIDENCE_AT_MAILING_ADDRESS_TOGGLE_KEY
+		= "allowResidenceAtMailingAddress";
+	
 	/* Services. */
 
 	@Autowired
@@ -183,15 +217,7 @@ public class OffenderContactController {
 	@Autowired
 	@Qualifier("addressPropertyEditorFactory")
 	private PropertyEditorFactory addressPropertyEditorFactory;
-	
-	@Autowired
-	@Qualifier("streetSuffixPropertyEditorFactory")
-	private PropertyEditorFactory streetSuffixPropertyEditorFactory;
-	
-	@Autowired
-	@Qualifier("addressUnitDesignatorPropertyEditorFactory")
-	private PropertyEditorFactory addressUnitDesignatorPropertyEditorFactory;
-	
+	 	
 	@Autowired
 	@Qualifier("zipCodePropertyEditorFactory")
 	private PropertyEditorFactory zipCodePropertyEditorFactory;
@@ -207,6 +233,16 @@ public class OffenderContactController {
 	@Autowired
 	@Qualifier("onlineAccountPropertyEditorFactory")
 	private PropertyEditorFactory onlineAccountPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("datePropertyEditorFactory")
+	private CustomDateEditorFactory customDateEditorFactory;
+	
+	/* Feature toggle repository. */
+	
+	@Autowired
+	@Qualifier("featureToggles")
+	private FeatureToggles featureToggles;
 	
 	/* Validators. */
 	
@@ -240,10 +276,10 @@ public class OffenderContactController {
 	}
 	
 	/**
-	 * Displays offenders financial profile.
+	 * Displays offender contact.
 	 * 
 	 * @param offender offender
-	 * @return view to display the list of employment records
+	 * @return view to display offender contact
 	 */
 	@RequestMapping(value="/edit.html", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('OFFENDER_CONTACT_VIEW') or hasRole('ADMIN')")
@@ -253,10 +289,10 @@ public class OffenderContactController {
 		offenderContactForm.setShowMailingAddressFields(true);
 		offenderContactForm.setShowPoBoxFields(true);
 		offenderContactForm.setShowTelephoneNumberItems(true);
-		offenderContactForm.setShowOnlineAccountItems(true);
+		offenderContactForm.setShowOnlineAccountItems(true);	
 		offenderContactForm.setMailingAddressOperation(
-				OffenderContactMailingAddressOperation.USE_EXISTING);
-		Address mailingAddress = this.offenderContactService
+					OffenderContactMailingAddressOperation.USE_EXISTING);
+	Address mailingAddress = this.offenderContactService
 				.findMailingAddress(offender);
 		if (mailingAddress != null) {
 			offenderContactForm.setEnterMailingAddressFields(true);
@@ -276,6 +312,23 @@ public class OffenderContactController {
 			}
 			offenderContactForm.setExistingMailingAddress(mailingAddress);
 			offenderContactForm.setExistingMailingAddressQuery(addressString);
+			if (this.getAllowResidenceAtMailingAddress()) {
+				Date effectiveDate = new Date();
+				ResidenceTerm primaryResidenceTerm
+					= this.offenderContactService.findPrimaryResidence(
+						offender, effectiveDate);
+				if (primaryResidenceTerm != null) {
+					if (primaryResidenceTerm.getAddress()
+							.equals(mailingAddress)) {
+						offenderContactForm.setResidentAtMailingAddress(true);
+						offenderContactForm
+							.setResidentAtMailingAddressEffectiveDate(
+									DateRange.getStartDate(
+											primaryResidenceTerm
+											.getDateRange()));
+					}
+				}
+			}
 		}
 		PoBox poBox = this.offenderContactService.findPoBox(offender);
 		if (poBox != null) {
@@ -328,13 +381,24 @@ public class OffenderContactController {
 	 }
 	
 	/**
-	 * Updates financial profile.
+	 * Updates offender contact.
 	 * 
-	 * @param victimNote victim note to update
-	 * @param victimNoteForm form for victim note
+	 * @param offender offender
+	 * @param offenderContactForm offender contact form
 	 * @param result result
-	 * @return redirect to screen to list notes for victim of note
-	 * @throws DuplicateEntityFoundException if victim note exists
+	 * @return redirect to offender profile
+	 * @throws NonResidenceTermConflictException if attempt is made to set
+	 * residence to mailing address and conflicting homeless term exists with
+	 * end date
+	 * @throws ResidenceTermConflictException if attempt is made to set
+	 * residence to mailing address and conflicting primary residence exists
+	 * with end date 
+	 * @throws CityExistsException 
+	 * @throws ZipCodeExistsException 
+	 * @throws AddressExistsException 
+	 * @throws ContactExistsException 
+	 * @throws TelephoneNumberExistsException 
+	 * @throws OnlineAccountExistsException 
 	 */
 	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_CONTACT_EDIT')")
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
@@ -342,18 +406,21 @@ public class OffenderContactController {
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
 			final OffenderContactForm offenderContactForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
+			final BindingResult result)
+					throws ResidenceTermConflictException,
+						NonResidenceTermConflictException, CityExistsException, ZipCodeExistsException, 
+						AddressExistsException, TelephoneNumberExistsException, ContactExistsException, 
+						OnlineAccountExistsException {
 		this.offenderContactFormValidator.validate(offenderContactForm, 
 				result);
 		if (result.hasErrors()) {
 			return this.prepareRedisplayMav(offenderContactForm, result, 
-					offender);
-		}
-		
+					offender);			
+		}		
 		PoBox poBox;
 		Address mailingAddress;
 		City mailingCity;
-		ZipCode mailingZipCode;
+		ZipCode mailingZipCode;	
 		if (offenderContactForm.getShowMailingAddressFields() != null
 				&& offenderContactForm.getShowMailingAddressFields()
 				&& offenderContactForm.getEnterMailingAddressFields() != null
@@ -411,6 +478,15 @@ public class OffenderContactController {
 				throw new UnsupportedOperationException(String.format(
 						"Unsupported mailing address operation: %s",
 						offenderContactForm.getMailingAddressOperation()));
+			}
+			if (this.getAllowResidenceAtMailingAddress()) {
+				if (offenderContactForm.getResidentAtMailingAddress() != null
+						&& offenderContactForm.getResidentAtMailingAddress()) {
+					this.offenderContactService.changePrimaryResidence(
+							offender, mailingAddress,
+							offenderContactForm
+								.getResidentAtMailingAddressEffectiveDate());
+				}
 			}
 		} else {
 			mailingAddress = null;
@@ -501,10 +577,10 @@ public class OffenderContactController {
 	/* Action menus. */
 	
 	/**
-	 * Shows action menu for financial profile.
+	 * Shows action menu for offender contact.
 	 * 
 	 * @param offender offender
-	 * @return action menu for financial profile
+	 * @return action menu for offender contact
 	 */
 	@RequestMapping(value = "/offenderContactActionMenu.html", 
 			method = RequestMethod.GET)
@@ -540,10 +616,10 @@ public class OffenderContactController {
 	/* AJAX invokable methods. */
 	
 	/**
-	 * Returns fields to create victim association telephone number.
+	 * Returns fields to create telephone number.
 	 * 
 	 * @param itemIndex telephone number item index
-	 * @return fields to create victim association telephone number
+	 * @return fields to create telephone number
 	 */
 	@RequestMapping(value = "/createTelephoneNumber.html",
 			method = RequestMethod.GET)
@@ -563,10 +639,10 @@ public class OffenderContactController {
 	}
 	
 	/**
-	 * Returns fields to create victim association online account.
+	 * Returns fields to create online account.
 	 * 
 	 * @param itemIndex online account item index
-	 * @return fields to create victim association online account
+	 * @return fields to create online account
 	 */
 	@RequestMapping(value = "/createOnlineAccount.html",
 			method = RequestMethod.GET)
@@ -709,17 +785,35 @@ public class OffenderContactController {
 	/* Helpers */
 	
 	/**
-	 * Prepares the model and view to display the screen to edit the financial 
-	 * profile
-	 * @param financialProfileForm financial profile form
+	 * Prepares the model and view
+	 * @param offenderContactForm offender contact form
 	 * @param offender offender
 	 * @return model and view to be displayed
 	 */
 	private ModelAndView prepareEditMav(
 			final OffenderContactForm offenderContactForm,
 			final Offender offender) {
+		State homeState = this.offenderContactService.findHomeState();
+		if (offenderContactForm.getPoBoxFields() == null) {
+			if (homeState != null) {
+				PoBoxFields poBoxFields = new PoBoxFields();
+				 poBoxFields.setState(homeState);
+				 poBoxFields.setCountry(homeState.getCountry());
+				 offenderContactForm.setPoBoxFields(poBoxFields);
+			}
+		}
+		
+		if (offenderContactForm.getMailingAddressFields() == null) {
+			if (homeState != null) {
+				 AddressFields addressFields = new AddressFields();
+				 addressFields.setState(homeState);
+				 addressFields.setCountry(homeState.getCountry());
+				 offenderContactForm.setMailingAddressFields(addressFields);			 
+			}
+		}
 		ModelAndView mav = new ModelAndView(VIEW_NAME);
 		mav.addObject(OFFENDER_CONTACT_FORM_MODEL_KEY, offenderContactForm);
+		
 		int offenderContactTelephoneNumberItemIndex;
 		if (offenderContactForm.getTelephoneNumberItems() != null) {
 			offenderContactTelephoneNumberItemIndex
@@ -784,6 +878,9 @@ public class OffenderContactController {
 		this.addressFieldsControllerDelegate.prepareEditAddressFields(
 			mav.getModelMap(), countries, mailingStates, mailingCities, 
 			mailingZipCodes, MAILING_ADDRESS_FIELDS_NAME);
+		mav.addObject(
+				ALLOW_RESIDENCE_AT_MAILING_ADDRESS_TOGGLE_KEY,
+				this.getAllowResidenceAtMailingAddress());
 		List<State> poBoxStates;
 		List<City> poBoxCities;
 		List<ZipCode> poBoxZipCodes;
@@ -824,7 +921,7 @@ public class OffenderContactController {
 		return mav;
 	}
 	
-	// Prepares model and view to redisplay screen to edit victim associations
+	// Prepares model and view to redisplay screen
 	private ModelAndView prepareRedisplayMav(
 			final OffenderContactForm offenderContactForm,
 			final BindingResult result, final Offender offender) {
@@ -838,8 +935,7 @@ public class OffenderContactController {
 	/* Process the telephone number items */
 	private void processTelephoneNumberItems(
 			final List<OffenderContactTelephoneNumberItem> items, 
-			final Offender offender) 
-					throws DuplicateEntityFoundException {
+			final Offender offender) throws TelephoneNumberExistsException, ContactExistsException {
 		if (items != null) {
 			for (OffenderContactTelephoneNumberItem telephoneNumberItem 
 					: items) {
@@ -876,7 +972,7 @@ public class OffenderContactController {
 	/* Process online account items */
 	private void processOnlineAccountItems(
 			final List<OffenderContactOnlineAccountItem> items, 
-			final Offender offender) throws DuplicateEntityFoundException {
+			final Offender offender) throws OnlineAccountExistsException {
 		if (items != null) {
 			for (OffenderContactOnlineAccountItem accountItem : items) {
 				if (OffenderContactOnlineAccountOperation.CREATE.equals(
@@ -908,13 +1004,21 @@ public class OffenderContactController {
 	}
 	
 	// Returns true if value is true; false otherwise
-		private Boolean resolveCheckBoxValue(final Boolean value) {
-			if (value != null && value) {
-				return true;
-			} else {
-				return false;
-			}
+	private Boolean resolveCheckBoxValue(final Boolean value) {
+		if (value != null && value) {
+			return true;
+		} else {
+			return false;
 		}
+	}
+	
+	/* Feature toggle lookup helpers. */
+	
+	// Returns whether residences at mailing address are allowed
+	private boolean getAllowResidenceAtMailingAddress() {
+		return this.featureToggles.get(
+						"offendercontact", "allowResidenceAtMailingAddress");
+	}
 	
 	/* Reports. */
 	
@@ -928,7 +1032,7 @@ public class OffenderContactController {
 	@RequestMapping(value = "/offenderContactDetailsReport.html",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('OFFENDER_CONTACT_VIEW') or hasRole('ADMIN')")
-	public ResponseEntity<byte []> reportFinancialProfile(@RequestParam(
+	public ResponseEntity<byte []> reportOffenderContactDetails(@RequestParam(
 			value = "offender", required = true)
 			final Offender offender,
 			@RequestParam(value = "reportFormat", required = true)
@@ -965,11 +1069,6 @@ public class OffenderContactController {
 				this.statePropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(City.class,
 				this.cityPropertyEditorFactory.createPropertyEditor());
-		binder.registerCustomEditor(StreetSuffix.class,
-				this.streetSuffixPropertyEditorFactory.createPropertyEditor());
-		binder.registerCustomEditor(AddressUnitDesignator.class,
-				this.addressUnitDesignatorPropertyEditorFactory
-					.createPropertyEditor());
 		binder.registerCustomEditor(ZipCode.class,
 				this.zipCodePropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(OnlineAccountHost.class,
@@ -981,5 +1080,7 @@ public class OffenderContactController {
 		binder.registerCustomEditor(OnlineAccount.class,
 				this.onlineAccountPropertyEditorFactory
 					.createPropertyEditor());
+		binder.registerCustomEditor(Date.class,
+				this.customDateEditorFactory.createCustomDateOnlyEditor(true));
 	}
 }

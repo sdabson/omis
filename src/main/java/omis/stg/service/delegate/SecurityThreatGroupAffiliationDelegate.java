@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.delegate;
 
 import java.util.Date;
@@ -8,7 +25,6 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.audit.domain.VerificationSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.region.domain.City;
@@ -19,11 +35,13 @@ import omis.stg.domain.SecurityThreatGroupActivityLevel;
 import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupChapter;
 import omis.stg.domain.SecurityThreatGroupRank;
+import omis.stg.exception.SecurityThreatGroupAffiliationExistsException;
 
 /**
  * Delegate for security threat group affiliations.
  * 
  * @author Josh Divine
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Dec 07, 2016)
  * @since OMIS 3.0
  */
@@ -84,7 +102,7 @@ public class SecurityThreatGroupAffiliationDelegate {
 	 * @param comment comment
 	 * @param verificationSignature verification signature
 	 * @return security threat group affiliation
-	 * @throws DuplicateEntityFoundException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation exists
 	 */
 	public SecurityThreatGroupAffiliation create(
 			final Offender offender, final DateRange dateRange,
@@ -95,7 +113,7 @@ public class SecurityThreatGroupAffiliationDelegate {
 			final State state, final City city, final String moniker,
 			final String comment,
 			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupAffiliationExistsException {
 		Date startDate;
 		Date endDate;
 		if (dateRange != null) {
@@ -107,7 +125,8 @@ public class SecurityThreatGroupAffiliationDelegate {
 		}
 		if (this.securityThreatGroupAffiliationDao.find(
 				offender, group, startDate, endDate) != null) {
-			throw new DuplicateEntityFoundException("Affiliation exists");
+			throw new SecurityThreatGroupAffiliationExistsException(
+					"Affiliation exists");
 		}
 		SecurityThreatGroupAffiliation affiliation
 			= this.securityThreatGroupAffiliationInstanceFactory
@@ -148,7 +167,7 @@ public class SecurityThreatGroupAffiliationDelegate {
 	 * @param comment comment
 	 * @param verificationSignature verification signature
 	 * @return security threat group affiliation
-	 * @throws DuplicateEntityFoundException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation exists
 	 */
 	public SecurityThreatGroupAffiliation update(
 			final SecurityThreatGroupAffiliation affiliation,
@@ -159,7 +178,7 @@ public class SecurityThreatGroupAffiliationDelegate {
 			final State state, final City city, final String moniker,
 			final String comment,
 			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {
+			throws SecurityThreatGroupAffiliationExistsException {
 		Date startDate;
 		Date endDate;
 		if (dateRange != null) {
@@ -172,7 +191,8 @@ public class SecurityThreatGroupAffiliationDelegate {
 		if (this.securityThreatGroupAffiliationDao.findExcluding(
 				affiliation.getOffender(), group, startDate, endDate,
 				affiliation) != null) {
-			throw new DuplicateEntityFoundException("Affiliation exists");
+			throw new SecurityThreatGroupAffiliationExistsException(
+					"Affiliation exists");
 		}
 		affiliation.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(),

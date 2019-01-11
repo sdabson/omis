@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  - OMIS - Offender Management Information System
  - Copyright (C) 2011 - 2017 State of Montana
@@ -22,6 +21,10 @@
   - Docket mapping and queries.
   -
   - Author: Stephen Abson
+  - Author: Josh Divine
+  - Author: Annie Wahl
+  - Version: 0.1.5 (Aug 15, 2018)
+  - Since: OMIS 3.0
   -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -70,5 +73,11 @@
 		from omis.docket.domain.Docket docket
 		where docket.person = :person
 		order by docket.person.name.lastName, docket.value
+	]]></query>
+	<query name="findDocketsByValue"><![CDATA[
+		select docket
+		from omis.docket.domain.Docket docket
+		where upper(docket.value) like concat(:value, '%')
+		order by docket.value
 	]]></query>
 </hibernate-mapping>

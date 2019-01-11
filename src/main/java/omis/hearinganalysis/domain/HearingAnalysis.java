@@ -17,22 +17,20 @@
 */
 package omis.hearinganalysis.domain;
 
+import java.util.Date;
+
 import omis.audit.domain.Creatable;
 import omis.audit.domain.Updatable;
-import omis.paroleboarditinerary.domain.BoardAttendee;
-import omis.paroleboarditinerary.domain.BoardMeetingSite;
+import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
 /**
  * Hearing analysis.
  *
  * @author Josh Divine
- * @version 0.1.0 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.3 (Dec 3, 2018)
  * @since OMIS 3.0
- */
-/**
- * @author CID017
- *
  */
 public interface HearingAnalysis extends Creatable, Updatable {
 
@@ -65,21 +63,6 @@ public interface HearingAnalysis extends Creatable, Updatable {
 	ParoleEligibility getEligibility();
 	
 	/**
-	 * Sets the board meeting site.
-	 * 
-	 * @param boardMeetingSite board meeting site
-	 */
-	void setBoardMeetingSite(BoardMeetingSite boardMeetingSite);
-	
-	/**
-	 * Returns the board meeting site.
-	 * 
-	 * @return board meeting site
-	 */
-	BoardMeetingSite getBoardMeetingSite();
-	
-	
-	/**
 	 * Sets the hearing analysis category.
 	 * 
 	 * @param category hearing analysis category
@@ -96,16 +79,28 @@ public interface HearingAnalysis extends Creatable, Updatable {
 	/**
 	 * Sets the analyst.
 	 * 
-	 * @param analyst board attendee
+	 * @param analyst parole board member
 	 */
-	void setAnalyst(BoardAttendee analyst);
+	void setAnalyst(ParoleBoardMember analyst);
 	
 	/**
 	 * Returns the analyst.
 	 * 
 	 * @return analyst
 	 */
-	BoardAttendee getAnalyst();
+	ParoleBoardMember getAnalyst();
+	
+	/**
+	 * Returns the ExpectedCompletionDate for the Hearing Analysis.
+	 * @return expectedCompletionDate - Date
+	 */
+	Date getExpectedCompletionDate();
+	
+	/**
+	 * Sets the ExpectedCompletionDate for the Hearing Analysis.
+	 * @param expectedCompletionDate - Date
+	 */
+	void setExpectedCompletionDate(Date expectedCompletionDate);
 	
 	/**
 	 * Compares {@code this} and {@code obj} for equality.

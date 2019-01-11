@@ -1,7 +1,6 @@
 package omis.questionnaire.service.delegate;
 
 import java.util.List;
-
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
@@ -13,10 +12,10 @@ import omis.questionnaire.domain.QuestionnaireType;
 import omis.questionnaire.domain.SectionType;
 
 /**
- * QuestionnaireSectionDelegate.java
+ * Questionnaire Section Delegate.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Oct 17, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
@@ -34,10 +33,11 @@ public class QuestionnaireSectionDelegate {
 	private final AuditComponentRetriever auditComponentRetriever;
 
 	/**
-	 * Constructor for QuestionnaireSectionDelegate
-	 * @param questionnaireSectionDao
-	 * @param questionnaireSectionInstanceFactory
-	 * @param auditComponentRetriever
+	 * Constructor for QuestionnaireSectionDelegate.
+	 * @param questionnaireSectionDao - Questionnaire Section Dao
+	 * @param questionnaireSectionInstanceFactory - Questionnaire Section
+	 * Instance Factory
+	 * @param auditComponentRetriever - Audit Component Retriever
 	 */
 	public QuestionnaireSectionDelegate(
 			final QuestionnaireSectionDao questionnaireSectionDao,
@@ -51,23 +51,25 @@ public class QuestionnaireSectionDelegate {
 	}
 	
 	/**
-	 * Creates a QuestionnaireSection
+	 * Creates a Questionnaire Section.
 	 * @param title - String
 	 * @param sortOrder - Short
-	 * @param questionnaireType
-	 * @param sectionType
-	 * @param sectionNumber - Integer
+	 * @param questionnaireType - Questionnaire Type
+	 * @param sectionType - Section Type
+	 * @param sectionNumber - String
 	 * @param sectionHelp - String
 	 * @return QuestionnaireSection - Newly Created QuestionnaireSection
 	 * @throws DuplicateEntityFoundException - When QuestionnaireSection
 	 * already exists with given title
 	 */
-	public QuestionnaireSection create(final String title, final Short sortOrder, 
-			final QuestionnaireType questionnaireType, 
-			final SectionType sectionType, final Integer sectionNumber, 
+	public QuestionnaireSection create(final String title,
+			final Short sortOrder,
+			final QuestionnaireType questionnaireType,
+			final SectionType sectionType, final String sectionNumber,
 			final String sectionHelp)
-			throws DuplicateEntityFoundException{
-		if(this.questionnaireSectionDao.find(title, questionnaireType) != null){
+			throws DuplicateEntityFoundException {
+		if (this.questionnaireSectionDao.find(title, questionnaireType)
+				!= null) {
 			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
@@ -89,30 +91,32 @@ public class QuestionnaireSectionDelegate {
 						this.auditComponentRetriever.retrieveUserAccount(),
 						this.auditComponentRetriever.retrieveDate()));
 		
-		return this.questionnaireSectionDao.makePersistent(questionnaireSection);
+		return this.questionnaireSectionDao
+				.makePersistent(questionnaireSection);
 	}
 	
 	/**
-	 * Updates a QuestionnaireSection
+	 * Updates a Questionnaire Section.
 	 * @param questionnaireSection - QuestionnaireSection to update
 	 * @param title - String
 	 * @param sortOrder - Short
-	 * @param questionnaireType
-	 * @param sectionType
-	 * @param sectionNumber - Integer
+	 * @param questionnaireType - Questionnaire Type
+	 * @param sectionType - Section Type
+	 * @param sectionNumber - String
 	 * @param sectionHelp - String
 	 * @return QuestionnaireSection - Updated QuestionnaireSection
 	 * @throws DuplicateEntityFoundException - When QuestionnaireSection
 	 * already exists with given title
 	 */
 	public QuestionnaireSection update(
-			final QuestionnaireSection questionnaireSection, final String title, 
-			final Short sortOrder, final QuestionnaireType questionnaireType, 
-			final SectionType sectionType, final Integer sectionNumber, 
+			final QuestionnaireSection questionnaireSection,
+			final String title,
+			final Short sortOrder, final QuestionnaireType questionnaireType,
+			final SectionType sectionType, final String sectionNumber,
 			final String sectionHelp)
-			throws DuplicateEntityFoundException{
-		if(this.questionnaireSectionDao.findExcluding(title, questionnaireType,
-				questionnaireSection) != null){
+			throws DuplicateEntityFoundException {
+		if (this.questionnaireSectionDao.findExcluding(title, questionnaireType,
+				questionnaireSection) != null) {
 			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
@@ -127,24 +131,25 @@ public class QuestionnaireSectionDelegate {
 						this.auditComponentRetriever.retrieveUserAccount(),
 						this.auditComponentRetriever.retrieveDate()));
 		
-		return this.questionnaireSectionDao.makePersistent(questionnaireSection);
+		return this.questionnaireSectionDao
+				.makePersistent(questionnaireSection);
 	}
 	
 	/**
-	 * Removes a QuestionnaireSection
+	 * Removes a Questionnaire Section.
 	 * @param questionnaireSection - QuestionnaireSection to Remove
 	 */
-	public void remove(final QuestionnaireSection questionnaireSection){
+	public void remove(final QuestionnaireSection questionnaireSection) {
 		this.questionnaireSectionDao.makeTransient(questionnaireSection);
 	}
 	
 	/**
-	 * Returns a list of QuestionnaireSections by specified QuestionnaireType
-	 * @param questionnaireType
+	 * Returns a list of Questionnaire Sections by specified Questionnaire Type.
+	 * @param questionnaireType - Questionnaire Type
 	 * @return List of QuestionnaireSections by specified QuestionnaireType
 	 */
 	public List<QuestionnaireSection> findByQuestionnaireType(
-			QuestionnaireType questionnaireType){
+			final QuestionnaireType questionnaireType) {
 		return this.questionnaireSectionDao
 				.findByQuestionnaireType(questionnaireType);
 	}

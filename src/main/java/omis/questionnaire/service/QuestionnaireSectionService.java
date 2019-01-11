@@ -1,87 +1,86 @@
 package omis.questionnaire.service;
 
 import java.util.List;
-
 import omis.exception.DuplicateEntityFoundException;
 import omis.questionnaire.domain.QuestionnaireSection;
 import omis.questionnaire.domain.QuestionnaireType;
 import omis.questionnaire.domain.SectionType;
 
 /**
- * QuestionnaireSectionService.java
+ * Questionnaire Section Service.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Nov 16, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
 public interface QuestionnaireSectionService {
 	
 	/**
-	 * Creates a QuestionnaireSection
+	 * Creates a Questionnaire Section.
 	 * @param title - String
 	 * @param sortOrder - Short
-	 * @param sectionNumber - Integer
+	 * @param sectionNumber - String
 	 * @param sectionType 
 	 * @param sectionHelp - String
-	 * @param questionnaireType
+	 * @param questionnaireType - questionnaire type
 	 * @return Newly Created QuestionnaireSection
 	 * @throws DuplicateEntityFoundException - When QuestionnaireSection
 	 * already exists with given title
 	 */
-	public QuestionnaireSection create(String title, Short sortOrder, 
-			Integer sectionNumber, SectionType sectionType, String sectionHelp,
+	QuestionnaireSection create(String title, Short sortOrder, 
+			String sectionNumber, SectionType sectionType, String sectionHelp,
 			QuestionnaireType questionnaireType)
 					throws DuplicateEntityFoundException;
 	
 	/**
-	 * Updates a QuestionnaireSection
+	 * Updates a Questionnaire Section.
 	 * @param questionnaireSection - QuestionnaireSection to update
 	 * @param title - String
 	 * @param sortOrder - Short
-	 * @param sectionNumber - Integer
+	 * @param sectionNumber - String
 	 * @param sectionType 
 	 * @param sectionHelp - String
-	 * @param questionnaireType
+	 * @param questionnaireType - Questionnaire Type
 	 * @return Updated QuestionnaireSection
 	 * @throws DuplicateEntityFoundException - When QuestionnaireSection
 	 * already exists with given title
 	 */
-	public QuestionnaireSection update(QuestionnaireSection questionnaireSection,
+	QuestionnaireSection update(QuestionnaireSection questionnaireSection,
 			String title, Short sortOrder, 
-			Integer sectionNumber, SectionType sectionType, String sectionHelp,
+			String sectionNumber, SectionType sectionType, String sectionHelp,
 			QuestionnaireType questionnaireType)
 					throws DuplicateEntityFoundException;
 	
 	/**
-	 * Removes a questionnaireSection
+	 * Removes a questionnaire section.
 	 * @param questionnaireSection - QuestionnaireSection to remove
 	 */
-	public void remove(QuestionnaireSection questionnaireSection);
+	void remove(QuestionnaireSection questionnaireSection);
 	
 	/**
-	 * Returns a list of all valid SectionTypes
+	 * Returns a list of all valid Section Types.
 	 * @return List of all valid SectionTypes
 	 */
-	public List<SectionType> findAllSectionTypes();
+	List<SectionType> findAllSectionTypes();
 	
 	/**
-	 * Returns a list of all questionnaireSections by specified 
-	 * questionnaireType
-	 * @param questionnaireType
+	 * Returns a list of all questionnaire sections by specified 
+	 * questionnaire type.
+	 * @param questionnaireType - questionnaire type
 	 * @return list of all questionnaireSections by specified 
 	 */
-	public List<QuestionnaireSection> findAllByQuestionnaireType(
+	List<QuestionnaireSection> findAllByQuestionnaireType(
 			QuestionnaireType questionnaireType);
 	
 	/**
 	 * Returns a count of all questionnaire sections existing in a 
-	 * questionnaireType
-	 * @param questionnaireType
+	 * questionnaire type.
+	 * @param questionnaireType - questionnaire type
 	 * @return count of all questionnaire sections existing in a 
 	 * questionnaireType
 	 */
-	public Integer countSectionsByQuestionnaireType(
+	Integer countSectionsByQuestionnaireType(
 			QuestionnaireType questionnaireType);
 	
 }

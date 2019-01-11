@@ -1,18 +1,36 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.placement.service;
 
 import java.util.Date;
 import java.util.List;
 
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.location.exception.LocationNotAllowedException;
 import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationTerm;
 import omis.locationterm.exception.LocationTermConflictException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.offender.domain.Offender;
 import omis.organization.domain.Organization;
 import omis.program.domain.Program;
 import omis.program.domain.ProgramPlacement;
+import omis.program.exception.ProgramPlacementExistsException;
 import omis.supervision.domain.CorrectionalStatus;
 import omis.supervision.domain.PlacementTerm;
 import omis.supervision.domain.PlacementTermChangeReason;
@@ -54,8 +72,6 @@ public interface ChangeCorrectionalStatusService {
 	 * make an illegal change in correctional status
 	 * @throws OffenderNotUnderSupervisionException if the offender does
 	 * not have a correctional status on effective date
-	 * @throws PlacementTermConflictException if placement terms exist
-	 * between effective date and end date
 	 * @throws PlacementTermChangeReasonNotAllowedException if change
 	 * reason is not allowed
 	 * @throws EndedPlacementTermException if placement term on date is ended
@@ -67,34 +83,33 @@ public interface ChangeCorrectionalStatusService {
 			Date effectiveDate, Date endDate)
 				throws IllegalCorrectionalStatusChangeException,
 					OffenderNotUnderSupervisionException,
-					PlacementTermConflictException,
 					PlacementTermChangeReasonNotAllowedException,
 					EndedPlacementTermException;
 	
 	/**
-	 * Places an offender at a facility.
+	 * Places an offender at a location.
 	 * 
 	 * @param offender offender
 	 * @param location location
 	 * @param effectiveDate effective date
 	 * @param endDate end date
 	 * @param reason reason
-	 * @return location term of offender at facility
+	 * @return location term of offender at location
 	 * @throws OffenderNotUnderSupervisionException if offender is not under
 	 * supervision on date
 	 * @throws LocationNotAllowedException if location placement is not allowed
 	 * for offender on effective date
 	 * @throws LocationTermConflictException if conflicting location terms
 	 * exist
-	 * @throws DuplicateEntityFoundException if offender is located at
-	 * facility during dates
+	 * @throws LocationTermExistsException if offender is located at location
+	 * during dates
 	 */
 	LocationTerm placeAtLocation(Offender offender, Location location,
 			Date effectiveDate, Date endDate, LocationReason reason)
 				throws OffenderNotUnderSupervisionException,
 					LocationNotAllowedException,
 					LocationTermConflictException,
-					DuplicateEntityFoundException;
+					LocationTermExistsException;
 	
 	/**
 	 * Returns allowed programs for offender on date.
@@ -114,11 +129,11 @@ public interface ChangeCorrectionalStatusService {
 	 * @param endDate end date
 	 * @param program program
 	 * @return program placement
-	 * @throws DuplicateEntityFoundException if program placement exists
+	 * @throws ProgramPlacementExistsException if program placement exists
 	 */
 	ProgramPlacement placeOnProgram(Offender offender, Date effectiveDate,
 			Date endDate, Program program)
-					throws DuplicateEntityFoundException;
+					throws ProgramPlacementExistsException;
 	
 	/**
 	 * Ends location of offender on date.
@@ -131,7 +146,7 @@ public interface ChangeCorrectionalStatusService {
 	 * @return ended location if one exists for offender on date; otherwise
 	 * {@code null}
 	 */
-	LocationTerm endLocation(Offender offender, Date effectiveDatez);
+	LocationTerm endLocation(Offender offender, Date effectiveDate);
 	
 	/**
 	 * Begins supervision of offender.

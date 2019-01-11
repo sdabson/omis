@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- - Author: Ryan Johns
- - Version: 0.1.0 (Apr 21, 2014)
+ - Author: Ryan Johns, Yidong Li
+ - Version: 0.1.0 (Oct 22, 2018)
  - Since: OMIS 3.0
  -->
 <!DOCTYPE hibernate-mapping PUBLIC

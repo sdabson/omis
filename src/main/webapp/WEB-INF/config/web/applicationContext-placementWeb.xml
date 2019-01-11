@@ -66,16 +66,6 @@
   		<constructor-arg name="order" value="1"/>
   		<constructor-arg name="enabled" value="${placementSummaryItemEnabled}"/>
     </bean>
-
-	<bean id="legacyPlacementSummaryItem"
-  		class="omis.placement.web.summary.LegacyPlacementSummaryItem">
-  		<constructor-arg name="placementReportService" ref="placementReportService"/>
-  		<constructor-arg name="summaryItemRegistry" ref="legacyPlacementSummaryItemRegistry"/>
-  		<constructor-arg name="includedPageName" value="/WEB-INF/views/placement/legacySummary/includes/summaryItem.jsp"/>
-  		<constructor-arg name="order" value="3"/>
-  		<constructor-arg name="enabled" value="${legacyPlacementSummaryItemEnabled}"/>
-    </bean>
-
   
    	<!-- Profile Item -->
  	

@@ -43,6 +43,7 @@ import omis.user.service.UserAccountService;
  * 
  * @author Stephen Abson
  * @author Sheronda Vaughn
+ * @author Sierra Haynes
  * @version 0.1.0 (Feb 10, 2014)
  * @since OMIS 3.0
  */
@@ -103,6 +104,9 @@ public class OffenderFlagController {
 	
 	private static final String OFFENDER_FLAG_LISTING_REPORT_NAME
 	    = "/BasicInformation/Flags/Offender_Flag_Details";
+	
+	private static final String SVO_REGISTRATION_REPORT_NAME
+	    = "/BasicInformation/Flags/SVOR_Registration_Form";
 	
 	/* Report parameters. */
 	
@@ -259,6 +263,30 @@ public class OffenderFlagController {
 			doc, reportFormat);
 }
 
+	/**
+	 * Returns the svo registration form for the specified offenders
+	 * 
+	 * @param offender offender
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/sVORegistrationReport.html",
+		method = RequestMethod.GET)
+	@PreAuthorize("hasRole('OFFENDER_FLAG_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportSVORegistration(@RequestParam(
+		value = "offender", required = true)
+		final Offender offender,
+		@RequestParam(value = "reportFormat", required = true)
+		final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(OFFENDER_FLAG_LISTING_ID_REPORT_PARAM_NAME,
+			Long.toString(offender.getOffenderNumber()));
+	byte[] doc = this.reportRunner.runReport(
+			SVO_REGISTRATION_REPORT_NAME,
+			reportParamMap, reportFormat);
+	return this.reportControllerDelegate.constructReportResponseEntity(
+			doc, reportFormat);
+}
 	/* Helper methods. */
 	
 	// Prepares edit model and view

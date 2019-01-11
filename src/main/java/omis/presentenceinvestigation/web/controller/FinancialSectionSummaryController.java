@@ -49,12 +49,12 @@ import omis.presentenceinvestigation.web.validator.FinancialSectionSummaryFormVa
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * FinancialSectionSummaryController.java
+ * Financial section summary controller.
  * 
- *@author Trevor Isles 
- *@version 0.1.0 (July 14, 2017)
- *@since OMIS 3.0
- *
+ * @author Trevor Isles
+ * @author Josh Divine 
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/financialSummary/")
@@ -589,7 +589,7 @@ public class FinancialSectionSummaryController {
 				presentenceInvestigationRequest);
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map, 
 				presentenceInvestigationRequest);
 		

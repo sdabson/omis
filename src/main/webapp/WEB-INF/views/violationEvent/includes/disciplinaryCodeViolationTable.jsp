@@ -5,6 +5,7 @@
 		<tr>
 			<th class="operations"><a class="actionMenuItem" id="disciplinaryCodeViolationItemsActionMenuLink" href="${pageContext.request.contextPath}/violationEvent/disciplinaryCodeViolationItemsActionMenu.html?disciplinaryCodeViolationItemIndex=${disciplinaryCodeViolationItemIndex}"></a></th>
 			<th><fmt:message key="violationNameLabel"/></th>
+			<th><fmt:message key="detailsLabel"/></th>
 		</tr>
 	</thead>
 	<tbody id="disciplinaryCodeViolationTableBody">

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.health.dao.impl.hibernate;
 
 import java.util.Date;
@@ -10,6 +27,7 @@ import omis.health.dao.ProviderAssignmentDao;
 import omis.health.domain.InternalReferral;
 import omis.health.domain.MedicalFacility;
 import omis.health.domain.ProviderAssignment;
+import omis.health.domain.ProviderTitle;
 import omis.person.domain.Person;
 
 import org.hibernate.SessionFactory;
@@ -19,7 +37,8 @@ import org.hibernate.SessionFactory;
  *
  * @author Joel Norris
  * @author Stephen Abson
- * @version 0.1.0 (Apr 9, 2014)
+ * @author Yidong Li
+ * @version 0.1.0 (Oct 24, 2018)
  * @since OMIS 3.0
  */
 public class ProviderAssignmentDaoHibernateImpl
@@ -70,6 +89,8 @@ FIND_EXTERNAL_PROVIDER_ASSIGNMENTS_FOR_FACILITY_BY_MEDICAL_FACILITY_QUERY_NAME
 	private static final String START_DATE_PARAMETER_NAME = "startDate";
 
 	private static final String END_DATE_PARAMETER_NAME = "endDate";
+	
+	private static final String TITLE_PARAMETER_NAME = "title";
 
 	private static final String DATE_PARAMETER_NAME = "date";
 	
@@ -82,6 +103,10 @@ FIND_EXTERNAL_PROVIDER_ASSIGNMENTS_FOR_FACILITY_BY_MEDICAL_FACILITY_QUERY_NAME
 	private static final String
 	FIND_INTERNAL_PROVIDER_ASSIGNMENTS_FOR_FACILITY_ON_DATE_QUERY_NAME
 		= "findInternalProviderAssignmentForFacilityOnDate";
+	
+	private static final String
+	FIND_EXISTING_PROVIDER_ASSIGNMENTS_QUERY_NAME
+		= "findExistingProviderAssignment";
 
 	/**
 	 * Instantiates an instance of provider assignment data access object
@@ -255,5 +280,21 @@ FIND_EXTERNAL_PROVIDER_ASSIGNMENTS_FOR_FACILITY_BY_MEDICAL_FACILITY_QUERY_NAME
 				.setParameter(DATE_PARAMETER_NAME, date)
 				.list();
 		return providerAssignments;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ProviderAssignment findExisting(final Person provider,
+		final Facility facility, final ProviderTitle title) {
+		final ProviderAssignment assignment
+			= (ProviderAssignment) this.getSessionFactory()
+			.getCurrentSession()
+			.getNamedQuery(FIND_EXISTING_PROVIDER_ASSIGNMENTS_QUERY_NAME)
+			.setParameter(FACILITY_PARAMETER_NAME, facility)
+			.setParameter(TITLE_PARAMETER_NAME, title)
+			.setParameter(PROVIDER_PARAMETER_NAME, provider)
+			.setReadOnly(true)
+			.uniqueResult();
+		return assignment;
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- - Author: Stephen Abson
+ - Author: Stephen Abson, Yidong Li
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -112,4 +112,17 @@
         where request.offender = :offender
         order by offenderName.lastName, offenderName.firstName, offender.offenderNumber
 	]]></query>
+	<query name="countExternalReferralRequestSummariesByFacility"><![CDATA[
+      select count(request.id)
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
+        where request.facility = :facility
+	]]></query>
+	<query name="countExternalReferralRequestSummariesByOffender"><![CDATA[
+      select count(request.id)
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
+        inner join request.offender offender
+        where request.offender = :offender
+    ]]></query>
 </hibernate-mapping>

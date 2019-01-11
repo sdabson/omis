@@ -1,5 +1,6 @@
 <!-- 
  - Author: Joel Norris
+ - Author: Sierra Haynes
  - Version: 0.1.0 (May 05, 2015)
  - Since: OMIS 3.0
  -->
@@ -19,10 +20,15 @@
 				<a class="removeLink" href="${pageContext.request.contextPath}/specialNeed/remove.html?specialNeed=${specialNeed.id}&specialNeedClassification=${classification.id}"><span class="visibleLinkLabel"><fmt:message key="removeLabel"/></span></a>
 			</li>
 		</sec:authorize>
-		<sec:authorize access="hasRole('SPECIAL_NEED_LIST') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('SPECIAL_NEED_VIEW') or hasRole('ADMIN')">
 			<li>
-				<a href="${pageContext.request.contextPath}/specialNeed/specialNeedDetailsReport.html?specialNeed=${specialNeed.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="specialNeedDetailsReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/specialNeed/specialNeedDetailsReport.html?specialNeed=${specialNeed.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="specialNeedDetailsReportLinkLabel"/></a>
 			</li>
 		</sec:authorize>
+		<sec:authorize access="hasRole('SPECIAL_NEED_VIEW') or hasRole('ADMIN')">
+			<li>
+				<a href="${pageContext.request.contextPath}/specialNeed/specialNeedDetailsRedactedReport.html?specialNeed=${specialNeed.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="specialNeedDetailsRedactedReportLinkLabel"/></a>
+			</li>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

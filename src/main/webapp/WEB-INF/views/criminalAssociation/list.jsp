@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+--%>
+<%--
+ - Author: Joel Norris
+ - Author: Yidong Li
+ - Author: Sheronda Vaughn
+ - Author: Josh Divine
+ - Version: 0.1.10 (Nov 28, 2018)
+ - Since: OMIS 3.0
+ --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
@@ -6,36 +31,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<fmt:setBundle basename="omis.criminalassociation.msgs.criminalAssociation" var="criminalAssociation"/>
-<fmt:bundle basename="omis.criminalassociation.msgs.form">
+<fmt:bundle basename="omis.criminalassociation.msgs.criminalAssociation">
 <head>
-	<title><fmt:message key="associatesLabel" bundle="${criminalAssociation}"/></title>
-	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
-	<meta http-equiv="pragma" content="no-cache"/>
-	<meta http-equiv="cache-control" content="no-cache"/>
-	<meta http-equiv="expires" content="0"/>
-	<meta http-equiv="X-UA-Compatible" content="IE10"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/general.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/colors.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/fonts.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/list.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
-	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
+	<title>
+		<fmt:message key="associatesLabel"/>
+		<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
+	</title>
+	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.search.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.tools.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/search.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/tools.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/links.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/form.js"></script>
+	<jsp:include page="/WEB-INF/views/common/includes/linksResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>	
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/criminalAssociation/scripts/criminalAssociations.js"> </script>
 </head>
 <body>
@@ -45,7 +50,7 @@
 	<sec:authorize access="hasRole('CRIMINAL_ASSOCIATION_EDIT') or hasRole('ADMIN')">
 		<h1>
 			<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/criminalAssociation/criminalAssociationsActionMenu.html?offender=${offender.id}"></a><span class="visibleLinkLabel"/>
-			<fmt:message key="associatesLabel" bundle="${criminalAssociation}"/>
+			<fmt:message key="associatesLabel"/>
 		</h1>
 	</sec:authorize>
 	<jsp:include page="includes/listTable.jsp"/>

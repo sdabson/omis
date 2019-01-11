@@ -7,6 +7,8 @@ import omis.dao.GenericDao;
 import omis.datatype.DateRange;
 import omis.location.domain.Location;
 import omis.person.domain.Person;
+import omis.region.domain.City;
+import omis.region.domain.State;
 import omis.residence.domain.NonResidenceTerm;
 import omis.residence.domain.ResidenceStatus;
 
@@ -14,6 +16,7 @@ import omis.residence.domain.ResidenceStatus;
  * Data access object for non residence term.
  * 
  * @author Sheronda Vaughn
+ * @author Stephen Abson
  * @version 0.1.0 (Feb 19, 2015)
  * @since  OMIS 3.0
  */
@@ -28,8 +31,8 @@ public interface NonResidenceTermDao
 	 * @param nonResidenceTerm non residence term
 	 * @return non residence term
 	 */
-	NonResidenceTerm findExcluding(Person person, 
-			Location location, ResidenceStatus status, 
+	NonResidenceTerm findExcluding(Person person, DateRange dateRange,
+			Location location, State state, City city, ResidenceStatus status, 
 			NonResidenceTerm nonResidenceTerm);
 
 	/**
@@ -41,8 +44,8 @@ public interface NonResidenceTermDao
 	 * @param status status
 	 * @return non residence term
 	 */
-	NonResidenceTerm find(Person person, 
-			Location location, ResidenceStatus status);
+	NonResidenceTerm find(Person person, DateRange dateRange,
+			Location location, State state, City city, ResidenceStatus status);
 
 	/**
 	 * Returns a list of locations excluding the one in view.
@@ -98,11 +101,23 @@ public interface NonResidenceTermDao
 			DateRange dateRange);
 
 	/**
-	 * Returns non residence terms for the specified person on the specified date.
+	 * Returns non residence terms for the specified person on the 
+	 * specified date.
 	 * 
 	 * @param person person
 	 * @param date effective date
 	 * @return list of non residence terms
 	 */
 	List<NonResidenceTerm> findByPersonAndDate(Person person, Date date);
+	
+	/**
+	 * Returns non residence terms for person with status on date.
+	 * 
+	 * @param person person
+	 * @param status status
+	 * @param date date
+	 * @return non residence terms for person with status on date
+	 */
+	List<NonResidenceTerm> findByPersonWithStatusOnDate(
+			Person person, ResidenceStatus status, Date date);
 }

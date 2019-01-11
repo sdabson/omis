@@ -23,6 +23,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:setBundle basename="omis.audit.msgs.audit" var="auditBundle"/>
 <fmt:bundle basename="omis.family.msgs.family">
@@ -32,7 +33,7 @@
 	<c:set var="addressFieldsPropertyName" value="addressFields" scope="request"/>
 	<c:set var="poBoxFields" value="${familyAssociationForm.poBoxFields}" scope="request"/>
 	<c:set var="poBoxFieldsPropertyName" value="poBoxFields" scope="request"/>
-	<c:if test="${not empty familyMember and createFlag eq true}">
+	<c:if test="${not empty familyMember}">
 		<fieldset><c:set value="${existingContactSummary}" var="contactSummary" scope="request"/>
 		<jsp:include page="/WEB-INF/views/contact/includes/contactSummary.jsp"/></fieldset>
 	</c:if>
@@ -47,6 +48,9 @@
 	<c:if test="${empty familyMember}">
 		<fieldset <c:if test="${not createFlag}">disabled</c:if>>
 			<legend><fmt:message key="personFieldsLabel"/></legend>
+			<sec:authorize access="hasRole('ADMIN') or hasRole('FAMILY_ASSOCIATION_SSN_EDIT')" var="canEditSsn"/>
+			<c:set var="readOnlySsn" value="${not canEditSsn}" scope="request"/>
+			<form:hidden path="validateSocialSecurityNumber"/>
 			<c:set var="personFields" value="${familyAssociationForm.personFields}" scope="request"/>
 			<c:set var="createFlag" value="${createFlag}" scope="request"/>
 			<jsp:include page="../../person/includes/personFields.jsp"/>
@@ -65,7 +69,7 @@
 			<div id="familyCreateScreenAddressContainer" <c:if test="${not familyAssociationForm.enterAddress}">hidden=true</c:if>>
 					<c:if test="${familyAssociationForm.addressOperation eq 'EXISTING'}">
 						<form:radiobutton path="addressOperation" id="newAddressNo" value="EXISTING" checked ="checked"/><label class="fieldValueLabel" for="newAddressNo"><fmt:message key="newAddressNoLabel"/></label>
-						<form:input path="addressQuery" id="familySearchAddressQuery" />
+						<form:input path="addressQuery" id="familySearchAddressQuery" class="large"/>
 						<form:errors path="addressQuery" cssClass="error"/>
 						<form:hidden path="address" id="searchAddress"/>
 						<br>
@@ -73,7 +77,7 @@
 					</c:if>
 					<c:if test="${familyAssociationForm.addressOperation eq 'NEW'}">
 						<form:radiobutton path="addressOperation" id="newAddressNo" value="EXISTING"/><label class="fieldValueLabel" for="newAddressNo"><fmt:message key="newAddressNoLabel"/></label>
-						<form:input path="addressQuery" id="familySearchAddressQuery" />
+						<form:input path="addressQuery" id="familySearchAddressQuery" class="large"/>
 						<form:errors path="addressQuery" cssClass="error"/>
 						<form:hidden path="address" id="searchAddress"/>
 						<br>
@@ -81,7 +85,7 @@
 					</c:if>
 					<c:if test="${familyAssociationForm.addressOperation eq 'CURRENT'}">
 						<form:radiobutton path="addressOperation" id="newAddressNo" value="EXISTING"/><label class="fieldValueLabel" for="newAddressNo"><fmt:message key="newAddressNoLabel"/></label>
-						<form:input path="addressQuery" id="familySearchAddressQuery" />
+						<form:input path="addressQuery" id="familySearchAddressQuery" class="large"/>
 						<form:errors path="addressQuery" cssClass="error"/>
 						<form:hidden path="address" id="searchAddress"/>
 						<br>
@@ -211,13 +215,16 @@
 			<form:errors path="cohabitant" cssClass="error"/>
 		</span>
 	</fieldset>
-	<c:if test="${empty familyMember}">
+	<%-- <c:if test="${empty familyMember}"> --%>
 		<fieldset>
 			<legend><fmt:message key="offenderToFamilyAssociationNotesLabel"/></legend>
-			<c:set var="familyAssociationNotes" value="${familyAssociationNotes}" scope="request"/>
-			<jsp:include page="noteTable.jsp"/>
+			<form:errors cssClass="error" path="familyAssociationNoteItems"/>
+			<c:set var="offenderRelationshipNoteItems" value="${familyAssociationForm.familyAssociationNoteItems}" scope="request"/>
+			<c:set var="offenderRelationshipNoteItemsFieldName" value="familyAssociationNoteItems" scope="request"/>
+			<c:set var="baseUrl" value="${pageContext.request.contextPath}/family" scope="request"/>
+			<jsp:include page="/WEB-INF/views/offenderRelationship/includes/offenderRelationshipNoteItemsTable.jsp"/>
 		</fieldset>
-	</c:if>
+	<%-- </c:if> --%>
 	<c:if test="${not empty familyAssociation}">
 		<c:set var="updatable" value="${familyAssociation}" scope="request"/>
 		<jsp:include page="/WEB-INF/views/audit/includes/updateSignature.jsp"/>

@@ -35,17 +35,19 @@ import omis.presentenceinvestigation.web.validator.JailAdjustmentSectionSummaryF
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * JailAdjustmentSectionSummaryController.java
+ * Jail adjustment section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Feb 27, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/jailAdjustmentSummary/")
 @PreAuthorize("hasRole('USER')")
 public class JailAdjustmentSectionSummaryController {
+	
+	/* View names */
 	
 	private static final String EDIT_VIEW_NAME =
 			"/presentenceInvestigation/jailAdjustmentSummary/edit";
@@ -65,8 +67,7 @@ public class JailAdjustmentSectionSummaryController {
 			"/presentenceInvestigation/jailAdjustmentSummary/includes/"
 			+ "jailAdjustmentSectionSummaryNoteItemsActionMenu";
 	
-	
-	
+	/* Model Keys */
 	
 	private static final String JAIL_ADJUSTMENT_SECTION_SUMMARY_MODEL_KEY =
 			"jailAdjustmentSectionSummary";
@@ -361,7 +362,7 @@ public class JailAdjustmentSectionSummaryController {
 				form.getJailAdjustmentSectionSummaryNoteItems().size());
 		this.offenderSummaryModelDelegate.add(map,
 				(Offender) jailAdjustmentSectionSummary
-					.getPresentenceInvestigationRequest().getDocket().getPerson());
+					.getPresentenceInvestigationRequest().getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				jailAdjustmentSectionSummary.getPresentenceInvestigationRequest());
 		
@@ -442,7 +443,4 @@ public class JailAdjustmentSectionSummaryController {
 				this.presentenceInvestigationRequestPropertyEditorFactory.
 					createPropertyEditor());
 	}
-	
-	
-	
 }

@@ -132,6 +132,8 @@ public class OffenderPhotoServiceImpl
 	@Override
 	public void remove(final OffenderPhotoAssociation association)
 			throws BusinessException {
+		this.offenderPhotoAssociationNoteDelegate
+		.removeByAssociation(association);
 		Photo photo = association.getPhoto();
 		this.offenderPhotoAssociationDao.makeTransient(association);
 		this.photoDao.makeTransient(photo);

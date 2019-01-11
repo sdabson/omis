@@ -20,16 +20,14 @@ package omis.supervision.dao.impl.hibernate;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
+
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.offender.domain.Offender;
 import omis.supervision.dao.PlacementTermDao;
-import omis.supervision.domain.CorrectionalStatus;
 import omis.supervision.domain.CorrectionalStatusTerm;
 import omis.supervision.domain.PlacementTerm;
-import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
-
-import org.hibernate.SessionFactory;
 
 /**
  * Hibernate implementation of data access object for placement terms.
@@ -79,6 +77,9 @@ public class PlacementTermDaoHibernateImpl
 	private static final String FIND_WITH_END_DATE_QUERY_NAME
 			= "findPlacementTermForOffenderWithEndDate";
 	
+	private static final String FIND_WITH_START_DATE_QUERY_NAME
+			= "findPlacementTermForOffenderWithStartDate";
+	
 	private static final String COUNT_FOR_OFFENDER_AFTER_DATE
 			= "countPlacementTermsByOffenderAfterDate";
 	
@@ -90,12 +91,6 @@ public class PlacementTermDaoHibernateImpl
 	private static final String OFFENDER_PARAM_NAME = "offender";
 
 	private static final String DATE_PARAM_NAME = "date";
-
-	private static final String CORRECTIONAL_STATUS_PARAM_NAME
-		= "correctionalStatus";
-
-	private static final String SUPERVISORY_ORGANIZATION_PARAM_NAME
-		= "supervisoryOrganization";
 
 	private static final String START_DATE_PARAM_NAME = "startDate";
 
@@ -150,16 +145,16 @@ public class PlacementTermDaoHibernateImpl
 	@Override
 	public PlacementTerm find(final Offender offender,
 			final Date startDate, final Date endDate,
-			final CorrectionalStatus correctionalStatus,
-			final SupervisoryOrganization supervisoryOrganization) {
+			final CorrectionalStatusTerm correctionalStatusTerm,
+			final SupervisoryOrganizationTerm supervisoryOrganizationTerm) {
 		PlacementTerm placementTerm
 			= (PlacementTerm) this.getSessionFactory()
 				.getCurrentSession().getNamedQuery(FIND_QUERY_NAME)
 				.setParameter(OFFENDER_PARAM_NAME, offender)
-				.setParameter(CORRECTIONAL_STATUS_PARAM_NAME,
-						correctionalStatus)
-				.setParameter(SUPERVISORY_ORGANIZATION_PARAM_NAME,
-						supervisoryOrganization)
+				.setParameter(CORRECTIONAL_STATUS_TERM_PARAM_NAME,
+						correctionalStatusTerm)
+				.setParameter(SUPERVISORY_ORGANIZATION_TERM_PARAM_NAME,
+						supervisoryOrganizationTerm)
 				.setTimestamp(START_DATE_PARAM_NAME, startDate)
 				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.uniqueResult();
@@ -170,17 +165,17 @@ public class PlacementTermDaoHibernateImpl
 	@Override
 	public PlacementTerm findExcluding(final Offender offender,
 			final Date startDate, final Date endDate,
-			final CorrectionalStatus correctionalStatus,
-			final SupervisoryOrganization supervisoryOrganization,
+			final CorrectionalStatusTerm correctionalStatusTerm,
+			final SupervisoryOrganizationTerm supervisoryOrganizationTerm,
 			final PlacementTerm excludedPlacementTerm) {
 		PlacementTerm placementTerm
 			= (PlacementTerm) this.getSessionFactory()
 				.getCurrentSession().getNamedQuery(FIND_EXCLUDING_QUERY_NAME)
 				.setParameter(OFFENDER_PARAM_NAME, offender)
-				.setParameter(CORRECTIONAL_STATUS_PARAM_NAME,
-						correctionalStatus)
-				.setParameter(SUPERVISORY_ORGANIZATION_PARAM_NAME,
-						supervisoryOrganization)
+				.setParameter(CORRECTIONAL_STATUS_TERM_PARAM_NAME,
+						correctionalStatusTerm)
+				.setParameter(SUPERVISORY_ORGANIZATION_TERM_PARAM_NAME,
+						supervisoryOrganizationTerm)
 				.setTimestamp(START_DATE_PARAM_NAME, startDate)
 				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.setParameter(EXCLUDED_PARAM_NAME, excludedPlacementTerm)
@@ -265,6 +260,19 @@ public class PlacementTermDaoHibernateImpl
 				.setParameter(SUPERVISORY_ORGANIZATION_TERM_PARAM_NAME,
 						supervisoryOrganizationTerm).uniqueResult();
 		return count;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public PlacementTerm findForOffenderWithStartDate(
+			final Offender offender, final Date startDate) {
+		PlacementTerm placementTerm = (PlacementTerm) this.getSessionFactory()
+				.getCurrentSession().getNamedQuery(
+						FIND_WITH_START_DATE_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.uniqueResult();
+		return placementTerm;
 	}
 
 	/** {@inheritDoc} */

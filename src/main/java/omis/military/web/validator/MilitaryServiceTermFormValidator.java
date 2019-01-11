@@ -66,8 +66,8 @@ public class MilitaryServiceTermFormValidator implements Validator {
 						errors.rejectValue("serviceTermNoteItems[" + index 
 								+ "].note", "serviceTermNote.note.empty");
 					}
-					index++;
 				}
+				index++;
 			}
 		}
 	}

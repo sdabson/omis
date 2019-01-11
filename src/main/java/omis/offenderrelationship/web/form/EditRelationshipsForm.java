@@ -18,6 +18,7 @@ import omis.user.domain.UserAccount;
  * 
  * @author Joel Norris
  * @author Yidong Li
+ * @author Stephen Abson
  * @version 0.1.0 (Jan 26, 2016)
  * @since OMIS 3.0
  */
@@ -33,12 +34,15 @@ public class EditRelationshipsForm implements Serializable {
 		= new ArrayList<TelephoneNumberItem>();
 	private List<OnlineAccountContactItem> onlineAccountContactItems
 		= new ArrayList<OnlineAccountContactItem>();
+	private List<OffenderRelationshipNoteItem> noteItems
+		= new ArrayList<OffenderRelationshipNoteItem>();
 	private UserAccount verifiedByUserAccount;
 	private Date verificationDate;
 	private Boolean verified;
 	private VerificationMethod verificationMethod;
 	private Boolean enterAddress;
 	private Boolean enterPoBox;
+	private boolean validateSocialSecurityNumber;
 	
 	/**
 	 * Instantiates a default instance of edit relationships form.
@@ -191,6 +195,25 @@ public class EditRelationshipsForm implements Serializable {
 	}
 	
 	/**
+	 * Sets note items.
+	 * 
+	 * @param noteItems note items
+	 */
+	public void setNoteItems(
+			final List<OffenderRelationshipNoteItem> noteItems) {
+		this.noteItems = noteItems;
+	}
+	
+	/**
+	 * Returns note items.
+	 * 
+	 * @return note items
+	 */
+	public List<OffenderRelationshipNoteItem> getNoteItems() {
+		return this.noteItems;
+	}
+	
+	/**
 	 * Returns the VerifiedByUserAccount.
 	 * 
 	 * @return VerifiedByUserAccount VerifiedByUserAccount
@@ -299,4 +322,24 @@ public class EditRelationshipsForm implements Serializable {
 	public void setEnterPoBox(final Boolean enterPoBox) {
 		this.enterPoBox = enterPoBox;
 	}
+	
+	/**
+	 * Returns whether to validate social security number.
+	 * 
+	 * @return whether to validate social security number
+	 */
+	public boolean getValidateSocialSecurityNumber() {
+		return this.validateSocialSecurityNumber;
+	}
+
+	/**
+	 * Sets whether to validate social security number.
+	 * 
+	 * @param validateSocialSecurityNumber whether to validate social security
+	 * number
+	 */
+	public void setValidateSocialSecurityNumber(
+			final boolean validateSocialSecurityNumber) {
+		this.validateSocialSecurityNumber = validateSocialSecurityNumber;
+	}	
 }

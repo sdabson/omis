@@ -28,7 +28,7 @@
 				<property name="endDate" column="`END_DATE`" not-null="false" type="java.util.Date"/>
 		</component>
 		<many-to-one name="address" column="`ADDRESS_ID`" not-null="true" entity-name="omis.address.domain.Address" unique="false"/>
-		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="boolean"/>
+		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="yes_no"/>
 		<property name="category" column="`CATEGORY`" not-null="true" type="residenceCategory"/>
 		<property name="status" column="`STATUS`" not-null="true" type="residenceStatus"/>
 		<property name="notes" column="`NOTES`" not-null="false" type="text"/>
@@ -65,10 +65,6 @@
 		(residenceTerm.dateRange.endDate is null and :endDate is null))	
 	and
 		residenceTerm.address = :address
-	and 
-		residenceTerm.category = :category
-	and
-		residenceTerm.status = :status
 	
 	]]></query>
 <!-- 	find residenceTerm by person excluding the one in view -->
@@ -87,10 +83,6 @@
 		(residenceTerm.dateRange.endDate is null and :endDate is null))
 	and 
 		residenceTerm.address = :address	
-	and 
-		residenceTerm.category = :category	
-	and 
-		residenceTerm.status = :status
 	and
 		residenceTerm != :residenceTerm	
 	]]></query>

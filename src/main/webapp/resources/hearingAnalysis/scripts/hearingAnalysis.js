@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 /**
  * Hearing analysis detail screen behavior.
  * 
  * Author: Josh Divine
- * Version: 0.1.0 Dec 5, 2017
+ * Version: 0.1.1 (Dec 3, 2018)
  * Since: OMIS 3.0
  */
 window.onload = function() {	
 	applyActionMenu(document.getElementById("actionMenuLink"));
+	applyDatePicker(document.getElementById("dueDate"));
 	applyFormUpdateChecker(document.getElementById("hearingAnalysisForm"));
 	applyHearingAnalysisBehavior();
 	applyActionMenu(document.getElementById("hearingAnalysisNotesActionMenuLink"), hearingAnalysisNoteActionMenuOnClick);

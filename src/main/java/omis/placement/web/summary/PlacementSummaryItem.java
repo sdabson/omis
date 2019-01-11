@@ -18,8 +18,8 @@ public class PlacementSummaryItem
 				extends AbstractSummaryItem 
 				implements SummaryItem {
 	private static final long serialVersionUID = 1L;
-	private static final String LOCATION_SUMMARY_MODEL_KEY 
-					= "locationTermSummary2";
+	private static final String OFFENDER_PLACEMENT_SUMMARY_MODEL_KEY 
+					= "offenderPlacementSummary";
 	private final PlacementReportService placementReportService;
 	
 	/** Constructor.
@@ -41,7 +41,7 @@ public class PlacementSummaryItem
 	@Override
 	public void build(final Map<String, Object> map, final Offender offender, 
 					final Date date) {
-		map.put(LOCATION_SUMMARY_MODEL_KEY, 
+		map.put(OFFENDER_PLACEMENT_SUMMARY_MODEL_KEY, 
 						this.placementReportService
 							.findOffenderPlacementSummaryByOffender(offender, 
 									date));

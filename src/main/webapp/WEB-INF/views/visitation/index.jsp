@@ -17,9 +17,9 @@
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
+	<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"> </script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/visitation/scripts/visitorIndex.js"> </script>
 </head>
 <body>

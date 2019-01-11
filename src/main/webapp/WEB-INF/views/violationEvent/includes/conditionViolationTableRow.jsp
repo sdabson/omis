@@ -12,7 +12,7 @@
 			<form:errors path="conditionViolationItems[${conditionViolationItemIndex}].itemOperation" cssClass="error"/>
 		</td>
 		<td>
-			<select id="conditionViolationItems[${conditionViolationItemIndex}].condition" name="conditionViolationItems[${conditionViolationItemIndex}].condition">
+			<select id="conditionViolationItems[${conditionViolationItemIndex}].condition" name="conditionViolationItems[${conditionViolationItemIndex}].condition" class="conditionSelect">
 				<jsp:include page="../../includes/nullOption.jsp"/>
 				<c:forEach items="${conditions}" var="cond">
 					<option value="${cond.id}" ${cond eq conditionViolationItem.condition ? 'selected="selected"' : ''} >
@@ -26,6 +26,10 @@
 			<span id="conditionViolationItemDescription${conditionViolationItemIndex}">
 				<c:out value="${conditionViolationItem.condition.conditionClause.description}"/>
 			</span>
+		</td>
+		<td>
+			<textarea style="width: 95%; max-width: 95%;" type="text" rows="5" value="${conditionViolationItem.details}" name="conditionViolationItems[${conditionViolationItemIndex}].details" id="conditionViolationItems[${conditionViolationItemIndex}].details" class="details"><c:out value="${conditionViolationItem.details}"/></textarea>
+			<form:errors path="conditionViolationItems[${conditionViolationItemIndex}].details" cssClass="error"/>
 		</td>
 	</tr>
 </fmt:bundle>

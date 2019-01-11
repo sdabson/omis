@@ -25,27 +25,27 @@
 			<property name="date" type="java.util.Date" not-null="true" column="`UPDATE_DATE`"/>
 		</component>
 		<component name="appearance" class="omis.demographics.domain.component.PersonAppearance">
-			<many-to-one name="eyeColor" column="`EYE_COLOR_ID`" not-null="true"/>
-			<many-to-one name="hairColor" column="`HAIR_COLOR_ID`" not-null="true"/>
+			<many-to-one name="eyeColor" column="`EYE_COLOR_ID`" not-null="false"/>
+			<many-to-one name="hairColor" column="`HAIR_COLOR_ID`" not-null="false"/>
 			<many-to-one name="complexion" column="`COMPLEXION_ID`" not-null="false"/>
 		</component>
 		<component name="physique" class="omis.demographics.domain.component.PersonPhysique">
 			<component name="height" class="omis.demographics.domain.Height">
-				<property name="feet" column="`HEIGHT_FT`" not-null="true"/>
-				<property name="inches" column="`HEIGHT_IN`" not-null="true"/>
+				<property name="feet" column="`HEIGHT_FT`" not-null="false"/>
+				<property name="inches" column="`HEIGHT_IN`" not-null="false"/>
 			</component>
 			<component name="weight" class="omis.demographics.domain.Weight">
-				<property name="pounds" column="`WEIGHT_LB`" not-null="true"/>
+				<property name="pounds" column="`WEIGHT_LB`" not-null="false"/>
 			</component>
 			<many-to-one name="build" column="`BUILD_ID`" not-null="false"/>
 		</component>
 		<many-to-one name="race" entity-name="omis.demographics.domain.Race"
-					 column="`RACE_ID`" not-null="true"/>
-		<property name="hispanicEthnicity" type="yes_no" column="`HISPANIC_ETHNICITY`" not-null="true"/>
+					 column="`RACE_ID`" not-null="false"/>
+		<property name="hispanicEthnicity" type="yes_no" column="`HISPANIC_ETHNICITY`" not-null="false"/>
 		<many-to-one name="tribe" entity-name="omis.demographics.domain.Tribe"
 					 column="`TRIBE_ID`" not-null="false"/>
 		<many-to-one name="maritalStatus" entity-name="omis.demographics.domain.MaritalStatus"
-					 column="`MARITAL_STATUS_ID`" not-null="true"/>
+					 column="`MARITAL_STATUS_ID`" not-null="false"/>
 		<property name="dominantSide" column="`DOMINANT_SIDE`" type="dominantSide" not-null="false"/>
 	</class>
 	<query name="findPersonDemographics"><![CDATA[

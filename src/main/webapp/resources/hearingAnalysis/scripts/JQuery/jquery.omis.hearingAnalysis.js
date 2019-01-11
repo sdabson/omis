@@ -15,55 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 /**
  * Jquery implementation of functions for hearingAnalysis.js
  * 
  * @author: Josh Divine
- * @version: 0.1.0 (Dec 6, 2017)
+ * @version: 0.1.1 (Dec 3, 2018)
  * @since: OMIS 3.0
  */
 function applyHearingAnalysisBehavior() {
 	for (var index = 0; index < currentHearingAnalysisNoteIndex; index++) {
 		hearingAnalysisNoteRowOnClick(index);
 	}
-	
-	boardItineraryOnChange();
-}
-
-function boardItineraryOnChange() {
-	$("#boardItinerary").change(function() {
-		$.ajax(config.ServerConfig.getContextPath() + "/hearingAnalysis/findBoardMeetingSitesForItinerary.html",
-				   {
-					   type: "GET",
-					   async: false,
-					   data: { itinerary: this.options[this.selectedIndex].value },
-					   success: function(data) {
-					   		$("#boardMeetingSite").empty().append(data);
-					   },
-					   error: function(jqXHR, textStatus, errorThrown) {
-							alert("Error - status: " + textStatus + "; error: "
-									+ errorThrown);
-					   }
-					   
-				   }
-				);
-		$.ajax(config.ServerConfig.getContextPath() + "/hearingAnalysis/findBoardAttendeesForItinerary.html",
-				   {
-					   type: "GET",
-					   async: false,
-					   data: { itinerary: this.options[this.selectedIndex].value },
-					   success: function(data) {
-					   		$("#analyst").empty().append(data);
-					   },
-					   error: function(jqXHR, textStatus, errorThrown) {
-							alert("Error - status: " + textStatus + "; error: "
-									+ errorThrown);
-					   }
-					   
-				   }
-				);
-	});
 }
 
 /**

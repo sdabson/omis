@@ -40,7 +40,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Supervision history section summary controller.
  *
  * @author Sheronda Vaughn
- * @version 0.1.0 (Aug 14, 2017)
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -395,15 +396,13 @@ public class SupervisionHistorySectionSummaryController {
 		map.addAttribute("resolvedViolationSummaries", 
 				this.violationSummaryReportService
 				.findResolvedViolationSummariesByOffender((Offender) 
-						request
-						.getDocket().getPerson()));
+						request.getPerson()));
 		map.addAttribute(PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY, 
 				request);
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(
 				map, request);
 		this.offenderSummaryModelDelegate.add(map, (Offender) 
-				request
-				.getDocket().getPerson());
+				request.getPerson());
 		map.addAttribute(
 				SUPERVISION_HISTORY_NOTE_ITEM_INDEX_MODEL_KEY, noteIndex);
 		map.addAttribute(

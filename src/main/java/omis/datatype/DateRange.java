@@ -1,10 +1,29 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.datatype;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 import omis.util.DateManipulator;
 
@@ -43,7 +62,7 @@ public class DateRange implements Serializable {
 	
 	/** Instantiates a default date range. */
 	public DateRange() {
-		// Do nothing
+		// Default instantiation
 	}
 	
 	/**
@@ -459,7 +478,7 @@ public class DateRange implements Serializable {
 			result.add(rangeAtTimes);
 			current.changeDate(1);
 			
-			// This might be a bit iffy
+			// This might be a bit suspect
 			current.setToTimeOfDate(startTime);
 		}
 		return result;
@@ -744,7 +763,8 @@ public class DateRange implements Serializable {
 		startMan.setToEarliestTimeInDay();
 		DateManipulator endMan = new DateManipulator(endDate);
 		endMan.setToLatestTimeInDay();
-		return DateRange.countDaysExactly(startMan.getDate(), endMan.getDate());
+		return (endMan.getDate().getTime() / DAY_LENGTH)
+				- (startMan.getDate().getTime() / DAY_LENGTH);
 	}
 	
 	/**
@@ -755,11 +775,139 @@ public class DateRange implements Serializable {
 	 * @param startDate start date
 	 * @param endDate end date
 	 * @return exact count of days in a date range
+	 * @throws IllegalArgumentException if {@code startDate} is greater than
+	 * {@code endDate}
+	 * @throws NullPointerException if either {@code startDate} or
+	 * {@code endDate} is {@code null}
 	 */
 	public static long countDaysExactly(
 			final Date startDate, final Date endDate) {
-		return (endDate.getTime() / DAY_LENGTH)
-				- (startDate.getTime() / DAY_LENGTH);
+		
+		// Verifies that start date and end date are not null and that end date
+		// is on or after start date
+		Objects.requireNonNull(startDate, "Start date required");
+		Objects.requireNonNull(endDate, "End date required");
+		if (startDate.after(endDate)) {
+			throw new IllegalArgumentException(
+					"Start date must be before or on end date");
+		}
+		
+		// Performs calculation
+		return (DateRange.getOffsettedTime(endDate) / DAY_LENGTH)
+				- (DateRange.getOffsettedTime(startDate) / DAY_LENGTH);
+	}
+	
+	/**
+	 * Returns an exact count of days in {@code this}.
+	 * 
+	 * <p>This is the number of 24 hour instances between the range.
+	 * 
+	 * @return an exact count of days in {@code this}
+	 * is greater than {@code endDate} of {@code this}
+	 * @throws NullPointerException if either {@code startDate} of {@code this}
+	 * {@code endDate} of {@code this} is {@code null}
+	 */
+	public long countDaysExactly() {
+		return DateRange.countDaysExactly(this.getStartDate(),
+				this.getEndDate());
+	}
+	
+	/**
+	 * Returns an exact count of years in a date range.
+	 * 
+	 * <p>The exact count of years is the number of full years between the
+	 * dates.
+	 * 
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @return exact count of years in a date range
+	 * @throws IllegalArgumentException if {@code startDate} is greater than
+	 * {@code endDate}
+	 * @throws NullPointerException if either {@code startDate} or
+	 * {@code endDate} is {@code null}
+	 */
+	public static long countYearsExactly(
+			final Date startDate, final Date endDate) {
+		
+		// Verifies that start date and end date are not null and that end date
+		// is on or after start date
+		Objects.requireNonNull(startDate, "Start date required");
+		Objects.requireNonNull(endDate, "End date required");
+		if (startDate.after(endDate)) {
+			throw new IllegalArgumentException(
+					"Start date must be before or on end date");
+		}
+		
+		// Bypasses time check if month of end date is greater than that of
+		// start date or months are equals but end day is great than start day
+		GregorianCalendar startCal = new GregorianCalendar();
+		startCal.setTime(startDate);
+		int startDay = startCal.get(GregorianCalendar.DAY_OF_MONTH);
+		int startMonth = startCal.get(GregorianCalendar.MONTH);
+		int startYear = startCal.get(GregorianCalendar.YEAR);
+		GregorianCalendar endCal = new GregorianCalendar();
+		endCal.setTime(endDate);
+		int endDay = endCal.get(GregorianCalendar.DAY_OF_MONTH);
+		int endMonth = endCal.get(GregorianCalendar.MONTH);
+		int endYear = endCal.get(GregorianCalendar.YEAR);
+		if (endMonth > startMonth
+				|| (endMonth == startMonth && endDay > startDay)) {
+			
+			// Years are complete factoring in only dates
+			return endYear - startYear;
+		} else if (endMonth == startMonth && endDay == startDay) {
+			
+			// Factors in time if month and day are equal - time of day of
+			// end date must be greater or equal to that of start date
+			int startHour = startCal.get(GregorianCalendar.HOUR_OF_DAY);
+			int startMinute = startCal.get(GregorianCalendar.MINUTE);
+			int startSecond = startCal.get(GregorianCalendar.SECOND);
+			int startMillisecond = startCal.get(GregorianCalendar.MILLISECOND);
+			int endHour = endCal.get(GregorianCalendar.HOUR_OF_DAY);
+			int endMinute = endCal.get(GregorianCalendar.MINUTE);
+			int endSecond = endCal.get(GregorianCalendar.SECOND);
+			int endMillisecond = endCal.get(GregorianCalendar.MILLISECOND);
+			if (endHour > startHour
+					|| (((endHour == startHour && endMinute > startMinute)
+							|| (((endHour == startHour
+										&& endMinute == startMinute
+										&& endSecond > startSecond)
+									|| (endHour == startHour
+											&& endMinute == startMinute
+											&& endSecond == startSecond
+											&& endMillisecond
+												>= startMillisecond)))))) {
+				
+				// Years are complete factoring in times
+				return endYear - startYear;
+			} else {
+				
+				// Years are not complete if end time is before start time on
+				// same month and day
+				return (endYear - startYear) - 1;
+			}
+		} else {
+			
+			// Deducts one year as the end date does not start on the same day
+			// of the month of greater than the start date - ergo, the year
+			// isn't a full one
+			return (endYear - startYear) - 1;
+		}
+	}
+	
+	/**
+	 * Returns an exact count of years in {@code this}.
+	 * 
+	 * <p>The exact count of years is the number of full years between the
+	 * start and end date of {@code this}.
+	 * 
+	 * @return exact count of years in {@code this}
+	 * @throws NullPointerException if either {@code startDate} of {@code this}
+	 * {@code endDate} of {@code this} is {@code null}
+	 */
+	public long countYearsExactly() {
+		return DateRange.countYearsExactly(
+				this.getStartDate(), this.getEndDate());
 	}
 	
 	/**
@@ -860,5 +1008,14 @@ public class DateRange implements Serializable {
 		} else {
 			return date2 == null;
 		}
+	}
+	
+	// Returns time in MS with time zone/DST offset added
+	private static long getOffsettedTime(final Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		int offset = cal.get(GregorianCalendar.ZONE_OFFSET);
+		int dstOffset = cal.get(GregorianCalendar.DST_OFFSET);
+		return cal.getTime().getTime() + offset + dstOffset;
 	}
 }

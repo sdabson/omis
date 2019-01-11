@@ -1,16 +1,16 @@
+
 package omis.hearing.report;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import omis.hearing.domain.ResolutionClassificationCategory;
 import omis.violationevent.domain.ViolationEventCategory;
 
 /**
- * ViolationSummary.java
+ * Violation Summary.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Apr 18, 2017)
+ *@author Annie Wahl
+ *@version 0.1.2 (Jul 27, 2018)
  *@since OMIS 3.0
  *
  */
@@ -28,11 +28,19 @@ public class ViolationSummary implements Serializable {
 	
 	private final String disciplinaryCodeDescription;
 	
+	private final String disciplinaryCodeValue;
+	
 	private final String violationEventDetails;
 	
 	private final Date violationEventDate;
 	
 	private final String conditionClause;
+	
+	private final String conditionTitle;
+	
+	private final String modifiedDisciplinaryCode;
+	
+	private final String modifiedConditionClause;
 	
 	private final String decisionReason;
 	
@@ -40,211 +48,347 @@ public class ViolationSummary implements Serializable {
 	
 	private final String dispositionCategory;
 	
+	private final Date appealDate;
+	
 	private final String sanctionDescription;
 	
 	private final ResolutionClassificationCategory resolutionCategory;
-
+	
+	private final String violationDetails;
+	
 	/**
-	 * Constructor to find resolved violations
-	 * @param conditionViolationId
-	 * @param disciplinaryCodeViolationId
-	 * @param violationEventCategory
-	 * @param disciplinaryCodeDescription
-	 * @param conditionClause
-	 * @param decisionReason
-	 * @param decision
-	 * @param dispositionCategory
-	 * @param sanctionDescription
+	 * Constructor to find resolved violations.
+	 * @param conditionViolationId - Long
+	 * @param disciplinaryCodeViolationId -Long
+	 * @param violationEventCategory - Violation Event Category
+	 * @param disciplinaryCodeDescription - String
+	 * @param disciplinaryCodeValue - String
+	 * @param conditionClause - String
+	 * @param conditionTitle - String
+	 * @param modifiedDisciplinaryCode - String
+	 * @param modifiedConditionClause - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param decisionReason - String
+	 * @param decision - String
+	 * @param dispositionCategory - String
+	 * @param appealDate - appeal date
+	 * @param sanctionDescription - String
+	 * @param resolutionCategory - Resolution Classification Category
+	 * @param violationDetails - violation details
 	 */
 	public ViolationSummary(final Long conditionViolationId,
 			final Long disciplinaryCodeViolationId,
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
+			final String disciplinaryCodeValue,
 			final String conditionClause,
+			final String conditionTitle,
+			final String modifiedDisciplinaryCode,
+			final String modifiedConditionClause,
 			final String violationEventDetails,
 			final Date violationEventDate,
 			final String decisionReason,
 			final String decision, final String dispositionCategory,
+			final Date appealDate,
 			final String sanctionDescription,
-			final ResolutionClassificationCategory resolutionCategory) {
+			final ResolutionClassificationCategory resolutionCategory,
+			final String violationDetails) {
 		this.conditionViolationId = conditionViolationId;
 		this.disciplinaryCodeViolationId = disciplinaryCodeViolationId;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
+		this.disciplinaryCodeValue = disciplinaryCodeValue;
 		this.violationEventDate = violationEventDate;
 		this.violationEventDetails = violationEventDetails;
 		this.conditionClause = conditionClause;
+		this.conditionTitle = conditionTitle;
 		this.decisionReason = decisionReason;
 		this.decision = decision;
 		this.dispositionCategory = dispositionCategory;
+		this.appealDate = appealDate;
 		this.sanctionDescription = sanctionDescription;
 		this.resolutionCategory = resolutionCategory;
 		this.infractionId = null;
+		this.violationDetails = violationDetails;
+		this.modifiedConditionClause = modifiedConditionClause;
+		this.modifiedDisciplinaryCode = modifiedDisciplinaryCode;
 	}
 	
+	/**
+	 * Constructor for Resolved disciplinary code violation summaries.
+	 * 
+	 * @param infractionId - Long
+	 * @param disciplinaryCodeViolationId - Long
+	 * @param violationEventCategory - Violation Event Category
+	 * @param disciplinaryCodeDescription - String
+	 * @param disciplinaryCodeValue - String
+	 * @param modifiedDisciplinaryCode - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param decisionReason - String
+	 * @param decision - String
+	 * @param dispositionCategory - String
+	 * @param appealDate - appeal date
+	 * @param sanctionDescription - String
+	 * @param resolutionCategory - Resolution Classification Category
+	 * @param violationDetails - violation details
+	 */
 	public ViolationSummary(
 			final Long infractionId,
 			final Long disciplinaryCodeViolationId,
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
+			final String disciplinaryCodeValue,
+			final String modifiedDisciplinaryCode,
 			final String violationEventDetails,
 			final Date violationEventDate, final String decisionReason,
 			final String decision, final String dispositionCategory,
+			final Date appealDate,
 			final String sanctionDescription,
-			final ResolutionClassificationCategory resolutionCategory) {
+			final ResolutionClassificationCategory resolutionCategory,
+			final String violationDetails) {
 		this.infractionId = infractionId;
 		this.conditionViolationId = null;
 		this.disciplinaryCodeViolationId = disciplinaryCodeViolationId;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
+		this.disciplinaryCodeValue = disciplinaryCodeValue;
 		this.violationEventDate = violationEventDate;
 		this.violationEventDetails = violationEventDetails;
+		this.modifiedConditionClause = null;
+		this.modifiedDisciplinaryCode = modifiedDisciplinaryCode;
 		this.conditionClause = null;
+		this.conditionTitle = null;
 		this.decisionReason = decisionReason;
 		this.decision = decision;
 		this.dispositionCategory = dispositionCategory;
+		this.appealDate = appealDate;
 		this.sanctionDescription = sanctionDescription;
 		this.resolutionCategory = resolutionCategory;
+		this.violationDetails = violationDetails;
 	}
 	
+	/**
+	 * Constructor for Resolved Condition Violation Summaries.
+	 * 
+	 * @param infractionId - Long
+	 * @param violationEventCategory - Violation Event Category
+	 * @param conditionViolationId - Long
+	 * @param conditionClause - String
+	 * @param conditionTitle - String
+	 * @param modifiedConditionClause - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param decisionReason - String
+	 * @param decision - String
+	 * @param dispositionCategory - String
+	 * @param appealDate - appeal date
+	 * @param sanctionDescription - String
+	 * @param resolutionCategory - Resolution Classification Category
+	 * @param violationDetails - violation details
+	 */
 	public ViolationSummary(
 			final Long infractionId,
 			final ViolationEventCategory violationEventCategory,
 			final Long conditionViolationId,
 			final String conditionClause,
+			final String conditionTitle,
+			final String modifiedConditionClause,
 			final String violationEventDetails, final Date violationEventDate,
 			final String decisionReason,
 			final String decision, final String dispositionCategory,
+			final Date appealDate,
 			final String sanctionDescription,
-			final ResolutionClassificationCategory resolutionCategory) {
+			final ResolutionClassificationCategory resolutionCategory,
+			final String violationDetails) {
 		this.infractionId = infractionId;
 		this.conditionViolationId = conditionViolationId;
 		this.disciplinaryCodeViolationId = null;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = null;
+		this.disciplinaryCodeValue = null;
 		this.violationEventDate = violationEventDate;
 		this.violationEventDetails = violationEventDetails;
 		this.conditionClause = conditionClause;
+		this.conditionTitle = conditionTitle;
 		this.decisionReason = decisionReason;
 		this.decision = decision;
 		this.dispositionCategory = dispositionCategory;
+		this.appealDate = appealDate;
 		this.sanctionDescription = sanctionDescription;
 		this.resolutionCategory = resolutionCategory;
+		this.violationDetails = violationDetails;
+		this.modifiedConditionClause = modifiedConditionClause;
+		this.modifiedDisciplinaryCode = null;
 	}
 	
 	/**
-	 * Constructor to find unresolved DisciplinaryCodeViolations
-	 * @param disciplinaryCodeViolationId
-	 * @param violationEventCategory
-	 * @param disciplinaryCodeDescription
-	 * @param violationEventDetails
+	 * Constructor to find unresolved DisciplinaryCodeViolations.
+	 * @param disciplinaryCodeViolationId - Long
+	 * @param violationEventCategory - Violation Event Category
+	 * @param disciplinaryCodeDescription - String
+	 * @param disciplinaryCodeValue - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param violationDetails - violation details
 	 */
 	public ViolationSummary(
 			final Long disciplinaryCodeViolationId,
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
+			final String disciplinaryCodeValue,
 			final String violationEventDetails,
-			final Date violationEventDate) {
+			final Date violationEventDate,
+			final String violationDetails) {
 		this.infractionId = null;
 		this.conditionViolationId = null;
 		this.disciplinaryCodeViolationId = disciplinaryCodeViolationId;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
+		this.disciplinaryCodeValue = disciplinaryCodeValue;
+		this.modifiedDisciplinaryCode = null;
 		this.violationEventDetails = violationEventDetails;
 		this.violationEventDate = violationEventDate;
+		this.modifiedConditionClause = null;
 		this.conditionClause = null;
+		this.conditionTitle = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
+		this.appealDate = null;
 		this.sanctionDescription = null;
 		this.resolutionCategory = null;
+		this.violationDetails = violationDetails;
 	}
 	
 	/**
-	 * Constructor to find unresolved ConditionViolations
-	 * @param violationEventCategory
-	 * @param conditionViolationId
-	 * @param disciplinaryCodeDescription
-	 * @param violationEventDetails
+	 * Constructor to find unresolved ConditionViolations.
+	 * @param violationEventCategory - Violation Event Category
+	 * @param conditionViolationId - Long
+	 * @param conditionClause - String
+	 * @param conditionTitle - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param violationDetails - violation details
 	 */
 	public ViolationSummary(
 			final ViolationEventCategory violationEventCategory,
 			final Long conditionViolationId,
 			final String conditionClause,
-			final String violationEventDetails, final Date violationEventDate) {
+			final String conditionTitle,
+			final String violationEventDetails, final Date violationEventDate,
+			final String violationDetails) {
 		this.infractionId = null;
 		this.conditionViolationId = conditionViolationId;
 		this.disciplinaryCodeViolationId = null;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = null;
+		this.disciplinaryCodeValue = null;
 		this.violationEventDetails = violationEventDetails;
 		this.violationEventDate = violationEventDate;
 		this.conditionClause = conditionClause;
+		this.conditionTitle = conditionTitle;
+		this.modifiedConditionClause = null;
+		this.modifiedDisciplinaryCode = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
+		this.appealDate = null;
 		this.sanctionDescription = null;
 		this.resolutionCategory = null;
+		this.violationDetails = violationDetails;
 	}
 	
 	/**
-	 * Constructor to find all unresolved violations
-	 * @param conditionViolationId
-	 * @param disciplinaryCodeViolationId
-	 * @param violationEventCategory
-	 * @param disciplinaryCodeDescription
-	 * @param conditionClause
-	 * @param violationEventDetails
+	 * Constructor to find all unresolved violations.
+	 * @param conditionViolationId - Long
+	 * @param disciplinaryCodeViolationId - Long
+	 * @param violationEventCategory - Violation Event Category
+	 * @param disciplinaryCodeDescription - String
+	 * @param disciplinaryCodeValue - String
+	 * @param conditionClause - String
+	 * @param conditionTitle - String
+	 * @param violationEventDetails - String
+	 * @param violationEventDate - Date
+	 * @param violationDetails - violation details
 	 */
 	public ViolationSummary(final Long conditionViolationId,
 			final Long disciplinaryCodeViolationId,
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
+			final String disciplinaryCodeValue,
 			final String conditionClause,
-			final String violationEventDetails, final Date violationEventDate) {
+			final String conditionTitle,
+			final String violationEventDetails, final Date violationEventDate,
+			final String violationDetails) {
 		this.infractionId = null;
 		this.conditionViolationId = conditionViolationId;
 		this.disciplinaryCodeViolationId = disciplinaryCodeViolationId;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
+		this.disciplinaryCodeValue = disciplinaryCodeValue;
 		this.violationEventDetails = violationEventDetails;
 		this.violationEventDate = violationEventDate;
 		this.conditionClause = conditionClause;
+		this.conditionTitle = conditionTitle;
+		this.modifiedConditionClause = null;
+		this.modifiedDisciplinaryCode = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
+		this.appealDate = null;
 		this.sanctionDescription = null;
 		this.resolutionCategory = null;
+		this.violationDetails = violationDetails;
 	}
 	
 	/**
 	 * Constructor to summarize a single
-	 *  DisciplinaryCodeViolation/ConditionViolation
-	 * @param violationEventDetails
-	 * @param disciplinaryCodeDescription
-	 * @param conditionClause
+	 *  DisciplinaryCodeViolation/ConditionViolation.
+	 * @param violationId - violation id
+	 * @param violationEventDetails - String
+	 * @param violationEventCategory - Violation Event Category
+	 * @param disciplinaryCodeDescription - String
+	 * @param disciplinaryCodeValue - String
+	 * @param conditionClause - String
+	 * @param conditionTitle - String
+	 * @param violationEventDate - Date
+	 * @param violationDetails - violation details
 	 */
-	public ViolationSummary(final String violationEventDetails,
+	public ViolationSummary(
+			final Long violationId,
+			final String violationEventDetails,
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
-			final String conditionClause, final Date violationEventDate){
+			final String disciplinaryCodeValue,
+			final String conditionClause, 
+			final String conditionTitle,
+			final Date violationEventDate,
+			final String violationDetails) {
 		this.infractionId = null;
-		this.conditionViolationId = null;
-		this.disciplinaryCodeViolationId = null;
+		this.conditionViolationId = violationId;
+		this.disciplinaryCodeViolationId = violationId;
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
+		this.disciplinaryCodeValue = disciplinaryCodeValue;
 		this.violationEventDetails = violationEventDetails;
 		this.violationEventDate = violationEventDate;
 		this.conditionClause = conditionClause;
+		this.conditionTitle = conditionTitle;
+		this.modifiedConditionClause = null;
+		this.modifiedDisciplinaryCode = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
+		this.appealDate = null;
 		this.sanctionDescription = null;
 		this.resolutionCategory = null;
+		this.violationDetails = violationDetails;
 	}
 	
 	/**
-	 * Returns the infractionId
+	 * Returns the infractionId.
 	 * @return infractionId - Long
 	 */
 	public Long getInfractionId() {
@@ -252,7 +396,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the conditionViolationId
+	 * Returns the conditionViolationId.
 	 * @return conditionViolationId - Long
 	 */
 	public Long getConditionViolationId() {
@@ -260,7 +404,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the disciplinaryCodeViolationId
+	 * Returns the disciplinaryCodeViolationId.
 	 * @return disciplinaryCodeViolationId - Long
 	 */
 	public Long getDisciplinaryCodeViolationId() {
@@ -268,7 +412,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the violationEventCategory
+	 * Returns the violationEventCategory.
 	 * @return violationEventCategory - ViolationEventCategory
 	 */
 	public ViolationEventCategory getViolationEventCategory() {
@@ -276,7 +420,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the disciplinaryCodeDescription
+	 * Returns the disciplinaryCodeDescription.
 	 * @return disciplinaryCodeDescription - String
 	 */
 	public String getDisciplinaryCodeDescription() {
@@ -284,7 +428,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the conditionClause
+	 * Returns the conditionClause.
 	 * @return conditionClause - String
 	 */
 	public String getConditionClause() {
@@ -292,7 +436,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the decisionReason
+	 * Returns the decisionReason.
 	 * @return decisionReason - String
 	 */
 	public String getDecisionReason() {
@@ -300,7 +444,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the decision
+	 * Returns the decision.
 	 * @return decision - String
 	 */
 	public String getDecision() {
@@ -308,7 +452,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the dispositionCategory
+	 * Returns the dispositionCategory.
 	 * @return dispositionCategory - DispositionCategory
 	 */
 	public String getDispositionCategory() {
@@ -316,7 +460,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the sanctionDescription
+	 * Returns the sanctionDescription.
 	 * @return sanctionDescription - String
 	 */
 	public String getSanctionDescription() {
@@ -324,7 +468,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the violationEventDetails
+	 * Returns the violationEventDetails.
 	 * @return violationEventDetails - String
 	 */
 	public String getViolationEventDetails() {
@@ -332,7 +476,7 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the resolutionCategory
+	 * Returns the resolutionCategory.
 	 * @return resolutionCategory - ResolutionClassificationCategory
 	 */
 	public ResolutionClassificationCategory getResolutionCategory() {
@@ -340,13 +484,60 @@ public class ViolationSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the violationEventDate
+	 * Returns the violationEventDate.
 	 * @return violationEventDate - Date
 	 */
 	public Date getViolationEventDate() {
 		return violationEventDate;
 	}
-	
+
+	/**
+	 * Returns the disciplinaryCodeValue.
+	 * @return disciplinaryCodeValue - String
+	 */
+	public String getDisciplinaryCodeValue() {
+		return this.disciplinaryCodeValue;
+	}
+
+	/**
+	 * Returns the conditionTitle.
+	 * @return conditionTitle - String
+	 */
+	public String getConditionTitle() {
+		return this.conditionTitle;
+	}
+
+	/**
+	 * Returns the appealDate.
+	 * @return appealDate - Date
+	 */
+	public Date getAppealDate() {
+		return this.appealDate;
+	}
+
+	/**
+	 * Returns the violation details.
+	 * @return the violationDetails
+	 */
+	public String getViolationDetails() {
+		return this.violationDetails;
+	}
+
+	/**
+	 * Returns this modified disciplinary code.
+	 * @return modifiedDisciplinaryCode - modified disciplinary code
+	 */
+	public String getModifiedDisciplinaryCode() {
+		return this.modifiedDisciplinaryCode;
+	}
+
+	/**
+	 * Returns the modified condition clause.
+	 * @return modifiedConditionClause - modified condition clause
+	 */
+	public String getModifiedConditionClause() {
+		return this.modifiedConditionClause;
+	}
 	
 	
 }

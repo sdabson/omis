@@ -17,23 +17,27 @@
 */
 package omis.address.exception;
 
+import omis.address.domain.ZipCode;
 import omis.exception.DuplicateEntityFoundException;
 
 /**
  * Thrown if zip code exists.
  * 
  * @author Yidong Li
- * @version 0.0.1 (Jan 25, 2018)
+ * @version 0.0.1 (Jan 8, 2019)
  * @since OMIS 3.0
  */
 public class ZipCodeExistsException
 		extends DuplicateEntityFoundException {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private final ZipCode zipCode; 
 
 	/** Instantiates exception thrown if zip code exists. */
 	public ZipCodeExistsException() {
 		// Default instantiation
+		this.zipCode = null;
 	}
 	
 	/**
@@ -44,6 +48,7 @@ public class ZipCodeExistsException
 	 */
 	public ZipCodeExistsException(final String message, final Throwable cause) {
 		super(message, cause);
+		this.zipCode = null;
 	}
 	
 	/**
@@ -53,6 +58,7 @@ public class ZipCodeExistsException
 	 */
 	public ZipCodeExistsException(final String message) {
 		super(message);
+		this.zipCode = null;
 	}
 	
 	/**
@@ -62,5 +68,37 @@ public class ZipCodeExistsException
 	 */
 	public ZipCodeExistsException(final Throwable cause) {
 		super(cause);
+		this.zipCode = null;
+	}
+	
+	/**
+	 * Instantiates exception thrown if zip code exists with cause.
+	 * 
+	 * @param cause cause
+	 * @param message message
+	 * @param zipCode zip code
+	 */
+	public ZipCodeExistsException(final String message, final Throwable cause,
+		final ZipCode zipCode) {
+		super(message, cause);
+		this.zipCode = zipCode;
+	}
+	
+	/**
+	 * Instantiates exception thrown if zip code exists with cause.
+	 * 
+	 * @param zipCode zip code
+	 */
+	public ZipCodeExistsException(final ZipCode zipCode) {
+		this.zipCode = zipCode;
+	}
+	
+	/**
+	 * Returns city.
+	 * 
+	 * @return city
+	 */
+	public ZipCode getZipCode() {
+		return this.zipCode;
 	}
 }

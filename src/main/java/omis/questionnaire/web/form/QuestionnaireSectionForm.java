@@ -3,10 +3,10 @@ package omis.questionnaire.web.form;
 import omis.questionnaire.domain.SectionType;
 
 /**
- * QuestionnaireSectionForm.java
+ * Questionnaire Section Form.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Nov 17, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
@@ -14,7 +14,7 @@ public class QuestionnaireSectionForm {
 	
 	private String title;
 	
-	private Integer sectionNumber;
+	private String sectionNumber;
 	
 	private SectionType sectionType;
 	
@@ -36,21 +36,21 @@ public class QuestionnaireSectionForm {
 	/**
 	 * @param title the title to set
 	 */
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
 	/**
 	 * @return the sectionNumber
 	 */
-	public Integer getSectionNumber() {
+	public String getSectionNumber() {
 		return this.sectionNumber;
 	}
 
 	/**
 	 * @param sectionNumber the sectionNumber to set
 	 */
-	public void setSectionNumber(Integer sectionNumber) {
+	public void setSectionNumber(final String sectionNumber) {
 		this.sectionNumber = sectionNumber;
 	}
 
@@ -64,7 +64,7 @@ public class QuestionnaireSectionForm {
 	/**
 	 * @param sectionType the sectionType to set
 	 */
-	public void setSectionType(SectionType sectionType) {
+	public void setSectionType(final SectionType sectionType) {
 		this.sectionType = sectionType;
 	}
 
@@ -78,7 +78,7 @@ public class QuestionnaireSectionForm {
 	/**
 	 * @param sectionHelp the sectionHelp to set
 	 */
-	public void setSectionHelp(String sectionHelp) {
+	public void setSectionHelp(final String sectionHelp) {
 		this.sectionHelp = sectionHelp;
 	}
 	

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.paroleboardmember.web.controller;
 
 import java.util.Date;
@@ -24,8 +41,6 @@ import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleboardmember.service.ParoleBoardMemberService;
 import omis.paroleboardmember.web.form.ParoleBoardMemberForm;
 import omis.paroleboardmember.web.validator.ParoleBoardMemberFormValidator;
-import omis.probationterm.exception.ProbationTermConflictException;
-import omis.probationterm.exception.ProbationTermExistsException;
 import omis.staff.domain.StaffAssignment;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
@@ -33,7 +48,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Controller for managing parole board members.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 9, 2017)
+ * @version 0.1.1 (Aug 2, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -262,7 +277,7 @@ public class ManageParoleBoardMemberController {
 	 */
 	@ExceptionHandler(DuplicateEntityFoundException.class)
 	public ModelAndView handleParoleBoardMemberExistsException(
-			final ProbationTermExistsException exception) {
+			final DuplicateEntityFoundException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				PAROLE_BOARD_MEMBER_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
 				exception);
@@ -276,7 +291,7 @@ public class ManageParoleBoardMemberController {
 	 */
 	@ExceptionHandler(DateConflictException.class)
 	public ModelAndView handleParoleBoardMemberDateConflictException(
-			final ProbationTermConflictException exception) {
+			final DateConflictException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				PAROLE_BOARD_MEMBER_DATE_CONFLICT_MESSAGE_KEY, 
 				ERROR_BUNDLE_NAME, exception);

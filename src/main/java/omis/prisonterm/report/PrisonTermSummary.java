@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.prisonterm.report;
 
 import java.util.Date;
@@ -9,10 +26,10 @@ import omis.prisonterm.domain.PrisonTermStatus;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Oct 17, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Dec 18, 2018)
  * @since OMIS 3.0
  */
-
 public class PrisonTermSummary {
 	private final Long id;
 	
@@ -50,6 +67,18 @@ public class PrisonTermSummary {
 	
 	private final PrisonTermStatus status;
 	
+	private final String verificationUserLastName;
+	
+	private final String verificationUserFirstName;
+	
+	private final String verificationUserMiddleName;
+	
+	private final String verificationUserUsername;
+	
+	private final Date verificationDate;
+	
+	private final Long sentenceCalculationDocumentId;
+	
 	/**
 	 * Instantiates a prison term summary with the specified values.
 	 * 
@@ -71,6 +100,11 @@ public class PrisonTermSummary {
 	 * @param sentenceToFollow
 	 * @param comments
 	 * @param prisonTermStatus
+	 * @param verificationUser
+	 * @param verificationUserLastName
+	 * @param verificationUserFirstName
+	 * @param verificationDate
+	 * @param sentenceCalculationDocumentId
 	 */
 	public PrisonTermSummary(
 			final Long id,
@@ -90,7 +124,13 @@ public class PrisonTermSummary {
 			final Date maximumDischargeDate,
 			final Boolean sentenceToFollow,
 			final String comments,
-			final PrisonTermStatus prisonTermStatus) {
+			final PrisonTermStatus prisonTermStatus,
+			final String verificationUserLastName,
+			final String verificationUserFirstName,
+			final String verificationUserMiddleName,
+			final String verificationUserUsername,
+			final Date verificationDate,
+			final Long sentenceCalculationDocumentId) {
 		this.id = id;
 		this.offenderId = offenderId;
 		this.offenderLastName = offenderLastName;
@@ -109,33 +149,12 @@ public class PrisonTermSummary {
 		this.sentenceToFollow = sentenceToFollow;
 		this.comments = comments;
 		this.status = prisonTermStatus;
-	}
-	
-	/**
-	 * @param paroleEligibilityDate
-	 * @param projectedDischargeDate
-	 */
-	public PrisonTermSummary(
-			final Date paroleEligibilityDate,
-			final Date projectedDischargeDate) {
-		this.id = null;
-		this.offenderId = null;
-		this.offenderLastName = null;
-		this.offenderFirstName = null;
-		this.offenderMiddleName = null;
-		this.offenderSuffix = null;
-		this.offenderNumber = null;
-		this.actionDate = null;
-		this.preSentenceCredits = null;
-		this.sentenceDate = null;
-		this.sentenceTermYears = null;
-		this.sentenceTermDays = null;
-		this.paroleEligibilityDate = paroleEligibilityDate;
-		this.projectedDischargeDate = projectedDischargeDate;
-		this.maximumDischargeDate = null;
-		this.sentenceToFollow = null;
-		this.comments = null;
-		this.status = null;
+		this.verificationUserLastName = verificationUserLastName;
+		this.verificationUserFirstName = verificationUserFirstName;
+		this.verificationUserMiddleName = verificationUserMiddleName;
+		this.verificationUserUsername = verificationUserUsername;
+		this.verificationDate = verificationDate;
+		this.sentenceCalculationDocumentId = sentenceCalculationDocumentId;
 	}
 
 	/**
@@ -262,5 +281,59 @@ public class PrisonTermSummary {
 	 */
 	public PrisonTermStatus getStatus() {
 		return status;
+	}
+	
+	/**
+	 * Returns the verificationUserLastName.
+	 *
+	 * @return verificationUserLastName
+	 */
+	public String getVerificationUserLastName() {
+		return this.verificationUserLastName;
+	}
+
+	/**
+	 * Returns the verificationUserFirstName.
+	 *
+	 * @return verificationUserFirstName
+	 */
+	public String getVerificationUserFirstName() {
+		return this.verificationUserFirstName;
+	}
+
+	/**
+	 * Returns the verificationUserMiddleName.
+	 *
+	 * @return verificationUserMiddleName
+	 */
+	public String getVerificationUserMiddleName() {
+		return this.verificationUserMiddleName;
+	}
+
+	/**
+	 * Returns the verificationUserUsername.
+	 *
+	 * @return verificationUserUsername
+	 */
+	public String getVerificationUserUsername() {
+		return this.verificationUserUsername;
+	}
+
+	/**
+	 * Returns the verificationDate.
+	 *
+	 * @return verificationDate
+	 */
+	public Date getVerificationDate() {
+		return this.verificationDate;
+	}
+
+	/**
+	 * Returns the sentenceCalculationDocumentId.
+	 *
+	 * @return sentenceCalculationDocumentId
+	 */
+	public Long getSentenceCalculationDocumentId() {
+		return this.sentenceCalculationDocumentId;
 	}
 }

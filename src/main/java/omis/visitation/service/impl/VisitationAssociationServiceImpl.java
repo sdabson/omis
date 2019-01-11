@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.visitation.service.impl;
 
 import java.util.ArrayList;
@@ -34,12 +51,15 @@ import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 import omis.residence.service.delegate.ResidenceTermDelegate;
+import omis.visitation.domain.Visit;
 import omis.visitation.domain.VisitationApproval;
 import omis.visitation.domain.VisitationAssociation;
 import omis.visitation.domain.VisitationAssociationCategory;
 import omis.visitation.domain.VisitationAssociationFlags;
 import omis.visitation.service.VisitationAssociationService;
+import omis.visitation.service.delegate.VisitDelegate;
 import omis.visitation.service.delegate.VisitationAssociationCategoryDelegate;
 import omis.visitation.service.delegate.VisitationAssociationDelegate;
 
@@ -82,6 +102,8 @@ implements VisitationAssociationService {
 	
 	private OffenderDelegate offenderDelegate;
 	
+	private VisitDelegate visitDelegate;
+	
 	/**
 	 * Instantiates a visitation association service with the specified
 	 * data access objects, service implementation delegates, instance
@@ -114,7 +136,8 @@ implements VisitationAssociationService {
 			final AddressDelegate addressDelegate,
 			final ContactDelegate contactDelegate,
 			final PersonDelegate personDelegate,
-			final OffenderDelegate offenderDelegate) {
+			final OffenderDelegate offenderDelegate,
+			final VisitDelegate visitDelegate) {
 		this.relationshipDelegate = relationshipDelegate;
 		this.visitationAssociationCategoryDelegate = 
 				visitationAssociationCategoryDelegate;
@@ -128,6 +151,7 @@ implements VisitationAssociationService {
 		this.contactDelegate = contactDelegate;
 		this.personDelegate = personDelegate;
 		this.offenderDelegate = offenderDelegate;
+		this.visitDelegate = visitDelegate;
 	}
 
 	/** {@inheritDoc} */
@@ -159,6 +183,10 @@ implements VisitationAssociationService {
 	/** {@inheritDoc} */
 	@Override
 	public void remove(final VisitationAssociation association) {
+		List<Visit> visits = this.visitDelegate.findVisitsByVisitationAssociation(association);
+		for (Visit visit : visits) {
+			this.visitDelegate.remove(visit);
+		}
 		this.visitationAssociationDelegate.remove(association);
 	}
 
@@ -211,7 +239,7 @@ implements VisitationAssociationService {
 	@Override
 	public ResidenceTerm createResidenceTerm(final Person person, 
 			final Address address)
-		throws DuplicateEntityFoundException, 
+		throws DuplicateEntityFoundException, ResidenceTermExistsException,
 		PrimaryResidenceExistsException, ResidenceStatusConflictException {
 		return this.residenceTermDelegate.createResidenceTerm(person,
 				new DateRange(new Date(), null), ResidenceCategory.PRIMARY,

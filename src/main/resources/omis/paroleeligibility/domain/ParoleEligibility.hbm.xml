@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <!DOCTYPE hibernate-mapping PUBLIC
        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
@@ -58,21 +75,54 @@
 		and
 			eligibility <> :excludedEligibility
 	]]></query>
-	<query name="findParoleEligibilitySummaryByOffender"><![CDATA[
-		select paroleEligibility
-		from
-			omis.paroleeligibility.domain.ParoleEligibility paroleEligibility
-		where
-			paroleEligibility.offender = :offender
-		order by paroleEligibility.offender.name.lastName, 
-		paroleEligibility.offender.name.firstName, paroleEligibility.offender.offenderNumber,
-		paroleEligibility.hearingEligibilityDate
-	]]></query>
 	<query name="findParoleEligibilityCountByEligibilities"><![CDATA[
 		select count(paroleEligibility.id)
 		from
 			omis.paroleeligibility.domain.ParoleEligibility paroleEligibility
 		where
 			paroleEligibility.offender = :offender
+	]]></query>
+	<query name="findParoleEligibilitiesByOffenderAfterDate"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		where
+			eligibility.offender = :offender
+		and
+			eligibility.hearingEligibilityDate > :date
+	]]></query>
+	<query name="findUnscheduledParoleEligibilities"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		where
+			(eligibility.status.category = 'APPEARING'
+			and
+			eligibility not in
+				(select eligibility2
+				from
+					omis.boardhearing.domain.BoardHearing as boardHearing
+				inner join
+					boardHearing.paroleEligibility as eligibility2)
+			)
+		order by
+			eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnscheduledParoleEligibilitiesIncluding"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		where
+			(eligibility.status.category = 'APPEARING'
+			and
+			eligibility not in
+				(select eligibility2
+				from
+					omis.boardhearing.domain.BoardHearing as boardHearing
+				inner join
+					boardHearing.paroleEligibility as eligibility2)
+			)
+		order by
+			eligibility.hearingEligibilityDate asc
 	]]></query>
 </hibernate-mapping>

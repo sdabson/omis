@@ -22,19 +22,19 @@ function validateInput(elt){
 	var returnValid; 
 	var index = 0;
 	
-	if(elt.className.includes("currency")){
+	if(elt.className.indexOf("currency") != -1){
 		valid[index] = currencyValidation(elt);
 		index++;
 	}
-	if(elt.className.includes("phoneNumber")){
+	if(elt.className.indexOf("phoneNumber") != -1){
 		valid[index] = phoneNumberValidation(elt);
 		index++;
 	}
-	if(elt.className.includes("wholeNumber")){
+	if(elt.className.indexOf("wholeNumber") != -1){
 		valid[index] = wholeNumberValidation(elt);
 		index++;
 	}
-	if(elt.className.includes("decimalNumber")){
+	if(elt.className.indexOf("decimalNumber") != -1){
 		valid[index] = decimalNumberValidation(elt);
 		index++;
 	}

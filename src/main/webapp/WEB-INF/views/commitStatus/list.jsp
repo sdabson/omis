@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <%--
  - Author: Yidong Li
+ - Author: Sheronda Vaughn
  - Version: 0.1.0 (June 6, 2017)
  - Since: OMIS 3.0
  --%>
@@ -29,21 +30,14 @@
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 		<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/linksResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.search.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.tools.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/search.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/tools.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/links.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/form.js"></script>
+		<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/formResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/commitStatus/scripts/commitStatusList.js"> </script>
 	</head>
 	<body>

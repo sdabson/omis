@@ -13,8 +13,10 @@
   <bean id="prisonTermService"
   		class="omis.prisonterm.service.impl.PrisonTermServiceImpl">
   	<constructor-arg name="prisonTermDelegate" ref="prisonTermDelegate"/>
-  	<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>		
-  	<constructor-arg name="prisonTermDao" ref="prisonTermDao"/>	
+  	<constructor-arg name="prisonTermDocumentAssociationDelegate" ref="prisonTermDocumentAssociationDelegate"/>
+  	<constructor-arg name="userAccountDelegate" ref="userAccountDelegate"/>
+  	<constructor-arg name="documentDelegate" ref="documentDelegate"/>
+  	<constructor-arg name="documentTagDelegate" ref="documentTagDelegate"/>
   </bean>
   
   <!-- Service delegates -->
@@ -24,6 +26,12 @@
 	  <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
 	  <constructor-arg name="prisonTermDao" ref="prisonTermDao"/>
   </bean>
+  
+	<bean id="prisonTermDocumentAssociationDelegate" class="omis.prisonterm.service.delegate.PrisonTermDocumentAssociationDelegate">
+		<constructor-arg name="prisonTermDocumentAssociationDao" ref="prisonTermDocumentAssociationDao" />
+		<constructor-arg name="prisonTermDocumentAssociationInstanceFactory" ref="prisonTermDocumentAssociationInstanceFactory" />
+		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+	</bean>
   
   <!-- Report Services -->
   
@@ -49,19 +57,12 @@
   	<constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
   	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   </bean>
-  
-  <bean id="facilityDao" 
-  		class="omis.facility.dao.impl.hibernate.FacilityDaoHibernateImpl">
-  	<constructor-arg name="entityName" value="omis.facility.domain.Facility"/>
-  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-  
-  <bean id="userAccountDao" 
-  		class="omis.user.dao.impl.hibernate.UserAccountDaoHibernateImpl">
-  	<constructor-arg name="entityName" value="omis.user.domain.UserAccount"/>
-  	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-  
+  		
+ 	<bean id="prisonTermDocumentAssociationDao" class="omis.prisonterm.dao.impl.hibernate.PrisonTermDocumentAssociationDaoHibernateImpl">
+		<constructor-arg name="sessionFactory" ref="sessionFactory" />
+		<constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTermDocumentAssociation" />
+	</bean>
+  		
   <!-- Instance factories -->
   
   <bean id="prisonTermInstanceFactory" 
@@ -70,6 +71,11 @@
     <constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
   </bean>
   
+	<bean id="prisonTermDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+		<constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTermDocumentAssociation" />
+	</bean>
+	
   <!-- Property editor factories -->
   
   <bean id="prisonTermPropertyEditorFactory"
@@ -78,4 +84,34 @@
     <constructor-arg name="entityName" value="omis.prisonterm.domain.PrisonTerm"/>
     <constructor-arg name="configuration" ref="hibernateConfiguration"/>
   </bean>
+  
+	<bean id="prisonTermDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+		<constructor-arg name="dao" ref="prisonTermDocumentAssociationDao" />
+		<constructor-arg name="entityName"
+			value="omis.prisonterm.domain.PrisonTermDocumentAssociation" />
+		<constructor-arg name="configuration" ref="hibernateConfiguration" />
+	</bean>
+	
+	
+	<!-- Document Beans -->
+	
+	<bean id="prisonTermDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+		<constructor-arg name="fileLocator" ref="prisonTermDocumentLocator"/>
+	</bean>
+
+	<bean id="prisonTermDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+		<constructor-arg name="fileLocator" ref="prisonTermDocumentLocator"/>
+		<constructor-arg name="defaultFilename" value="notFound"/>
+	</bean>
+
+	<bean id="prisonTermDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+		<constructor-arg name="path" value="${application.resource.path}\Documents\PrisonTermDocuments"/>
+	</bean>
+	
+	<bean id="prisonTermDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+		<constructor-arg name="fileLocator" ref="prisonTermDocumentLocator"/>
+	</bean>
+		
+		
 </beans>

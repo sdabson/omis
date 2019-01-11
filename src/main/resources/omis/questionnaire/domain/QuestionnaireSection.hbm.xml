@@ -16,7 +16,7 @@
 			<property name="sortOrder" column="`SORT_ORDER`" type="java.lang.Short" not-null="true"/>
 			<many-to-one name="questionnaireType" column="`QUESTIONNAIRE_TYPE_ID`" entity-name="omis.questionnaire.domain.QuestionnaireType" not-null="true"/>
 			<many-to-one name="sectionType" column="`SECTION_TYPE_ID`" entity-name="omis.questionnaire.domain.SectionType" not-null="true"/>
-			<property name="sectionNumber" column="`SECTION_NUMBER`" type="java.lang.Integer" not-null="true"/>
+			<property name="sectionNumber" column="`SECTION_NUMBER`" type="java.lang.String" not-null="true"/>
 			<property name="sectionHelp" column="`SECTION_HELP`" type="java.lang.String" />
 			<component name="creationSignature">
 				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>

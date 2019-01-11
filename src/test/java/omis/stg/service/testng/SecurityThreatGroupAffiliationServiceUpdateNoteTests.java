@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.testng;
 
 import java.text.ParseException;
@@ -27,6 +44,12 @@ import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupAffiliationNote;
 import omis.stg.domain.SecurityThreatGroupChapter;
 import omis.stg.domain.SecurityThreatGroupRank;
+import omis.stg.exception.SecurityThreatGroupActivityLevelExistsException;
+import omis.stg.exception.SecurityThreatGroupAffiliationExistsException;
+import omis.stg.exception.SecurityThreatGroupAffiliationNoteExistsException;
+import omis.stg.exception.SecurityThreatGroupChapterExistsException;
+import omis.stg.exception.SecurityThreatGroupExistsException;
+import omis.stg.exception.SecurityThreatGroupRankExistsException;
 import omis.stg.service.SecurityThreatGroupAffiliationService;
 import omis.stg.service.delegate.SecurityThreatGroupActivityLevelDelegate;
 import omis.stg.service.delegate.SecurityThreatGroupAffiliationDelegate;
@@ -42,6 +65,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to update security threat group affiliation notes.
  *
  * @author Josh Divine
+ * @author Sheronda Vaughn
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -113,9 +137,18 @@ public class SecurityThreatGroupAffiliationServiceUpdateNoteTests
 	 * Tests update of the date for a security threat group affiliation note.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException 
+	 * @throws SecurityThreatGroupExistsException 
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupAffiliationExistsException 
+	 * @throws SecurityThreatGroupRankExistsException 
+	 * @throws SecurityThreatGroupActivityLevelExistsException 
 	 */
 	@Test
-	public void testUpdateNoteDate() throws DuplicateEntityFoundException {
+	public void testUpdateNoteDate() throws DuplicateEntityFoundException, 
+		SecurityThreatGroupAffiliationNoteExistsException, SecurityThreatGroupExistsException, 
+		SecurityThreatGroupChapterExistsException, SecurityThreatGroupAffiliationExistsException, 
+		SecurityThreatGroupRankExistsException, SecurityThreatGroupActivityLevelExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
 				"John", "Jay", null);
@@ -168,9 +201,18 @@ public class SecurityThreatGroupAffiliationServiceUpdateNoteTests
 	 * Tests update of the note for a security threat group affiliation note.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws SecurityThreatGroupExistsException 
+	 * @throws SecurityThreatGroupAffiliationExistsException 
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupActivityLevelExistsException 
+	 * @throws SecurityThreatGroupRankExistsException 
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException 
 	 */
 	@Test
-	public void testUpdateNoteNote() throws DuplicateEntityFoundException {
+	public void testUpdateNoteNote() throws DuplicateEntityFoundException, 
+		SecurityThreatGroupExistsException, SecurityThreatGroupAffiliationExistsException, 
+		SecurityThreatGroupChapterExistsException, SecurityThreatGroupActivityLevelExistsException, 
+		SecurityThreatGroupRankExistsException, SecurityThreatGroupAffiliationNoteExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
 				"John", "Jay", null);
@@ -220,13 +262,22 @@ public class SecurityThreatGroupAffiliationServiceUpdateNoteTests
 	}
 	
 	/**
-	 * Tests {@code DuplicateEntityFoundException} is thrown.
+	 * Tests {@code SecurityThreatGroupAffiliationNoteExistsException} is thrown.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException 
+	 * @throws SecurityThreatGroupRankExistsException 
+	 * @throws SecurityThreatGroupAffiliationExistsException 
+	 * @throws SecurityThreatGroupChapterExistsException 
+	 * @throws SecurityThreatGroupActivityLevelExistsException 
+	 * @throws SecurityThreatGroupExistsException 
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
-	public void testDuplicateEntityFoundException() 
-			throws DuplicateEntityFoundException {
+	@Test(expectedExceptions = {SecurityThreatGroupAffiliationNoteExistsException.class})
+	public void testSecurityThreatGroupAffiliationNoteExistsException() 
+			throws DuplicateEntityFoundException, SecurityThreatGroupAffiliationNoteExistsException, 
+			SecurityThreatGroupRankExistsException, SecurityThreatGroupAffiliationExistsException, 
+			SecurityThreatGroupChapterExistsException, SecurityThreatGroupActivityLevelExistsException, 
+			SecurityThreatGroupExistsException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
 				"John", "Jay", null);

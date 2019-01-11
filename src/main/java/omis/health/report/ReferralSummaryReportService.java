@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.health.report;
 
 import java.util.Date;
@@ -13,7 +30,8 @@ import omis.offender.domain.Offender;
  * Report service for referral summaries.
  * 
  * @author Stephen Abson
- * @version 0.1.0 (May 9, 2014)
+ * @author Yidong Li
+ * @version 0.1.0 (Oct 22, 2018)
  * @since OMIS 3.0
  */
 public interface ReferralSummaryReportService {
@@ -87,4 +105,32 @@ public interface ReferralSummaryReportService {
 			Date startDate, Date endDate,
 			ReferralType[] types, HealthAppointmentStatus[] statuses,
 			Date effectiveDate);
+	
+	/**
+	 * Returns the count of referral summaries by facility.
+	 * 
+	 * @param facility facility
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @param types referral types
+	 * @param statuses appointment statuses
+	 * @return the count of referral summaries by facility
+	 */
+	long countByFacility(Facility facility,
+		Date startDate, Date endDate,
+		ReferralType[] types, HealthAppointmentStatus[] statuses);
+	
+	/**
+	 * Returns the count of referral summaries by offender.
+	 * 
+	 * @param offender offender
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @param types referral types
+	 * @param statuses appointment statuses
+	 * @return the count of referral summaries by offender
+	 */
+	long countByOffender(Offender offender,
+		Date startDate, Date endDate,
+		ReferralType[] types, HealthAppointmentStatus[] statuses);
 }

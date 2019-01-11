@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.dao.impl.hibernate;
 
 import java.util.Date;
@@ -51,6 +68,9 @@ public class LocationTermDaoHibernateImpl
 	
 	private static final String FIND_FOR_OFFENDER_BETWEEN_DATES_QUERY_NAME
 		= "findLocationTermsByOffenderBetweenDates";
+	
+	private static final String FIND_FOR_OFFENDER_WITH_START_DATE_QUERY_NAME
+		= "findLocationTermForOffenderWithStartDate";
 	
 	/* Parameters. */
 	
@@ -207,9 +227,34 @@ public class LocationTermDaoHibernateImpl
 		long count = (long) this.getSessionFactory().getCurrentSession()
 				.getNamedQuery(COUNT_AFTER_DATE_EXCLUDING_QUERY_NAME)
 				.setParameter(OFFENDER_PARAM_NAME, offender)
-				.setParameter(START_DATE_PARAM_NAME, startDate)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
 				.setParameter(EXCLUDED_LOCATION_TERM_PARAM_NAME, 
 						excludedLocationTerm).uniqueResult();
 		return count;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public LocationTerm findWithStartDate(
+			final Offender offender, final Date startDate) {
+		LocationTerm locationTerm = (LocationTerm) this.getSessionFactory()
+				.getCurrentSession().getNamedQuery(
+						FIND_FOR_OFFENDER_WITH_START_DATE_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.uniqueResult();
+		return locationTerm;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public LocationTerm endLocationTerm(
+			final Offender offender, final Date effectiveDate) {
+		
+		// TODO - remove this method once legacy functionality is no longer
+		// required - SA
+		throw new UnsupportedOperationException(
+				"Ending location term not supported - update location term"
+					+ " instead");
 	}
 }

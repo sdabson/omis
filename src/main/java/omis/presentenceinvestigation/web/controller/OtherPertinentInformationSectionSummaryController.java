@@ -33,19 +33,21 @@ import omis.presentenceinvestigation.web.form.OtherPertinentInformationSectionSu
 import omis.presentenceinvestigation.web.form.PresentenceInvestigationItemOperation;
 import omis.presentenceinvestigation.web.validator.OtherPertinentInformationSectionSummaryFormValidator;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
+
 /**
- * OtherPertinentInformationSectionSummaryController.java
+ * Other pertinent information section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (May 19, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/otherPertinentInformationSummary/")
 @PreAuthorize("hasRole('USER')")
 public class OtherPertinentInformationSectionSummaryController {
-/* View Names */
+
+	/* View Names */
 	
 	private static final String EDIT_VIEW_NAME =
 			"/presentenceInvestigation/otherPertinentInformationSummary/edit";
@@ -107,7 +109,6 @@ public class OtherPertinentInformationSectionSummaryController {
 	@Qualifier("otherPertinentInformationSectionSummaryService")
 	private OtherPertinentInformationSectionSummaryService
 		otherPertinentInformationSectionSummaryService;
-	
 
 	/* Property Editor Factories */
 	
@@ -374,7 +375,7 @@ public class OtherPertinentInformationSectionSummaryController {
 				presentenceInvestigationRequest);
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 				

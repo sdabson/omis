@@ -22,14 +22,14 @@
 		<sec:authorize access="hasRole('PRISON_TERM_LIST') or hasRole('ADMIN')">
 			<c:if test="${not empty offender and empty prisonTerm}">
 			<li>
-				<a href="${pageContext.request.contextPath}/prisonTerm/prisonTermListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="prisonTermListingReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/prisonTerm/prisonTermListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="prisonTermListingReportLinkLabel"/></a>
 			</li>
 			</c:if>
 		</sec:authorize>
 		<sec:authorize access="hasRole('PRISON_TERM_EDIT') or hasRole('ADMIN')">
 			<c:if test="${not empty prisonTerm}">
 			<li>
-			<a class="viewEditLink" href="${pageContext.request.contextPath}/prisonTerm/edit.html?prisonTerm=${prisonTerm.id}&offender=${offender.id}">
+			<a class="viewEditLink" href="${pageContext.request.contextPath}/prisonTerm/edit.html?prisonTerm=${prisonTerm.id}">
 				<span class="visibleLinkLabel">
 					<fmt:message key="viewEditPrisonTermLink"/>
 				</span>
@@ -51,8 +51,17 @@
 		<sec:authorize access="hasRole('PRISON_TERM_LIST') or hasRole('ADMIN')">
 			<c:if test="${not empty prisonTerm}">
 			<li>
-				<a href="${pageContext.request.contextPath}/prisonTerm/prisonTermDetailsReport.html?prisonTerm=${prisonTerm.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="prisonTermDetailsReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/prisonTerm/prisonTermDetailsReport.html?prisonTerm=${prisonTerm.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="prisonTermDetailsReportLinkLabel"/></a>
 			</li>
+			</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('PRISON_TERM_LIST') or hasRole('ADMIN')">
+			<c:if test="${not empty prisonTerm and not empty sentenceCalculation}">
+				<li>
+					<a id="prisonTermDocumentDownloadLink" href="${pageContext.request.contextPath}/prisonTerm/retrieveFile.html?document=${sentenceCalculation.document.id}" class="downloadLink">
+						<fmt:message key="sentenceCalculationLink" />
+					</a>
+				</li>
 			</c:if>
 		</sec:authorize>
 	</ul>

@@ -1,5 +1,6 @@
 <!-- 
  - Author: Sheronda Vaughn
+ - Author: Sierra Haynes
  - Version: 0.1.0 (Sept 13, 2017)
  - Since: OMIS 3.0
  -->
@@ -17,7 +18,14 @@
 		<sec:authorize access="hasRole('OFFENDER_FLAG_VIEW') or hasRole('ADMIN')">
 	        <c:if test="${not empty offender}">
 	            <li>
-	                <a href="${pageContext.request.contextPath}/offenderFlag/offenderFlagsListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="offenderFlagsListingReportLinkLabel"/></a>
+	                <a href="${pageContext.request.contextPath}/offenderFlag/sVORegistrationReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="sVORegistrationReportLinkLabel"/></a>
+	            </li>
+	        </c:if>
+	    </sec:authorize>		
+		<sec:authorize access="hasRole('OFFENDER_FLAG_VIEW') or hasRole('ADMIN')">
+	        <c:if test="${not empty offender}">
+	            <li>
+	                <a href="${pageContext.request.contextPath}/offenderFlag/offenderFlagsListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderFlagsListingReportLinkLabel"/></a>
 	            </li>
 	        </c:if>
 	    </sec:authorize>

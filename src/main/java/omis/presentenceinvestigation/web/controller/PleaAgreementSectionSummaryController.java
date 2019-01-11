@@ -49,12 +49,12 @@ import omis.presentenceinvestigation.web.validator.PleaAgreementSectionSummaryFo
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * PleaAgreementSectionSummaryController.java
+ * Plea agreement section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Apr 13, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/pleaAgreementSummary/")
@@ -151,8 +151,6 @@ public class PleaAgreementSectionSummaryController {
 	@Qualifier("pleaAgreementSectionSummaryService")
 	private PleaAgreementSectionSummaryService pleaAgreementSectionSummaryService;
 	
-
-	
 	/* Property Editor Factories */
 	
 	@Autowired
@@ -227,7 +225,6 @@ public class PleaAgreementSectionSummaryController {
 	 */
 	public PleaAgreementSectionSummaryController() {
 	}
-	
 	
 	/**
 	 * Displays the ModelAndView for editing a PleaAgreementSectionSummary
@@ -609,7 +606,7 @@ public class PleaAgreementSectionSummaryController {
 		
 		
 		this.offenderSummaryModelDelegate.add(map,
-				(Offender) presentenceInvestigationRequest.getDocket().getPerson());
+				(Offender) presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 				
@@ -752,8 +749,6 @@ public class PleaAgreementSectionSummaryController {
 		(ENTITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
 				exception);
 	}
-	
-	
 	
 	/* InitBinder */
 	

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.region.service.delegate;
 
 import java.util.List;
@@ -44,6 +61,7 @@ public class CityDelegate {
 	 * @param name name
 	 * @param state State
 	 * @param country country
+	 * @param valid whether valid
 	 * @return new city
 	 * @throws CityExistsException if city exists
 	 */
@@ -57,9 +75,10 @@ public class CityDelegate {
 			throw new IllegalArgumentException("State not in country");
 		}
 		
-		// Checks if city exists
-		if (this.cityDao.find(name, state, country) != null) {
-			throw new CityExistsException("City exists");
+		// Checks if city exists and reports existing city in exception
+		City existingCity = this.cityDao.find(name, state, country);
+		if (existingCity != null) {
+			throw new CityExistsException(existingCity);
 		}
 		
 		// Creates new city

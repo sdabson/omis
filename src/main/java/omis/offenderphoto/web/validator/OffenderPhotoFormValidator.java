@@ -74,8 +74,8 @@ public class OffenderPhotoFormValidator
 								"offenderPhotoAssociationNoteItems["
 								+ index + "].value", item.getValue(), errors);
 					}
-					index++;
 				}
+				index++;
 			}
 		}
 	}

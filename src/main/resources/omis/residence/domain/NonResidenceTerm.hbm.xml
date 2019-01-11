@@ -26,7 +26,7 @@
 		<many-to-one name="state" column="`STATE_ID`" not-null="false" entity-name="omis.region.domain.State"/>
 		<many-to-one name="city" column="`CITY_ID`" not-null="false" entity-name="omis.region.domain.City"/>
 		<property name="notes" column="`NOTES`" not-null="false" type="text"/>
-		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="boolean"/>
+		<property name="confirmed" column="`CONFIRMED`" not-null="false" type="yes_no"/>
 		<property name="status" column="`STATUS`" not-null="true" type="residenceStatus"/>
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
@@ -50,9 +50,17 @@
 		omis.residence.domain.NonResidenceTerm nonResidenceTerm
 	where
 		nonResidenceTerm.person = :person
+	and ((:location is not null and nonResidenceTerm.location = :location)
+	or (:location is null and nonResidenceTerm.location is null)
+		and (:state is null and nonResidenceTerm.state is null or nonResidenceTerm.state = :state)
+		and (:city is null and nonResidenceTerm.city is null or nonResidenceTerm.city = :city))
+	and (nonResidenceTerm.dateRange.startDate = :startDate
+		or
+		(nonResidenceTerm.dateRange.startDate is null and :startDate is null))
 	and 
-		(nonResidenceTerm.location = :location
-		 or nonResidenceTerm.location is null and :location is null)
+		(nonResidenceTerm.dateRange.endDate = :endDate
+		or
+		(nonResidenceTerm.dateRange.endDate is null and :endDate is null))
 	and 
 		nonResidenceTerm.status = :status
 	and nonResidenceTerm != :nonResidenceTerm
@@ -64,9 +72,17 @@
 		omis.residence.domain.NonResidenceTerm nonResidenceTerm
 	where
 		nonResidenceTerm.person = :person	
+	and ((:location is not null and nonResidenceTerm.location = :location)
+	or (:location is null and nonResidenceTerm.location is null)
+		and (:state is null and nonResidenceTerm.state is null or nonResidenceTerm.state = :state)
+		and (:city is null and nonResidenceTerm.city is null or nonResidenceTerm.city = :city))
+	and (nonResidenceTerm.dateRange.startDate = :startDate
+		or
+		(nonResidenceTerm.dateRange.startDate is null and :startDate is null))
 	and 
-		(nonResidenceTerm.location = :location
-		 or nonResidenceTerm.location is null and :location is null)
+		(nonResidenceTerm.dateRange.endDate = :endDate
+		or
+		(nonResidenceTerm.dateRange.endDate is null and :endDate is null))	
 	and 
 		nonResidenceTerm.status = :status
 	]]></query>	
@@ -173,5 +189,15 @@
 				((term.dateRange.startDate is null or term.dateRange.startDate < :date)
 			and
 				(term.dateRange.endDate is null or term.dateRange.endDate > :date))
+	]]></query>
+	<query name="findNonResidenceTermsByPersonWithStatusOnDate"><![CDATA[
+		select nonResidenceTerm
+		from omis.residence.domain.NonResidenceTerm nonResidenceTerm
+		where nonResidenceTerm.person = :person
+		  and nonResidenceTerm.status = :status
+		  and (nonResidenceTerm.dateRange.startDate is null
+		    or nonResidenceTerm.dateRange.startDate <= :date)
+		  and (nonResidenceTerm.dateRange.endDate > :date
+		    or nonResidenceTerm.dateRange.endDate is null)
 	]]></query>
 </hibernate-mapping>

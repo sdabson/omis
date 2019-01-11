@@ -74,7 +74,7 @@ public class PrisonTermServicePrisonTermCreationAutoEndingTest
 			preSentenceCredits1, sentenceDate1, sentenceTermYears1, 
 			sentenceTermDays1, paroleEligibilityDate1, projectedDischargeDate1, 
 			maximumDischargeDate1, status1, sentenceToFollow1, comments1, 
-			verificationUser1, verificationDate1);
+			verificationUser1, verificationDate1, null);
 				
 		// Create the 2nd term with status of "ACTIVE"
 		Date actionDate2 = this.parseDateText("01/01/2017");
@@ -96,7 +96,7 @@ public class PrisonTermServicePrisonTermCreationAutoEndingTest
 			preSentenceCredits2, sentenceDate2, sentenceTermYears2, 
 			sentenceTermDays2, paroleEligibilityDate2, projectedDischargeDate2, 
 			maximumDischargeDate2, status2, sentenceToFollow2, comments2, 
-			verificationUser2, verificationDate2);
+			verificationUser2, verificationDate2, null);
 		
 		// Assertions
 		// After the creation of 2nd prison term with status of "ACTIVE", the 

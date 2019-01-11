@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.paroleboardmember.service.delegate;
 
 import java.util.Date;
@@ -18,7 +35,7 @@ import omis.staff.domain.StaffAssignment;
  * Parole board member delegate.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 8, 2017)
+ * @version 0.1.2 (Nov 28, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardMemberDelegate {
@@ -64,7 +81,8 @@ public class ParoleBoardMemberDelegate {
 	 * @return parole board member
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 * @throws DateConflictException if date range not within staff assignment 
-	 * date range
+	 * date range or if an existing parole board member conflicts with the 
+	 * specified date range
 	 */
 	public ParoleBoardMember create(final StaffAssignment staffAssignment,
 			final DateRange dateRange) throws DuplicateEntityFoundException, 
@@ -78,6 +96,12 @@ public class ParoleBoardMemberDelegate {
 				staffAssignment.getDateRange())) {
 			throw new DateConflictException("Parole board member date range "
 					+ "must be within the staff assignment date range.");
+		}
+		if (!this.paroleBoardMemberDao.findExistingWithinDateRange(
+				staffAssignment, dateRange.getStartDate(), 
+				dateRange.getEndDate()).isEmpty()) {
+			throw new DateConflictException("Parole board member already exists"
+					+ " for this staff assignment on the specified date range.");
 		}
 		ParoleBoardMember paroleBoardMember = this
 				.paroleBoardMemberInstanceFactory.createInstance();
@@ -98,7 +122,8 @@ public class ParoleBoardMemberDelegate {
 	 * @return parole board member
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 * @throws DateConflictException if date range not within staff assignment 
-	 * date range
+	 * date range or if an existing parole board member conflicts with the 
+	 * specified date range
 	 */
 	public ParoleBoardMember update(final ParoleBoardMember paroleBoardMember,
 			final StaffAssignment staffAssignment, final DateRange dateRange) 
@@ -113,6 +138,12 @@ public class ParoleBoardMemberDelegate {
 				staffAssignment.getDateRange())) {
 			throw new DateConflictException("Parole board member date range "
 					+ "must be within the staff assignment date range.");
+		}
+		if (!this.paroleBoardMemberDao.findExistingWithinDateRangeExcluding(
+				staffAssignment, dateRange.getStartDate(), 
+				dateRange.getEndDate(), paroleBoardMember).isEmpty()) {
+			throw new DateConflictException("Parole board member already exists"
+					+ " for this staff assignment on the specified date range.");
 		}
 		populateParoleBoardMember(paroleBoardMember, staffAssignment, 
 				dateRange);

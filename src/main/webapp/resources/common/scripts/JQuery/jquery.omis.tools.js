@@ -214,7 +214,7 @@ ui.Tools = new function() {
 					$(".actionListContainer").addClass("hide");
 				}
 				
-				$.ajax({  
+				$.ajax({
 					type: "GET",
 					cache: false,
 					url: $(event.target).attr('href')
@@ -222,13 +222,25 @@ ui.Tools = new function() {
 					targetElement.html(html);
 					enableMenu(link,targetElement);
 					
+					var leftRight = "left", atTopBottom = "bottom", myTopBottom = "top-1px";
+					
+					if ($(window).width() - $(targetElement).width() <= $(link).position().left) {
+						leftRight = "right";
+					}
+					if (($(window).height() - $(link).position().top + $(window).scrollTop()) <= ($(link).height() + $(targetElement).height())
+							&& (($(link).position().top - $(window).scrollTop()) > ($(link).height() + $(targetElement).height()))) {
+						atTopBottom = "top";
+						myTopBottom = "bottom+1px";
+					}
+					
 					/*positioning open*/
 					$(targetElement).position({
-						my: "left top-1px",
-						at: "left bottom",
+						my: leftRight + " " + myTopBottom,
+						at: leftRight + " " + atTopBottom,
 						collision: "none",
 						of:link
 					});
+					
 					/*positioning close*/
 					if (below) {
 						targetElement.find("a.actionItem").each(function(index, element) {

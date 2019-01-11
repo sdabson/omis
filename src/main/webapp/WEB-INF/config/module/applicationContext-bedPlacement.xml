@@ -8,21 +8,34 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
         
-        <!-- Services -->
+    <!-- Services -->
    
+    <bean id="bedPlacementService"
+	        	class="omis.bedplacement.service.impl.BedPlacementServiceImpl">
+    	<constructor-arg name="bedPlacementDelegate" ref="bedPlacementDelegate" />
+    	<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
+    	<constructor-arg name="complexDelegate" ref="complexDelegate" />
+    	<constructor-arg name="unitDelegate" ref="unitDelegate" />
+    	<constructor-arg name="sectionDelegate" ref="sectionDelegate" />
+    	<constructor-arg name="levelDelegate" ref="levelDelegate" />
+    	<constructor-arg name="roomDelegate" ref="roomDelegate" />
+    	<constructor-arg name="bedDelegate" ref="bedDelegate" />
+    	<constructor-arg name="locationTermDelegate" ref="locationTermDelegate" />
+    	<constructor-arg name="bedPlacementReasonDelegate" ref="bedPlacementReasonDelegate" />
+    </bean>
     
     <bean id="bedPlacementReasonService"
-        	class="omis.bedplacement.service.impl.BedPlacementReasonServiceImpl">
-        	<constructor-arg name="bedPlacementReasonDao" ref="bedPlacementReasonDao" />
+          class="omis.bedplacement.service.impl.BedPlacementReasonServiceImpl">
+        <constructor-arg name="bedPlacementReasonDao" ref="bedPlacementReasonDao" />
     </bean>
     
     <bean id="bedPlacementSummaryReportService"
-    	class="omis.bedplacement.report.impl.hibernate.BedPlacementSummaryReportServiceHibernateImpl">
+    	  class="omis.bedplacement.report.impl.hibernate.BedPlacementSummaryReportServiceHibernateImpl">
     	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
     </bean>
    
    <bean id="bedPlacementProfileItemReportService"
-   	class="omis.bedplacement.report.impl.hibernate.BedPlacementProfileItemReportServiceHibernateImpl">
+   	     class="omis.bedplacement.report.impl.hibernate.BedPlacementProfileItemReportServiceHibernateImpl">
    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>	
    	</bean>
     
@@ -34,10 +47,17 @@
 		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
 	</bean>
 	
-   <bean id="bedPlacementReasonDelegate" class="omis.bedplacement.service.delegate.BedPlacementReasonDelegate">
+    <bean id="bedPlacementReasonDelegate" class="omis.bedplacement.service.delegate.BedPlacementReasonDelegate">
 		<constructor-arg name="bedPlacementReasonDao" ref="bedPlacementReasonDao"/>
 		<constructor-arg name="bedPlacementReasonInstanceFactory" ref="bedPlacementReasonInstanceFactory"/>
 	</bean>
+	
+	<!-- TODO - Replace usage with regular delegate - SA -->
+	
+	<bean id="bedPlacementLookupDelegate"
+    	class="omis.bedplacement.report.impl.hibernate.BedPlacementLookupDelegateHibernateImpl">
+    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
 	
     <!-- Data access objects -->
     
@@ -82,46 +102,5 @@
  			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
   			<constructor-arg name="dao" ref="bedPlacementReasonDao"/>
 	</bean>
-	<!-- Profile specific services -->
- 	<beans profile="prod,preprod,test">
-	    <bean id="bedPlacementService"
-	        	class="omis.bedplacement.service.impl.BedPlacementServiceImpl">
-	        	<constructor-arg name="bedPlacementDelegate" ref="bedPlacementDelegate" />
-	        	<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
-	        	<constructor-arg name="complexDelegate" ref="complexDelegate" />
-	        	<constructor-arg name="unitDelegate" ref="unitDelegate" />
-	        	<constructor-arg name="sectionDelegate" ref="sectionDelegate" />
-	        	<constructor-arg name="levelDelegate" ref="levelDelegate" />
-	        	<constructor-arg name="roomDelegate" ref="roomDelegate" />
-	        	<constructor-arg name="bedDelegate" ref="bedDelegate" />
-	        	<constructor-arg name="locationTermDelegate" ref="legacyLocationTermDelegate" />
-	        	<constructor-arg name="bedPlacementReasonDelegate" ref="bedPlacementReasonDelegate" />
-	    </bean> 
-	    
-	    <bean id="bedPlacementLookupDelegate"
-	    	class="omis.bedplacement.report.impl.hibernate.LegacyBedPlacementLookupDelegateHibernateImpl">
-	    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-	    </bean>
-    </beans>
-    
-    <beans profile="dev,standalone">
-	    <bean id="bedPlacementService"
-	        	class="omis.bedplacement.service.impl.BedPlacementServiceImpl">
-	        	<constructor-arg name="bedPlacementDelegate" ref="bedPlacementDelegate" />
-	        	<constructor-arg name="facilityDelegate" ref="facilityDelegate" />
-	        	<constructor-arg name="complexDelegate" ref="complexDelegate" />
-	        	<constructor-arg name="unitDelegate" ref="unitDelegate" />
-	        	<constructor-arg name="sectionDelegate" ref="sectionDelegate" />
-	        	<constructor-arg name="levelDelegate" ref="levelDelegate" />
-	        	<constructor-arg name="roomDelegate" ref="roomDelegate" />
-	        	<constructor-arg name="bedDelegate" ref="bedDelegate" />
-	        	<constructor-arg name="locationTermDelegate" ref="locationTermDelegate" />
-	        	<constructor-arg name="bedPlacementReasonDelegate" ref="bedPlacementReasonDelegate" />
-	    </bean>
-	    
-	    <bean id="bedPlacementLookupDelegate"
-	    	class="omis.bedplacement.report.impl.hibernate.BedPlacementLookupDelegateHibernateImpl">
-	    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-	    </bean>
-    </beans>
+	
 </beans>

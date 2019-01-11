@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Document configuration file.
+  -
+  - Author: Ryan Johns
+  - Author: Stephen Abson
+  - Author: Josh Divine
+  - Version: 0.1.4 (Jan 9, 2019)
+  - Since: OMIS 3.0
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -12,7 +39,7 @@
         
         <bean id="documentProfileItemService"
         	class="omis.offenderdocument.service.impl.DocumentProfileItemServiceImpl">
-        	<constructor-arg name="courtCaseDocumentAssociationDelegate" ref="courtCaseDocumentAssociationDelegate"/>
+        	<constructor-arg name="courtDocumentAssociationDelegate" ref="courtDocumentAssociationDelegate"/>
         </bean>
         
         <!--  Report Services -->
@@ -31,8 +58,6 @@
         	<constructor-arg name="documentInstanceFactory" ref="documentInstanceFactory"/>
         	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
         </bean>
-
-		
         
         <!-- Instance Factories -->
         <bean id="documentInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
@@ -62,6 +87,10 @@
     		<constructor-arg name="path" value="${application.resource.path}\Documents\OffenderDocuments"/>
     	</bean>
         
+        <bean id="offenderDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="offenderDocumentLocator"/>
+		</bean>
+		
         <!-- Data access objects -->
         <bean id="documentTagDao" class="omis.document.dao.impl.hibernate.DocumentTagDaoHibernateImpl">
         	<constructor-arg name="sessionFactory" ref="sessionFactory"/>

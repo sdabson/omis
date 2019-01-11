@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.assessment.report">
+	<query name="findAssessmentQuestionnairesByOffender"><![CDATA[
+		select administeredQuestionnaire
+		from omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+		inner join administeredQuestionnaire.questionnaireType questionnaireType
+		where (questionnaireType in (select questionnaireType2 from
+			omis.assessment.domain.AssessmentRating assessmentRating
+			inner join assessmentRating.questionnaireType questionnaireType2))
+		and
+			administeredQuestionnaire.answerer = :offender
+	]]></query>
+	<query name="findAssessmentSummaryByAdministeredQuestionnaire"><![CDATA[
+		select new omis.assessment.report.AssessmentSummary(
+				administeredQuestionnaire.id,
+				questionnaireType.title,
+				questionnaireCategory.description,
+				administeredQuestionnaire.date,
+				name.lastName,
+				name.firstName
+			)
+		from omis.questionnaire.domain.AdministeredQuestionnaire administeredQuestionnaire
+		inner join administeredQuestionnaire.questionnaireType questionnaireType
+		inner join questionnaireType.questionnaireCategory questionnaireCategory
+		inner join administeredQuestionnaire.assessor assessor
+		inner join assessor.name name
+		where
+			administeredQuestionnaire = :administeredQuestionnaire
+	]]></query>
+	<query name="findAssessmentCategoryScoreSummariesByAdministeredQuestionnaire"><![CDATA[
+		select new omis.assessment.report.AssessmentCategoryScoreSummary(
+			assessmentCategoryScore.id,
+			ratingCategory.description,
+			ratingRank.name,
+			assessmentRating.description,
+			assessmentCategoryScore.score,
+			assessmentRating.min,
+			assessmentRating.max
+		)
+		from omis.assessment.domain.AssessmentCategoryScore assessmentCategoryScore
+		inner join assessmentCategoryScore.administeredQuestionnaire administeredQuestionnaire
+		inner join assessmentCategoryScore.ratingCategory ratingCategory,
+		omis.assessment.domain.AssessmentRating assessmentRating
+		inner join assessmentRating.rank ratingRank
+		where
+			administeredQuestionnaire = :administeredQuestionnaire
+		and
+			administeredQuestionnaire.questionnaireType = assessmentRating.questionnaireType
+		and
+			assessmentCategoryScore.score >= assessmentRating.min
+		and
+			assessmentCategoryScore.score <= assessmentRating.max
+		and
+			assessmentRating.category = ratingCategory
+	]]></query>
+	<query name="findAssessmentQuestionCategories"><![CDATA[
+		select distinct questionnaireCategory
+		from omis.assessment.domain.AssessmentRating assessmentRating
+		inner join assessmentRating.questionnaireType questionnaireType
+		inner join questionnaireType.questionnaireCategory questionnaireCategory
+		where
+			questionnaireCategory.valid = true
+	]]></query>
+	<query name="findAssessmentRatingSummariesByAdministeredQuestionnaire"><![CDATA[
+		select new omis.assessment.report.AssessmentRatingSummary(
+			assessmentRating.id,
+			assessmentCategoryScore.id,
+			assessmentCategoryScore.score,
+			case
+				when
+					assessmentCategoryScore.score >= assessmentRating.min
+					and assessmentCategoryScore.score <= assessmentRating.max
+				then
+					true
+				else
+					false
+			end,
+			case
+				when
+					assessmentCategoryOverride is not null
+				then
+					true
+				else
+					false
+			end,
+			assessmentRating.description,
+			rank.name,
+			assessmentRating.min,
+			assessmentRating.max
+		)
+		from
+			omis.assessment.domain.AssessmentCategoryOverride assessmentCategoryOverride
+		right outer join
+			assessmentCategoryOverride.assessmentCategoryScore assessmentCategoryScore
+		inner join
+			assessmentCategoryScore.administeredQuestionnaire administeredQuestionnaire
+		inner join
+			assessmentCategoryScore.ratingCategory ratingCategory,
+			omis.assessment.domain.AssessmentRating assessmentRating
+		inner join
+			assessmentRating.rank rank
+		where
+			administeredQuestionnaire = :administeredQuestionnaire
+		and
+			administeredQuestionnaire.questionnaireType = assessmentRating.questionnaireType
+		and
+			ratingCategory.significance = 'PRIMARY'
+		and
+			assessmentRating.category = ratingCategory
+		order by
+			assessmentRating.id, ratingCategory.id
+	]]></query>
+</hibernate-mapping>

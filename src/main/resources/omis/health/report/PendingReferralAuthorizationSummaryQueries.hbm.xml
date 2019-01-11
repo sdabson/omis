@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- - Author: Stephen Abson
+ - Author: Stephen Abson, Yidong Li
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -92,6 +92,38 @@
         left outer join referredByProviderAssignment.provider referredByProviderAssignmentProvider
         left outer join referredByProviderAssignmentProvider.name referredByProviderAssignmentName
         left outer join referredByProviderAssignment.title referredByProviderAssignmentTitle
+        where (not exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request)
+          or exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request
+              and externalReferralAuthorization.status = 'PANEL_REVIEW_REQUIRED'
+              and externalReferralAuthorization.panelReviewDecision.status is null))
+          and request.offender = :offender
+	]]></query>
+	<query name="countPendingExternalReferralAuthorizationsByFacility"><![CDATA[
+      select count(request.id)
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
+        where (not exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request)
+          or exists (
+            select externalReferralAuthorization
+            from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization
+            where externalReferralAuthorization.request = request
+              and externalReferralAuthorization.status = 'PANEL_REVIEW_REQUIRED'
+              and externalReferralAuthorization.panelReviewDecision.status is null))
+          and request.facility = :facility
+	]]></query>
+	<query name="countPendingExternalReferralAuthorizationsByOffender"><![CDATA[
+      select count(request.id)
+      from
+        omis.health.domain.ExternalReferralAuthorizationRequest request
         where (not exists (
             select externalReferralAuthorization
             from omis.health.domain.ExternalReferralAuthorization externalReferralAuthorization

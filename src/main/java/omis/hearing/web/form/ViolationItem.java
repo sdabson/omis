@@ -1,26 +1,45 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.hearing.web.form;
 
+import java.io.Serializable;
 import java.util.Date;
-
+import omis.condition.domain.Condition;
+import omis.disciplinaryCode.domain.DisciplinaryCode;
 import omis.hearing.domain.DispositionCategory;
 import omis.hearing.domain.Infraction;
-import omis.hearing.report.ViolationSummary;
+import omis.hearing.domain.InfractionPlea;
 import omis.person.domain.Person;
 import omis.violationevent.domain.ConditionViolation;
 import omis.violationevent.domain.DisciplinaryCodeViolation;
 
 /**
- * ViolationItem.java
+ * Violation Item.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Aug 17, 2017)
+ *@author Annie Wahl
+ *@version 0.1.2 (Jul 18, 2018)
  *@since OMIS 3.0
  *
  */
-public class ViolationItem {
+public class ViolationItem implements Serializable {
 	
-	private ViolationSummary summary;
-	
+	private static final long serialVersionUID = 1L;
+
 	private ConditionViolation conditionViolation;
 	
 	private DisciplinaryCodeViolation disciplinaryCodeViolation;
@@ -41,66 +60,66 @@ public class ViolationItem {
 	
 	private DispositionCategory disposition;
 	
+	private InfractionPlea plea;
+	
+	private Boolean adjusted;
+	
+	private DisciplinaryCode adjustedDisciplinaryCode;
+	
+	private Condition adjustedCondition;
+	
 	/**
-	 * 
+	 * Default constructor for Violation Item.
 	 */
 	public ViolationItem() {
 	}
 
 	/**
-	 * @param summary
-	 * @param conditionViolation
+	 * @param conditionViolation - Condition Violation
 	 */
-	public ViolationItem(final ViolationSummary summary,
+	public ViolationItem(
 			final ConditionViolation conditionViolation) {
-		this.summary = summary;
 		this.conditionViolation = conditionViolation;
 		this.disciplinaryCodeViolation = null;
 		this.infraction = null;
 	}
 
 	/**
-	 * @param summary
-	 * @param disciplinaryCodeViolation
+	 * @param disciplinaryCodeViolation - Disciplinary Code Violation
 	 */
 	public ViolationItem(
-			final ViolationSummary summary,
 			final DisciplinaryCodeViolation disciplinaryCodeViolation) {
-		this.summary = summary;
 		this.disciplinaryCodeViolation = disciplinaryCodeViolation;
 		this.conditionViolation = null;
 		this.infraction = null;
 	}
 	
 	/**
-	 * @param summary
-	 * @param conditionViolation
+	 * @param conditionViolation - Condition Violation
+	 * @param infraction - Infraction
 	 */
-	public ViolationItem(final ViolationSummary summary,
+	public ViolationItem(
 			final ConditionViolation conditionViolation,
 			final Infraction infraction) {
-		this.summary = summary;
 		this.conditionViolation = conditionViolation;
 		this.disciplinaryCodeViolation = null;
 		this.infraction = infraction;
 	}
 
 	/**
-	 * @param summary
-	 * @param disciplinaryCodeViolation
+	 * @param disciplinaryCodeViolation - Disciplinary code Violation
+	 * @param infraction - Infraction
 	 */
 	public ViolationItem(
-			final ViolationSummary summary,
 			final DisciplinaryCodeViolation disciplinaryCodeViolation,
 			final Infraction infraction) {
-		this.summary = summary;
 		this.disciplinaryCodeViolation = disciplinaryCodeViolation;
 		this.conditionViolation = null;
 		this.infraction = infraction;
 	}
 	
 	/**
-	 * Returns the infraction
+	 * Returns the infraction.
 	 * @return infraction - Infraction
 	 */
 	public Infraction getInfraction() {
@@ -108,7 +127,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the date
+	 * Returns the date.
 	 * @return date - Date
 	 */
 	public Date getDate() {
@@ -116,7 +135,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the date
+	 * Sets the date.
 	 * @param date - Date
 	 */
 	public void setDate(final Date date) {
@@ -124,7 +143,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the decision
+	 * Returns the decision.
 	 * @return decision - String
 	 */
 	public String getDecision() {
@@ -132,7 +151,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the decision
+	 * Sets the decision.
 	 * @param decision - String
 	 */
 	public void setDecision(final String decision) {
@@ -140,7 +159,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the reason
+	 * Returns the reason.
 	 * @return reason - String
 	 */
 	public String getReason() {
@@ -148,7 +167,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the reason
+	 * Sets the reason.
 	 * @param reason - String
 	 */
 	public void setReason(final String reason) {
@@ -156,7 +175,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the sanction
+	 * Returns the sanction.
 	 * @return sanction - String
 	 */
 	public String getSanction() {
@@ -164,7 +183,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the sanction
+	 * Sets the sanction.
 	 * @param sanction - String
 	 */
 	public void setSanction(final String sanction) {
@@ -172,7 +191,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the disposition
+	 * Returns the disposition.
 	 * @return disposition - DispositionCategory
 	 */
 	public DispositionCategory getDisposition() {
@@ -180,7 +199,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the disposition
+	 * Sets the disposition.
 	 * @param disposition - DispositionCategory
 	 */
 	public void setDisposition(final DispositionCategory disposition) {
@@ -188,15 +207,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the summary
-	 * @return summary - ViolationSummary
-	 */
-	public ViolationSummary getSummary() {
-		return summary;
-	}
-
-	/**
-	 * Returns the conditionViolation
+	 * Returns the conditionViolation.
 	 * @return conditionViolation - ConditionViolation
 	 */
 	public ConditionViolation getConditionViolation() {
@@ -204,7 +215,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the disciplinaryCodeViolation
+	 * Returns the disciplinaryCodeViolation.
 	 * @return disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public DisciplinaryCodeViolation getDisciplinaryCodeViolation() {
@@ -212,16 +223,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the summary
-	 * @param summary - ViolationSummary
-	 */
-	public void setSummary(
-			final ViolationSummary summary) {
-		this.summary = summary;
-	}
-
-	/**
-	 * Sets the conditionViolation
+	 * Sets the conditionViolation.
 	 * @param conditionViolation - ConditionViolation
 	 */
 	public void setConditionViolation(
@@ -230,7 +232,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the disciplinaryCodeViolation
+	 * Sets the disciplinaryCodeViolation.
 	 * @param disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public void setDisciplinaryCodeViolation(
@@ -239,7 +241,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the infraction
+	 * Sets the infraction.
 	 * @param infraction - Infraction
 	 */
 	public void setInfraction(final Infraction infraction) {
@@ -247,7 +249,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the authority
+	 * Returns the authority.
 	 * @return authority - Person
 	 */
 	public Person getAuthority() {
@@ -255,7 +257,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the authority
+	 * Sets the authority.
 	 * @param authority - Person
 	 */
 	public void setAuthority(final Person authority) {
@@ -263,7 +265,7 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Returns the appeal date
+	 * Returns the appeal date.
 	 * @return appealDate - Date of appeal
 	 */
 	public Date getAppealDate() {
@@ -271,10 +273,77 @@ public class ViolationItem {
 	}
 
 	/**
-	 * Sets the appeal date
+	 * Sets the appeal date.
 	 * @param appealDate - Date of appeal
 	 */
-	public void setAppealDate(Date appealDate) {
+	public void setAppealDate(final Date appealDate) {
 		this.appealDate = appealDate;
 	}
+
+	/**
+	 * Returns the plea.
+	 * @return plea - InfractionPlea
+	 */
+	public InfractionPlea getPlea() {
+		return this.plea;
+	}
+
+	/**
+	 * Sets the plea.
+	 * @param plea - InfractionPlea
+	 */
+	public void setPlea(final InfractionPlea plea) {
+		this.plea = plea;
+	}
+
+	/**
+	 * Returns adjusted.
+	 * @return adjusted - adjusted
+	 */
+	public Boolean getAdjusted() {
+		return this.adjusted;
+	}
+
+	/**
+	 * Sets adjusted.
+	 * @param adjusted - adjusted
+	 */
+	public void setAdjusted(final Boolean adjusted) {
+		this.adjusted = adjusted;
+	}
+
+	/**
+	 * Returns the adjusted Disciplinary Code.
+	 * @return adjustedDisciplinaryCode - adjusted disciplinary code
+	 */
+	public DisciplinaryCode getAdjustedDisciplinaryCode() {
+		return this.adjustedDisciplinaryCode;
+	}
+
+	/**
+	 * Sets the adjusted disciplinary code.
+	 * @param adjustedDisciplinaryCode - adjusted disciplinary code
+	 */
+	public void setAdjustedDisciplinaryCode(
+			final DisciplinaryCode adjustedDisciplinaryCode) {
+		this.adjustedDisciplinaryCode = adjustedDisciplinaryCode;
+	}
+
+	/**
+	 * Returns the adjusted condition.
+	 * @return adjustedCondition - adjusted condition
+	 */
+	public Condition getAdjustedCondition() {
+		return this.adjustedCondition;
+	}
+
+	/**
+	 * Sets the adjusted condition.
+	 * @param adjustedCondition - adjusted condition
+	 */
+	public void setAdjustedCondition(final Condition adjustedCondition) {
+		this.adjustedCondition = adjustedCondition;
+	}
+	
+	
 }

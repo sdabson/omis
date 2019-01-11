@@ -1,21 +1,7 @@
 package omis.presentenceinvestigation.web.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import omis.beans.factory.PropertyEditorFactory;
-import omis.offender.beans.factory.OffenderPropertyEditorFactory;
-import omis.offender.domain.Offender;
-import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
-import omis.person.domain.Person;
-import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
-import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary;
-import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummaryReportService;
-import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
-import omis.report.ReportFormat;
-import omis.user.domain.UserAccount;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,15 +19,27 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 
+import omis.beans.factory.PropertyEditorFactory;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
+import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.person.domain.Person;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
+import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummaryReportService;
+import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
+import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
+import omis.user.domain.UserAccount;
 
 /**
  * Report presentence investigation request controller.
  * 
  * @author Joel Norris
- * @author Annie Jacques
- * @version 0.1.2 (May 18, 2017)
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @author Sierra Haynes
+ * @version 0.1.4 (May 15, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -68,6 +66,9 @@ public class ReportPresentenceInvestigationRequestController {
 	private static final String INVESTIGATION_REQUEST_DETAIL_REPORT_NAME 
 		="/Legal/PSI/Pre_Sentence_Investigation";	
 	
+	private static final String AFFIDAVIT_OF_PECUNIARY_LOSS_REPORT_NAME 
+		="/Legal/PSI/Affidavit_of_Victims_Pecuniary_Loss";	
+	
 	private static final String PSI_QUESTIONNAIRE_REPORT_NAME 
 		="/Legal/PSI/PSI_Questionnaire";
 	
@@ -86,22 +87,31 @@ public class ReportPresentenceInvestigationRequestController {
 	private static final String VICTIM_IMPACT_KID_REPORT_NAME 
 		="/Relationships/Victims/Victim_Impact_for_Kids";
 	
+	private static final String PSI_REQUEST_DETAILS_REPORT_NAME 
+		="/Legal/PSI/PSI_Request_Details_OC";	
+	
+	private static final String PSI_REQUEST_LISTING_REPORT_NAME 
+		="/Legal/PSI/PSI_Request_Listing_OC";	
+	
 	/* Report Parameter names. */
 	
 	private static final String INVESTIGATION_REQUEST_ID_REPORT_PARAM_NAME 
-	= "PSI_REQ_ID";
+		= "PSI_REQ_ID";
+	
+	private static final String PSI_REQUEST_LIST_ID_REPORT_PARAM_NAME 
+		= "DOC_ID";
 	
 	private static final String PSI_QUESTIONNAIRE_ID_REPORT_PARAM_NAME 
-	= "PERSON_ID";
+		= "PERSON_ID";
 	
 	private static final String INVESTIGATION_ASSIGNMENT_ID_REPORT_PARAM_NAME 
-	= "ASSIGNED_USER_ID";
+		= "ASSIGNED_USER_ID";
 	
 	private static final String INVESTIGATION_PROGRESS_ID_REPORT_PARAM_NAME 
-	= "ASSIGNED_USER_ID";
+		= "ASSIGNED_USER_ID";
 	
 	private static final String INVESTIGATION_TASK_ID_REPORT_PARAM_NAME 
-	= "ASSIGNED_USER_ID";
+		= "ASSIGNED_USER_ID";
 		
 	/* Model keys. */
 	
@@ -118,6 +128,12 @@ public class ReportPresentenceInvestigationRequestController {
 	
 	private static final String USER_ACCOUNT_MODEL_KEY =
 			"AuditComponentRetrieverSpringMvcImpl#auditUserAccount";
+	
+	private static final String UNSUBMITTED_SUMMARIES_MODEL_KEY = 
+			"unsubmittedSummaries";
+	
+	private static final String SUBMITTED_SUMMARIES_MODEL_KEY = 
+			"submittedSummaries";
 	
 	/* Services. */
 	@Autowired
@@ -188,30 +204,40 @@ public class ReportPresentenceInvestigationRequestController {
 			@RequestParam(value = "offender", required = false)
 				final Person offender) {
 		ModelMap map = new ModelMap();
-		List<PresentenceInvestigationRequestSummary> summaries 
-			= new ArrayList<PresentenceInvestigationRequestSummary>();
-		
 		if(offender == null && assignedUser != null){
-			summaries = this.presentenceInvestigationRequestReportService
-			.findPresentenceInvestigationRequestSummariesByUser(assignedUser);
 			map.addAttribute(ASSIGNED_USER_MODEL_KEY, assignedUser);
+			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
+					.presentenceInvestigationRequestReportService
+					.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+							assignedUser));
+			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
+					.presentenceInvestigationRequestReportService
+					.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+							assignedUser));
 		}
 		else if(offender != null){
-			summaries = this.presentenceInvestigationRequestReportService
-			.findPresentenceInvestigationRequestSummariesByOffender(offender);
 			if(this.presentenceInvestigationRequestService.isOffender(offender)){
 				this.offenderSummaryModelDelegate.add(map,(Offender) offender);
 			}
 			map.addAttribute(OFFENDER_MODEL_KEY, offender);
+			map.addAttribute(SUMMARIES_MODEL_KEY, this
+					.presentenceInvestigationRequestReportService
+					.findPresentenceInvestigationRequestSummariesByOffender(
+							offender));
 			
 		}
 		else if(offender == null && assignedUser == null){
 			UserAccount user = this.retrieveUserAccount();
-			summaries = this.presentenceInvestigationRequestReportService
-				.findPresentenceInvestigationRequestSummariesByUser(user);
-				map.addAttribute(ASSIGNED_USER_MODEL_KEY, user);
+			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
+					.presentenceInvestigationRequestReportService
+					.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+							user));
+			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
+					.presentenceInvestigationRequestReportService
+					.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+							user));
+			map.addAttribute(ASSIGNED_USER_MODEL_KEY, user);
 		}
-		map.addAttribute(SUMMARIES_MODEL_KEY, summaries);
 		
 		return new ModelAndView(LIST_VIEW_NAME, map);
 	}
@@ -307,6 +333,78 @@ public class ReportPresentenceInvestigationRequestController {
 				Long.toString(presentenceInvestigationRequest.getId()));
 		byte[] doc = this.reportRunner.runReport(
 				INVESTIGATION_REQUEST_DETAIL_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * returns the affidavit of victim's pecuniary loss report for the specified request
+	 * @param presentenceInvestigationRequest presentenceInvestigationRequest
+	 * @param reportFormat
+	 * @return
+	 */
+	@RequestMapping(value = "/affidavitOfPecuniaryLossReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PRESENTENCE_INVESTIGATION_REQUEST_LIST') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportAffidavitOfPecuniaryLoss(@RequestParam(
+			value = "presentenceInvestigationRequest", required = true)
+			final PresentenceInvestigationRequest presentenceInvestigationRequest,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(INVESTIGATION_REQUEST_ID_REPORT_PARAM_NAME,
+				Long.toString(presentenceInvestigationRequest.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				AFFIDAVIT_OF_PECUNIARY_LOSS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/** returns the psi requests for the specified offender
+	 * 
+	 * @param offender Offender
+	 * @param reportFormat
+	 * @return
+	 */
+	@RequestMapping(value = "/pSIRequestListingReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PRESENTENCE_INVESTIGATION_REQUEST_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportPSIRequestListing(@RequestParam(
+			value = "offender", required = true)
+			final Offender offender,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(PSI_REQUEST_LIST_ID_REPORT_PARAM_NAME,
+				Long.toString(offender.getOffenderNumber()));
+		byte[] doc = this.reportRunner.runReport(
+				PSI_REQUEST_LISTING_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/** returns the details for the specified psi request
+	 * 
+	 * @param offender
+	 * @param reportFormat
+	 * @return
+	 */
+	@RequestMapping(value = "/psiRequestDetailsReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PRESENTENCE_INVESTIGATION_REQUEST_LIST') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportPSIRequestDetails(@RequestParam(
+			value = "presentenceInvestigationRequest", required = true)
+			final PresentenceInvestigationRequest presentenceInvestigationRequest,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(INVESTIGATION_REQUEST_ID_REPORT_PARAM_NAME,
+				Long.toString(presentenceInvestigationRequest.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				PSI_REQUEST_DETAILS_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);

@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Author: Stephen Abson -->
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Mapping and queries for location term change action.
+  -
+  - Author: Stephen Abson
+  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.locationterm.domain">
+
+	<!-- Maps entity. -->
 	<class entity-name="omis.locationterm.domain.LocationTermChangeAction"
 	       proxy="omis.locationterm.domain.LocationTermChangeAction"
 	       name="omis.locationterm.domain.impl.LocationTermChangeActionImpl"
@@ -13,11 +38,38 @@
           <param name="sequence">`LOC_TERM_CHANGE_ACTION_SEQ`</param>
         </generator>
 	  </id>
-      <property name="name" not-null="true" unique="true" column="`NAME`"/>
+      <property name="name" type="java.lang.String" not-null="true" unique="true" column="`NAME`"/>
+      <property name="valid" type="yes_no" not-null="true" column="`VALID`"/>
 	</class>
+	
+	<!-- Finds location term change action. -->
 	<query name="findLocationTermChangeAction"><![CDATA[
 		select changeAction
 		from omis.locationterm.domain.LocationTermChangeAction changeAction
 		where changeAction.name = :name
+		  and changeAction.valid = true
 	]]></query>
+	
+	<!-- Finds location term change actions. -->
+	<query name="findLocationTermChangeActions"><![CDATA[
+		select changeAction
+		from omis.locationterm.domain.LocationTermChangeAction changeAction
+		where changeAction.valid = true
+		order by changeAction.name
+	]]></query>
+	
+	<!-- Finds location term change actions allowed for correctional status. -->
+	<query name="findLocationTermChangeActionsAllowedForCorrectionalStatus"><![CDATA[
+		select changeAction
+		from omis.locationterm.domain.LocationTermChangeAction changeAction
+		where changeAction in (
+			select innerChangeAction
+			from omis.locationterm.domain.AllowedLocationChange allowedLocationChange
+			  inner join allowedLocationChange.action innerChangeAction
+			where allowedLocationChange.correctionalStatus = :correctionalStatus
+		  )
+		  and changeAction.valid = true
+		order by changeAction.name
+	]]></query>
+	
 </hibernate-mapping>

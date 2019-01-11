@@ -13,7 +13,9 @@
   
   <!-- Validators -->
   
-  <bean id="residenceFormValidator" class="omis.residence.web.validator.ResidenceFormValidator"/>
+  <bean id="residenceFormValidator" class="omis.residence.web.validator.ResidenceFormValidator">
+  		<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+  </bean>
   <bean id="residenceSearchFormValidator" class="omis.residence.web.validator.ResidenceSearchFormValidator"/>
   
   <!-- Profile Item -->

@@ -1,4 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
+  - Module configuration file.
+  -
+  - Author: Stephen Abson
+  - Author: Ryan Johns
+  - Author: Joel Norris
+  - Author: Annie Wahl
+  - Author: Yidong Li
+  - Author: Trevor Isles
+  - Author: Sheronda Vaughn
+  - Author: Josh Divine
+  - Version: 0.1.0 (Aug 9, 2018)
+  - Since: OMIS 3.0
+  -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
@@ -15,11 +46,15 @@
   
   <import resource="applicationContext-asrc.xml"/>
   
+  <import resource="applicationContext-assessment.xml"/>
+  
   <import resource="applicationContext-audit.xml"/>
   
   <import resource="applicationContext-bedPlacement.xml"/>
   
   <import resource="applicationContext-biographicAndContactSection.xml"/>
+  
+  <import resource="applicationContext-boardConsideration.xml"/>
   
   <import resource="applicationContext-boardHearing.xml"/>
   
@@ -30,6 +65,8 @@
   <import resource="applicationContext-caseload.xml"/>
   
   <import resource="applicationContext-cache.xml"/>
+  
+  <import resource="applicationContext-chronologicalNote.xml"/>
   
   <import resource="applicationContext-citation.xml"/>
   
@@ -55,7 +92,7 @@
 
   <import resource="applicationContext-courtCaseCondition.xml"/>
   
-  <import resource="applicationContext-courtCaseDocument.xml"/>
+  <import resource="applicationContext-courtDocument.xml"/>
   
   <import resource="applicationContext-criminalAssociation.xml"/>
   
@@ -99,6 +136,8 @@
   
   <import resource="applicationContext-incident.xml"/>
   
+  <import resource="applicationContext-ippo.xml"/>
+  
   <import resource="applicationContext-jail.xml"/>
   
   <import resource="applicationContext-judge.xml"/>
@@ -111,7 +150,11 @@
   
   <import resource="applicationContext-media.xml"/>
   
+  <import resource="applicationContext-medicalReview.xml"/>
+  
   <import resource="applicationContext-military.xml"/>
+  
+  <import resource="applicationContext-mentalHealthReview.xml"/>
   
   <import resource="applicationContext-need.xml"/>
   
@@ -135,9 +178,15 @@
   
   <import resource="applicationContext-paroleBoardItinerary.xml"/>
   
+  <import resource="applicationContext-paroleBoardLocation.xml"/>
+  
   <import resource="applicationContext-paroleBoardMember.xml"/>
   
   <import resource="applicationContext-paroleEligibility.xml"/>
+  
+  <import resource="applicationContext-parolePlan.xml"/>
+  
+  <import resource="applicationContext-paroleReview.xml"/>
   
   <import resource="applicationContext-person.xml"/>
   
@@ -157,6 +206,8 @@
   
   <import resource="applicationContext-prisonTerm.xml"/>
 
+  <import resource="applicationContext-probationParole.xml"/>
+  
   <import resource="applicationContext-probationTerm.xml"/>
   
   <import resource="applicationContext-program.xml"/>
@@ -203,7 +254,7 @@
   
   <import resource="applicationContext-trackeddocument.xml"/>
   
-  <import resource="applicationContext-unitManagerReview.xml"/>
+  <import resource="applicationContext-travelPermit.xml"/>
   
   <import resource="applicationContext-user.xml"/>
   

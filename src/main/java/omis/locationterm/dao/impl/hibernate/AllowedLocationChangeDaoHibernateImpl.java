@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.dao.impl.hibernate;
 
 import java.util.List;
@@ -40,6 +57,8 @@ public class AllowedLocationChangeDaoHibernateImpl
 	FIND_LOCATIONS_FOR_ANY_CHANGE_IN_STATE_QUERY_NAME
 		= "findLocationsAllowedForAnyChangeInState";
 	
+	private static final String FIND_QUERY_NAME = "findAllowedLocationChange";
+	
 	/* Parameter names. */
 	
 	private static final String ACTION_PARAM_NAME = "action";
@@ -48,6 +67,8 @@ public class AllowedLocationChangeDaoHibernateImpl
 		= "correctionalStatus";
 
 	private static final String STATE_PARAM_NAME = "state";
+
+	private static final String LOCATION_PARAM_NAME = "location";
 	
 	/* Constructors. */
 
@@ -117,5 +138,22 @@ public class AllowedLocationChangeDaoHibernateImpl
 			.setParameter(STATE_PARAM_NAME, state)
 			.list();
 		return locations;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public AllowedLocationChange find(
+			final LocationTermChangeAction action,
+			final CorrectionalStatus correctionalStatus,
+			final Location location) {
+		AllowedLocationChange change
+			= (AllowedLocationChange) this.getSessionFactory()
+				.getCurrentSession().getNamedQuery(FIND_QUERY_NAME)
+				.setParameter(ACTION_PARAM_NAME, action)
+				.setParameter(CORRECTIONAL_STATUS_PARAM_NAME,
+						correctionalStatus)
+				.setParameter(LOCATION_PARAM_NAME, location)
+				.uniqueResult();
+		return change;
 	}
 }

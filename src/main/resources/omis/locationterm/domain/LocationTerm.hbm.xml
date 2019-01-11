@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Mapping and queries for location term.
+  -
   - Author: Stephen Abson
   - Author: Joel Norris
-  - Version: 0.1.1 (February 5, 2015)
-  - Since: OMIS 3.0 
   -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -33,8 +52,9 @@
       	</component>
       	<many-to-one name="offender" entity-name="omis.offender.domain.Offender" not-null="true" column="`OFFENDER_ID`"/>
       </properties>
-      <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+      <many-to-one name="location" lazy="false" fetch="join" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
       <property name="locked" type="yes_no" not-null="true" column="`LOCKED`"/>
+      <property name="notes" type="java.lang.String" not-null="false" column="`NOTES`"/>
 	</class>
 	<query name="findLocationTermsByOffender"><![CDATA[
 		select locationTerm
@@ -72,23 +92,27 @@
 			and 
 				(locationTerm.endDate > :date or locationTerm.endDate is null))
 	]]></query>
+	<query name="findLocationTermForOffenderWithStartDate"><![CDATA[
+		select locationTerm
+		from omis.locationterm.domain.LocationTerm locationTerm
+		where locationTerm.offender = :offender
+		  and locationTerm.dateRange.startDate = :startDate
+	]]></query>
 	<query name="countLocationTermsForOffenderBetweenDates"><![CDATA[
 		select count(locationTerm)
 		from omis.locationterm.domain.LocationTerm locationTerm
 		where locationTerm.offender = :offender
-		  and (locationTerm.dateRange.startDate <= :endDate
-		      or (locationTerm.dateRange.startDate is null and :endDate is null))
+		  and (locationTerm.dateRange.startDate <= :endDate or :endDate is null)
 		    and (locationTerm.dateRange.endDate > :startDate
-		      or (locationTerm.dateRange.endDate is null and :startDate is null))
+		      or (locationTerm.dateRange.endDate is null or :startDate is null))
 	]]></query>
 	<query name="countLocationTermsForOffenderBetweenDatesExcluding"><![CDATA[
 		select count(locationTerm)
 		from omis.locationterm.domain.LocationTerm locationTerm
 		where locationTerm.offender = :offender
-		  and (locationTerm.dateRange.startDate <= :endDate
-		      or (locationTerm.dateRange.startDate is null and :endDate is null))
+		  and (locationTerm.dateRange.startDate <= :endDate or :endDate is null)
 		    and (locationTerm.dateRange.endDate > :startDate
-		      or (locationTerm.dateRange.endDate is null and :startDate is null))
+		      or (locationTerm.dateRange.endDate is null or :startDate is null))
 		  and locationTerm not in (:excludedLocationTerms)
 	]]></query>
 	<query name="countLocationTermsForOffenderAfterDateExcluding"><![CDATA[
@@ -123,43 +147,4 @@
 	  		and (locationTerm.dateRange.endDate is null or locationTerm.dateRange.endDate > :startDate))
 	  	order by locationTerm.dateRange.startDate desc	
 	]]></query>
-	
-	<!-- 
-	  - Query to look up offender locations from legacy database.
-	  -->
-	<sql-query name="findLegacyLocationTermByOffenderOnDate">
-		<return entity-name="omis.locationterm.domain.LocationTerm"/>
-		<![CDATA[
-			select
-              0 as "ID",
-              user_account."ID" as "CREATE_ACCOUNT_ID",
-              ofndr_loc_hist.updt_dt as "CREATE_DATE",
-              user_account."ID" as "UPDATE_ACCOUNT_ID",
-              ofndr_loc_hist.updt_dt as "UPDATE_DATE",
-              ofndr_loc_hist.assgn_dt as "START_DATE",
-              ofndr_loc_hist.end_dt as "END_DATE",
-              offender."ID" as "OFFENDER_ID",
-              loc."ID" as "LOCATION_ID",
-              org."NAME",
-              tmp_facility_info.facility_desc,
-              'Y' as "LOCKED"
-			from omis.ofndr_loc_hist ofndr_loc_hist
-			  inner join "OFFENDER" offender
-			    on (ofndr_loc_hist.ofndr_num = offender."OFFENDER_NUMBER")
-			  inner join "USER_ACCOUNT" user_account
-			    on (upper(ofndr_loc_hist.updt_usr_id) = upper(user_account."USERNAME"))
-			  inner join omis.tmp_facility_info tmp_facility_info
-			    on (tmp_facility_info.body_loc_cd = ofndr_loc_hist.body_loc_cd)
-			  inner join "ORGANIZATION" org
-			    on (upper(tmp_facility_info.facility_desc) = upper(org."NAME"))
-			  inner join "LOCATION" loc
-			    on (org."ID" = loc."ORGANIZATION_ID"),
-			       "FACILITY" f
-			where offender."ID" = :offenderId
-			  and (ofndr_loc_hist.assgn_dt <= :effectiveDate
-			    and (ofndr_loc_hist.end_dt > :effectiveDate
-			      or ofndr_loc_hist.end_dt is null))
-			    and f."LOCATION_ID" = loc."ID"
-		]]>
-	</sql-query>
 </hibernate-mapping>

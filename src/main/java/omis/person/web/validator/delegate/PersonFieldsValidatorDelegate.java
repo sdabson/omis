@@ -62,6 +62,16 @@ public class PersonFieldsValidatorDelegate {
 						personFields.getCityName(), errors);
 			}
 		}
+		if(personFields.getSocialSecurityNumber() != null
+				&& !personFields.getSocialSecurityNumber().isEmpty()) {
+			try {
+				Integer.valueOf(personFields
+					.getSocialSecurityNumber().replaceAll("-", ""));
+			} catch (NumberFormatException e) {
+				errors.rejectValue(personFieldsVariableName + ".socialSecurityNumber",
+						"personFields.socialSecurityNumber.numberFormat");
+			}
+		}
 		return errors;
 	}
 }

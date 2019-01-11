@@ -1,3 +1,20 @@
+<%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
@@ -72,6 +89,14 @@
 		</span>
 		
 		<span class="fieldGroup">
+			<form:label path="time" class="fieldLabel">
+				<fmt:message key="timeLabel"/>
+			</form:label>
+			<form:input path="time" cssClass="time" />
+			<form:errors path="time" cssClass="error"/>
+		</span>
+		
+		<span class="fieldGroup">
 			<form:label path="status" class="fieldLabel">
 				<fmt:message key="statusLabel"/>
 			</form:label>
@@ -87,44 +112,22 @@
 		</span>
 		
 		<span class="fieldGroup">
-			
 			<form:label path="officer" class="fieldLabel">
 				<fmt:message key="hearingOfficerLabel"/>
 			</form:label>
 			<input id="officerInput"/>
 				<form:hidden id="officer" path="officer"/>
+				<a id="currentOfficerUser" class="currentUserAccountLink"></a>
 				<a id="clearOfficer" class="clearLink"></a>
 			<span id="officerDisplay">
 				<c:if test="${not empty hearingForm.officer}" >
-					<c:out value="${hearingForm.officer.staffMember.name.lastName}, ${hearingForm.officer.staffMember.name.firstName} ${hearingForm.officer.title.name}"/>
+					<c:out value="${hearingForm.officer.user.name.lastName}, ${hearingForm.officer.user.name.firstName} (${hearingForm.officer.username})"/>
 				</c:if>
 			</span>
 			<form:errors path="officer" cssClass="error"/>
-			
-			
-			
-		</span>
-		
-		<span class="fieldGroup">
-			<form:label path="inAttendance" class="fieldLabel">
-				<fmt:message key="offenderPresentLabel"/>
-			</form:label>
-			<form:checkbox path="inAttendance" />
-			<form:errors path="inAttendance" cssClass="error"/>
 		</span>
 	</fieldset>
-		
-		<!-- Attended Staff Items -->
-	<fieldset>
-		<legend>
-			<fmt:message key="attendedStaffLabel"/>
-		</legend>
-		<span class="fieldGroup">
-			<form:errors path="staffAttendanceItems" cssClass="error"/>
-			<c:set var="staffAttendanceItems" value="${hearingForm.staffAttendanceItems}" scope="request"/>
-			<jsp:include page="staffAttendanceTable.jsp"/>
-		</span>
-	</fieldset>
+	
 	<fieldset>
 		<legend>
 			<fmt:message key="infractionsLabel" />
@@ -143,10 +146,8 @@
 		<legend>
 			<fmt:message key="notesLabel" />
 		</legend>
-		<span class="fieldGroup">
-			<c:set var="hearingNoteItems" value="${hearingForm.hearingNoteItems}" scope="request"/>
-			<jsp:include page="hearingNoteTable.jsp"/>
-		</span>
+		<c:set var="hearingNoteItems" value="${hearingForm.hearingNoteItems}" scope="request"/>
+		<jsp:include page="hearingNoteTable.jsp"/>
 	</fieldset>
 		
 	

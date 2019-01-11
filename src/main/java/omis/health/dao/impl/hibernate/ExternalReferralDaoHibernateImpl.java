@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.health.dao.impl.hibernate;
 
 import java.util.Date;
@@ -8,6 +25,7 @@ import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.health.dao.ExternalReferralDao;
 import omis.health.domain.ExternalReferral;
 import omis.health.domain.ExternalReferralAuthorization;
+import omis.health.domain.OffenderAppointmentAssociation;
 import omis.health.domain.ProviderAssignment;
 import omis.offender.domain.Offender;
 
@@ -16,7 +34,8 @@ import omis.offender.domain.Offender;
  * 
  * @author Stephen Abson
  * @author Sheronda Vaughn
- * @version 0.1.0 (May 7, 2014)
+ * @author Yidong Li
+ * @version 0.1.0 (Nov 7, 2018)
  * @since OMIS 3.0
  */
 public class ExternalReferralDaoHibernateImpl
@@ -40,7 +59,11 @@ public class ExternalReferralDaoHibernateImpl
 	// properties in query name when finding by business key
 	private static final String
 	FIND_BY_OFFENDER_DATE_TIME_AND_PROVIDER_EXCLUDING_QUERY_NAME 
-		= "findExternalReferralByOffenderDateTimeProviderExcluding";	
+		= "findExternalReferralByOffenderDateTimeProviderExcluding";
+	
+	private static final String
+	FIND_EXISTING_EXTERNAL_REFERRAL_QUERY_NAME 
+		= "findExistingExternalReferral";	
 	
 	/* Parameters. */
 	
@@ -57,6 +80,9 @@ public class ExternalReferralDaoHibernateImpl
 
 	private static final String EXCLUDED_REFERRAL_MODEL_KEY
 		= "excludedExternalReferral";
+	
+	private static final String OFFEDNER_APPOINTMENT_ASSOCIATION_PARAM_NAME
+	= "offenderAppointmentAssociation";
 
 	/* Constructors. */
 	
@@ -115,5 +141,21 @@ public class ExternalReferralDaoHibernateImpl
 						providerAssignment)
 				.setParameter(EXCLUDED_REFERRAL_MODEL_KEY, excludedReferral)
 					.uniqueResult();
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ExternalReferral findExisting(
+		final OffenderAppointmentAssociation
+		offenderAppointmentAssociation) {
+		ExternalReferral externalReferral
+			= (ExternalReferral) this.getSessionFactory()
+			.getCurrentSession().getNamedQuery(
+			FIND_EXISTING_EXTERNAL_REFERRAL_QUERY_NAME)
+			.setParameter(OFFEDNER_APPOINTMENT_ASSOCIATION_PARAM_NAME,
+			offenderAppointmentAssociation)
+			.setReadOnly(true)
+			.uniqueResult();
+		return externalReferral;
 	}
 }

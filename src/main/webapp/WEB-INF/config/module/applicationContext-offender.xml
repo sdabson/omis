@@ -110,11 +110,7 @@
   <bean id="alternativeOffenderNameProfileItemReportService"
   	class="omis.offender.report.impl.hibernate.AlternativeOffenderNameProfileItemReportServiceHibernateImpl">
   	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-  
-  <bean id="offenderSearchSummaryService" class="omis.offender.report.impl.hibernate.OffenderSearchSummaryReportServiceHibernateImpl">
-	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-  </bean>
+  </bean> 
   
   <bean id="activitySummaryReportService"
 		class="omis.offender.report.impl.hibernate.ActivitySummaryReportServiceHibernateImpl">
@@ -214,5 +210,9 @@
         class="omis.offender.beans.factory.impl.OffenderPropertyEditorFactoryImpl">
     <constructor-arg name="offenderDao" ref="offenderDao"/>
   </bean>
-  
+   
+  <bean id="offenderSearchSummaryService" class="omis.offender.report.impl.hibernate.OffenderSearchSummaryReportServiceHibernateImpl">
+	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+
 </beans>

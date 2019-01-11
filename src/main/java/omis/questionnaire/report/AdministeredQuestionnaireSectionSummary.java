@@ -20,7 +20,7 @@ public class AdministeredQuestionnaireSectionSummary implements Serializable {
 	
 	private final String title;
 	
-	private final Integer number;
+	private final String number;
 	
 	private final String sectionHelpText;
 	
@@ -37,7 +37,7 @@ public class AdministeredQuestionnaireSectionSummary implements Serializable {
 	 */
 	public AdministeredQuestionnaireSectionSummary(final Long questionnaireSectionId, 
 			final Long questionnaireSectionStatusId,
-			final String title, final Integer number,
+			final String title, final String number,
 			final String sectionHelpText, final String sectionTypeDescription,
 			final Boolean draft) {
 		this.questionnaireSectionId = questionnaireSectionId;
@@ -73,7 +73,7 @@ public class AdministeredQuestionnaireSectionSummary implements Serializable {
 	/**
 	 * @return the number
 	 */
-	public Integer getNumber() {
+	public String getNumber() {
 		return this.number;
 	}
 

@@ -7,7 +7,6 @@ import omis.audit.domain.VerificationMethod;
 import omis.audit.domain.VerificationSignature;
 import omis.audit.service.delegate.VerificationMethodDelegate;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -19,6 +18,10 @@ import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupAffiliationNote;
 import omis.stg.domain.SecurityThreatGroupChapter;
 import omis.stg.domain.SecurityThreatGroupRank;
+import omis.stg.exception.SecurityThreatGroupAffiliationExistsException;
+import omis.stg.exception.SecurityThreatGroupAffiliationNoteExistsException;
+import omis.stg.exception.SecurityThreatGroupChapterExistsException;
+import omis.stg.exception.SecurityThreatGroupRankExistsException;
 import omis.stg.service.SecurityThreatGroupAffiliationService;
 import omis.stg.service.delegate.SecurityThreatGroupActivityLevelDelegate;
 import omis.stg.service.delegate.SecurityThreatGroupAffiliationDelegate;
@@ -128,13 +131,14 @@ public class SecurityThreatGroupAffiliationServiceImpl
 			final State state, final City city, final String moniker,
 			final String comment,
 			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupAffiliationExistsException {
 		return this.securityThreatGroupAffiliationDelegate.create(offender, 
 				dateRange, group, activityLevel, chapter, rank, state, city, 
 				moniker, comment, verificationSignature);
 	}
 
-	/** {@inheritDoc} */
+	/** {@inheritDoc} 
+	 * @throws SecurityThreatGroupAffiliationExistsException */
 	@Override
 	public SecurityThreatGroupAffiliation update(
 			final SecurityThreatGroupAffiliation affiliation,
@@ -144,8 +148,8 @@ public class SecurityThreatGroupAffiliationServiceImpl
 			final SecurityThreatGroupRank rank,
 			final State state, final City city, final String moniker,
 			final String comment,
-			final VerificationSignature verificationSignature)
-			throws DuplicateEntityFoundException {
+			final VerificationSignature verificationSignature) 
+					throws SecurityThreatGroupAffiliationExistsException {
 		return this.securityThreatGroupAffiliationDelegate.update(affiliation, 
 				dateRange, group, activityLevel, chapter, rank, state, city, 
 				moniker, comment, verificationSignature);
@@ -162,17 +166,18 @@ public class SecurityThreatGroupAffiliationServiceImpl
 	public SecurityThreatGroupAffiliationNote createNote(
 			final SecurityThreatGroupAffiliation affiliation, final Date date, 
 			final String note)
-			throws DuplicateEntityFoundException {
+			throws SecurityThreatGroupAffiliationNoteExistsException {
 			return (SecurityThreatGroupAffiliationNote) this
 					.securityThreatGroupAffiliationNoteDelegate
 					.addNote(affiliation, date, note);
 	}
 
-	/** {@inheritDoc} */
+	/** {@inheritDoc} 
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException */
 	@Override
 	public SecurityThreatGroupAffiliationNote updateNote(
 			SecurityThreatGroupAffiliationNote affiliationNote, Date date, 
-			String note) throws DuplicateEntityFoundException {
+			String note) throws SecurityThreatGroupAffiliationNoteExistsException {
 		return this.securityThreatGroupAffiliationNoteDelegate
 				.update(affiliationNote, date, note);
 	}
@@ -247,7 +252,7 @@ public class SecurityThreatGroupAffiliationServiceImpl
 	@Override
 	public SecurityThreatGroupChapter createChapter(String name, 
 			SecurityThreatGroup securityThreatGroup) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupChapterExistsException {
 		return this.securityThreatGroupChapterDelegate
 				.create(name, securityThreatGroup);
 	}
@@ -256,7 +261,7 @@ public class SecurityThreatGroupAffiliationServiceImpl
 	@Override
 	public SecurityThreatGroupRank createRank(String name, 
 			SecurityThreatGroup securityThreatGroup) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupRankExistsException {
 		return this.securityThreatGroupRankDelegate.create(name, 
 				securityThreatGroup);
 	}

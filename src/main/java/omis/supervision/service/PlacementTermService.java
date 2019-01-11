@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.locationterm.domain.LocationTerm;
 import omis.offender.domain.Offender;
 import omis.region.domain.State;
@@ -38,6 +37,7 @@ import omis.supervision.exception.OffenderNotUnderSupervisionException;
 import omis.supervision.exception.PlacementTermConflictException;
 import omis.supervision.exception.PlacementTermExistsAfterException;
 import omis.supervision.exception.PlacementTermExistsBeforeException;
+import omis.supervision.exception.PlacementTermExistsException;
 import omis.supervision.exception.PlacementTermLockedException;
 import omis.supervision.exception.PlacementTermNoteExistsException;
 import omis.supervision.exception.SupervisoryOrganizationTermConflictException;
@@ -47,7 +47,8 @@ import omis.supervision.exception.SupervisoryOrganizationTermConflictException;
  * 
  * @author Stephen Abson
  * @author Jason Nelson
- * @version 0.1.1 (Nov 12, 2014)
+ * @author Joel Norris
+ * @version 0.1.3 (December 5, 2018)
  * @since OMIS 3.0
  */
 public interface PlacementTermService {
@@ -75,6 +76,22 @@ public interface PlacementTermService {
 	 * <p>If not null, the start and end date of the date range are prevented
 	 * from being equal by a {@code IllegalArgumentException} being thrown.
 	 * 
+	 * <p>New placement term uses existing correctional status term and/or
+	 * supervisory organization term if the correction status and/or supervisory
+	 * organization, respectively, and date ranges match. If the correctional
+	 * status and/or supervisory organization does not match, existing
+	 * correctional status terms and/or supervisory organization terms are ended
+	 * and new ones began. If the correctional status and/or supervisory
+	 * organization matches, the date ranges of the respective terms are
+	 * lengthened for use by the placement term.
+	 * 
+	 * <p>Placement terms that overlap will be shortened, placement terms that
+	 * occur within the new placement term will cause a
+	 * {@code PlacementTermConflictException}.
+	 * 
+	 * <p>Placement term conflicts are reported first, then correctional status
+	 * terms, then supervisory organization terms.
+	 * 
 	 * @param offender offender
 	 * @param supervisoryOrganization of supervisory organization
 	 * @param correctionalStatus of correctional status
@@ -82,7 +99,7 @@ public interface PlacementTermService {
 	 * @param startChangeReason start change reason
 	 * @param endChangeReason end change reason
 	 * @return new placement term
-	 * @throws DuplicateEntityFoundException if placement term exists
+	 * @throws PlacementTermExistsException if placement term exists
 	 * @throws CorrectionalStatusTermConflictException if conflicting
 	 * correctional status terms exist
 	 * @throws SupervisoryOrganizationTermConflictException if conflicting
@@ -96,7 +113,7 @@ public interface PlacementTermService {
 			DateRange dateRange,
 			PlacementTermChangeReason startChangeReason,
 			PlacementTermChangeReason endChangeReason)
-					throws DuplicateEntityFoundException,
+					throws PlacementTermExistsException,
 						CorrectionalStatusTermConflictException,
 						SupervisoryOrganizationTermConflictException,
 						PlacementTermConflictException;
@@ -113,7 +130,7 @@ public interface PlacementTermService {
 	 * @param startChangeReason start change reason
 	 * @param endChangeReason end change reason
 	 * @return new placement term
-	 * @throws DuplicateEntityFoundException if placement term exists
+	 * @throws PlacementTermExistsException if placement term exists
 	 * @throws SupervisoryOrganizationTermConflictException if conflicting
 	 * supervisory organization terms exist
 	 * @throws PlacementTermConflictException if the placement term
@@ -130,8 +147,7 @@ public interface PlacementTermService {
 			DateRange dateRange,
 			PlacementTermChangeReason startChangeReason,
 			PlacementTermChangeReason endChangeReason)
-					throws DuplicateEntityFoundException,
-						SupervisoryOrganizationTermConflictException,
+					throws SupervisoryOrganizationTermConflictException,
 						PlacementTermConflictException, 
 						OffenderNotUnderSupervisionException,
 						PlacementTermExistsAfterException,
@@ -147,15 +163,17 @@ public interface PlacementTermService {
 	 * on the status start date, if one exists, will be ended with the status
 	 * start date.
 	 * 
+	 * <p>Correctional status term and supervisory organization term end
+	 * dates are updated to new end date of placement term if matching
+	 * old end date.
+	 * 
 	 * @param placementTerm placement term to update
-	 * @param supervisoryOrganization supervisory organization
+	 * @param endDate end date
 	 * @param status status
 	 * @param statusDateRange status date range
-	 * @param dateRange date range
 	 * @param startChangeReason start change reason
 	 * @param endChangeReason end change reason
 	 * @return updated placement term
-	 * @throws DuplicateEntityFoundException if placement term exists
 	 * @throws CorrectionalStatusTermConflictException if conflicting
 	 * correctional status terms exist
 	 * @throws SupervisoryOrganizationTermConflictException of conflicting
@@ -163,19 +181,40 @@ public interface PlacementTermService {
 	 * @throws PlacementTermLockedException if placement term is locked
 	 */
 	PlacementTerm update(PlacementTerm placementTerm,
-			SupervisoryOrganization supervisoryOrganization,
+			Date endDate,
 			PlacementStatus status,
 			DateRange statusDateRange,
-			DateRange dateRange,
 			PlacementTermChangeReason startChangeReason,
 			PlacementTermChangeReason endChangeReason)
-					throws DuplicateEntityFoundException,
-						CorrectionalStatusTermConflictException,
+					throws CorrectionalStatusTermConflictException,
 						SupervisoryOrganizationTermConflictException,
 						PlacementTermLockedException;
 	
 	/**
 	 * Removes a placement term.
+	 * 
+	 * <p>Removes correctional status and supervisory organization terms if
+	 * date ranges match that of {@code placementTerm}.
+	 * 
+	 * <p>Removes placement term notes that are associated to
+	 * the specified {@code placementTerm}.
+	 * 
+	 * <p>If the correctional status and/or supervisory organization term
+	 * run longer than the placement term, the correctional status and/or
+	 * supervisory organization term will be adjusted to exclude the period
+	 * of the removed placement term. In cases where the correctional status
+	 * term and/or supervisory organization term finish later than the placement
+	 * term, the start date of either or both of the latter two will be adjusted
+	 * to that of the placement term. In cases where the correctional status
+	 * term and/or supervisory organization term start earlier than the
+	 * placement term, the end date of either or both of the latter two will be
+	 * adjusted to the start date of the placement term.
+	 * 
+	 * <p>If a placement term exists with an {@code endDate} matching the
+	 * {@code startDate} of {@code placementTerm}, the {@code endDate} of the
+	 * former placement term and its correctional status and supervisory
+	 * organization terms is set to {@code null} if the {@code endDate} of
+	 * {@code placementTerm} is also {@code null}.
 	 * 
 	 * @param placementTerm placement term to remove
 	 */

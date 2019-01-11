@@ -23,6 +23,7 @@
 						<td>
 							<c:out value="${boardAttendee.memberLastName}"/>,
 							<c:out value="${boardAttendee.memberFirstName}"/>
+							- <c:out value="${boardAttendee.staffTitle}"/>
 							<c:if test="${not empty boardAttendee.memberMiddleName}"><c:out value="${boardAttendee.memberMiddleName}"/></c:if>
 							(<fmt:message key="attendeeRoleCategory.${boardAttendee.memberRole}"/>)
 						</td>
@@ -30,6 +31,7 @@
 				</c:forEach>
 			</table>
 		</td>
+		<td><c:out value="${paroleBoardItinerary.count}"/></td>
 	</tr>
 </c:forEach>
 </fmt:bundle>

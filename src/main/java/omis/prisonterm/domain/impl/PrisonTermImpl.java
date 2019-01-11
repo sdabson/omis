@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.prisonterm.domain.impl;
 
 import java.util.Date;
@@ -6,6 +23,7 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.offender.domain.Offender;
 import omis.prisonterm.domain.PrisonTerm;
+import omis.prisonterm.domain.PrisonTermDocumentAssociation;
 import omis.prisonterm.domain.PrisonTermStatus;
 import omis.user.domain.UserAccount;
 
@@ -14,7 +32,8 @@ import omis.user.domain.UserAccount;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Oct 17, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Dec 18, 2018)
  * @since OMIS 3.0
  */
 
@@ -56,6 +75,8 @@ public class PrisonTermImpl implements PrisonTerm {
 	
 	private Date verificationDate;
 	
+	private PrisonTermDocumentAssociation sentenceCalculation;
+	
 	/**
 	 * Instantiates a default instance of prison term.
 	 */
@@ -65,7 +86,7 @@ public class PrisonTermImpl implements PrisonTerm {
 	
 	/** {@inheritDoc} */
 	@Override
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;		
 	}
 
@@ -77,7 +98,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setOffender(Offender offender) {
+	public void setOffender(final Offender offender) {
 		this.offender = offender;	
 	}
 
@@ -89,7 +110,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setActionDate(Date actionDate) {
+	public void setActionDate(final Date actionDate) {
 		this.actionDate = actionDate;		
 	}
 
@@ -101,7 +122,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setPreSentenceCredits(Integer preSentenceCredits) {
+	public void setPreSentenceCredits(final Integer preSentenceCredits) {
 		this.preSentenceCredits = preSentenceCredits;
 	}
 
@@ -113,7 +134,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setSentenceDate(Date sentenceDate) {
+	public void setSentenceDate(final Date sentenceDate) {
 		this.sentenceDate = sentenceDate;
 	}
 
@@ -125,7 +146,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setSentenceTermYears(Integer sentenceTermYears) {
+	public void setSentenceTermYears(final Integer sentenceTermYears) {
 		this.sentenceTermYears = sentenceTermYears;
 	}
 
@@ -137,7 +158,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setSentenceTermDays(Integer sentenceTermDays) {
+	public void setSentenceTermDays(final Integer sentenceTermDays) {
 		this.sentenceTermDays = sentenceTermDays;
 	}
 
@@ -149,7 +170,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setParoleEligibilityDate(Date paroleEligibilityDate) {
+	public void setParoleEligibilityDate(final Date paroleEligibilityDate) {
 		this.paroleEligibilityDate = paroleEligibilityDate;
 	}
 
@@ -161,7 +182,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setProjectedDischargeDate(Date projectedDischargeDate) {
+	public void setProjectedDischargeDate(final Date projectedDischargeDate) {
 		this.projectedDischargeDate = projectedDischargeDate;
 	}
 
@@ -173,7 +194,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setMaximumDischargeDate(Date maximumDischargeDate) {
+	public void setMaximumDischargeDate(final Date maximumDischargeDate) {
 		this.maximumDischargeDate = maximumDischargeDate;
 	}
 
@@ -185,7 +206,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setStatus(PrisonTermStatus status) {
+	public void setStatus(final PrisonTermStatus status) {
 		this.status = status;
 	}
 
@@ -197,7 +218,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setSentenceToFollow(Boolean sentenceToFollow) {
+	public void setSentenceToFollow(final Boolean sentenceToFollow) {
 		this.sentenceToFollow = sentenceToFollow;
 	}
 
@@ -209,7 +230,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setComments(String comments) {
+	public void setComments(final String comments) {
 		this.comments = comments;
 	}
 
@@ -227,7 +248,8 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setCreationSignature(CreationSignature creationSignature) {
+	public void setCreationSignature(
+			final CreationSignature creationSignature) {
 		this.creationSignature = creationSignature;
 	}
 
@@ -239,7 +261,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setUpdateSignature(UpdateSignature updateSignature) {
+	public void setUpdateSignature(final UpdateSignature updateSignature) {
 		this.updateSignature = updateSignature;
 	}
 	
@@ -251,7 +273,7 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setVerificationUser(UserAccount verificationUser) {
+	public void setVerificationUser(final UserAccount verificationUser) {
 		this.verificationUser = verificationUser;
 	}
 	
@@ -263,10 +285,23 @@ public class PrisonTermImpl implements PrisonTerm {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setVerificationDate(Date verificationDate) {
+	public void setVerificationDate(final Date verificationDate) {
 		this.verificationDate = verificationDate;
 	}
-
+	
+	/** {@inheritDoc} */
+	@Override
+	public PrisonTermDocumentAssociation getSentenceCalculation() {
+		return this.sentenceCalculation;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public void setSentenceCalculation(
+			final PrisonTermDocumentAssociation sentenceCalculation) {
+		this.sentenceCalculation = sentenceCalculation;
+	}
+	
 	/** {@inheritDoc} */
 	@Override
 	public boolean equals(final Object o) {

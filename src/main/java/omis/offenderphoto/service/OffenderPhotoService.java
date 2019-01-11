@@ -55,7 +55,8 @@ public interface OffenderPhotoService {
 	List<OffenderPhotoAssociation> findByOffender(Offender offender);
 	
 	/**
-	 * Removes an offender photo association.
+	 * Removes an offender photo association and related offender
+	 * photo association notes.
 	 * 
 	 * @param association association to remove
 	 * @throws BusinessException if offender profile photo association

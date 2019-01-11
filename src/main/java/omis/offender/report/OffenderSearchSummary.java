@@ -32,9 +32,9 @@ public class OffenderSearchSummary implements Serializable,
 	
 	private final String suffixName;
 		
-	private final String supervisoryOrganizationDescription;
+	private final String supervisoryOrganizationName;
 	
-	private final String correctionalStatusDescription;
+	private final String correctionalStatusName;
 	
 	private final Date dateOfBirth;
 	
@@ -45,6 +45,8 @@ public class OffenderSearchSummary implements Serializable,
 	private final AddressSummaryDelegate addressSummaryDelegate;
 	
 	private final Boolean address;	
+	
+	private final String locationName;
 
 	/* Constructors. */
 	
@@ -55,9 +57,9 @@ public class OffenderSearchSummary implements Serializable,
 	 * @param lastName last name
 	 * @param firstName first name
 	 * @param middleName middle name
-	 * @param supervisoryOrganizationDescription supervisory organization 
+	 * @param supervisoryOrganizationName supervisory organization 
 	 * description
-	 * @param correctionalStatusDescription correctional status description
+	 * @param correctionalStatusName correctional status description
 	 * @param dateOfBirth date of birth
 	 * @param sexLabel sex label
 	 * @param address address
@@ -67,18 +69,18 @@ public class OffenderSearchSummary implements Serializable,
 			final Offender offender, final String lastName, 
 			final String firstName, final String middleName, 
 			final String suffixName,
-			final String supervisoryOrganizationDescription, 
-			final String correctionalStatusDescription, final Date dateOfBirth,
-			final Sex sexLabel, final Address address, 
+			final String supervisoryOrganizationName, 
+			final String correctionalStatusName, final Date dateOfBirth,
+			final Sex sexLabel, final Address address,  final String locationName,
 			final Boolean active) {
 		this.offender = offender;
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.suffixName = suffixName;
-		this.supervisoryOrganizationDescription 
-			= supervisoryOrganizationDescription;
-		this.correctionalStatusDescription = correctionalStatusDescription;
+		this.supervisoryOrganizationName 
+			= supervisoryOrganizationName;
+		this.correctionalStatusName = correctionalStatusName;
 		this.dateOfBirth = dateOfBirth;
 		this.sexLabel = sexLabel;	
 		if (address != null) {		
@@ -87,6 +89,7 @@ public class OffenderSearchSummary implements Serializable,
 			this.address = false;
 		}
 		this.addressSummaryDelegate = new AddressSummaryDelegate(address);
+		this.locationName = locationName;
 		this.active = active;		
 	}	
 	
@@ -112,12 +115,13 @@ public class OffenderSearchSummary implements Serializable,
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.suffixName = suffixName;
-		this.supervisoryOrganizationDescription = null;
-		this.correctionalStatusDescription = null;
+		this.supervisoryOrganizationName = null;
+		this.correctionalStatusName = null;
 		this.dateOfBirth = dateOfBirth;
 		this.sexLabel = sexLabel;	
 		this.address = null;
 		this.addressSummaryDelegate = null;
+		this.locationName = null;
 		this.active = null;
 	}
 
@@ -171,8 +175,8 @@ public class OffenderSearchSummary implements Serializable,
 	 * 
 	 * @return the supervisory organization description
 	 */
-	public String getSupervisoryOrganizationDescription() {
-		return this.supervisoryOrganizationDescription;
+	public String getSupervisoryOrganizationName() {
+		return this.supervisoryOrganizationName;
 	}
 
 	/**
@@ -180,8 +184,8 @@ public class OffenderSearchSummary implements Serializable,
 	 * 
 	 * @return the correctional status description
 	 */
-	public String getCorrectionalStatusDescription() {
-		return this.correctionalStatusDescription;
+	public String getCorrectionalStatusName() {
+		return this.correctionalStatusName;
 	}
 
 	/**
@@ -284,5 +288,14 @@ public class OffenderSearchSummary implements Serializable,
 	 */
 	public Boolean getAddress() {
 		return this.address;
+	}
+
+	/**
+	 * Gets the location name.
+	 * 
+	 * @return the locagion name
+	 */
+	public String getLocationName() {
+		return this.locationName;
 	}
 }

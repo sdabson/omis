@@ -1,24 +1,26 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.web.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import omis.beans.factory.PropertyEditorFactory;
-import omis.family.domain.FamilyAssociation;
-import omis.offender.beans.factory.OffenderPropertyEditorFactory;
-import omis.offender.domain.Offender;
-import omis.offender.report.OffenderReportService;
-import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
-import omis.offenderrelationship.report.OffenderRelationReportService;
-import omis.offenderrelationship.report.OffenderRelationSummary;
-import omis.person.domain.Person;
-import omis.relationship.domain.Relationship;
-import omis.report.ReportFormat;
-import omis.report.ReportRunner;
-import omis.report.web.controller.delegate.ReportControllerDelegate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,12 +35,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import omis.beans.factory.PropertyEditorFactory;
+import omis.contact.web.controller.delegate.ContactSummaryModelDelegate;
+import omis.family.domain.FamilyAssociation;
+import omis.offender.beans.factory.OffenderPropertyEditorFactory;
+import omis.offender.domain.Offender;
+import omis.offender.report.OffenderReportService;
+import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
+import omis.offenderrelationship.report.OffenderRelationReportService;
+import omis.offenderrelationship.report.OffenderRelationSummary;
+import omis.person.domain.Person;
+import omis.relationship.domain.Relationship;
+import omis.report.ReportFormat;
+import omis.report.ReportRunner;
+import omis.report.web.controller.delegate.ReportControllerDelegate;
+
 /**
  * Report offender relationship controller.
  * 
  * @author Joel Norris
  * @author Yidong Li
- * @version 0.1.0 (Jan 13, 2016)
+ * @version 0.1.1 (Dec 6, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -56,6 +73,7 @@ public class ReportOffenderRelationshipController {
 	private static final String RELATIONSHIP_MODEL_KEY = "relationship";
 	private static final String FAMILY_ASSOCIATION_MODEL_KEY 
 		= "familyAssociation";
+	private static final String RELATION_MODEL_KEY = "relation";
 	
 	/* View names. */
 	private static final String LIST_VIEW_NAME = "offenderRelationship/list";
@@ -122,6 +140,9 @@ public class ReportOffenderRelationshipController {
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
 	
 	@Autowired
+	private ContactSummaryModelDelegate contactSummaryModelDelegate;
+	
+	@Autowired
 	@Qualifier("reportControllerDelegate")
 	private ReportControllerDelegate reportControllerDelegate;
 	
@@ -143,19 +164,31 @@ public class ReportOffenderRelationshipController {
 	 */
 	@RequestMapping(value = "/list.html", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_LIST')")
-	public ModelAndView list(@RequestParam(value = "offender", required = true)
-		final Offender offender) {
-		List<OffenderRelationSummary> offenderRelationSummaryItems
-			= new ArrayList<OffenderRelationSummary>();
+	public ModelAndView list(
+			@RequestParam(value = "offender", required = false)
+				final Offender offender,
+			@RequestParam(value = "relation", required = false)
+				final Person relation) {
 		Date effectiveDate = new Date();
-		offenderRelationSummaryItems
-			= this.offenderRelationReportService.summarizeByOffender(offender, 
-			effectiveDate);
+		List<OffenderRelationSummary> offenderRelationSummaryItems;
 		ModelAndView mav = new ModelAndView(LIST_VIEW_NAME);
+		if (offender != null) {
+			offenderRelationSummaryItems
+				= this.offenderRelationReportService.summarizeByOffender(
+						offender, effectiveDate);
+			mav.addObject(OFFENDER_MODEL_KEY, offender);
+			this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
+		} else if (relation != null) {
+			offenderRelationSummaryItems
+				= this.offenderRelationReportService.summarizeByRelation(
+						relation, effectiveDate);
+			mav.addObject(RELATION_MODEL_KEY, relation);
+			this.contactSummaryModelDelegate.add(mav.getModelMap(), relation);
+		} else {
+			throw new AssertionError("Offender or relation required");
+		}
 		mav.addObject(OFFENDER_RELATION_SUMMARY_ITEMS_MODEL_KEY,
 			offenderRelationSummaryItems);
-		mav.addObject(OFFENDER_MODEL_KEY, offender);
-		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
 		return mav;
 	}
 	
@@ -196,8 +229,7 @@ public class ReportOffenderRelationshipController {
 			@RequestParam(value = "relationship", 
 			required = true) final Relationship relationship,
 			@RequestParam(value = "familyAssociation", 
-			required = true) final FamilyAssociation familyAssociation
-	) {
+			required = true) final FamilyAssociation familyAssociation) {
 		ModelMap map = new ModelMap();
 				
 		if (offenderYesNo != null) {

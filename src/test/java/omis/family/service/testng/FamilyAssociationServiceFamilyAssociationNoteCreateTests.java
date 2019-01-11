@@ -26,11 +26,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
 
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationCategoryClassification;
-import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationCategoryExistsException;
 import omis.family.exception.FamilyAssociationConflictException;
@@ -45,13 +43,19 @@ import omis.offender.service.delegate.OffenderDelegate;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
 import omis.relationship.domain.Relationship;
+import omis.relationship.domain.RelationshipNote;
+import omis.relationship.domain.RelationshipNoteCategory;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipNoteCategoryExistsException;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.relationship.service.delegate.RelationshipDelegate;
+import omis.relationship.service.delegate.RelationshipNoteCategoryDelegate;
+import omis.relationship.service.delegate.RelationshipNoteDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 import omis.util.PropertyValueAsserter;
 
 /**
- * Tests family association note creation 
+ * Tests family association note creation.
  *
  * @author Yidong Li
  * @author Josh Divine
@@ -86,6 +90,14 @@ public class FamilyAssociationServiceFamilyAssociationNoteCreateTests
 	@Qualifier("familyAssociationNoteDelegate")
 	private FamilyAssociationNoteDelegate familyAssociationNoteDelegate;
 	
+	@Autowired
+	@Qualifier("relationshipNoteCategoryDelegate")
+	private RelationshipNoteCategoryDelegate relationshipNoteCategoryDelegate;
+	
+	@Autowired
+	@Qualifier("relationshipNoteDelegate")
+	private RelationshipNoteDelegate relationshipNoteDelegate;
+	
 	/* Service to test. */
 	@Autowired
 	@Qualifier("familyAssociationService")
@@ -100,13 +112,16 @@ public class FamilyAssociationServiceFamilyAssociationNoteCreateTests
 	 * @throws FamilyAssociationExistsException 
 	 * @throws FamilyAssociationNoteExistsException 
 	 * @throws FamilyAssociationCategoryExistsException 
+	 * @throws RelationshipNoteExistsException 
 	 */
-	@Test
+	@Test()
 	public void testAddNote() throws FamilyAssociationNoteExistsException, 
-			ReflexiveRelationshipException, FamilyAssociationConflictException, 
-			FamilyAssociationExistsException, 
-			FamilyAssociationNoteExistsException, 
-			FamilyAssociationCategoryExistsException {
+		ReflexiveRelationshipException, FamilyAssociationConflictException, 
+		FamilyAssociationExistsException, 
+		FamilyAssociationNoteExistsException, 
+		FamilyAssociationCategoryExistsException,
+		RelationshipNoteCategoryExistsException,
+		RelationshipNoteExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 			"Kevin", "Johns", "Mr.");
@@ -129,22 +144,26 @@ public class FamilyAssociationServiceFamilyAssociationNoteCreateTests
 						relationship);
 		Date familyAssociationNoteDate = this.parseDateText("01/01/2017");
 		String value = "Testing note creation";
+		RelationshipNoteCategory relationshipNoteCategory
+			= this.relationshipNoteCategoryDelegate.create("category",
+			(short)34);
 		
 		// Action
-		FamilyAssociationNote familyAssociationNote =  this
-				.familyAssociationService.addNote(familyAssociation, 
-						familyAssociationNoteDate, value);
+		RelationshipNote familyAssociationNote =  this
+				.familyAssociationService.addRelationshipNote(familyAssociation, 
+					relationshipNoteCategory, familyAssociationNoteDate, value);
 		
 		// Assertions
 		PropertyValueAsserter.create()
-			.addExpectedValue("association", familyAssociation)
+			.addExpectedValue("category", relationshipNoteCategory)
 			.addExpectedValue("date", familyAssociationNoteDate)
 			.addExpectedValue("value", value)
+			.addExpectedValue("relationship", relationship)
 			.performAssertions(familyAssociationNote);
 	}
 	
 	/**
-	 * Tests {@code DuplicateEntityFoundException} is thrown.
+	 * Tests {@code FamilyAssociationNoteExistsException} is thrown.
 	 * 
 	 * @throws ReflexiveRelationshipException if relationship is between same 
 	 * person
@@ -152,12 +171,17 @@ public class FamilyAssociationServiceFamilyAssociationNoteCreateTests
 	 * @throws FamilyAssociationExistsException 
 	 * @throws FamilyAssociationNoteExistsException 
 	 * @throws FamilyAssociationCategoryExistsException 
+	 * @throws RelationshipNoteCategoryExistsException
+	 * @throws RelationshipNoteExistsException
 	 */
-	@Test(expectedExceptions = {FamilyAssociationNoteExistsException.class})
+	@Test(expectedExceptions = {RelationshipNoteExistsException.class})
 	public void testFamilyAssociationNoteExistsException() 
 		throws ReflexiveRelationshipException,
 		FamilyAssociationConflictException, FamilyAssociationExistsException, 
-		FamilyAssociationNoteExistsException, FamilyAssociationCategoryExistsException {
+		FamilyAssociationNoteExistsException, 
+		FamilyAssociationCategoryExistsException,
+		RelationshipNoteExistsException,
+		RelationshipNoteCategoryExistsException {
 		// Arrangement
 		Offender offender = this.offenderDelegate.createWithoutIdentity("Obama",
 				"Kevin", "Johns", "Mr.");
@@ -180,12 +204,17 @@ public class FamilyAssociationServiceFamilyAssociationNoteCreateTests
 						relationship);
 		Date familyAssociationNoteDate = this.parseDateText("01/01/2017");
 		String value = "Testing note creation";
-		this.familyAssociationNoteDelegate.create(familyAssociation, 
-				familyAssociationNoteDate, value);
+		RelationshipNoteCategory relationshipNoteCategory
+			= this.relationshipNoteCategoryDelegate.create("category",
+			(short) 32);
+		/*this.familyAssociationNoteDelegate.create(familyAssociation, 
+				familyAssociationNoteDate, value);*/
+		this.relationshipNoteDelegate.create(relationship,
+			relationshipNoteCategory, value, familyAssociationNoteDate);
 		
 		// Action
-		this.familyAssociationService.addNote(familyAssociation, 
-				familyAssociationNoteDate, value);
+		this.familyAssociationService.addRelationshipNote(familyAssociation,
+			relationshipNoteCategory, familyAssociationNoteDate, value);
 
 	}
 	

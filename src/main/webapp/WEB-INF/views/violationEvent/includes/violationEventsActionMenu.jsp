@@ -12,19 +12,28 @@
 		</sec:authorize>
 		<sec:authorize access="hasRole('VIOLATION_EVENT_CREATE') or hasRole('ADMIN')">
 			<c:forEach items="${categories}" var="category">
-				<li>
-					<a class="createLink" href="${pageContext.request.contextPath}/violationEvent/create.html?offender=${offender.id}&category=${category}">
-						<span class="visibleLinkLabel">
-							<fmt:message key="create${category}ViolationEventLink" />
-						</span>
-					</a>
-				</li>
+				<c:if test="${category.valid}">
+					<li>
+						<a class="createLink" href="${pageContext.request.contextPath}/violationEvent/create.html?offender=${offender.id}&category=${category}">
+							<span class="visibleLinkLabel">
+								<fmt:message key="create${category}ViolationEventLink" />
+							</span>
+						</a>
+					</li>
+				</c:if>
 			</c:forEach>
 		</sec:authorize>
-		<sec:authorize access="hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('VIOLATION_EVENT_LIST') or hasRole('ADMIN')">
 		<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/violationEvent/violationEventListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="violationEventListingReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/violationEvent/disciplinaryWitnessRequestReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="disciplinaryWitnessRequestReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
+		<sec:authorize access="hasRole('VIOLATION_EVENT_LIST') or hasRole('ADMIN')">
+		<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/violationEvent/violationEventListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="violationEventListingReportLinkLabel"/></a>
 			</li>
 		</c:if>
 		</sec:authorize>

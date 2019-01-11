@@ -118,7 +118,6 @@
 	<bean id="communitySupervisionSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
 	<bean id="offenderContactSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
 	<bean id="placementSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
-	<bean id="legacyPlacementSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
 	<bean id="identificationNumbersSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
 	<bean id="facilitySummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>
 	<bean id="dischargeDataSummaryItemRegistry" class="omis.offender.web.summary.SummaryItemRegistry"/>

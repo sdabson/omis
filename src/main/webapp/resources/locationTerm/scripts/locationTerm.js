@@ -1,3 +1,21 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  * Behavior for location term screen.
  *
@@ -18,7 +36,12 @@ window.onload = function() {
 		}
 		var request = new XMLHttpRequest();
 		request.open("GET", url, false);
-		request.send(null);
+		try {
+			request.send(null);
+		} catch (error) {
+			alert("Error sending request - error name: " + error.name + "; message: " + error.message);
+			throw error;
+		}
 		if (request.status == 200) {
 			return eval(request.responseText);
 		} else {
@@ -63,7 +86,12 @@ window.onload = function() {
 			}
 			var request = new XMLHttpRequest();
 			request.open("GET", url, false);
-			request.send(null);
+			try {
+				request.send(null);
+			} catch (error) {
+				alert("Error sending request - error name: " + error.name + "; message: " + error.message);
+				throw error;
+			}
 			if (request.status == 200) {
 				location.innerHTML = request.responseText;
 			} else {
@@ -75,6 +103,44 @@ window.onload = function() {
 			var commonResolver = new common.MessageResolver("omis.msgs.common");
 			var location = document.getElementById("location");
 			location.innerHTML = '<option value="">' + commonResolver.getMessage("nullLabel") + '</option>';
+		}
+	}
+	
+	// Updates next change actions those allowed on end date/time for offender
+	function updateNextChangeActions() {
+		var endDate = document.getElementById("endDate");
+		var endTime = document.getElementById("endTime");
+		var nextChangeAction = document.getElementById("nextChangeAction");
+		var nextChangeActionValue;
+		if (nextChangeAction.selectedIndex > -1) {
+			nextChangeActionValue = nextChangeAction.options[nextChangeAction.selectedIndex].value;
+		} else {
+			nextChangeActionValue = "";
+		}
+		var url = config.ServerConfig.getContextPath() + "/locationTerm/findAllowedChangeActions.html";
+		var params = "offender=" + offender;
+		if (endDate.value != null && endDate.value != "") {
+			params = params + "&effectiveDate=" + endDate.value;
+		}
+		if (endTime.value != null && endTime.value != "") {
+			params = params + "&effectiveTime=" + endTime.value;
+		}
+		if (nextChangeActionValue != null && nextChangeActionValue != "") {
+			params = params + "&defaultChangeAction=" + nextChangeActionValue;
+		}
+		var request = new XMLHttpRequest();
+		var urlAndParams = url + "?" + params;
+		request.open("GET", urlAndParams, false);
+		try {
+			request.send(null);
+		} catch (error) {
+			alert("Error sending request - error name: " + error.name + "; message: " + error.message);
+			throw error;
+		}
+		if (request.status == 200) {
+			nextChangeAction.innerHTML = request.responseText;
+		} else {
+			alert("Error - status: " + request.status + "; status text:" + request.statusText + "; URL: " + urlAndParams);
 		}
 	}
 	
@@ -99,8 +165,44 @@ window.onload = function() {
 			updateLocations();
 		};
 	}
-	applyDatePicker(document.getElementById("endDate"));
-	applyTimePicker(document.getElementById("endTime"));
+	var allowSingleReasonTerm = document.getElementById("allowSingleReasonTerm");
+	if (allowLocation.value == "true" && allowSingleReasonTerm.value == "true") {
+		var location = document.getElementById("location");
+		location.onchange = function() {
+			var reason = document.getElementById("reason");
+			var url = config.ServerConfig.getContextPath() + "/locationTerm/findAllowedReasons.html?location=" + location.value;
+			if (reason.value != "" && reason.value != null) {
+				url = url + "&defaultReason=" + reason.value;
+			}
+			var request = new XMLHttpRequest();
+			request.open("GET", url, false);
+			try {
+				request.send(null);
+			} catch (error) {
+				alert("Error sending request - error name: " + error.name + "; message: " + error.message);
+				throw error;
+			}
+			if (request.status == 200) {
+				reason.innerHTML = request.responseText;
+			} else {
+				alert("Error - status: " + request.status + "; status text:" + request.statusText + "; URL: " + url);
+			}
+			return false;
+		};
+	}
+	var endDate = document.getElementById("endDate");
+	var endTime = document.getElementById("endTime");
+	applyDatePicker(endDate);
+	applyTimePicker(endTime);
+	var allowNextChangeAction = document.getElementById("allowNextChangeAction");
+	if (allowNextChangeAction.value == "true") {
+		endDate.onchange = function() {
+			updateNextChangeActions();
+		};
+		endTime.onchange = function() {
+			updateNextChangeActions();
+		};
+	}
 	var allowMultipleReasonTerms = document.getElementById("allowMultipleReasonTerms");
 	var allowSingleReasonTerm = document.getElementById("allowSingleReasonTerm");
 	if (allowMultipleReasonTerms.value && allowSingleReasonTerm.value) {
@@ -186,9 +288,17 @@ window.onload = function() {
 			var createReasonTermLink = document.getElementById("createReasonTermLink");
 			createReasonTermLink.onclick = function() {
 				var url = createReasonTermLink.getAttribute("href") + "?itemIndex=" + locationReasonTermItemIndex;
+				if (locationTermLocation != null) {
+					url = url + "&location=" + locationTermLocation;
+				}
 				var request = new XMLHttpRequest();
 				request.open("GET", url + "&timestamp=" + new Date().getTime(), false);
-				request.send();
+				try {
+					request.send(null);
+				} catch (error) {
+					alert("Error sending request - error name: " + error.name + "; message: " + error.message);
+					throw error;
+				}
 				if (request.status == 200) {
 					ui.appendHtml(document.getElementById("reasonTermsBody"), request.responseText);
 					var removeLink = document.getElementById("reasonTermItems[" + locationReasonTermItemIndex + "].removeLink");

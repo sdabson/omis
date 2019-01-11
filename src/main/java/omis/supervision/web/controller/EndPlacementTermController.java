@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,12 +35,15 @@ import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
-import omis.exception.DuplicateEntityFoundException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.supervision.domain.PlacementTerm;
 import omis.supervision.domain.PlacementTermChangeReason;
+import omis.supervision.exception.CorrectionalStatusTermExistsException;
+import omis.supervision.exception.PlacementTermExistsException;
+import omis.supervision.exception.SupervisoryOrganizationTermExistsException;
 import omis.supervision.service.EndPlacementTermService;
 import omis.supervision.web.form.EndPlacementTermForm;
 import omis.supervision.web.validator.EndPlacementTermFormValidator;
@@ -49,6 +53,7 @@ import omis.util.DateManipulator;
  * Controller for ending a placement term.
  * 
  * @author Joshua Divine
+ * @author Stephen Abson
  * @version 0.1.0 (Feb 16, 2017)
  * @since OMIS 3.0
  */
@@ -155,8 +160,10 @@ public class EndPlacementTermController {
 	 * @param endPlacementTermForm end placement term form
 	 * @param result result
 	 * @return model and view
-	 * @throws DuplicateEntityFoundException thrown when a duplicate entity is 
-	 * found
+	 * @throws LocationTermExistsException 
+	 * @throws PlacementTermExistsException 
+	 * @throws SupervisoryOrganizationTermExistsException 
+	 * @throws CorrectionalStatusTermExistsException 
 	 */
 	@RequestMapping(value = "/endPlacementTerm.html", 
 			method = RequestMethod.POST)
@@ -167,9 +174,12 @@ public class EndPlacementTermController {
 			@RequestParam(value = "placementTerm", required = true)
 			final PlacementTerm placementTerm,
 			final EndPlacementTermForm endPlacementTermForm,
-			final BindingResult result) throws DuplicateEntityFoundException {
-		this.endPlacementTermFormValidator.validate(endPlacementTermForm, 
-				result);
+			final BindingResult result)
+					throws CorrectionalStatusTermExistsException,
+						SupervisoryOrganizationTermExistsException,
+						PlacementTermExistsException,
+						LocationTermExistsException {
+		this.validate(placementTerm, endPlacementTermForm, result);
 		if (result.hasErrors()) {
 			return this.prepareRedisplayMav(offender, placementTerm, 
 					endPlacementTermForm, result);
@@ -221,6 +231,23 @@ public class EndPlacementTermController {
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
 		return mav;
+	}
+	
+	// Validates form
+	private void validate(
+			final PlacementTerm placementTerm,
+			final EndPlacementTermForm endPlacementTermForm,
+			final Errors errors) {
+		if (endPlacementTermForm.getEndDate() != null
+				&& placementTerm.getDateRange().getStartDate().after(
+						DateManipulator.getDateAtTimeOfDay(
+								endPlacementTermForm.getEndDate(),
+								endPlacementTermForm.getEndTime()))) {
+			errors.rejectValue("endTime",
+					"endPlacementTermForm.endDate.beforeStartDate");
+		}
+		this.endPlacementTermFormValidator.validate(endPlacementTermForm, 
+				errors);
 	}
 	
 	/* Init binder. */

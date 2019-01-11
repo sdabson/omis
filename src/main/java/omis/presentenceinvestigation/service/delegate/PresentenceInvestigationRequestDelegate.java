@@ -1,36 +1,64 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.presentenceinvestigation.service.delegate;
 
 import java.util.Date;
 
-
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.docket.domain.Docket;
 import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
+import omis.person.domain.Person;
 import omis.presentenceinvestigation.dao.PresentenceInvestigationRequestDao;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationCategory;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.user.domain.UserAccount;
 
-/** Service delegate for presentence investigation request related operations.
+/** 
+ * Service delegate for presentence investigation request related operations.
+ * 
  * @author Ryan Johns
- * @author Annie Jacques
- * @version 0.1.1 (May 16, 2017)
- * @since OMIS 3.0 */
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.4 (Oct 24, 2018)
+ * @since OMIS 3.0
+ */
 public class PresentenceInvestigationRequestDelegate {
+	
+	/* Messages. */
+	
 	private static final String DUPLICATE_ENTITY_FOUND_MSG 
 		= "Presentence investigation request exists for this court case.";
+	
+	/* Data access objects. */
 	
 	private final PresentenceInvestigationRequestDao 
 		presentenceInvestigationRequestDao;
 	
+	/* Instance factories. */
+	
 	private final InstanceFactory<PresentenceInvestigationRequest> 
 		presentenceInvestigationRequestInstanceFactory;
 	
-	private final AuditComponentRetriever auditComponenetRetriever;
+	/* Component Retrievers. */
 	
+	private final AuditComponentRetriever auditComponenetRetriever;
 	
 	/** Constructor. 
 	 * @param presentenceInvestigationRequestDao - presentence investigation
@@ -55,45 +83,35 @@ public class PresentenceInvestigationRequestDelegate {
 	 * @param assignedUser - assigned user.
 	 * @param requestDate - request date.
 	 * @param expectedCompletionDate - expected completion date.
-	 * @param docket - docket.
-	 * @param completionDate - completion date.
+	 * @param person - person.
 	 * @param sentenceDate - sentence date.
 	 * @param category - PresentenceInvestigationCategory
+	 * @param submissionDate - submission date.
 	 * @return Presentence investigation request.
 	 * @throws DuplicateEntityFoundException - entity with given court case 
 	 * exists */
 	public PresentenceInvestigationRequest create(
 			final UserAccount assignedUser,
 			final Date requestDate, final  Date expectedCompletionDate, 
-			final Docket docket, final Date completionDate, 
-			final Date sentenceDate,
-			final PresentenceInvestigationCategory category) 
+			final Person person, final Date sentenceDate, 
+			final PresentenceInvestigationCategory category, 
+			final Date submissionDate) 
 					throws DuplicateEntityFoundException {
-		if (this.presentenceInvestigationRequestDao.find(docket) != null) {
+		if (this.presentenceInvestigationRequestDao.find(person, requestDate) != 
+				null) {
 			throw new DuplicateEntityFoundException(
 					DUPLICATE_ENTITY_FOUND_MSG);
 		}
-		PresentenceInvestigationRequest presentenceInvestigationRequest 
-			= this.presentenceInvestigationRequestInstanceFactory
+		PresentenceInvestigationRequest presentenceInvestigationRequest = this
+				.presentenceInvestigationRequestInstanceFactory
 				.createInstance();
-		
-		presentenceInvestigationRequest.setCompletionDate(completionDate);
-		presentenceInvestigationRequest.setDocket(docket);
-		presentenceInvestigationRequest.setExpectedCompletionDate(
-				expectedCompletionDate);
-		presentenceInvestigationRequest.setRequestDate(requestDate);
-		presentenceInvestigationRequest.setAssignedUser(assignedUser);
-		presentenceInvestigationRequest.setSentenceDate(sentenceDate);
-		presentenceInvestigationRequest.setCategory(category);
 		presentenceInvestigationRequest.setCreationSignature(
 				new CreationSignature(
 						this.auditComponenetRetriever.retrieveUserAccount(), 
 						this.auditComponenetRetriever.retrieveDate()));
-		presentenceInvestigationRequest.setUpdateSignature(
-				new UpdateSignature(
-						this.auditComponenetRetriever.retrieveUserAccount(),
-						this.auditComponenetRetriever.retrieveDate()));
-		
+		populatePresentenceInvestigationRequest(presentenceInvestigationRequest, 
+				assignedUser, requestDate, expectedCompletionDate, person, 
+				sentenceDate, category, submissionDate);
 		return this.presentenceInvestigationRequestDao.makePersistent(
 				presentenceInvestigationRequest);
 	}
@@ -103,12 +121,12 @@ public class PresentenceInvestigationRequestDelegate {
 	 * request.
 	 * @param assignedUser - assigned user.
 	 * @param requestDate - request date.
-	 * @param completionDate - completion date.
 	 * @param expectedCompletionDate - expected completion date.
 	 * @param completionDate - completion date.
-	 * @param docket - docket. 
+	 * @param person - person. 
 	 * @param sentenceDate - sentence date.
 	 * @param category - PresentenceInvestigationCategory
+	 * @param submissionDate - submission date.
 	 * @return presentence investigation request.
 	 * @throws DuplicateEntityFoundException - when presentence investigation
 	 * request exists for given court case. */
@@ -116,35 +134,24 @@ public class PresentenceInvestigationRequestDelegate {
 			final PresentenceInvestigationRequest 
 				presentenceInvestigationRequest,
 			final UserAccount assignedUser, final Date requestDate,
-			final Date completionDate,
-			final Date expectedCompletionDate, final Docket docket,
-			final Date sentenceDate,
-			final PresentenceInvestigationCategory category)
+			final Date expectedCompletionDate, final Person person,
+			final Date sentenceDate, 
+			final PresentenceInvestigationCategory category, 
+			final Date submissionDate)
 	throws DuplicateEntityFoundException {
 		
 		if (this.presentenceInvestigationRequestDao.findExcluding(
-				presentenceInvestigationRequest, docket) != null) {
+				presentenceInvestigationRequest, person, requestDate) != null) {
 			throw new DuplicateEntityFoundException(
 					DUPLICATE_ENTITY_FOUND_MSG);
 		}
-		
-		presentenceInvestigationRequest.setCompletionDate(completionDate);
-		presentenceInvestigationRequest.setDocket(docket);
-		presentenceInvestigationRequest.setExpectedCompletionDate(
-				expectedCompletionDate);
-		presentenceInvestigationRequest.setRequestDate(requestDate);
-		presentenceInvestigationRequest.setAssignedUser(assignedUser);
-		presentenceInvestigationRequest.setSentenceDate(sentenceDate);
-		presentenceInvestigationRequest.setCategory(category);
-		presentenceInvestigationRequest.setUpdateSignature(
-				new UpdateSignature(
-						this.auditComponenetRetriever.retrieveUserAccount(),
-						this.auditComponenetRetriever.retrieveDate()));
-		
+		populatePresentenceInvestigationRequest(presentenceInvestigationRequest, 
+				assignedUser, requestDate, expectedCompletionDate, person, 
+				sentenceDate, category, submissionDate);
 		return this.presentenceInvestigationRequestDao.makePersistent(
 				presentenceInvestigationRequest);
 	}
-	
+
 	/** Removes a presentence investigation request.
 	 * @param presentenceInvestigationRequest - presentence investigation 
 	 * request. */
@@ -152,5 +159,28 @@ public class PresentenceInvestigationRequestDelegate {
 			presentenceInvestigationRequest) {
 		this.presentenceInvestigationRequestDao.makeTransient(
 				presentenceInvestigationRequest);
+	}
+	
+	// Populates a presentence investigation request
+	private void populatePresentenceInvestigationRequest(
+			final PresentenceInvestigationRequest 
+					presentenceInvestigationRequest, 
+			final UserAccount assignedUser, final Date requestDate, 
+			final Date expectedCompletionDate, final Person person, 
+			final Date sentenceDate, 
+			final PresentenceInvestigationCategory category,
+			final Date submissionDate) {
+		presentenceInvestigationRequest.setPerson(person);
+		presentenceInvestigationRequest.setExpectedCompletionDate(
+				expectedCompletionDate);
+		presentenceInvestigationRequest.setRequestDate(requestDate);
+		presentenceInvestigationRequest.setAssignedUser(assignedUser);
+		presentenceInvestigationRequest.setSentenceDate(sentenceDate);
+		presentenceInvestigationRequest.setCategory(category);
+		presentenceInvestigationRequest.setSubmissionDate(submissionDate);
+		presentenceInvestigationRequest.setUpdateSignature(
+				new UpdateSignature(
+						this.auditComponenetRetriever.retrieveUserAccount(),
+						this.auditComponenetRetriever.retrieveDate()));
 	}
 }

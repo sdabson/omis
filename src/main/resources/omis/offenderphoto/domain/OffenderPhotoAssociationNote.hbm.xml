@@ -45,4 +45,10 @@
 		and note.association = :association
 		and note <> :note
 	]]></query>
+	
+	<!-- Delete all placement term notes by placement term -->
+	<query name="deleteOffenderPhotoAssociationNotesByAssociation"><![CDATA[
+		delete from omis.offenderphoto.domain.OffenderPhotoAssociationNote note
+		where note.association = :association
+	]]></query>
 </hibernate-mapping>

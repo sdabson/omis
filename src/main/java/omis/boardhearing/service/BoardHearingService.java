@@ -19,6 +19,7 @@ package omis.boardhearing.service;
 
 import java.util.Date;
 import java.util.List;
+
 import omis.boardhearing.domain.BoardHearing;
 import omis.boardhearing.domain.BoardHearingCategory;
 import omis.boardhearing.domain.BoardHearingNote;
@@ -26,7 +27,6 @@ import omis.boardhearing.domain.BoardHearingParticipant;
 import omis.boardhearing.domain.CancellationCategory;
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
-import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
@@ -37,10 +37,10 @@ import omis.paroleeligibility.domain.ParoleEligibility;
 /**
  * Board Hearing Service.
  * 
- *@author Annie Wahl 
- *@version 0.1.0 (Dec 29, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.2 (Apr 18, 2018)
+ * @since OMIS 3.0
  */
 public interface BoardHearingService {
 	
@@ -48,7 +48,6 @@ public interface BoardHearingService {
 	 * Creates a Board Hearing with the specified properties.
 	 * 
 	 * @param itinerary - Parole Board Itinerary
-	 * @param location - Location
 	 * @param hearingDate - Date
 	 * @param paroleEligibility - Parole Eligibility
 	 * @param category - Board Hearing Category
@@ -59,19 +58,15 @@ public interface BoardHearingService {
 	 * exists with the specified Parole Eligibility
 	 */
 	BoardHearing createBoardHearing(ParoleBoardItinerary itinerary,
-			Location location, Date hearingDate,
-			ParoleEligibility paroleEligibility,
-			BoardHearingCategory category,
-			CancellationCategory cancellation,
-			Boolean videoConference)
-				throws DuplicateEntityFoundException;
+			Date hearingDate, ParoleEligibility paroleEligibility, 
+			BoardHearingCategory category, CancellationCategory cancellation, 
+			Boolean videoConference) throws DuplicateEntityFoundException;
 	
 	/**
 	 * Updates the specified Board Hearing with the given properties.
 	 * 
 	 * @param boardHearing - Board Hearing to update
 	 * @param itinerary - Parole Board Itinerary
-	 * @param location - Location
 	 * @param hearingDate - Date
 	 * @param paroleEligibility - Parole Eligibility
 	 * @param category - Board Hearing Category
@@ -82,12 +77,9 @@ public interface BoardHearingService {
 	 * exists with the specified Parole Eligibility
 	 */
 	BoardHearing updateBoardHearing(BoardHearing boardHearing,
-			ParoleBoardItinerary itinerary,
-			Location location, Date hearingDate,
-			ParoleEligibility paroleEligibility,
-			BoardHearingCategory category,
-			CancellationCategory cancellation,
-			Boolean videoConference)
+			ParoleBoardItinerary itinerary, Date hearingDate, 
+			ParoleEligibility paroleEligibility, BoardHearingCategory category, 
+			CancellationCategory cancellation, Boolean videoConference)
 				throws DuplicateEntityFoundException;
 	
 	/**
@@ -235,6 +227,15 @@ public interface BoardHearingService {
 	 */
 	HearingAnalysis findHearingAnalysisByParoleEligibility(
 			ParoleEligibility eligibility);
+	
+	/**
+	 * Returns a Board Hearing with the specified Parole Eligibility.
+	 * 
+	 * @param paroleEligibility - Parole Eligibility
+	 * @return Board Hearing with the specified Parole Eligibility.
+	 */
+	BoardHearing findBoardHearingByParoleEligibility(
+			ParoleEligibility paroleEligibility);
 	
 	/**
 	 * Returns a list of parole board itineraries after the specified date.

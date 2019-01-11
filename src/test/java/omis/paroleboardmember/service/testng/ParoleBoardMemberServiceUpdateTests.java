@@ -30,7 +30,7 @@ import omis.supervision.service.delegate.SupervisoryOrganizationDelegate;
  * Tests method to update parole board members.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.1 (Nov 28, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardMemberServiceUpdateTests
@@ -156,17 +156,18 @@ public class ParoleBoardMemberServiceUpdateTests
 			throws DuplicateEntityFoundException, DateConflictException {
 		// Arrangements
 		Date startDate = this.parseDateText("01/01/2017");
-		Date endDate = null;
+		Date endDate = this.parseDateText("01/31/2017");
 		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
 		SupervisoryOrganization supervisoryOrganization = this
 				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
-		DateRange dateRange = new DateRange(startDate, endDate);
+		DateRange dateRange = new DateRange(startDate, null);
 		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
 				true);
 		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
 				staffMember, supervisoryOrganization, null, dateRange, title, 
 				true, null, null, null, null, null);
+		dateRange = new DateRange(startDate, endDate);
 		this.paroleBoardMemberDelegate.create(staffAssignment, dateRange);
 		Date secondStartDate = this.parseDateText("02/01/2017");
 		ParoleBoardMember paroleBoardMember = this.paroleBoardMemberDelegate
@@ -194,21 +195,23 @@ public class ParoleBoardMemberServiceUpdateTests
 				null);
 		SupervisoryOrganization supervisoryOrganization = this
 				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
-		DateRange dateRange = new DateRange(startDate, endDate);
+		DateRange dateRange = new DateRange(startDate, null);
 		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
 				true);
 		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
 				staffMember, supervisoryOrganization, null, dateRange, title, 
 				true, null, null, null, null, null);
+		dateRange = new DateRange(startDate, endDate);
 		this.paroleBoardMemberDelegate.create(staffAssignment, dateRange);
+		Date secondEndDate = this.parseDateText("03/01/2017");
 		ParoleBoardMember paroleBoardMember = this.paroleBoardMemberDelegate
 				.create(staffAssignment, new DateRange(
-						this.parseDateText("01/03/2017"), endDate));
+						this.parseDateText("02/01/2017"), secondEndDate));
 		Date newStartDate = this.parseDateText("01/02/2017");
 		
 		// Action
 		paroleBoardMember = this.paroleBoardMemberService.update(
-				paroleBoardMember, newStartDate, null);
+				paroleBoardMember, newStartDate, secondEndDate);
 	}
 
 	// Parses date text

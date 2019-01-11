@@ -25,6 +25,11 @@
     <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
   </bean>
   
+  <bean id="offenderPhotoJoinFormValidator"
+       class="omis.offenderphoto.web.validator.OffenderPhotoJoinFormValidator">
+    <constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
+  </bean>
+  
   <!-- Profile items -->
   <bean id="offenderPhotoProfileItem"
   	class="omis.offenderphoto.web.profile.OffenderPhotoProfileItem">

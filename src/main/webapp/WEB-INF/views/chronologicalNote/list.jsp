@@ -19,6 +19,7 @@
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!-- 
+ - Chronological note list screen
  - Author: Yidong Li
  - Version: 0.1.0 (Feb 1, 2018)
  - Since: OMIS 3.0
@@ -30,13 +31,15 @@
 <fmt:bundle basename="omis.chronologicalnote.msgs.chronologicalNote">
 <head>
 	<title>
-		<fmt:message key="documentTrackingListHeader"/>
+		<fmt:message key="chronlogicalNoteListHeader"/>
 		<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
 	</title>
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/linksResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/chronologicalnote/style/chronologicalNotes.css?VERSION=1.2"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/chronologicalnote/scripts/listChronologicalNote.js"> </script>
 </head>
  <body>
@@ -44,9 +47,10 @@
  	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
  	</c:if>
  	<h1>
-		<a class="actionMenuItem" id="chronologicalNoteListActionMenuLink" href="${pageContext.request.contextPath}/chronologicalNoteReport/chronologicalNoteListScreenActionMenu.html?offender=${offender.id}"></a><span class="visibleLinkLabel"/>
+		<a class="actionMenuItem" id="chronologicalNoteListActionMenuLink" href="${pageContext.request.contextPath}/chronologicalNote/chronologicalNoteListScreenActionMenu.html?offender=${offender.id}"></a><span class="visibleLinkLabel"/>
 		<fmt:message key="chronologicalNoteListHeader"/>
 	</h1>
+ 	<jsp:include page="/WEB-INF/views/chronologicalNote/includes/chronologicalNoteFilterOptionsForm.jsp"/>
 	<jsp:include page="includes/listTable.jsp"/>
 </body>
 </fmt:bundle>

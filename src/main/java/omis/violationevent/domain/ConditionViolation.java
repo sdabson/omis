@@ -5,50 +5,62 @@ import omis.audit.domain.Updatable;
 import omis.condition.domain.Condition;
 
 /**
- * ConditionViolation.java
+ * Condition Violation.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Feb 15, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Jul 26, 2018)
  *@since OMIS 3.0
  *
  */
 public interface ConditionViolation extends Creatable, Updatable {
 	
 	/**
-	 * Returns the ID of the ConditionViolation
-	 * @return ID
+	 * Returns the ID of the Condition Violation.
+	 * @return ID - id
 	 */
-	public Long getId();
+	Long getId();
 	
 	/**
-	 * Sets the ID of the ConditionViolation
-	 * @param id - Long
+	 * Sets the ID of the Condition Violation.
+	 * @param id - id
 	 */
-	public void setId(Long id);
+	void setId(Long id);
 	
 	/**
-	 * Returns the Condition for the ConditionViolation
+	 * Returns the Condition for the Condition Violation.
 	 * @return condition - Condition
 	 */
-	public Condition getCondition();
+	Condition getCondition();
 	
 	/**
-	 * Sets the Condition for the ConditionViolation
+	 * Sets the Condition for the Condition Violation.
 	 * @param condition - Condition
 	 */
-	public void setCondition(Condition condition);
+	void setCondition(Condition condition);
 	
 	/**
-	 * Returns the ViolationEvent for the ConditionViolation
-	 * @return violationEvent - ViolationEvent
+	 * Returns the ViolationEvent for the Condition Violation.
+	 * @return violationEvent - Violation Event
 	 */
-	public ViolationEvent getViolationEvent();
+	ViolationEvent getViolationEvent();
 	
 	/**
-	 * Sets the ViolationEvent for the ConditionViolation
-	 * @param violationEvent - ViolationEvent
+	 * Sets the ViolationEvent for the Condition Violation.
+	 * @param violationEvent - Violation Event
 	 */
-	public void setViolationEvent(ViolationEvent violationEvent);
+	void setViolationEvent(ViolationEvent violationEvent);
+	
+	/**
+	 * Returns the Details for the Condition Violation.
+	 * @return details - details
+	 */
+	String getDetails();
+	
+	/**
+	 * Sets the Details for the Condition Violation.
+	 * @param details - details
+	 */
+	void setDetails(String details);
 	
 	/** Compares {@code this} and {@code obj} for equality.
 	 * <p>

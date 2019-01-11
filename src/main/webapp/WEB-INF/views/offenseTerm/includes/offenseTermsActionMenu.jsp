@@ -39,6 +39,25 @@
 				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseListingReport.html?person=${person.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="courtCaseListingReportLinkLabel" bundle="${offenseTermBundle}"/></a>
 			</li>
 		</sec:authorize>
+		<sec:authorize access="hasRole('OFFENSE_TERM_LIST') or hasRole('ADMIN')">
+			<li>
+				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseListingRedactedReport.html?person=${person.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="courtCaseListingRedactedReportLinkLabel" bundle="${offenseTermBundle}"/></a>
+			</li>
+		</sec:authorize>		
+		<sec:authorize access="hasRole('OFFENSE_TERM_LIST') or hasRole('ADMIN')">
+			<c:if test="${not empty person}">
+			<li>
+				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseDetailListingReport.html?person=${person.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="courtCaseDetailListingReportLinkLabel" bundle="${offenseTermBundle}" /></a>
+			</li>
+			</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('OFFENSE_TERM_LIST') or hasRole('ADMIN')">
+			<c:if test="${not empty person}">
+			<li>
+				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseDetailListingRedactedReport.html?person=${person.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="courtCaseDetailListingRedactedReportLinkLabel" bundle="${offenseTermBundle}" /></a>
+			</li>
+			</c:if>
+		</sec:authorize>				
 	</c:if>
 	<c:if test="${not empty courtCase and not courtCase.flags.dismissed}">
 		<sec:authorize access="hasRole('OFFENSE_TERM_VIEW') or hasRole('ADMIN')">
@@ -80,15 +99,16 @@
 	<c:if test="${not empty courtCase and not courtCase.flags.dismissed}">
 		<sec:authorize access="hasRole('OFFENSE_TERM_VIEW') or hasRole('ADMIN')">
 			<li>
-				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseDetailsReport.html?courtCase=${courtCase.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="courtCaseDetailsReportLinkLabel" bundle="${offenseTermBundle}"/></a>
+				<a href="${pageContext.request.contextPath}/offenseTerm/courtCaseDetailsReport.html?courtCase=${courtCase.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="courtCaseDetailsReportLinkLabel" bundle="${offenseTermBundle}"/></a>
 			</li>
 		</sec:authorize>
 	</c:if>
+		<%-- temporarily removed per request by Jason Nelson -SH 12/12/18
 	<c:if test="${not empty courtCase and not courtCase.flags.dismissed}">
 		<sec:authorize access="hasRole('OFFENSE_TERM_VIEW') or hasRole('ADMIN')">
 			<li>
 				<a href="${pageContext.request.contextPath}/offenseTerm/reportOfViolationReport.rtf?courtCase=${courtCase.id}&reportFormat=RTF" class="reportLink"><fmt:message key="reportOfViolationReportLinkLabel" bundle="${offenseTermBundle}"/></a>
 			</li>
 		</sec:authorize>
-	</c:if>	
+	</c:if>	--%>
 </ul>

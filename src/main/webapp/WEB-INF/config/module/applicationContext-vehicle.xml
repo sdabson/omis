@@ -3,156 +3,196 @@
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-        
-        <!-- DAOs -->
-        
-        <bean name="vehicleAssociationDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleAssociationDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-        </bean>
-        
-        <bean name="vehicleColorDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleColorDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-        </bean>
-        
-        <bean name="vehicleModelDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleModelDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-       </bean>
-        
-        <bean name="vehicleMakeDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleMakeDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-       </bean>
-       
-       <bean name="vehicleOwnerAssociationDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleOwnerAssociationDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-       </bean>
-       
-       <bean name="vehicleLicenseDao"
-        	class="omis.vehicle.dao.hibernate.impl.VehicleLicenseDaoHibernateImpl">
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
-        		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-       </bean>
-        
-        <!-- Services -->
-        
-        <bean id="offenderVehicleManager"
-        	class="omis.vehicle.service.impl.OffenderVehicleManagerImpl">
-        		<constructor-arg name="vehicleAssociationDao" ref="vehicleAssociationDao"/>
-        		<constructor-arg name="vehicleColorDao" ref="vehicleColorDao"/>
-        		<constructor-arg name="vehicleMakeDao" ref="vehicleMakeDao"/>
-        		<constructor-arg name="vehicleModelDao" ref="vehicleModelDao"/>
-          		<constructor-arg name="vehicleLicenseDao" ref="vehicleLicenseDao"/>
-          		<constructor-arg name="vehicleOwnerAssociationDao" ref="vehicleOwnerAssociationDao"/>
-          		<constructor-arg name="stateDao" ref="stateDao"/>
-        		<constructor-arg name="vehicleAssociationInstanceFactory" ref="vehicleAssociationInstanceFactory"/>
-        		<constructor-arg name="vehicleOwnerAssociationInstanceFactory" ref="vehicleOwnerAssociationInstanceFactory"/>
-        		<constructor-arg name="vehicleLicenseInstanceFactory" ref="vehicleLicenseInstanceFactory"/>
-        		<constructor-arg name="vehicleMakeInstanceFactory" ref="vehicleMakeInstanceFactory"/>
-        		<constructor-arg name="vehicleModelInstanceFactory" ref="vehicleModelInstanceFactory"/>
-        		<constructor-arg name="vehicleColorInstanceFactory" ref="vehicleColorInstanceFactory"/>
-        		<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
-        </bean>
-         
-        <!--  Report services -->
-        <bean id ="offenderVehicleSummaryReportService"
-	      	class="omis.vehicle.report.impl.hibernate.OffenderVehicleSummaryReportServiceHibernateImpl">
-	  	  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-	    </bean>
-	    
-	    <bean id="vehicleProfileItemReportService"
-	    	class="omis.vehicle.report.impl.hibernate.VehicleProfileItemReportServiceHibernateImpl">
-	    	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-	    </bean>
-        
-        <!-- Instance factories -->
-
-        <bean name="vehicleAssociationInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
-        </bean>
-        
-        <bean name="vehicleOwnerAssociationInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
-        </bean>
-        
-        <bean name="vehicleLicenseInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
-        </bean>
-
-		<bean name="vehicleModelInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
-        </bean>
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    
+    <!-- DAOs -->
+    
+    <bean name="vehicleAssociationDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <bean name="vehicleColorDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleColorDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <bean name="vehicleModelDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleModelDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+   </bean>
+    
+    <bean name="vehicleMakeDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleMakeDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+   </bean>
+   
+   <bean name="vehicleOwnerAssociationDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleOwnerAssociationDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+   </bean>
+   
+   <bean name="vehicleLicenseDao"
+    	class="omis.vehicle.dao.hibernate.impl.VehicleLicenseDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+   </bean>
+    
+    <!-- Services -->
+    
+    <bean id="offenderVehicleManager"
+    	class="omis.vehicle.service.impl.OffenderVehicleManagerImpl">
+    		<constructor-arg name="vehicleAssociationDao" ref="vehicleAssociationDao"/>
+      		<constructor-arg name="vehicleOwnerAssociationDao" ref="vehicleOwnerAssociationDao"/>
+    		<constructor-arg name="vehicleOwnerAssociationDelegate" ref="vehicleOwnerAssociationDelegate"/>
+    		<constructor-arg name="vehicleLicenseDelegate" ref="vehicleLicenseDelegate"/>
+    		<constructor-arg name="vehicleAssociationDelegate" ref="vehicleAssociationDelegate"/>
+    		<constructor-arg name="vehicleColorDelegate" ref="vehicleColorDelegate"/>
+    		<constructor-arg name="vehicleModelDelegate" ref="vehicleModelDelegate"/>
+    		<constructor-arg name="vehicleMakeDelegate" ref="vehicleMakeDelegate"/>
+    		<constructor-arg name="stateDelegate" ref="stateDelegate"/>
+    </bean>
      
-        <bean name="vehicleMakeInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
-        </bean>
-        
-        <bean name="vehicleColorInstanceFactory"
-        		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-        		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-        		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
-        </bean>
-        
-        <!-- Property edit factories -->
-        
-		<bean id="vehicleMakePropertyEditorFactory"
-       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-       		<constructor-arg name="dao" ref="vehicleMakeDao"/>
- 			<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
- 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-		</bean>
-		         
-        <bean id="vehicleAssociationPropertyEditorFactory"
-        	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-        	<constructor-arg name="dao" ref="vehicleAssociationDao"/>
-        	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
-        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-        </bean>
-        <bean id="vehicleModelPropertyEditorFactory"
-        	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-        	<constructor-arg name="dao" ref="vehicleModelDao"/>
-        	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
-        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-        </bean>
-        <bean id="vehicleColorPropertyEditorFactory"
-        	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-        	<constructor-arg name="dao" ref="vehicleColorDao"/>
-        	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
-        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-        </bean>
-        <bean id="vehicleLicensePropertyEditorFactory"
-        	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-        	<constructor-arg name="dao" ref="vehicleLicenseDao"/>
-        	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
-        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-        </bean>
-        <bean id="vehicleOwnerAssociationPropertyEditorFactory"
-        	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
-        	<constructor-arg name="dao" ref="vehicleOwnerAssociationDao"/>
-        	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
-        	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-        </bean>
+    <!--  Report services -->
+    <bean id ="offenderVehicleSummaryReportService"
+   	class="omis.vehicle.report.impl.hibernate.OffenderVehicleSummaryReportServiceHibernateImpl">
+  		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+ 
+ <bean id="vehicleProfileItemReportService"
+ 	class="omis.vehicle.report.impl.hibernate.VehicleProfileItemReportServiceHibernateImpl">
+ 	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+ </bean>
+    
+    <!-- Instance factories -->
+
+      <bean name="vehicleAssociationInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
+      </bean>
+      
+      <bean name="vehicleOwnerAssociationInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
+      </bean>
+      
+      <bean name="vehicleLicenseInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
+      </bean>
+
+	  <bean name="vehicleModelInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
+      </bean>
+   
+      <bean name="vehicleMakeInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
+      </bean>
+      
+      <bean name="vehicleColorInstanceFactory"
+      		class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+      		<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+      		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
+      </bean>
+      
+      <!-- Property edit factories -->
+      
+	  <bean id="vehicleMakePropertyEditorFactory"
+     		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+     		<constructor-arg name="dao" ref="vehicleMakeDao"/>
+		<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleMake"/>
+		<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+	  </bean>
+         
+      <bean id="vehicleAssociationPropertyEditorFactory"
+      	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      	<constructor-arg name="dao" ref="vehicleAssociationDao"/>
+      	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleAssociation"/>
+      	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      </bean>
+      <bean id="vehicleModelPropertyEditorFactory"
+      	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      	<constructor-arg name="dao" ref="vehicleModelDao"/>
+      	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleModel"/>
+      	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      </bean>
+      <bean id="vehicleColorPropertyEditorFactory"
+      	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      	<constructor-arg name="dao" ref="vehicleColorDao"/>
+      	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleColor"/>
+      	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      </bean>
+      <bean id="vehicleLicensePropertyEditorFactory"
+      	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      	<constructor-arg name="dao" ref="vehicleLicenseDao"/>
+      	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleLicense"/>
+      	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      </bean>
+      <bean id="vehicleOwnerAssociationPropertyEditorFactory"
+      	class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+      	<constructor-arg name="dao" ref="vehicleOwnerAssociationDao"/>
+      	<constructor-arg name="entityName" value="omis.vehicle.domain.VehicleOwnerAssociation"/>
+      	<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+      </bean>
+      
+      <!-- Service delegates -->
+      <bean id="vehicleOwnerAssociationDelegate"
+	    class="omis.vehicle.service.delegate.VehicleOwnerAssociationDelegate">
+	    <constructor-arg name="vehicleOwnerAssociationDao" ref="vehicleOwnerAssociationDao"/>
+	    <constructor-arg name="vehicleOwnerAssociationInstanceFactory" ref="vehicleOwnerAssociationInstanceFactory"/>
+	    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  </bean>
+	  
+	  <bean id="vehicleLicenseDelegate"
+	    class="omis.vehicle.service.delegate.VehicleLicenseDelegate">
+	    <constructor-arg name="vehicleLicenseDao" ref="vehicleLicenseDao"/>
+	    <constructor-arg name="vehicleLicenseInstanceFactory" ref="vehicleLicenseInstanceFactory"/>
+	    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	  </bean>
+	  
+	  <bean id="vehicleAssociationDelegate"
+	    class="omis.vehicle.service.delegate.VehicleAssociationDelegate">
+	    <constructor-arg name="vehicleAssociationInstanceFactory" ref="vehicleAssociationInstanceFactory"/>
+	    <constructor-arg name="vehicleAssociationDao" ref="vehicleAssociationDao"/>
+	    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+	    <constructor-arg name="vehicleOwnerAssociationDelegate" ref="vehicleOwnerAssociationDelegate"/>
+	    <constructor-arg name="vehicleLicenseDelegate" ref="vehicleLicenseDelegate"/>
+	    <constructor-arg name="vehicleOwnerAssociationDao" ref="vehicleOwnerAssociationDao"/>
+	    <constructor-arg name="vehicleLicenseDao" ref="vehicleLicenseDao"/>
+	    <constructor-arg name="vehicleOwnerAssociationInstanceFactory" ref="vehicleOwnerAssociationInstanceFactory"/>
+	  </bean>
+	  
+	  <bean id="vehicleColorDelegate"
+	    class="omis.vehicle.service.delegate.VehicleColorDelegate">
+	    <constructor-arg name="vehicleColorDao" ref="vehicleColorDao"/>
+	    <constructor-arg name="vehicleColorInstanceFactory" ref="vehicleColorInstanceFactory"/>
+	  </bean>
+	  
+	   <bean id="vehicleMakeDelegate"
+	    class="omis.vehicle.service.delegate.VehicleMakeDelegate">
+	    <constructor-arg name="vehicleMakeDao" ref="vehicleMakeDao"/>
+	    <constructor-arg name="vehicleMakeInstanceFactory" ref="vehicleMakeInstanceFactory"/>
+	  </bean>
+	  
+	  <bean id="vehicleModelDelegate"
+	    class="omis.vehicle.service.delegate.VehicleModelDelegate">
+	    <constructor-arg name="vehicleModelDao" ref="vehicleModelDao"/>
+	    <constructor-arg name="vehicleModelInstanceFactory" ref="vehicleModelInstanceFactory"/>
+	  </bean>
        
 </beans>        

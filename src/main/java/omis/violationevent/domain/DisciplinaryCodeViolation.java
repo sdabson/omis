@@ -5,50 +5,62 @@ import omis.audit.domain.Updatable;
 import omis.disciplinaryCode.domain.DisciplinaryCode;
 
 /**
- * DisciplinaryCodeViolation.java
+ * Disciplinary Code Violation.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jan 17, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Jul 26, 2018)
  *@since OMIS 3.0
  *
  */
 public interface DisciplinaryCodeViolation extends Creatable, Updatable {
 	
 	/**
-	 * Returns the ID of the DisciplinaryCodeViolation
+	 * Returns the ID of the Disciplinary Code Violation..
 	 * @return ID
 	 */
-	public Long getId();
+	Long getId();
 	
 	/**
-	 * Sets the ID of the DisciplinaryCodeViolation
-	 * @param id - Long
+	 * Sets the ID of the Disciplinary Code Violation..
+	 * @param id - ID
 	 */
-	public void setId(Long id);
+	void setId(Long id);
 	
 	/**
-	 * Returns the disciplinaryCode for the DisciplinaryCodeViolation
-	 * @return disciplinaryCode - DisciplinaryCode
+	 * Returns the disciplinaryCode for the Disciplinary Code Violation..
+	 * @return disciplinaryCode - Disciplinary Code
 	 */
-	public DisciplinaryCode getDisciplinaryCode();
+	DisciplinaryCode getDisciplinaryCode();
 	
 	/**
-	 * Sets the disciplinaryCode for the DisciplinaryCodeViolation
-	 * @param disciplinaryCode - DisciplinaryCode
+	 * Sets the disciplinaryCode for the Disciplinary Code Violation..
+	 * @param disciplinaryCode - Disciplinary Code
 	 */
-	public void setDisciplinaryCode(DisciplinaryCode disciplinaryCode);
+	void setDisciplinaryCode(DisciplinaryCode disciplinaryCode);
 	
 	/**
-	 * Returns the ViolationEvent for the DisciplinaryCodeViolation
-	 * @return ViolationEvent - ViolationEvent
+	 * Returns the ViolationEvent for the Disciplinary Code Violation..
+	 * @return violationEvent - Violation Event
 	 */
-	public ViolationEvent getViolationEvent();
+	ViolationEvent getViolationEvent();
 	
 	/**
-	 * Sets the ViolationEvent for the DisciplinaryCodeViolation
-	 * @param ViolationEvent - ViolationEvent
+	 * Sets the ViolationEvent for the Disciplinary Code Violation.
+	 * @param violationEvent - Violation Event
 	 */
-	public void setViolationEvent(ViolationEvent violationEvent);
+	void setViolationEvent(ViolationEvent violationEvent);
+	
+	/**
+	 * Returns the Details for the Disciplinary Code Violation.
+	 * @return details - details
+	 */
+	String getDetails();
+	
+	/**
+	 * Sets the Details for the Disciplinary Code Violation.
+	 * @param details - details
+	 */
+	void setDetails(String details);
 	
 	/** Compares {@code this} and {@code obj} for equality.
 	 * <p>

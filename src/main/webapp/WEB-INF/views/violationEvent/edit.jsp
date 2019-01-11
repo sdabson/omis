@@ -10,7 +10,7 @@
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/violationEvents/style/violationEvent.css"/>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/violationEvents/style/violationEvent.css?VERSION=2"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"> </script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/violationEvents/scripts/includes/jquery.omis.violationEvent.js?VERSION=1"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/violationEvents/scripts/violationEvent.js?VERSION=1"></script>

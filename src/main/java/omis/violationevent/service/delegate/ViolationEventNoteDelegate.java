@@ -6,17 +6,17 @@ import java.util.List;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.violationevent.dao.ViolationEventNoteDao;
 import omis.violationevent.domain.ViolationEvent;
 import omis.violationevent.domain.ViolationEventNote;
+import omis.violationevent.exception.ViolationEventNoteExistsException;
 
 /**
- * ViolationEventNoteDelegate.java
+ * Violation Event Note Delegate.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jan 18, 2017)
+ *@author Annie Wahl
+ *@version 0.1.1 (Aug 6, 2018)
  *@since OMIS 3.0
  *
  */
@@ -34,7 +34,7 @@ public class ViolationEventNoteDelegate {
 	private final AuditComponentRetriever auditComponentRetriever;
 
 	/**
-	 * Constructor for ViolationEventNoteDelegate
+	 * Constructor for ViolationEventNoteDelegate.
 	 * @param violationEventNoteDao
 	 * @param violationEventNoteInstanceFactory
 	 * @param auditComponentRetriever
@@ -51,20 +51,22 @@ public class ViolationEventNoteDelegate {
 	}
 	
 	/**
-	 * Creates a ViolationEventNote with specified properties
+	 * Creates a ViolationEventNote with specified properties.
 	 * @param date - Date
 	 * @param description - String
 	 * @param violationEvent - ViolationEvent
 	 * @return Newly created ViolationEventNote
-	 * @throws DuplicateEntityFoundException - When a ViolationEventNote already
-	 * exists with specified date and description for given ViolationEvent
+	 * @throws ViolationEventNoteExistsException - When a ViolationEventNote
+	 * already exists with specified date and description for given
+	 * ViolationEvent
 	 */
 	public ViolationEventNote create(final Date date, final String description,
 			final ViolationEvent violationEvent)
-					throws DuplicateEntityFoundException{
-		if(this.violationEventNoteDao
-				.find(date, description, violationEvent) != null){
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+					throws ViolationEventNoteExistsException {
+		if (this.violationEventNoteDao
+				.find(date, description, violationEvent) != null) {
+			throw new ViolationEventNoteExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		ViolationEventNote violationEventNote = 
@@ -86,21 +88,22 @@ public class ViolationEventNoteDelegate {
 	}
 	
 	/**
-	 * Updates a ViolationEventNote with specified properties
+	 * Updates a ViolationEventNote with specified properties.
 	 * @param violationEventNote - ViolationEventNote to update
 	 * @param date - Date
 	 * @param description - String 
 	 * @return Updated ViolationEventNote
-	 * @throws DuplicateEntityFoundExcepton - when a ViolationEventNote already
-	 * exists with given date and description for its ViolationEvent
+	 * @throws ViolationEventNoteExistsException - when a ViolationEventNote
+	 * already exists with given date and description for its ViolationEvent
 	 */
 	public ViolationEventNote update(
 			final ViolationEventNote violationEventNote, final Date date,
 			final String description)
-					throws DuplicateEntityFoundException{
-		if(this.violationEventNoteDao.findExcluding(violationEventNote, date,
-				description, violationEventNote.getViolationEvent()) != null){
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+					throws ViolationEventNoteExistsException {
+		if (this.violationEventNoteDao.findExcluding(violationEventNote, date,
+				description, violationEventNote.getViolationEvent()) != null) {
+			throw new ViolationEventNoteExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		violationEventNote.setDate(date);
@@ -114,21 +117,21 @@ public class ViolationEventNoteDelegate {
 	}
 	
 	/**
-	 * Removes a ViolationEventNote
+	 * Removes a ViolationEventNote.
 	 * @param violationEventNote - ViolationEventNote to remove
 	 */
-	public void remove(final ViolationEventNote violationEventNote){
+	public void remove(final ViolationEventNote violationEventNote) {
 		this.violationEventNoteDao.makeTransient(violationEventNote);
 	}
 	
 	
 	/**
-	 * Finds and returns a list of all ViolationEventNotes by ViolationEvent
+	 * Finds and returns a list of all ViolationEventNotes by ViolationEvent.
 	 * @param violationEvent - ViolationEvent
 	 * @return List of violationEventNotes by specified ViolationEvent
 	 */
 	public List<ViolationEventNote> findByViolationEvent(
-			final ViolationEvent violationEvent){
+			final ViolationEvent violationEvent) {
 		return violationEventNoteDao.findByViolationEvent(violationEvent);
 	}
 	

@@ -28,7 +28,8 @@ import omis.person.domain.Person;
  * Data access object for dockets.
  *
  * @author Stephen Abson
- * @version 0.0.1
+ * @author Josh Divine
+ * @version 0.1.1 (Aug 15, 2018)
  * @since OMIS 3.0
  */
 public interface DocketDao
@@ -62,4 +63,12 @@ public interface DocketDao
 	 * @return List of dockets for the specified person
 	 */
 	List<Docket> findByPerson(Person person);
+
+	/**
+	 * Returns a list of dockets for the specified value.
+	 * 
+	 * @param value value
+	 * @return list of dockets
+	 */
+	List<Docket> findByValue(String value);
 }

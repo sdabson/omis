@@ -27,6 +27,7 @@
 	<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/document/includes/documentTagResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery.ptTimeSelect.css"/>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery.ptTimeSelect.js"> </script>
@@ -34,7 +35,7 @@
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.search.js"> </script>
    	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/search.js"> </script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/user/scripts/searchUserAccount.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/prisonTerm/scripts/prisonTerm.js"> </script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/prisonTerm/scripts/prisonTerm.js?VERSION=1"> </script>
 </head>
 
 <body>

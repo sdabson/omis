@@ -1,5 +1,5 @@
 <%--
-  - Victim association edit form.
+  - Offender contact edit form.
   -
   - Author: Stephen Abson
   --%>
@@ -13,8 +13,8 @@
 <form:hidden path="showMailingAddressFields"/>
 	<c:if test="${offenderContactForm.showMailingAddressFields}">
 	<c:set var="addressFieldsPropertyName" value="mailingAddressFields" scope="request"/>
-	<fieldset id="mailingAddressFieldSet">
-		<legend><fmt:message key="offenderMailingAddressDetailsLabel" bundle="${offenderContactBundle}"/></legend>
+	<fieldset id="mailingAddressFieldSet">	
+		<legend><fmt:message key="offenderMailingAddressDetailsLabel" bundle="${offenderContactBundle}"/></legend>		
 		<form:label path="enterMailingAddressFields"><fmt:message key="enterMailingAddressLabel" bundle="${contactBundle}"/></form:label>
 		<form:checkbox id="enterMailingAddressFields" path="enterMailingAddressFields"/>
 		<form:errors path="enterMailingAddressFields" cssClass="error"/>
@@ -31,11 +31,12 @@
 				<form:label path="mailingAddressOperation" class="fieldLabel"><fmt:message key="useExistingMailingAddressLabel" bundle="${offenderContactBundle}"/></form:label>
 				<form:radiobutton id="useExistingMailingAddressButton" path="mailingAddressOperation" value="USE_EXISTING"/>
 			</span>
+			<form:errors path="mailingAddressOperation"/>
 			<span class="fieldGroup" id="existingMailingAddressGroup">
 				<form:label path="existingMailingAddressQuery" class="fieldLabel"><fmt:message key="existingMailngAddressLabel" bundle="${offenderContactBundle}"/></form:label>
-				<form:input path="existingMailingAddressQuery" class="medium" disabled="${offenderContactForm.mailingAddressOperation.name ne 'USE_EXISTING'}"/>
+				<form:input path="existingMailingAddressQuery" class="medium" disabled = "${offenderContactForm.mailingAddressOperation.name ne 'USE_EXISTING'}"/>				
 				<form:hidden path="existingMailingAddress"/>
-				<form:errors path="existingMailingAddressQuery"/>
+				<form:errors path="existingMailingAddressQuery" cssClass="error"/>
 			</span>
 			<span class="fieldGroup">
 				<form:label path="mailingAddressOperation" class="fieldLabel"><fmt:message key="createNewMailingAddressLabel" bundle="${offenderContactBundle}"/></form:label>
@@ -54,6 +55,18 @@
 				<c:set var="addressFields" value="${offenderContactForm.mailingAddressFields}" scope="request"/>
 				<jsp:include page="/WEB-INF/views/address/includes/addressFields.jsp"></jsp:include>
 			</div>
+			<c:if test="${allowResidenceAtMailingAddress}">
+				<span class="fieldGroup">
+					<form:label path="residentAtMailingAddress" class="fieldLabel"><fmt:message key="residentAtMailingAddressLabel" bundle="${offenderContactBundle}"/></form:label>
+					<form:checkbox id="residentAtMailingAddress" path="residentAtMailingAddress"/>
+					<form:errors path="residentAtMailingAddress" cssClass="error"/>
+				</span>
+				<span class="fieldGroup">
+					<form:label path="residentAtMailingAddressEffectiveDate" class="fieldLabel"><fmt:message key="residentAtMailingAddressEffectiveDateLabel" bundle="${offenderContactBundle}"/></form:label>
+					<form:input id="residentAtMailingAddressEffectiveDate" path="residentAtMailingAddressEffectiveDate" class="date" disabled="${not offenderContactForm.residentAtMailingAddress}"/>
+					<form:errors path="residentAtMailingAddressEffectiveDate" cssClass="error"/>
+				</span>
+			</c:if>
 		</div>
 	</fieldset>
 	</c:if>

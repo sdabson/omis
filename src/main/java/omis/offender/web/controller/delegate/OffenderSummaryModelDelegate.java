@@ -1,9 +1,27 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offender.web.controller.delegate;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,11 +48,8 @@ public class OffenderSummaryModelDelegate {
 		BASIC_INFORMATION_SUMMARY_ITEM_REGISTRY_MODEL_KEY
 			= "basicInformationSummaryItemRegistry";
 	
-	/*private static final String PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY =
-			"placementSummaryItemRegistry";*/
-	
-	private static final String LEGACY_PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY
-		= "legacyPlacementSummaryItemRegistry";
+	private static final String PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY =
+			"placementSummaryItemRegistry";
 
 	private static final String OFFENDER_FLAG_SUMMARY_ITEM_REGISTRY_MODEL_KEY =
 			"offenderFlagSummaryItemRegistry";
@@ -53,7 +68,10 @@ public class OffenderSummaryModelDelegate {
 		= "dischargeDataSummaryItemRegistry";
 	
 	private static final String IDENTIFICATION_SUMMARY_ITEM_REGISTRY_MODEL_KEY =
-			"identificationNumberSummaryItemRegistry";
+		"identificationNumberSummaryItemRegistry";
+	
+	private static final String OFFENDER_PROFILE_ITEMS_PROPERTIES_MODEL_KEY =
+			"offenderProfileItemsProperties";
 	
 	/* Summary Item Registries */
 	
@@ -68,10 +86,6 @@ public class OffenderSummaryModelDelegate {
 	@Autowired
 	@Qualifier("placementSummaryItemRegistry")
 	private SummaryItemRegistry placementSummaryItemRegistry;
-	
-	@Autowired
-	@Qualifier("legacyPlacementSummaryItemRegistry")
-	private SummaryItemRegistry legacyPlacementSummaryItemRegistry;
 	
 	@Autowired
 	@Qualifier("offenderContactSummaryItemRegistry")
@@ -92,6 +106,10 @@ public class OffenderSummaryModelDelegate {
 	@Autowired
 	@Qualifier("dischargeDataSummaryItemRegistry")
 	private SummaryItemRegistry dischargeDataSummaryItemRegistry;
+
+	@Autowired
+	@Qualifier("offenderProfileItemsProperties")
+	private Properties offenderProfileItemsProperties;
 	
 	/* Constructors. */
 	
@@ -119,10 +137,8 @@ public class OffenderSummaryModelDelegate {
 				this.basicInformationSummaryItemRegistry.getItems());
 		this.buildSummaryItems(modelMap, offender, currentDate,
 				this.offenderFlagSummaryItemRegistry.getItems());
-		/*this.buildSummaryItems(modelMap, offender, currentDate,
-				this.placementSummaryItemRegistry.getItems());*/
 		this.buildSummaryItems(modelMap, offender, currentDate,
-				this.legacyPlacementSummaryItemRegistry.getItems());
+				this.placementSummaryItemRegistry.getItems());
 		this.buildSummaryItems(modelMap, offender, currentDate,
 				this.contactSummaryItemRegistry.getItems());
 		this.buildSummaryItems(modelMap, offender, currentDate,
@@ -134,10 +150,8 @@ public class OffenderSummaryModelDelegate {
 		this.buildSummaryItems(modelMap, offender, currentDate,
 				this.dischargeDataSummaryItemRegistry.getItems());
 		
-		/*modelMap.put(PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
-				this.placementSummaryItemRegistry);*/
-		modelMap.put(LEGACY_PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
-				this.legacyPlacementSummaryItemRegistry);
+		modelMap.put(PLACEMENT_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
+				this.placementSummaryItemRegistry);
 		modelMap.put(OFFENDER_FLAG_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
 				this.offenderFlagSummaryItemRegistry);
 		modelMap.put(FACILITY_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
@@ -152,6 +166,8 @@ public class OffenderSummaryModelDelegate {
 				this.dischargeDataSummaryItemRegistry);
 		modelMap.put(BASIC_INFORMATION_SUMMARY_ITEM_REGISTRY_MODEL_KEY,
 				this.basicInformationSummaryItemRegistry);
+		modelMap.put(OFFENDER_PROFILE_ITEMS_PROPERTIES_MODEL_KEY,
+				this.offenderProfileItemsProperties);
 	}
 	
 	/**

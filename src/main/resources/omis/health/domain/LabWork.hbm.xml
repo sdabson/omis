@@ -176,4 +176,10 @@
 		from
 			omis.health.domain.Lab lab
 	]]></query>
+	<query name="findExistingLabWork"><![CDATA[
+		select labWork
+		from
+			omis.health.domain.LabWork labWork
+		where labWork.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
 </hibernate-mapping>

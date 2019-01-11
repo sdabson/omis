@@ -1,18 +1,20 @@
 package omis.hearing.web.form;
 
-import omis.hearing.report.ViolationSummary;
+import java.io.Serializable;
 import omis.violationevent.domain.ConditionViolation;
 import omis.violationevent.domain.DisciplinaryCodeViolation;
 
 /**
- * ViolationSummaryItem.java
+ * Violation Summary Item.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Apr 24, 2017)
+ *@author Annie Wahl 
+ *@version 0.1.1 (Aug 1, 2018)
  *@since OMIS 3.0
  *
  */
-public class ViolationSelectionItem {
+public class ViolationSelectionItem implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private ConditionViolation conditionViolation;
 	
@@ -20,26 +22,22 @@ public class ViolationSelectionItem {
 	
 	private Boolean selected;
 	
-	private ViolationSummary violationSummary;
-	
 	/**
-	 * 
+	 * Default constructor for ViolationSelectionItem.
 	 */
 	public ViolationSelectionItem() {
 	}
 
 	/**
-	 * Returns the conditionViolation
+	 * Returns the conditionViolation.
 	 * @return conditionViolation - ConditionViolation
 	 */
 	public ConditionViolation getConditionViolation() {
 		return conditionViolation;
 	}
 
-
-
 	/**
-	 * Sets the conditionViolation
+	 * Sets the conditionViolation.
 	 * @param conditionViolation - ConditionViolation
 	 */
 	public void setConditionViolation(
@@ -47,20 +45,16 @@ public class ViolationSelectionItem {
 		this.conditionViolation = conditionViolation;
 	}
 
-
-
 	/**
-	 * Returns the disciplinaryCodeViolation
+	 * Returns the disciplinaryCodeViolation.
 	 * @return disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public DisciplinaryCodeViolation getDisciplinaryCodeViolation() {
 		return disciplinaryCodeViolation;
 	}
 
-
-
 	/**
-	 * Sets the disciplinaryCodeViolation
+	 * Sets the disciplinaryCodeViolation.
 	 * @param disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public void setDisciplinaryCodeViolation(
@@ -68,10 +62,8 @@ public class ViolationSelectionItem {
 		this.disciplinaryCodeViolation = disciplinaryCodeViolation;
 	}
 
-
-
 	/**
-	 * Returns the selected
+	 * Returns the selected.
 	 * @return selected - Boolean
 	 */
 	public Boolean getSelected() {
@@ -79,29 +71,10 @@ public class ViolationSelectionItem {
 	}
 
 	/**
-	 * Sets the selected
+	 * Sets the selected.
 	 * @param selected - Boolean
 	 */
 	public void setSelected(final Boolean selected) {
 		this.selected = selected;
 	}
-
-	/**
-	 * Returns the violationSummary
-	 * @return violationSummary - ViolationSummary
-	 */
-	public ViolationSummary getViolationSummary() {
-		return violationSummary;
-	}
-
-	/**
-	 * Sets the violationSummary
-	 * @param violationSummary - ViolationSummary
-	 */
-	public void setViolationSummary(final ViolationSummary violationSummary) {
-		this.violationSummary = violationSummary;
-	}
-	
-	
-	
 }

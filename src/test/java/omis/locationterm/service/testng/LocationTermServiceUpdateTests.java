@@ -10,39 +10,53 @@ import org.testng.annotations.Test;
 import omis.address.domain.Address;
 import omis.address.domain.BuildingCategory;
 import omis.address.domain.ZipCode;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
 import omis.address.service.delegate.AddressUnitDesignatorDelegate;
 import omis.address.service.delegate.StreetSuffixDelegate;
 import omis.address.service.delegate.ZipCodeDelegate;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.country.domain.Country;
+import omis.country.exception.CountryExistsException;
 import omis.country.service.delegate.CountryDelegate;
 import omis.datatype.DateRange;
 import omis.exception.DateRangeOutOfBoundsException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
+import omis.location.exception.LocationExistsException;
 import omis.location.service.delegate.LocationDelegate;
 import omis.locationterm.domain.LocationTerm;
 import omis.locationterm.exception.LocationTermConflictException;
 import omis.locationterm.exception.LocationTermExistsAfterException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.locationterm.exception.LocationTermLockedException;
 import omis.locationterm.service.LocationTermService;
 import omis.locationterm.service.delegate.LocationTermDelegate;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
 import omis.organization.domain.Organization;
+import omis.organization.exception.OrganizationExistsException;
 import omis.organization.service.delegate.OrganizationDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
+import omis.region.exception.StateExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.supervision.domain.CorrectionalStatus;
 import omis.supervision.domain.CorrectionalStatusTerm;
+import omis.supervision.domain.PlacementTermChangeReason;
 import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
+import omis.supervision.exception.CorrectionalStatusExistsException;
+import omis.supervision.exception.CorrectionalStatusTermExistsException;
 import omis.supervision.exception.OffenderNotUnderSupervisionException;
+import omis.supervision.exception.PlacementTermChangeReasonExistsException;
+import omis.supervision.exception.PlacementTermExistsException;
+import omis.supervision.exception.SupervisoryOrganizationExistsException;
 import omis.supervision.service.delegate.CorrectionalStatusDelegate;
 import omis.supervision.service.delegate.CorrectionalStatusTermDelegate;
+import omis.supervision.service.delegate.PlacementTermChangeReasonDelegate;
 import omis.supervision.service.delegate.PlacementTermDelegate;
 import omis.supervision.service.delegate.SupervisoryOrganizationDelegate;
 import omis.supervision.service.delegate.SupervisoryOrganizationTermDelegate;
@@ -111,6 +125,10 @@ public class LocationTermServiceUpdateTests
 	private PlacementTermDelegate placementTermDelegate;
 	
 	@Autowired
+	@Qualifier("placementTermChangeReasonDelegate")
+	private PlacementTermChangeReasonDelegate placementTermChangeReasonDelegate;
+	
+	@Autowired
 	@Qualifier("supervisoryOrganizationTermDelegate")
 	private SupervisoryOrganizationTermDelegate 
 			supervisoryOrganizationTermDelegate;
@@ -141,7 +159,8 @@ public class LocationTermServiceUpdateTests
 	
 	/* Tests. */
 	
-	/** Test update of location term. 
+	/**
+	 * Test update of location term. 
 	 * 
 	 * @throws DuplicateEntityFoundException if location term exists
 	 * @throws DateRangeOutOfBoundsException if location term is out of bounds
@@ -161,7 +180,7 @@ public class LocationTermServiceUpdateTests
 			OffenderNotUnderSupervisionException {
 		// Arrangements
 		Offender offender = this.offenderDelegate
-				.createWithoutIdentity("Blofeld", "Ernst", null, null);
+				.createWithoutIdentity("White", "Ernst", null, null);
 		Country unitedStates = this.countryDelegate.create(
 				"United States", "US", true);
 		State mt = this.stateDelegate.create(
@@ -170,17 +189,17 @@ public class LocationTermServiceUpdateTests
 				true, mt, unitedStates);
 		ZipCode mt59602 = this.zipCodeDelegate
 				.create(helena, "59602", null, true);
-		Address megaJailAddress = this.addressDelegate.findOrCreate(
+		Address jailAddress = this.addressDelegate.findOrCreate(
 				"1000", null, null, BuildingCategory.APARTMENT,
 				mt59602);
-		Organization megaJailOrg = this.organizationDelegate
-				.create("Mega Jail", "MEGA", null);
-		Organization megaPnpOrg = this.organizationDelegate
-				.create("Mega PnP", "MPNP", null);
-		Location megaJailLoc = this.locationDelegate.create(
-				megaJailOrg, null, megaJailAddress);
-		Location megaPnpLoc = this.locationDelegate
-				.create(megaPnpOrg, null, megaJailAddress);
+		Organization jail = this.organizationDelegate
+				.create("Jail", "JL", null);
+		Organization pnp = this.organizationDelegate
+				.create("PnP", "PNP", null);
+		Location jailLocation = this.locationDelegate.create(
+				jail, null, jailAddress);
+		Location pnpLocation = this.locationDelegate
+				.create(pnp, null, jailAddress);
 		Date startDate = this.parseDateText("09/12/2001");
 		Date endDate = this.parseDateText("12/03/2016");
 		DateRange dateRange = new DateRange(this.parseDateText("09/12/2001"), 
@@ -194,28 +213,151 @@ public class LocationTermServiceUpdateTests
 				.create("Status", "S", false, (short) 1, true);
 		CorrectionalStatusTerm correctionalStatusTerm 
 				= this.correctionalStatusTermDelegate.create(offender, 
-						dateRange, correctionalStatus );
+						dateRange, correctionalStatus);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate.create(
+						"New Sentence", (short) 1, true, false);
 		this.placementTermDelegate.create(offender, dateRange, 
-				supervisoryOrganizationTerm, correctionalStatusTerm, null, null, 
-				false);
+				supervisoryOrganizationTerm, correctionalStatusTerm,
+				newSentenceReason, null, false);
 		LocationTerm locationTerm = this.locationTermDelegate
-				.create(offender, megaJailLoc, startDate, endDate, false);
+				.create(offender, jailLocation, startDate, endDate, false,
+						null);
 		
 		// Action
-		locationTerm = this.locationTermService.update(locationTerm, megaPnpLoc,
-				new DateRange(startDate, endDate));
+		String notes = "Off to jail!";
+		locationTerm = this.locationTermService.update(locationTerm, pnpLocation,
+				new DateRange(startDate, endDate), notes);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("offender", offender)
-			.addExpectedValue("location", megaPnpLoc)
+			.addExpectedValue("location", pnpLocation)
 			.addExpectedValue("dateRange", new DateRange(startDate, endDate))
+			.addExpectedValue("notes", notes)
 			.performAssertions(locationTerm);
+	}
+	
+	/**
+	 * Tests that {@code LocationTermExistsException is thrown when an attempt
+	 * is made to update a location term to be a duplicate of an existing
+	 * location term.
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists
+	 * @throws PlacementTermExistsException if placement term exists 
+	 * @throws CountryExistsException if country exists
+	 * @throws StateExistsException if State exists
+	 * @throws CityExistsException if city exists
+	 * @throws ZipCodeExistsException if ZIP code exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists 
+	 * @throws LocationExistsException if location exists 
+	 * @throws LocationTermExistsException if location term exists
+	 * @throws OrganizationExistsException if organization exists
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 * @throws LocationTermLockedException if location term is locked 
+	 * @throws LocationTermExistsAfterException if location terms exist after
+	 * @throws LocationTermConflictException if conflicting location terms
+	 * exist
+	 * @throws PlacementTermChangeReasonExistsException if placement term change
+	 * reason exists 
+	 */
+	@Test(expectedExceptions = {LocationTermExistsException.class})
+	public void testLocationTermExistsException()
+			throws CorrectionalStatusExistsException,
+				CorrectionalStatusTermExistsException,
+				PlacementTermExistsException,
+				CountryExistsException,
+				StateExistsException,
+				CityExistsException,
+				ZipCodeExistsException,
+				SupervisoryOrganizationExistsException,
+				LocationExistsException,
+				LocationTermExistsException,
+				OrganizationExistsException,
+				LocationTermConflictException,
+				LocationTermExistsAfterException,
+				LocationTermLockedException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arranges offender in prison and then hospital
+		Offender offender = this.offenderDelegate
+				.createWithoutIdentity("White", "Donald", null, null);
+		DateRange placementRange = new DateRange(
+				this.parseDateText("12/12/2012"),
+				this.parseDateText("12/12/2014"));
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		CorrectionalStatusTerm secureTerm
+			= this.correctionalStatusTermDelegate
+				.create(offender, placementRange, secure);
+		PlacementTermChangeReason newSentenceReason
+			= this.placementTermChangeReasonDelegate
+				.create("New Sentence", (short) 1, true, false);
+		this.placementTermDelegate.create(offender, placementRange,
+				null, secureTerm, newSentenceReason, null, false);
+		Country country = this.countryDelegate
+				.create("United States", "USA", true);
+		State state = this.stateDelegate
+				.create("Montana", "MT", country, true, true);
+		City city = this.cityDelegate
+				.create("Helena", true, state, country);
+		ZipCode zipCode = this.zipCodeDelegate
+				.create(city, "59601", null, true);
+		Address prisonAddress = this.addressDelegate
+				.findOrCreate("1000 1000TH ST UNIT 1000", null, null, null,
+						zipCode);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison", "PRSN", null);
+		Location prisonLocation = this.locationDelegate
+				.create(prison, null, prisonAddress);
+		DateRange prisonRange = new DateRange(
+				this.parseDateText("12/12/2012"),
+				this.parseDateText("12/12/2013"));
+		try {
+			this.locationTermDelegate
+				.create(offender, prisonLocation,
+						DateRange.getStartDate(prisonRange),
+						DateRange.getEndDate(prisonRange),
+						false, null);
+		} catch (LocationTermExistsException e) {
+			throw new AssertionError(e);
+		}
+		Organization hospital = this.organizationDelegate
+				.create("Hospital", "HOSP", null);
+		Address hospitalAddress = this.addressDelegate
+				.findOrCreate("2000 2000TH ST 2000", null, null, null, zipCode);
+		Location hospitalLocation = this.locationDelegate
+				.create(hospital, null, hospitalAddress);
+		DateRange hospitalRange = new DateRange(
+				this.parseDateText("12/12/2013"),
+				this.parseDateText("12/12/2014"));
+		LocationTerm hospitalLocationTerm;
+		try {
+			hospitalLocationTerm = this.locationTermDelegate
+				.create(offender, hospitalLocation,
+						DateRange.getStartDate(hospitalRange),
+						DateRange.getEndDate(hospitalRange),
+						false, null);
+		} catch (LocationTermExistsException e) {
+			throw new AssertionError(e);	
+		}
+		
+		// Action - updates hospital location term to be duplicate of prison
+		// location term
+		this.locationTermService.update(
+				hospitalLocationTerm, prisonLocation, prisonRange, null);
 	}
 	
 	/** 
 	 * Tests whether business exception {@code LocationTermConflictException} is
 	 * thrown. 
+	 * 
+	 * <p>Consider removing this as it may be a duplicate of
+	 * {@code testUpdateEarlierLocationTermWithNullEndDateFails}.
 	 * 
 	 * @throws DuplicateEntityFoundException if location term exists
 	 * @throws DateRangeOutOfBoundsException if location term is out of bounds
@@ -236,7 +378,7 @@ public class LocationTermServiceUpdateTests
 			OffenderNotUnderSupervisionException {
 		// Arrangements
 		Offender offender = this.offenderDelegate
-				.createWithoutIdentity("Blofeld", "Ernst", null, null);
+				.createWithoutIdentity("White", "Ernst", null, null);
 		Country unitedStates = this.countryDelegate.create(
 				"United States", "US", true);
 		State mt = this.stateDelegate.create(
@@ -245,17 +387,17 @@ public class LocationTermServiceUpdateTests
 				true, mt, unitedStates);
 		ZipCode mt59602 = this.zipCodeDelegate
 				.create(helena, "59602", null, true);
-		Address megaJailAddress = this.addressDelegate.findOrCreate(
+		Address jailAddress = this.addressDelegate.findOrCreate(
 				"1000", null, null, BuildingCategory.APARTMENT,
 				mt59602);
-		Organization megaJailOrg = this.organizationDelegate
-				.create("Mega Jail", "MEGA", null);
-		Organization megaPnpOrg = this.organizationDelegate
-				.create("Mega PnP", "MPNP", null);
+		Organization jail = this.organizationDelegate
+				.create("Jail", "JAIL", null);
+		Organization pnp = this.organizationDelegate
+				.create("PnP", "PNP", null);
 		Location megaJailLoc = this.locationDelegate.create(
-				megaJailOrg, null, megaJailAddress);
+				jail, null, jailAddress);
 		Location megaPnpLoc = this.locationDelegate
-				.create(megaPnpOrg, null, megaJailAddress);
+				.create(pnp, null, jailAddress);
 		Date startDate = this.parseDateText("09/12/2001");
 		Date endDate = this.parseDateText("12/03/2016");
 		DateRange dateRange = new DateRange(startDate, 
@@ -270,22 +412,26 @@ public class LocationTermServiceUpdateTests
 		CorrectionalStatusTerm correctionalStatusTerm 
 				= this.correctionalStatusTermDelegate.create(offender, 
 						dateRange, correctionalStatus );
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+						.create("New Sentence", (short) 1, true, false);
 		this.placementTermDelegate.create(offender, dateRange, 
-				supervisoryOrganizationTerm, correctionalStatusTerm, null, null, 
-				false);
+				supervisoryOrganizationTerm, correctionalStatusTerm,
+				newSentenceReason, null, false);
 		LocationTerm locationTerm = this.locationTermDelegate
-				.create(offender, megaJailLoc, startDate, endDate, false);
+				.create(offender, megaJailLoc, startDate, endDate, false,
+						null);
 		
 		Date conflictStartDate = endDate;
 		Date conflictEndDate = this.parseDateText("1/1/2017");
 		this.locationTermDelegate.create(offender, megaJailLoc, 
-				conflictStartDate, conflictEndDate, false);
+				conflictStartDate, conflictEndDate, false, null);
 		
 		endDate = this.parseDateText("1/1/2018");
 		
 		// Action
 		locationTerm = this.locationTermService.update(locationTerm, megaPnpLoc,
-				new DateRange(startDate, endDate));
+				new DateRange(startDate, endDate), null);
 	}
 	
 	/** 
@@ -309,9 +455,10 @@ public class LocationTermServiceUpdateTests
 			LocationTermExistsAfterException,
 			LocationTermLockedException, 
 			OffenderNotUnderSupervisionException {
+		
 		// Arrangements
 		Offender offender = this.offenderDelegate
-				.createWithoutIdentity("Blofeld", "Ernst", null, null);
+				.createWithoutIdentity("White", "Ernst", null, null);
 		Country unitedStates = this.countryDelegate.create(
 				"United States", "US", true);
 		State mt = this.stateDelegate.create(
@@ -320,17 +467,17 @@ public class LocationTermServiceUpdateTests
 				true, mt, unitedStates);
 		ZipCode mt59602 = this.zipCodeDelegate
 				.create(helena, "59602", null, true);
-		Address megaJailAddress = this.addressDelegate.findOrCreate(
+		Address jailAddress = this.addressDelegate.findOrCreate(
 				"1000", null, null, BuildingCategory.APARTMENT,
 				mt59602);
-		Organization megaJailOrg = this.organizationDelegate
-				.create("Mega Jail", "MEGA", null);
-		Organization megaPnpOrg = this.organizationDelegate
-				.create("Mega PnP", "MPNP", null);
-		Location megaJailLoc = this.locationDelegate.create(
-				megaJailOrg, null, megaJailAddress);
-		Location megaPnpLoc = this.locationDelegate
-				.create(megaPnpOrg, null, megaJailAddress);
+		Organization jail = this.organizationDelegate
+				.create("Jail", "JAIL", null);
+		Organization pnp = this.organizationDelegate
+				.create("PnP", "PNP", null);
+		Location jailLocation = this.locationDelegate.create(
+				jail, null, jailAddress);
+		Location pnpLocation = this.locationDelegate
+				.create(pnp, null, jailAddress);
 		Date startDate = this.parseDateText("09/12/2001");
 		Date endDate = this.parseDateText("12/03/2016");
 		DateRange dateRange = new DateRange(startDate, 
@@ -345,20 +492,24 @@ public class LocationTermServiceUpdateTests
 		CorrectionalStatusTerm correctionalStatusTerm 
 				= this.correctionalStatusTermDelegate.create(offender, 
 						dateRange, correctionalStatus );
+		PlacementTermChangeReason newSentenceReason
+			= this.placementTermChangeReasonDelegate
+				.create("New Sentence", (short) 1, true, false);
 		this.placementTermDelegate.create(offender, dateRange, 
-				supervisoryOrganizationTerm, correctionalStatusTerm, null, null, 
-				false);
+				supervisoryOrganizationTerm, correctionalStatusTerm,
+				newSentenceReason, null, false);
 		LocationTerm locationTerm = this.locationTermDelegate
-				.create(offender, megaJailLoc, startDate, endDate, false);
+				.create(offender, jailLocation, startDate, endDate, false,
+						null);
 		
 		Date conflictStartDate = endDate;
 		Date conflictEndDate = this.parseDateText("1/1/2017");
-		this.locationTermDelegate.create(offender, megaJailLoc, 
-				conflictStartDate, conflictEndDate, false);
+		this.locationTermDelegate.create(offender, jailLocation, 
+				conflictStartDate, conflictEndDate, false, null);
 		
 		// Action
-		locationTerm = this.locationTermService.update(locationTerm, megaPnpLoc,
-				new DateRange(startDate, null));
+		this.locationTermService.update(locationTerm, pnpLocation,
+				new DateRange(startDate, null), null);
 	}
 	
 	/**
@@ -384,7 +535,7 @@ public class LocationTermServiceUpdateTests
 					OffenderNotUnderSupervisionException {
 		// Arrangements
 		Offender offender = this.offenderDelegate.createWithoutIdentity(
-				"Blofeld", "Ernst", null, null);
+				"White", "Ernst", null, null);
 		Organization organization = this.organizationDelegate.create(
 				"Lewis and Clark County Jail", "LCCJ", null);
 		Country country = this.countryDelegate.create(
@@ -400,13 +551,14 @@ public class LocationTermServiceUpdateTests
 				new DateRange(this.parseDateText("15/05/2011"), null), address);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, location, this.parseDateText("15/05/2011"),
-						null, true);
+						null, true, null);
 		
 		// Action
 		this.locationTermService.update(locationTerm,
 				locationTerm.getLocation(),
 				new DateRange(locationTerm.getDateRange().getStartDate(),
-						this.parseDateText("06/23/2012")));
+						this.parseDateText("06/23/2012")),
+				null);
 	}
 	
 	/** 
@@ -432,7 +584,7 @@ public class LocationTermServiceUpdateTests
 			OffenderNotUnderSupervisionException {
 		// Arrangements
 		Offender offender = this.offenderDelegate
-				.createWithoutIdentity("Blofeld", "Ernst", null, null);
+				.createWithoutIdentity("White", "Ernst", null, null);
 		Country unitedStates = this.countryDelegate.create(
 				"United States", "US", true);
 		State mt = this.stateDelegate.create(
@@ -444,22 +596,375 @@ public class LocationTermServiceUpdateTests
 		Address megaJailAddress = this.addressDelegate.findOrCreate(
 				"1000", null, null, BuildingCategory.APARTMENT,
 				mt59602);
-		Organization megaJailOrg = this.organizationDelegate
-				.create("Mega Jail", "MEGA", null);
-		Organization megaPnpOrg = this.organizationDelegate
-				.create("Mega PnP", "MPNP", null);
-		Location megaJailLoc = this.locationDelegate.create(
-				megaJailOrg, null, megaJailAddress);
-		Location megaPnpLoc = this.locationDelegate
-				.create(megaPnpOrg, null, megaJailAddress);
+		Organization jail = this.organizationDelegate
+				.create("Jail", "JAIL", null);
+		Organization pnp = this.organizationDelegate
+				.create("PnP", "PNP", null);
+		Location jailLocation = this.locationDelegate.create(
+				jail, null, megaJailAddress);
+		Location pnpLocation = this.locationDelegate
+				.create(pnp, null, megaJailAddress);
 		Date startDate = this.parseDateText("09/12/2001");
 		Date endDate = this.parseDateText("12/03/2016");
 		LocationTerm locationTerm = this.locationTermDelegate
-				.create(offender, megaJailLoc, startDate, endDate, false);
+				.create(offender, jailLocation, startDate, endDate, false,
+						null);
 		
 		// Action
-		locationTerm = this.locationTermService.update(locationTerm, megaPnpLoc,
-				new DateRange(startDate, endDate));
+		locationTerm = this.locationTermService.update(
+			locationTerm, pnpLocation, new DateRange(startDate, endDate), null);
+	}
+	
+	/**
+	 * Tests that the earliest of two location terms immediately following
+	 * one another can be updated with its original values.
+	 * 
+	 * @throws DuplicateEntityFoundException if duplicate entities exist
+	 * @throws LocationTermConflictException if original location term
+	 * conflicts
+	 * @throws DateRangeOutOfBoundsException if date range is out of bounds
+	 * @throws LocationTermExistsAfterException if location terms exist
+	 * after original that conflict
+	 * @throws LocationTermLockedException if location term is locked
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 */
+	public void testUpdateEarlierLocationTermWithOriginalValues()
+			throws DuplicateEntityFoundException,
+				LocationTermConflictException,
+				DateRangeOutOfBoundsException,
+				LocationTermExistsAfterException,
+				LocationTermLockedException,
+				OffenderNotUnderSupervisionException {
+		
+		// Arrangements - place offender in prison
+		Offender offender = this.offenderDelegate
+				.createWithoutIdentity("White", "Ernst", "Stavro", null);
+		Country unitedStates = this.countryDelegate.create(
+				"United States", "USA", true);
+		State montana = this.stateDelegate.create(
+				"Montana", "MT", unitedStates, true, true);
+		City helenaMontana = this.cityDelegate.create(
+				"Helena", true, montana, unitedStates);
+		ZipCode mt59602 = this.zipCodeDelegate.create(
+				helenaMontana, "59602", null, true);
+		Address prisonAddress
+			= this.addressDelegate.findOrCreate(
+					"1000 1ST ST", null, null, null, mt59602);
+		SupervisoryOrganization prison
+			= this.supervisoryOrganizationDelegate
+				.create("Prison", "PRSN", null);
+		Location prisonLocation = this.locationDelegate
+				.create(prison, new DateRange(), prisonAddress);
+		Date prisonStartDate = this.parseDateText("02/02/2002");
+		Date prisonEndDate = this.parseDateText("03/03/2003");
+		DateRange prisonDateRange = new DateRange(
+				prisonStartDate, prisonEndDate);
+		LocationTerm prisonTerm = this.locationTermDelegate
+				.create(offender, prisonLocation, prisonStartDate,
+						prisonEndDate, false, null);
+		SupervisoryOrganizationTerm prereleaseOrganizationTerm
+			= this.supervisoryOrganizationTermDelegate
+				.create(offender, prisonDateRange, prison);
+		CorrectionalStatus altSecure = this.correctionalStatusDelegate
+				.create("Alt-Secure", "ALT", true, (short) 1, true);
+		CorrectionalStatusTerm correctionalStatusTerm
+			= this.correctionalStatusTermDelegate
+				.create(offender, prisonDateRange, altSecure);
+		PlacementTermChangeReason newSentenceReason
+			= this.placementTermChangeReasonDelegate
+				.create("New Sentence", (short) 1, true, false);
+		this.placementTermDelegate.create(offender, prisonDateRange,
+				prereleaseOrganizationTerm, correctionalStatusTerm,
+				newSentenceReason, null, true);
+		
+		// More arrangements - place offender in a prerelease immediately after
+		// Add placement term for location as offender must be supervised in
+		// order to invoke update method for location term
+		Date prereleaseStartDate = this.parseDateText("03/03/2003");
+		Date prereleaseEndDate = this.parseDateText("04/04/2004");
+		Organization prerelease
+			= this.organizationDelegate.create("Prerelease", "PRE", null);
+		Address prereleaseAddress = this.addressDelegate
+				.findOrCreate("2000 2ND ST", null, null, null, mt59602);
+		Location prereleaseLocation = this.locationDelegate
+				.create(prerelease, new DateRange(), prereleaseAddress);
+		String notes = "Off to prerelease!";
+		this.locationTermDelegate.create(offender, prereleaseLocation,
+				prereleaseStartDate, prereleaseEndDate, false, notes);
+		
+		// Action - attempt to update prison term with original values
+		this.locationTermService.update(prisonTerm, prisonLocation,
+				new DateRange(prisonStartDate, prisonEndDate), notes);
+		
+		// Assertions
+		PropertyValueAsserter.create()
+			.addExpectedValue("dateRange.startDate", prisonStartDate)
+			.addExpectedValue("dateRange.endDate", prisonEndDate)
+			.addExpectedValue("location", prisonLocation)
+			.addExpectedValue("offender", offender)
+			.addExpectedValue("notes", notes)
+			.performAssertions(prisonTerm);
+	}
+	
+	/**
+	 * Tests that the earliest of two location terms immediately following
+	 * one another cannot be updated with values conflicting with the later
+	 * location term without throwing a {@code LocationTermConflictException}.
+	 * 
+	 * @throws LocationTermConflictException if update is prevented due to
+	 * conflicting dates - asserted
+	 * @throws DuplicateEntityFoundException if entities exist
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 * @throws LocationTermLockedException if location term is locked 
+	 * @throws LocationTermExistsAfterException if location terms exist after
+	 * location term that is to be updated
+	 * @throws DateRangeOutOfBoundsException if date range is out of bounds 
+	 */
+	@Test(expectedExceptions = {LocationTermConflictException.class})
+	public void testUpdateEarlierLocationTermWithConflictingEndDate()
+			throws LocationTermConflictException,
+				DuplicateEntityFoundException,
+				DateRangeOutOfBoundsException,
+				LocationTermExistsAfterException,
+				LocationTermLockedException,
+				OffenderNotUnderSupervisionException {
+		
+		// Arrangements - place offender securely at a prison
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"White", "Ernst", "Stavro", null);
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		DateRange placementDateRange = new DateRange(
+				this.parseDateText("01/01/2011"),
+				this.parseDateText("03/03/2013"));
+		CorrectionalStatusTerm secureTerm
+				= this.correctionalStatusTermDelegate
+					.create(offender, placementDateRange, secure);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison", "PRSN", null);
+		SupervisoryOrganizationTerm prisonSupervisoryTerm
+				= this.supervisoryOrganizationTermDelegate
+					.create(offender, placementDateRange, prison);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, false);
+		this.placementTermDelegate.create(offender, placementDateRange,
+				prisonSupervisoryTerm, secureTerm, newSentenceReason, null,
+				false);
+		
+		// More arrangements - locate offender in prison for the earlier
+		// part of his prison placement
+		Country unitedStates = this.countryDelegate.create(
+				"United States", "USA", true);
+		State montana = this.stateDelegate.create(
+				"Montana", "MT", unitedStates, true, true);
+		City helenaMontana = this.cityDelegate.create(
+				"Helena", true, montana, unitedStates);
+		ZipCode mt59602 = this.zipCodeDelegate.create(
+				helenaMontana, "59602", null, true);
+		Address prisonAddress = this.addressDelegate.findOrCreate(
+				"1000 1ST ST", null, null, null, mt59602);
+		Location prisonLocation = this.locationDelegate.create(
+				prison, placementDateRange, prisonAddress);
+		Date prisonLocationEndDate = this.parseDateText("02/02/2012");
+		LocationTerm prisonTerm = this.locationTermDelegate
+				.create(offender, prisonLocation,
+						DateRange.getStartDate(placementDateRange),
+						prisonLocationEndDate, false, null);
+		
+		// Even more arrangements - locate offender in jail immediately after
+		// prison term - this might represent going out to court
+		Address jailAddress = this.addressDelegate
+				.findOrCreate("2000 2ND ST", null, null, null, mt59602);
+		Organization jail = this.organizationDelegate.create(
+				"Jail", "JAIL", null);
+		Location jailLocation = this.locationDelegate
+				.create(jail, new DateRange(prisonLocationEndDate,
+						DateRange.getEndDate(placementDateRange)),
+						jailAddress);
+		this.locationTermDelegate.create(
+				offender, jailLocation, prisonLocationEndDate,
+				DateRange.getEndDate(placementDateRange), false, null);
+		
+		// Action - update prison location term with an end date that conflicts
+		// with prison term
+		Date conflictingPrisonEndDate = this.parseDateText("02/03/2012");
+		this.locationTermService.update(prisonTerm, prisonLocation,
+				new DateRange(
+						DateRange.getStartDate(placementDateRange),
+						conflictingPrisonEndDate), null);
+	}
+	
+	/**
+	 * Tests that the earliest of two location terms immediately following
+	 * one another cannot be updated with a {@code null} end date which
+	 * would conflict with a future location term without throwing
+	 * a {@code LocationTermConflictException}.
+	 * 
+	 * @throws DuplicateEntityFoundException if entities exist
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 * @throws LocationTermLockedException if location term is locked 
+	 * @throws LocationTermExistsAfterException if location terms exist after
+	 * location term that is to be updated - asserted
+	 * @throws DateRangeOutOfBoundsException if date range is out of bounds 
+	 */
+	@Test(expectedExceptions = {LocationTermExistsAfterException.class})
+	public void testUpdateEarlierLocationTermWithNullEndDateFails()
+			throws LocationTermConflictException,
+				DuplicateEntityFoundException,
+				DateRangeOutOfBoundsException,
+				LocationTermExistsAfterException,
+				LocationTermLockedException,
+				OffenderNotUnderSupervisionException {
+		
+		// Arrangements - place offender securely at a prison
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"White", "Ernst", "Stavro", null);
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		DateRange placementDateRange = new DateRange(
+				this.parseDateText("01/01/2011"),
+				this.parseDateText("03/03/2013"));
+		CorrectionalStatusTerm secureTerm
+				= this.correctionalStatusTermDelegate
+					.create(offender, placementDateRange, secure);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison", "PRSN", null);
+		SupervisoryOrganizationTerm prisonSupervisoryTerm
+				= this.supervisoryOrganizationTermDelegate
+					.create(offender, placementDateRange, prison);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, false);
+		this.placementTermDelegate.create(offender, placementDateRange,
+				prisonSupervisoryTerm, secureTerm, newSentenceReason,
+				null, false);
+		
+		// More arrangements - locate offender in prison for the earlier
+		// part of his prison placement
+		Country unitedStates = this.countryDelegate.create(
+				"United States", "USA", true);
+		State montana = this.stateDelegate.create(
+				"Montana", "MT", unitedStates, true, true);
+		City helenaMontana = this.cityDelegate.create(
+				"Helena", true, montana, unitedStates);
+		ZipCode mt59602 = this.zipCodeDelegate.create(
+				helenaMontana, "59602", null, true);
+		Address prisonAddress = this.addressDelegate.findOrCreate(
+				"1000 1ST ST", null, null, null, mt59602);
+		Location prisonLocation = this.locationDelegate.create(
+				prison, placementDateRange, prisonAddress);
+		Date prisonLocationEndDate = this.parseDateText("02/02/2012");
+		LocationTerm prisonTerm = this.locationTermDelegate
+				.create(offender, prisonLocation,
+						DateRange.getStartDate(placementDateRange),
+						prisonLocationEndDate, false, null);
+		
+		// Even more arrangements - locate offender in jail immediately after
+		// prison term - this might represent going out to court
+		Address jailAddress = this.addressDelegate
+				.findOrCreate("2000 2ND ST", null, null, null, mt59602);
+		Organization jail = this.organizationDelegate.create(
+				"Jail", "JAIL", null);
+		Location jailLocation = this.locationDelegate
+				.create(jail, new DateRange(prisonLocationEndDate,
+						DateRange.getEndDate(placementDateRange)),
+						jailAddress);
+		this.locationTermDelegate.create(
+				offender, jailLocation, prisonLocationEndDate,
+				DateRange.getEndDate(placementDateRange), false, null);
+		
+		// Action - update prison location term with a null end date that
+		// conflicts with the future jail location term
+		this.locationTermService.update(prisonTerm, prisonLocation,
+				new DateRange(
+						DateRange.getStartDate(placementDateRange),
+						null), null);
+	}
+	
+	/**
+	 * Tests that {@code IllegalArgumentException) is thrown when start date
+	 * and end date are on update.
+	 * 
+	 * @throws IllegalArgumentException if start date and end date are equal
+	 * - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws CorrectionalStatusTermExistsException if correctional status
+	 * term exists
+	 * @throws PlacementTermExistsException if placement term exists 
+	 * @throws OrganizationExistsException if organization exists
+	 * @throws CountryExistsException if country exists
+	 * @throws CityExistsException if city exists
+	 * @throws ZipCodeExistsException if ZIP code exists
+	 * @throws LocationExistsException if location exists
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision
+	 * @throws LocationTermExistsAfterException if location term exists after
+	 * @throws LocationTermConflictException if conflicting location terms
+	 * exists
+	 * @throws LocationTermExistsException if location term exists 
+	 * @throws LocationTermLockedException if location term is locked
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 */
+	@Test(expectedExceptions = {IllegalArgumentException.class})
+	public void testIllegalArgumentExceptionWhenStartDateEqualsEndDate()
+			throws CorrectionalStatusExistsException,
+				CorrectionalStatusTermExistsException,
+				PlacementTermExistsException,
+				OrganizationExistsException,
+				CountryExistsException,
+				CityExistsException,
+				ZipCodeExistsException,
+				LocationExistsException,
+				LocationTermExistsException,
+				LocationTermConflictException,
+				LocationTermExistsAfterException,
+				OffenderNotUnderSupervisionException,
+				LocationTermLockedException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arranges offender on secure placement
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"White", "Donald", null, null);
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		DateRange placementRange = new DateRange(
+				this.parseDateText("12/12/2012"), null);
+		CorrectionalStatusTerm secureTerm = this.correctionalStatusTermDelegate
+				.create(offender, placementRange, secure);
+		PlacementTermChangeReason initialPlacementReason
+				= this.placementTermChangeReasonDelegate.create(
+						"Initial Placement", (short) 1, true, false);
+		this.placementTermDelegate.create(
+				offender, placementRange, null, secureTerm,
+				initialPlacementReason, null, false);
+		Organization hospital = this.organizationDelegate
+				.create("Hospital", "HOSP", null);
+		Country country = this.countryDelegate.create(
+				"United States", "USA", true);
+		City city = this.cityDelegate.create(
+				"Washington DC", true, null, country);
+		ZipCode zipCode = this.zipCodeDelegate.create(
+				city, "20001", null, true);
+		Address address = this.addressDelegate.findOrCreate(
+				"1000 1000TH ST 1000", null, null, null, zipCode);
+		Location hospitalLocation = this.locationDelegate
+				.create(hospital, null, address);
+		LocationTerm locationTerm = this.locationTermDelegate
+				.create(offender, hospitalLocation,
+						this.parseDateText("12/12/2017"), null, false, null);
+		
+		// Action - attempts to update location term to have an equal start
+		// and end date
+		this.locationTermService.update(locationTerm, hospitalLocation,
+				new DateRange(
+						this.parseDateText("12/12/2017"),
+						this.parseDateText("12/12/2017")),
+				null);	
 	}
 	
 	/* Helper methods. */
@@ -471,5 +976,4 @@ public class LocationTermServiceUpdateTests
 		customEditor.setAsText(dateText);
 		return (Date) customEditor.getValue();
 	}
-	
 }

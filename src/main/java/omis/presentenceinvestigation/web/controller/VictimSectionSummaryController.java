@@ -25,9 +25,11 @@ import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.person.domain.Person;
+import omis.presentenceinvestigation.domain.PresentenceInvestigationDocketAssociation;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.presentenceinvestigation.domain.VictimSectionSummary;
 import omis.presentenceinvestigation.domain.VictimSectionSummaryNote;
+import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
 import omis.presentenceinvestigation.service.VictimSectionSummaryService;
 import omis.presentenceinvestigation.web.controller.delegate.PresentenceInvestigationRequestSummaryModelDelegate;
 import omis.presentenceinvestigation.web.form.PresentenceInvestigationItemOperation;
@@ -188,6 +190,11 @@ public class VictimSectionSummaryController {
 	@Autowired
 	@Qualifier("victimAssociationReportService")
 	private VictimAssociationReportService victimAssociationReportService; 
+	
+	@Autowired
+	@Qualifier("presentenceInvestigationRequestService")
+	private PresentenceInvestigationRequestService 
+			presentenceInvestigationRequestService;
 	
 	/* Validator */
 	
@@ -471,7 +478,7 @@ public class VictimSectionSummaryController {
 		map.addAttribute(VICTIM_SECTION_SUMMARY_MODEL_KEY,
 				victimSectionSummary);
 		map.addAttribute(OFFENDER_MODEL_KEY, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		map.addAttribute(FORM_MODEL_KEY, form);
 		map.addAttribute(
 				VICTIM_SECTION_SUMMARY_NOTE_ITEM_INDEX_MODEL_KEY,
@@ -484,7 +491,7 @@ public class VictimSectionSummaryController {
 				presentenceInvestigationRequest);
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 				
@@ -512,8 +519,7 @@ public class VictimSectionSummaryController {
 		List<VictimSectionSummaryDocketAssociationItem> docketAssociationItems =
 			new ArrayList<VictimSectionSummaryDocketAssociationItem>();
 		for (VictimAssociation assoc : this.victimSectionSummaryService
-				.findVictimsByOffender((Offender) request
-						.getDocket().getPerson())) {
+				.findVictimsByOffender((Offender) request.getPerson())) {
 			
 			VictimSectionSummaryDocketAssociationItem vdaItem 
 				= new VictimSectionSummaryDocketAssociationItem();
@@ -521,21 +527,30 @@ public class VictimSectionSummaryController {
 			vdaItem.setVictimAssociation(assoc);
 			//Lookup VictimDocketAssociation for second person in assoc, populate
 			//itemOperation depending on whether a VictimDocketAssociation exists or not
-			List<VictimDocketAssociation> docketAssociations =
-					this.victimSectionSummaryService
-					.findVictimAssociationByDocket(request.getDocket());
+			List<PresentenceInvestigationDocketAssociation> dockets = 
+					this.presentenceInvestigationRequestService
+					.findPresentenceInvestigationDocketAssociationsByPresentenceInvestigationRequest(
+							request);
 			VictimDocketDocumentAssociationItemOperation itemOperation =
 					VictimDocketDocumentAssociationItemOperation.EXCLUDE;
-			for(VictimDocketAssociation docketAssociation : docketAssociations){
-				if(docketAssociation.getVictim().equals(assoc.getRelationship()
-						.getSecondPerson())){
-					itemOperation =
-							VictimDocketDocumentAssociationItemOperation.EXISTS;
-					vdaItem.setVictimDocketAssociation(docketAssociation);
+			for (PresentenceInvestigationDocketAssociation docket : dockets) {
+				List<VictimDocketAssociation> docketAssociations =
+						this.victimSectionSummaryService
+						.findVictimAssociationByDocket(docket.getDocket());
+				for(VictimDocketAssociation docketAssociation : docketAssociations){
+					if(docketAssociation.getVictim().equals(assoc.getRelationship()
+							.getSecondPerson())){
+						itemOperation =
+								VictimDocketDocumentAssociationItemOperation.EXISTS;
+						vdaItem.setVictimDocketAssociation(docketAssociation);
+						break;
+					}
+				}
+				if (VictimDocketDocumentAssociationItemOperation.EXISTS.equals(
+						itemOperation)) {
 					break;
 				}
 			}
-			
 			vdaItem.setItemOperation(itemOperation);
 			
 			docketAssociationItems.add(vdaItem);

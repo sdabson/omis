@@ -18,33 +18,10 @@
 			<fmt:message key="employmentLabel" bundle="${employment}"/>
 			<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
 		</title>
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
-		<meta http-equiv="pragma" content="no-cache"/>
-		<meta http-equiv="cache-control" content="no-cache"/>
-		<meta http-equiv="X-UA-Compatible" content="no-cache"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/general.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/colors.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/fonts.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/list.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 		<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/linksResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.search.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.tools.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/search.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/tools.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/links.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/form.js"></script>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/employment/scripts/employments.js"> </script>
 	</head>
 	<body>

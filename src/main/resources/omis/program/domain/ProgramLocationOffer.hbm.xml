@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
- - Program facility offer mapping and queries.
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+ - Program location offering mapping and queries.
  -
  - Author: Stephen Abson 
  -->
@@ -8,6 +27,8 @@
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.program.domain">
+
+	<!-- Maps class. -->
 	<class entity-name="omis.program.domain.ProgramLocationOffer"
 	       proxy="omis.program.domain.ProgramLocationOffer"
 	       name="omis.program.domain.impl.ProgramLocationOfferImpl"
@@ -23,11 +44,20 @@
 		  <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
 		</properties>
 	</class>
+	
+	<!-- Finds offerings of programs at locations -->
 	<query name="findProgramLocationOffers" cacheable="true" cache-region="program"><![CDATA[
 		select programLocationOffer
-		from omis.program.domain.ProgramLocationOffer
-			programLocationOffer
+		from omis.program.domain.ProgramLocationOffer programLocationOffer
 	      inner join programLocationOffer.program program
 		order by program.name
+	]]></query>
+	
+	<!-- Finds offering of program at location -->
+	<query name="findProgramLocationOffer" cacheable="true" cache-region="program"><![CDATA[
+		select programLocationOffer
+		from omis.program.domain.ProgramLocationOffer programLocationOffer
+		where programLocationOffer.program = :program
+		  and programLocationOffer.location = :location
 	]]></query>
 </hibernate-mapping>

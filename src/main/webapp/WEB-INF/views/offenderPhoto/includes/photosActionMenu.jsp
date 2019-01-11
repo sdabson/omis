@@ -21,10 +21,22 @@
 						<fmt:message key="createOffenderPhotoLink" bundle="${offenderPhotoBundle}"/></a>
 				</li>
 			</sec:authorize>
+			<sec:authorize access="(hasRole('OFFENDER_PHOTO_CREATE') and hasRole('OFFENDER_PHOTO_VIEW')) or hasRole('ADMIN')">
+				<li>
+					<a class="createLink" href="${pageContext.request.contextPath}/offenderPhoto/join.html?offender=${offender.id}&amp;profile=true">
+						<fmt:message key="joinAndCreateProfilePhotoLink" bundle="${offenderPhotoBundle}"/></a>
+				</li>
+			</sec:authorize>
+			<sec:authorize access="(hasRole('OFFENDER_PHOTO_CREATE') and hasRole('OFFENDER_PHOTO_VIEW')) or hasRole('ADMIN')">
+				<li>
+					<a class="createLink" href="${pageContext.request.contextPath}/offenderPhoto/join.html?offender=${offender.id}&amp;profile=false">
+						<fmt:message key="joinAndCreateOffenderPhotoLink" bundle="${offenderPhotoBundle}"/></a>
+				</li>
+			</sec:authorize>
 			<sec:authorize access="hasRole('OFFENDER_PHOTO_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="offenderPhotosListingReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderPhotosListingReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
 			</li>
 			</c:if>
 		</sec:authorize>

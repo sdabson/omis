@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.probationparole.domain">
+	<class entity-name="omis.probationparole.domain.ProbationParoleDocumentCategory"
+			proxy="omis.probationparole.domain.ProbationParoleDocumentCategory"
+			name="omis.probationparole.domain.impl.ProbationParoleDocumentCategoryImpl"
+			table="`P_P_DOCUMENT_CATEGORY`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`P_P_DOCUMENT_CATEGORY_SEQ`</param>
+				</generator>
+			</id>
+			<property name="name" column="`NAME`" type="java.lang.String" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true" />
+	</class>
+	<query name="findProbationParoleDocumentCategories"><![CDATA[
+		select probationParoleDocumentCategory
+		from
+			omis.probationparole.domain.ProbationParoleDocumentCategory probationParoleDocumentCategory
+		where
+			probationParoleDocumentCategory.valid = true
+		order by
+			probationParoleDocumentCategory.name
+	]]></query>
+</hibernate-mapping>

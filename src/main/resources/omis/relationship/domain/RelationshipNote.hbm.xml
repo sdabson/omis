@@ -23,7 +23,7 @@
 		</id>
 		<properties name="uniqueRelationshipNote">
 			<many-to-one name="relationship" entity-name="omis.relationship.domain.Relationship" not-null="true" column="`RELATIONSHIP_ID`"/>
-			<many-to-one name="category" entity-name="omis.relationship.domain.RelationshipNoteCategory" not-null="true" column="CATEGORY_ID"/>
+			<many-to-one name="category" entity-name="omis.relationship.domain.RelationshipNoteCategory" not-null="true" column="`CATEGORY_ID`"/>
 			<property name="date" type="java.util.Date" not-null="true" column="`DATE`"/>
 			<property name="value" type="java.lang.String" not-null="true" column="`VALUE`"/>
 		</properties>
@@ -61,7 +61,22 @@
 	<query name="findRelationshipNotesByRelationship"><![CDATA[
       select note
       from omis.relationship.domain.RelationshipNote note
+      inner join note.category category
       where note.relationship = :relationship
+      and category in 
+      (
+      	select desCategory
+      	from omis.relationship.domain.RelationshipNoteCategoryDesignator des
+      	inner join des.category desCategory
+      )
 		order by note.date
+	]]></query>
+	<query name="deleteRelationshipNotesByRelationship"><![CDATA[
+		delete from omis.relationship.domain.RelationshipNote note
+		where note.relationship = :relationship
+	]]></query>
+	<query name="countRelationshipNotesByRelationship"><![CDATA[
+		select count(note) from omis.relationship.domain.RelationshipNote note
+		where note.relationship = :relationship
 	]]></query>
 </hibernate-mapping>

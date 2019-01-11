@@ -7,8 +7,8 @@
 		<head>
 			<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 			<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
-			<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 			<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/otherPhoto/style/otherPhotoWizard.css"/>
+			<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/otherPhoto/scripts/otherPhoto.js"> </script>
 			<title>
 				<fmt:message key="otherPhysicalFeaturePhotoAssociationLabel"/>

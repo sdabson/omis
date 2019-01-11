@@ -32,32 +32,41 @@
 			<li><a class="createLink" href="${pageContext.request.contextPath}/supervision/placementTerm/create.html?offender=${offender.id}&amp;allowCorrectionalStatusChange=true"><span class="visibleLinkLabel"><c:choose><c:when test="${not empty effectivePlacementTerm}"><fmt:message key="changePlacementLink"/></c:when><c:otherwise><fmt:message key="createPlacementTermLink"/></c:otherwise></c:choose></span></a></li>
 		</sec:authorize>
 	</c:if>
+	<%-- Disable link until supervisory organizations are activated - SA --%>
 	<c:if test="${not empty effectivePlacementTerm and effectivePlacementTerm.correctionalStatusTerm.correctionalStatus.locationRequired}">
-		<sec:authorize access="hasRole('PLACEMENT_TERM_CREATE') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('DISABLED') and (hasRole('PLACEMENT_TERM_CREATE') or hasRole('ADMIN'))">
 			<li><a class="createLink" href="${pageContext.request.contextPath}/supervision/placementTerm/create.html?offender=${offender.id}&amp;allowCorrectionalStatusChange=false"><span class="visibleLinkLabel"><fmt:message key="facilityTransferLink"/></span></a></li>
 		</sec:authorize>
 	</c:if>
-	<c:if test="${not empty effectivePlacementTerm and not effectivePlacementTerm.correctionalStatusTerm.correctionalStatus.locationRequired}">
+	<c:if test="${not empty effectivePlacementTerm and not empty effectivePlacementTerm.supervisoryOrganizationTerm and not effectivePlacementTerm.correctionalStatusTerm.correctionalStatus.locationRequired}">
 		<sec:authorize access="hasRole('PLACEMENT_TERM_CREATE') or hasRole('ADMIN')">
 			<li><a class="createLink" href="${pageContext.request.contextPath}/supervision/placementTerm/create.html?offender=${offender.id}&amp;allowCorrectionalStatusChange=false"><span class="visibleLinkLabel"><fmt:message key="changeSupervisoryOrganizationLink"/></span></a></li>
 		</sec:authorize>
 	</c:if>
+	<%-- Disable link until supervisory organizations are activated - SA --%>
 	<c:if test="${not empty effectivePlacementTerm and empty effectivePlacementTerm.dateRange.endDate}">
-		<sec:authorize access="hasRole('PLACEMENT_TERM_EDIT') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('DISABLED') and (hasRole('PLACEMENT_TERM_EDIT') or hasRole('ADMIN'))">
 			<li><a class="createLink" href="${pageContext.request.contextPath}/supervision/placementTerm/endPlacementTerm.html?offender=${offender.id}&placementTerm=${effectivePlacementTerm.id}"><span class="visibleLinkLabel"><fmt:message key="endPlacementTermLink"/></span></a></li>
 		</sec:authorize>
 	</c:if>
 	<c:if test="${not empty offender}">
-		<sec:authorize access="hasRole('SUPERVISION_PROFILE_VIEW') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('DISABLED') and (hasRole('SUPERVISION_PROFILE_VIEW') or hasRole('ADMIN'))">
 			<li><a class="supervisionProfileLink" href="${pageContext.request.contextPath}/supervision/profile.html?offender=${offender.id}"><span class="visibleLinkLabel"><fmt:message key="supervisionProfileHeader" bundle="${profileBundle}"/></span></a></li>
 		</sec:authorize>
 	</c:if>
 	<sec:authorize access="hasRole('PLACEMENT_TERM_VIEW') or hasRole('ADMIN')">
 		<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/supervision/placementTerm/placementListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="placementListingReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/supervision/placementTerm/placementListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="placementListingReportLinkLabel"/></a>
 			</li>
 		</c:if>
 	</sec:authorize>
+	<sec:authorize access="hasRole('DISABLED') and (hasRole('PLACEMENT_TERM_VIEW') or hasRole('ADMIN'))">
+		<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/supervision/placementTerm//placementSupOrgListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="placementSupOrgListingReportLinkLabel"/></a>
+			</li>
+		</c:if>
+	</sec:authorize>	
 </ul>
 </fmt:bundle>

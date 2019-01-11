@@ -18,7 +18,7 @@
 
 <%--
  - Author: Josh Divine
- - Version: 0.1.0 (Jan 17, 2018)
+ - Version: 0.1.1 (Dec 3, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ page trimDirectiveWhitespaces="true" %>
@@ -47,18 +47,11 @@
 		</span>
 		<span class="fieldGroup">
 			<label class="fieldLabel detailsLabel">
-				<fmt:message key="boardHearingLabel"/>
-			</label>
-			<span class="detail">
-				<c:out value="${hearingAnalysisSummary.boardMeetingLocationName} - "/>
-				<fmt:formatDate value="${hearingAnalysisSummary.boardMeetingDate}" pattern="MM/dd/yyyy"/>
-			</span>
-		</span>
-		<span class="fieldGroup">
-			<label class="fieldLabel detailsLabel">
 				<fmt:message key="analystLabel"/>
 			</label>
-			<c:out value="${hearingAnalysisSummary.analystLastName}, ${hearingAnalysisSummary.analystFirstName} ${hearingAnalysisSummary.analystMiddleName} (${hearingAnalysisSummary.analystTitleName})"/>
+			<c:if test="${not empty hearingAnalysisSummary.analystLastName}">
+				<c:out value="${hearingAnalysisSummary.analystLastName}, ${hearingAnalysisSummary.analystFirstName} ${hearingAnalysisSummary.analystMiddleName} (${hearingAnalysisSummary.analystTitleName})"/>
+			</c:if>
 		</span>
 	</fieldset>
 </div>

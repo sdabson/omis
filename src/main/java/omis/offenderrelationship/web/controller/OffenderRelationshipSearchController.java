@@ -21,7 +21,22 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
+import omis.config.util.FeatureToggles;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -30,19 +45,9 @@ import omis.offenderrelationship.report.OffenderRelationshipSummary;
 import omis.offenderrelationship.web.form.OffenderRelationshipSearchForm;
 import omis.offenderrelationship.web.form.OffenderRelationshipSearchType;
 import omis.offenderrelationship.web.validator.OffenderRelationshipSearchFormValidator;
+import omis.person.domain.Person;
+import omis.relationship.domain.Relationship;
 import omis.web.form.SearchOperation;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller to search for offender relationships.
@@ -55,6 +60,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  * @author Stephen Abson
  * @author Yidong Li
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Jun 23, 2015)
  * @since OMIS 3.0
  */
@@ -66,6 +72,10 @@ public class OffenderRelationshipSearchController {
 	/* View names */
 	
 	private static final String VIEW_NAME = "offenderRelationship/search";
+	
+	private static final String 
+		OFFENDER_RELATIONSHIP_SEARCH_ROW_ACTION_MENU_VIEW_NAME 
+			= "offenderRelationship/includes/offenderRelationshipSearchRowActionMenu";
 
 	/* Model keys */
 	
@@ -76,6 +86,18 @@ public class OffenderRelationshipSearchController {
 
 	private static final String OFFENDER_RELATIONSHIP_SUMMARIES_MODEL_KEY
 		= "offenderRelationshipSummaries";
+	
+	private static final String OFFENDER_MODEL_KEY = "offender";
+	
+	private static final String RELATION_MODEL_KEY = "relation";
+	
+	private static final String RELATIONSHIP_MODEL_KEY = "relationship";
+	
+	private static final String RELATIONSHIP_EXIST_MODEL_KEY 
+		= "relationshipExist";
+	
+	private static final String RELATION_IS_OFFENDER_MODEL_KEY
+		= "relationIsOffender";
 	
 	/* Constants. */
 	
@@ -93,6 +115,21 @@ public class OffenderRelationshipSearchController {
 		= "showAllResultsOptions";
 
 	private static final String MAXIMUM_RESULTS_MODEL_KEY = "maximumResults";
+	
+	/* Toggle keys. */
+	
+	private static final String ALLOW_ADDRESS_SEARCH_TOGGLE_KEY
+		= "allowAddressSearch";
+	
+	private static final String ALLOW_TELEPHONE_NUMBER_SEARCH_TOGGLE_KEY
+		= "allowTelephoneNumberSearch";
+	
+	private static final String ALLOW_ONLINE_ACCOUNT_SEARCH_TOGGLE_KEY
+		= "allowOnlineAccountSearch";
+	
+	/* Module name. */
+	
+	private static final String MODULE_NAME = "offenderrelationship";
 	
 	/* Report services. */
 	
@@ -115,6 +152,14 @@ public class OffenderRelationshipSearchController {
 	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
 	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("personPropertyEditorFactory")
+	private PropertyEditorFactory personPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("relationshipPropertyEditorFactory")
+	private PropertyEditorFactory relationshipPropertyEditorFactory;
 
 	/* Validators. */
 	
@@ -122,6 +167,12 @@ public class OffenderRelationshipSearchController {
 	@Qualifier("offenderRelationshipSearchFormValidator")
 	private OffenderRelationshipSearchFormValidator 
 		offenderRelationshipSearchFormValidator;
+	
+	/* Feature toggles. */
+	
+	@Autowired
+	@Qualifier("featureToggles")
+	private FeatureToggles featureToggles;
 	
 	/* Constructors */
 	
@@ -143,7 +194,7 @@ public class OffenderRelationshipSearchController {
 	@PreAuthorize("hasRole('OFFENDER_RELATIONSHIP_LIST') or hasRole('ADMIN')")
 	@RequestMapping(value = "/search.html", method = RequestMethod.GET)
 	public ModelAndView search(
-			@RequestParam(value = "offender", required = true)
+			@RequestParam(value = "offender", required = false)
 				final Offender offender,
 			@RequestParam(value = "effectiveDate", required = false)
 				final Date effectiveDate,
@@ -153,8 +204,12 @@ public class OffenderRelationshipSearchController {
 			= new OffenderRelationshipSearchForm();
 		offenderRelationshipSearchForm.setType(
 				OffenderRelationshipSearchType.NAME);
-		return this.prepareMav(offenderRelationshipSearchForm,
-				offender, options);
+		ModelAndView mav = this.prepareMav(
+				offenderRelationshipSearchForm, options);
+		if (offender != null) {
+			this.offenderSummaryModelDelegate.add(mav.getModel(), offender);
+		}
+		return mav;
 	}
 	
 	/**
@@ -172,7 +227,7 @@ public class OffenderRelationshipSearchController {
 	@PreAuthorize("hasRole('OFFENDER_RELATIONSHIP_LIST') or hasRole('ADMIN')")
 	@RequestMapping(value = "/search.html", method = RequestMethod.POST)
 	public ModelAndView performSearch(
-			@RequestParam(value = "offender", required = true)
+			@RequestParam(value = "offender", required = false)
 				final Offender offender,
 			@RequestParam(value = "effectiveDate", required = false)
 				final Date effectiveDate,
@@ -186,16 +241,24 @@ public class OffenderRelationshipSearchController {
 		if (SearchOperation.SEARCH.equals(searchOperation)) {
 			this.offenderRelationshipSearchFormValidator.validate(
 					offenderRelationshipSearchForm, result);
-			if (result.hasErrors()) {	
-				return this.prepareRedisplayMav(offenderRelationshipSearchForm, 
-						offender, options, result);
+			if (result.hasErrors()) {
+				ModelAndView mav = this.prepareRedisplayMav(
+						offenderRelationshipSearchForm, options, result); 
+				if (offender != null) {
+					this.offenderSummaryModelDelegate.add(mav.getModel(),
+							offender);
+				}
+				return mav;
 			}		
 		}
-		ModelAndView mav = this.prepareMav(offenderRelationshipSearchForm,
-				offender, options);
-		List<OffenderRelationshipSummary> offenderRelationshipSummaries;
+		ModelAndView mav = this.prepareMav(
+				offenderRelationshipSearchForm, options);
+		if (offender != null) {
+			this.offenderSummaryModelDelegate.add(mav.getModel(), offender);
+		}
+		List<OffenderRelationshipSummary> offenderRelationshipSummaries;		
 		if (OffenderRelationshipSearchType.NAME
-				.equals(offenderRelationshipSearchForm.getType())) {
+				.equals(offenderRelationshipSearchForm.getType())) {			
 			Boolean approximateMatch;
 			if ((offenderRelationshipSearchForm.getFirstName().length() 
 					<= FIRST_NAME_LENGTH_FIVE
@@ -263,6 +326,22 @@ public class OffenderRelationshipSearchController {
 				= this.offenderRelationshipReportService
 					.summarizeByBirthDate(offenderRelationshipSearchForm
 							.getBirthDate(), new Date());
+		} else if (this.getAllowAddressSearch()
+				&& OffenderRelationshipSearchType.ADDRESS.equals(
+						offenderRelationshipSearchForm.getType())) {
+			offenderRelationshipSummaries = this.offenderRelationshipReportService
+					.summarizeByAddress(offenderRelationshipSearchForm.getAddressValue(),
+							offenderRelationshipSearchForm.getCityName(), offenderRelationshipSearchForm.getStateName(),
+							offenderRelationshipSearchForm.getZipCodeValue());
+		} else if (OffenderRelationshipSearchType.TELEPHONE_NUMBER.equals(
+						offenderRelationshipSearchForm.getType())) {
+			offenderRelationshipSummaries = this.offenderRelationshipReportService.
+					summarizeByTelephoneNumber(offenderRelationshipSearchForm.getTelephoneNumberValue());			
+		} else if (this.getAllowOnlineAccountSearch()
+				&& OffenderRelationshipSearchType.ONLINE_ACCOUNT
+					.equals(offenderRelationshipSearchForm.getType())) {
+			offenderRelationshipSummaries = this.offenderRelationshipReportService
+					.summarizeByOnlineAccount(offenderRelationshipSearchForm.getOnlineAccountName());
 		} else {
 			throw new UnsupportedOperationException(String.format(
 					"Search by %s not supported",
@@ -273,30 +352,86 @@ public class OffenderRelationshipSearchController {
 		return mav; 
 	}
 	
+	
+	/**
+	 * Model and view of offender relationship search row action menu.
+	 *
+	 * @param offender offender
+	 * @param relation relation
+	 * @param relationIsOffender whether relation is an offender
+	 * @return model and view
+	 */
+	@RequestMapping(value="/offenderRelationshipSearchRowActionMenu.html", 
+			method=RequestMethod.GET)
+	public ModelAndView offenderRelationshipSearchRowActionMenu(
+			@RequestParam(value = "offender", required = false) 
+				final Offender offender,
+			@RequestParam(value = "relation", required = false) 
+				final Person relation,
+			@RequestParam(value = "relationIsOffender", required = false)
+				final Boolean relationIsOffender) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(OFFENDER_MODEL_KEY,  offender);
+		map.addAttribute(RELATION_MODEL_KEY, relation);
+		map.addAttribute(RELATION_IS_OFFENDER_MODEL_KEY,
+				relationIsOffender);
+		map.addAttribute(RELATIONSHIP_EXIST_MODEL_KEY, 
+				this.offenderRelationshipReportService.relationshipExists(
+						offender, relation));
+		map.addAttribute(RELATIONSHIP_MODEL_KEY, 
+				this.offenderRelationshipReportService.findRelationship(
+						offender, relation));
+		return new ModelAndView(
+				OFFENDER_RELATIONSHIP_SEARCH_ROW_ACTION_MENU_VIEW_NAME, map);
+	}	
+	
 	/* Helper methods */
 	
 	// Prepares model and view
 	private ModelAndView prepareMav(
 			final OffenderRelationshipSearchForm offenderRelationshipSearchForm,
-			final Offender offender,
 			final OffenderRelationshipOption[] options) {
 		ModelAndView mav = new ModelAndView(VIEW_NAME);
 		mav.addObject(OPTIONS_MODEL_KEY, options);
 		mav.addObject(FORM_MODEL_KEY, offenderRelationshipSearchForm);
-		this.offenderSummaryModelDelegate.add(mav.getModel(), offender);
+		mav.addObject(ALLOW_ADDRESS_SEARCH_TOGGLE_KEY,
+				this.getAllowAddressSearch());
+		mav.addObject(ALLOW_TELEPHONE_NUMBER_SEARCH_TOGGLE_KEY,
+				this.getAllowTelephoneNumberSearch());
+		mav.addObject(ALLOW_ONLINE_ACCOUNT_SEARCH_TOGGLE_KEY,
+				this.getAllowOnlineAccountSearch());
 		return mav;
 	}
 	
 	// Prepares redisplay model and view
 	private ModelAndView prepareRedisplayMav(
 			final OffenderRelationshipSearchForm offenderRelationshipSearchForm,
-			final Offender offender,
 			final OffenderRelationshipOption[] options,
 			final BindingResult result) {
-		ModelAndView mav = this.prepareMav(offenderRelationshipSearchForm, 
-			offender, options);		
+		ModelAndView mav = this.prepareMav(
+				offenderRelationshipSearchForm, options);		
 		mav.addObject(BindingResult.MODEL_KEY_PREFIX + FORM_MODEL_KEY, result);
 		return mav;
+	}
+	
+	/* Feature toggle lookup helpers. */
+	
+	// Returns whether address search is allowed
+	private boolean getAllowAddressSearch() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_ADDRESS_SEARCH_TOGGLE_KEY);
+	}
+	
+	// Returns whether telephone number search is allowed
+	private boolean getAllowTelephoneNumberSearch() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_TELEPHONE_NUMBER_SEARCH_TOGGLE_KEY);
+	}
+	
+	// Returns whether online account search is allowed
+	private boolean getAllowOnlineAccountSearch() {
+		return this.featureToggles.get(
+				MODULE_NAME, ALLOW_ONLINE_ACCOUNT_SEARCH_TOGGLE_KEY);
 	}
 	
 	/* Init binders */
@@ -317,5 +452,11 @@ public class OffenderRelationshipSearchController {
 		binder.registerCustomEditor(Date.class,
 				this.customDateEditorFactory
 					.createCustomDateOnlyEditor(true));
+		binder.registerCustomEditor(Person.class,
+				this.personPropertyEditorFactory
+				.createPropertyEditor());
+		binder.registerCustomEditor(Relationship.class,
+				this.relationshipPropertyEditorFactory
+				.createPropertyEditor());
 	}
 }

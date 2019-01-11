@@ -1,0 +1,98 @@
+/*
+ * Offender photo join cascading style sheet.
+ *
+ * Author: Joel Norris
+ * Version: 0.1.0
+ * Since: OMIS 3.0 
+ */
+ 
+ form.editForm fieldset.joinPhotoFieldSet {
+ 	min-width: 0;
+ }
+
+div.offenderPhotosContainer {	
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	padding: 20px;
+	vertical-align: middle;
+	width: 95%;
+	display: block;
+}
+
+div.photoItem {
+	display: inline-block;
+	text-align: center;
+	padding: 20px;
+	height: 240px;
+/* 	font-size: 30px; */
+	width: 200px;
+	margin: 0 5px 0 5px;
+}
+
+div.photoItem label.photoItemDateLabel {
+	display: block;
+	margin: 0 0 5px 0;
+}
+
+
+img.photoItemThumbnail {
+	max-height: 180px; 
+	max-width: 160px;
+}
+
+img.joinedPhotoPreview {
+	width: 480px;
+	height: 270px;
+}
+
+div.photoItem div.photoItemThumbnailContainer {
+	height: 240px;
+}
+
+.hoverableMapSection.hover {
+	background: red;
+	color: red;
+}
+
+/* /* Image hover for joined image preview styling*/ */
+
+/* div.previewImageWrapper { */
+/*     position: relative; */
+/*     display:inline-block; */
+/*     padding: none; */
+/* } */
+
+div.previewImageWrapper img.joinedPhotoPreview {
+	display: block;
+}
+
+/* div.previewImageWrapper .hoverableImageAfter { */
+/*     position: absolute; */
+/*     top: 0; */
+/*     left: 0; */
+/*     width: 100%; */
+/*     height: 100%; */
+/*     display: none; */
+/* } */
+
+/* div.previewImageWrapper .hoverableImageAfter.leftImage { */
+/*     left: 0; */
+/*     width: 50%; */
+/*     height: 100%; */
+/* } */
+
+/* div.previewImageWrapper .hoverableImageAfter.rightImage { */
+/*     left: 50%; */
+/*     width: 50%; */
+/*     height: 100%; */
+/* } */
+
+/* div.previewImageWrapper .hoverableImageAfter.show { */
+/*     display: block; */
+/*     background: rgba(0, 0, 0, .5); */
+/*     background-image: url('../images/whiteMagnifyingGlass.png'); */
+/*     background-repeat: no-repeat; */
+/*     cursor: pointer; */
+/*     padding: none; */
+/* } */

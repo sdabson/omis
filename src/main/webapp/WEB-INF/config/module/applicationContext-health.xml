@@ -270,13 +270,7 @@
     <constructor-arg name="entityName" value="omis.health.domain.ExternalReferralAuthorization"/>
   </bean>
 
-  <bean id="externalReferralInstanceFactory"
-        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-    <constructor-arg name="entityName" value="omis.health.domain.ExternalReferral"/>
-  </bean>
-  
-  <bean id="externalReferralRequestAuthorizationRequirementInstanceFactory"
+ <bean id="externalReferralRequestAuthorizationRequirementInstanceFactory"
         class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
     <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
     <constructor-arg name="entityName" value="omis.health.domain.ExternalReferralRequestAuthorizationRequirement"/>
@@ -318,6 +312,42 @@
     <constructor-arg name="entityName" value="omis.health.domain.LabWorkReferralAssociation"/>
   </bean>
   
+  <bean id="providerTitleInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.ProviderTitle"/>
+  </bean>
+  
+   <bean id="medicalFacilityInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.MedicalFacility"/>
+  </bean>
+  
+  <bean id="externalReferralReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.ExternalReferralReason"/>
+  </bean>
+  
+  <bean id="internalReferralReasonInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.InternalReferralReason"/>
+  </bean>
+  
+   <bean id="externalReferralInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.ExternalReferral"/>
+  </bean>
+  
+  <bean id="labWorkCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.health.domain.LabWorkCategory"/>
+  </bean>
+  
   <!-- Helper classes -->
   
   <bean id="offenderAppointmentAssociationDelegate"
@@ -343,8 +373,75 @@
  
   <bean id="medicalFacilityDelegate" class="omis.health.service.delegate.MedicalFacilityDelegate">
     <constructor-arg name="medicalFacilityDao" ref="medicalFacilityDao"/>
+    <constructor-arg name="medicalFacilityInstanceFactory" ref="medicalFacilityInstanceFactory"/>
   </bean>
- 
+  
+  <bean id="externalReferralAuthorizationRequestDelegate" class="omis.health.service.delegate.ExternalReferralAuthorizationRequestDelegate">
+    <constructor-arg name="externalReferralAuthorizationRequestInstanceFactory" ref="externalReferralAuthorizationRequestInstanceFactory"/>
+    <constructor-arg name="externalReferralAuthorizationRequestDao" ref="externalReferralAuthorizationRequestDao"/>
+  </bean>
+  
+   <bean id="externalReferralReasonDelegate" class="omis.health.service.delegate.ExternalReferralReasonDelegate">
+    <constructor-arg name="externalReferralReasonInstanceFactory" ref="externalReferralReasonInstanceFactory"/>
+    <constructor-arg name="externalReferralReasonDao" ref="externalReferralReasonDao"/>
+  </bean>
+  
+  <bean id="providerAssignmentDelegate" class="omis.health.service.delegate.ProviderAssignmentDelegate">
+    <constructor-arg name="providerAssignmentInstanceFactory" ref="providerAssignmentInstanceFactory"/>
+    <constructor-arg name="providerAssignmentDao" ref="providerAssignmentDao"/>
+  </bean>
+  
+  <bean id="providerTitleDelegate" class="omis.health.service.delegate.ProviderTitleDelegate">
+    <constructor-arg name="providerTitleInstanceFactory" ref="providerTitleInstanceFactory"/>
+    <constructor-arg name="providerTitleDao" ref="providerTitleDao"/>
+  </bean>
+  
+  <bean id="externalReferralAuthorizationDelegate" class="omis.health.service.delegate.ExternalReferralAuthorizationDelegate">
+    <constructor-arg name="externalReferralAuthorizationInstanceFactory" ref="externalReferralAuthorizationInstanceFactory"/>
+    <constructor-arg name="externalReferralAuthorizationDao" ref="externalReferralAuthorizationDao"/>
+  </bean>
+  
+  <bean id="providerInternalReferralAssociationDelegate" class="omis.health.service.delegate.ProviderInternalReferralAssociationDelegate">
+    <constructor-arg name="providerInternalReferralAssociationInstanceFactory" ref="providerInternalReferralAssociationInstanceFactory"/>
+    <constructor-arg name="providerInternalReferralAssociationDao" ref="providerInternalReferralAssociationDao"/>
+  </bean>
+  
+  <bean id="internalReferralReasonDelegate" class="omis.health.service.delegate.InternalReferralReasonDelegate">
+    <constructor-arg name="internalReferralReasonInstanceFactory" ref="internalReferralReasonInstanceFactory"/>
+    <constructor-arg name="internalReferralReasonDao" ref="internalReferralReasonDao"/>
+  </bean>
+  
+  <bean id="internalReferralDelegate" class="omis.health.service.delegate.InternalReferralDelegate">
+    <constructor-arg name="internalReferralInstanceFactory" ref="internalReferralInstanceFactory"/>
+    <constructor-arg name="internalReferralDao" ref="internalReferralDao"/>    
+  </bean>
+  
+  <bean id="healthAppointmentDelegate"
+        class="omis.health.service.delegate.HealthAppointmentDelegate">
+    <constructor-arg name="healthAppointmentInstanceFactory" ref="healthAppointmentInstanceFactory"/>
+    <constructor-arg name="healthAppointmentDao" ref="healthAppointmentDao"/>
+  </bean>
+  
+ <bean id="labWorkDelegate"
+        class="omis.health.service.delegate.LabWorkDelegate">
+    <constructor-arg name="labWorkInstanceFactory" ref="labWorkInstanceFactory"/>
+    <constructor-arg name="labWorkDao" ref="labWorkDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
+  <bean id="labWorkCategoryDelegate"
+        class="omis.health.service.delegate.LabWorkCategoryDelegate">
+    <constructor-arg name="labWorkCategoryInstanceFactory" ref="labWorkCategoryInstanceFactory"/>
+    <constructor-arg name="labWorkCategoryDao" ref="labWorkCategoryDao"/>
+  </bean>
+  
+  <bean id="externalReferralDelegate"
+        class="omis.health.service.delegate.ExternalReferralDelegate">
+    <constructor-arg name="externalReferralInstanceFactory" ref="externalReferralInstanceFactory"/>
+    <constructor-arg name="externalReferralDao" ref="externalReferralDao"/>
+    <constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+  </bean>
+  
   <!-- Service configuration -->
  	
 	<bean id="referralCenterService"

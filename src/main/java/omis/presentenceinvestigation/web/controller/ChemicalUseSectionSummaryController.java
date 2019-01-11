@@ -49,12 +49,12 @@ import omis.presentenceinvestigation.web.validator.ChemicalUseSectionSummaryForm
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * ChemicalUseSectionSummaryController.java
+ * Chemical use section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (May 6, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/chemicalUseSummary/")
@@ -603,7 +603,7 @@ public class ChemicalUseSectionSummaryController {
 		
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
 				

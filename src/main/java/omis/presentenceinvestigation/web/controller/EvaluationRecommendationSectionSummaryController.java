@@ -33,19 +33,21 @@ import omis.presentenceinvestigation.web.form.EvaluationRecommendationSectionSum
 import omis.presentenceinvestigation.web.form.PresentenceInvestigationItemOperation;
 import omis.presentenceinvestigation.web.validator.EvaluationRecommendationSectionSummaryFormValidator;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
+
 /**
  * Evaluation Recommendation Section Summary Controller
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Sep 12, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine 
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/evaluationRecommendationSummary/")
 @PreAuthorize("hasRole('USER')")
 public class EvaluationRecommendationSectionSummaryController {
-/* View Names */
+	
+	/* View Names */
 	
 	private static final String EDIT_VIEW_NAME =
 			"/presentenceInvestigation/evaluationRecommendationSummary/edit";
@@ -378,11 +380,10 @@ public class EvaluationRecommendationSectionSummaryController {
 				presentenceInvestigationRequest);
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				presentenceInvestigationRequest);
-				
-				
+
 		return new ModelAndView(EDIT_VIEW_NAME, map);
 	}
 	

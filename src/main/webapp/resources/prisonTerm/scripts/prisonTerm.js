@@ -30,5 +30,39 @@ window.onload = function() {
 		document.getElementById("verificationUserInput").value = config.SessionConfig.getUserAccountLabel();
 		return false;
 	};
+	
+	applyActionMenu(document.getElementById("actionMenuLink"));
+	applyDatePicker(document.getElementById("date"));
+	applyAddTagLink();
+	applyRemoveTagLinks();
+	if (document.getElementById("documentData")) {
+		applyFileExtensionNamer();
+	}
+	
+	if (document.getElementById("removeSentenceCalculationLink")) {
+		document.getElementById("removeSentenceCalculationLink").onclick = function(e) {
+			e.preventDefault();
+			document.getElementById("title").value = "";
+			document.getElementById("date").value = "";
+			document.getElementById("data").value = "";
+			document.getElementById("dataFileExtension").value = "";
+			document.getElementById("documentData").classList.remove("hidden");
+			document.getElementById("prisonTermDocumentDownloadLink").classList.add("hidden");
+			document.getElementById("removeSentenceCalculation").value = "true";
+			var removeLinks = document.getElementsByClassName("tagRemoveLink");
+			var event = new Event("click");
+			for(var x = 0; x < removeLinks.length; x++) {
+				removeLinks[x].dispatchEvent(event);
+			}
+		};
+	}
+}
 
+function applyFileExtensionNamer() {
+	var documentData = document.getElementById("documentData");
+	var fileExtension = document.getElementById("dataFileExtension");
+	documentData.onchange = function() {
+		var fileExtensionValue = documentData.value.substr(documentData.value.lastIndexOf('.')+1);
+		fileExtension.value = fileExtensionValue;
+	}
 }

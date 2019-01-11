@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.placement.service.impl;
 
 import java.util.Collections;
@@ -5,14 +22,15 @@ import java.util.Date;
 import java.util.List;
 
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.location.exception.LocationNotAllowedException;
 import omis.location.service.delegate.LocationDelegate;
 import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
 import omis.locationterm.domain.LocationTerm;
+import omis.locationterm.exception.LocationReasonTermExistsException;
 import omis.locationterm.exception.LocationTermConflictException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.locationterm.service.delegate.LocationReasonTermDelegate;
 import omis.locationterm.service.delegate.LocationTermDelegate;
 import omis.offender.domain.Offender;
@@ -20,6 +38,7 @@ import omis.organization.domain.Organization;
 import omis.placement.service.ChangeCorrectionalStatusService;
 import omis.program.domain.Program;
 import omis.program.domain.ProgramPlacement;
+import omis.program.exception.ProgramPlacementExistsException;
 import omis.program.service.delegate.ProgramDelegate;
 import omis.program.service.delegate.ProgramPlacementDelegate;
 import omis.supervision.domain.CorrectionalStatus;
@@ -29,12 +48,15 @@ import omis.supervision.domain.PlacementTerm;
 import omis.supervision.domain.PlacementTermChangeReason;
 import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
+import omis.supervision.exception.CorrectionalStatusTermExistsException;
 import omis.supervision.exception.EndedPlacementTermException;
 import omis.supervision.exception.IllegalCorrectionalStatusChangeException;
 import omis.supervision.exception.OffenderNotUnderSupervisionException;
 import omis.supervision.exception.OffenderUnderSupervisionException;
 import omis.supervision.exception.PlacementTermChangeReasonNotAllowedException;
 import omis.supervision.exception.PlacementTermConflictException;
+import omis.supervision.exception.PlacementTermExistsException;
+import omis.supervision.exception.SupervisoryOrganizationTermExistsException;
 import omis.supervision.service.delegate.AllowedCorrectionalStatusChangeDelegate;
 import omis.supervision.service.delegate.AllowedCorrectionalStatusChangeReasonRuleDelegate;
 import omis.supervision.service.delegate.CorrectionalStatusTermDelegate;
@@ -156,7 +178,6 @@ public class ChangeCorrectionalStatusServiceImpl
 			final Date effectiveDate, final Date endDate)
 				throws IllegalCorrectionalStatusChangeException,
 					OffenderNotUnderSupervisionException,
-					PlacementTermConflictException,
 					PlacementTermChangeReasonNotAllowedException,
 					EndedPlacementTermException {
 		
@@ -166,7 +187,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					.findForOffenderOnDate(offender, effectiveDate);
 		if (existingPlacementTerm == null) {
 			throw new OffenderNotUnderSupervisionException(
-				"Correctional status term for offender does not exist on date");
+				"Placement term for offender does not exist on date");
 		}
 		
 		// Throws exception if placement term on effective date is ended
@@ -177,12 +198,16 @@ public class ChangeCorrectionalStatusServiceImpl
 		}
 		
 		// Throw exception if other placement terms exist between effective
-		// date and end date for offender
+		// date and end date for offender - with good data, this should not
+		// be possible as the end date of the placement term on the effective
+		// date should be null (see above). This means that no other placement
+		// terms should exists on or after the effective date. An unchecked
+		// exception is therefore appropriate - SA
 		long otherPlacementTermCount = this.placementTermDelegate
 				.countForOffenderBetweenDatesExcluding(
 					offender, effectiveDate, endDate, existingPlacementTerm);
 		if (otherPlacementTermCount > 0) {
-			throw new PlacementTermConflictException(otherPlacementTermCount
+			throw new AssertionError(otherPlacementTermCount
 					+ " conflicting placement term(s)");
 		}
 		
@@ -209,7 +234,8 @@ public class ChangeCorrectionalStatusServiceImpl
 		}
 		
 		// Throws exception if change reason is not allowed
-		if (this.allowedCorrectionalStatusChangeReasonRuleDelegate.find(
+		if (changeReason != null
+				&& this.allowedCorrectionalStatusChangeReasonRuleDelegate.find(
 				correctionalStatusOnDate, correctionalStatus, changeReason)
 					== null) {
 			throw new PlacementTermChangeReasonNotAllowedException(
@@ -232,7 +258,7 @@ public class ChangeCorrectionalStatusServiceImpl
 							existingPlacementTerm.getStartChangeReason(),
 							changeReason,
 							existingPlacementTerm.getLocked());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (PlacementTermExistsException e) {
 			throw new AssertionError("Placement term cannot exist", e);
 		}
 		
@@ -244,7 +270,7 @@ public class ChangeCorrectionalStatusServiceImpl
 							existingCorrectionalStatusTerm.getDateRange(),
 							effectiveDate),
 					existingCorrectionalStatusTerm.getCorrectionalStatus());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (CorrectionalStatusTermExistsException e) {
 			throw new AssertionError(
 					"Correctional status term cannot exist", e);
 		}
@@ -256,7 +282,7 @@ public class ChangeCorrectionalStatusServiceImpl
 			changedCorrectionalStatusTerm = this.correctionalStatusTermDelegate
 					.create(offender, new DateRange(effectiveDate, endDate),
 							correctionalStatus);
-		} catch (DuplicateEntityFoundException e) {
+		} catch (CorrectionalStatusTermExistsException e) {
 			throw new AssertionError(
 					"Correctional status term cannot exist", e);
 		}
@@ -279,7 +305,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					= this.supervisoryOrganizationTermDelegate.create(
 						offender, new DateRange(effectiveDate, endDate),
 						supervisoryOrganization);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (SupervisoryOrganizationTermExistsException e) {
 				throw new AssertionError(
 						"Supervisory organization term cannot exist", e);
 			}
@@ -294,7 +320,7 @@ public class ChangeCorrectionalStatusServiceImpl
 									newExistingEndDate),
 							existingSupervisoryOrganizationTerm.
 								getSupervisoryOrganization());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (SupervisoryOrganizationTermExistsException e) {
 			throw new AssertionError(
 					"Supervisory organization term cannot exist", e);
 		}
@@ -308,7 +334,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					changedCorrectionalStatusTerm,
 					changeReason,
 					null, false);
-		} catch (DuplicateEntityFoundException e) {
+		} catch (PlacementTermExistsException e) {
 			throw new AssertionError("Placement term cannot exist", e);
 		}
 	}
@@ -364,7 +390,7 @@ public class ChangeCorrectionalStatusServiceImpl
 			correctionalStatusTerm = this.correctionalStatusTermDelegate
 					.create(offender, new DateRange(effectiveDate, endDate),
 							correctionalStatus);
-		} catch (DuplicateEntityFoundException e) {
+		} catch (CorrectionalStatusTermExistsException e) {
 			throw new AssertionError(
 					"Correctional status term cannot exist", e);
 		}
@@ -374,7 +400,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					.supervisoryOrganizationTermDelegate.create(
 							offender, new DateRange(effectiveDate, endDate),
 							supervisoryOrganization);
-		} catch (DuplicateEntityFoundException e) {
+		} catch (SupervisoryOrganizationTermExistsException e) {
 			throw new AssertionError(
 					"Supervisory organization term cannot exist", e);
 		}
@@ -383,7 +409,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					offender, new DateRange(effectiveDate, endDate),
 					supervisoryOrganizationTerm, correctionalStatusTerm,
 					changeReason, null, false);
-		} catch (DuplicateEntityFoundException e) {
+		} catch (PlacementTermExistsException e) {
 			throw new AssertionError("Placement term cannot exist", e);
 		}
 	}
@@ -397,7 +423,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					throws OffenderNotUnderSupervisionException,
 						LocationNotAllowedException,
 						LocationTermConflictException,
-						DuplicateEntityFoundException {
+						LocationTermExistsException {
 		
 		// Determines placement term on effective date
 		// Throws exception if null
@@ -408,7 +434,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					"Placement term for offender does not exist on date");
 		}
 		
-		// Throws exception if facility is not allowed for correctional status
+		// Throws exception if location is not allowed for correctional status
 		if (!placementTerm.getCorrectionalStatusTerm()
 				.getCorrectionalStatus().getLocationRequired()) {
 			throw new LocationNotAllowedException(
@@ -441,7 +467,7 @@ public class ChangeCorrectionalStatusServiceImpl
 				Date existingEndDate = DateRange.getEndDate(
 						existingLocationTerm.getDateRange());
 				if (existingEndDate == null
-						|| existingEndDate.compareTo(effectiveDate) < 0) {
+						|| existingEndDate.after(effectiveDate)) {
 					try {
 						existingLocationTerm = this.locationTermDelegate
 							.update(existingLocationTerm,
@@ -449,8 +475,9 @@ public class ChangeCorrectionalStatusServiceImpl
 									DateRange.getStartDate(
 										existingLocationTerm.getDateRange()),
 									endDate,
-									existingLocationTerm.getLocked());
-					} catch (DuplicateEntityFoundException e) {
+									existingLocationTerm.getLocked(),
+									existingLocationTerm.getNotes());
+					} catch (LocationTermExistsException e) {
 						throw new AssertionError(
 								"Location term cannot exist", e);
 					}
@@ -464,15 +491,16 @@ public class ChangeCorrectionalStatusServiceImpl
 								DateRange.getStartDate(
 										existingLocationTerm.getDateRange()),
 								effectiveDate,
-								existingLocationTerm.getLocked());
-				} catch (DuplicateEntityFoundException e) {
+								existingLocationTerm.getLocked(),
+								existingLocationTerm.getNotes());
+				} catch (LocationTermExistsException e) {
 					throw new AssertionError("Location term cannot exist", e);
 				}
 				try {
 					locationTerm = this.locationTermDelegate
 						.create(offender, location,
-								effectiveDate, endDate, false);
-				} catch (DuplicateEntityFoundException e) {
+								effectiveDate, endDate, false, null);
+				} catch (LocationTermExistsException e) {
 					throw new AssertionError("Location term cannot exist", e);
 				}
 			}
@@ -489,7 +517,8 @@ public class ChangeCorrectionalStatusServiceImpl
 			
 			// Creates new location term for location of facility
 			locationTerm = this.locationTermDelegate
-				.create(offender, location, effectiveDate, endDate, false);
+				.create(offender, location, effectiveDate, endDate, false,
+						null);
 		}
 		
 		if (reason != null) {
@@ -500,7 +529,7 @@ public class ChangeCorrectionalStatusServiceImpl
 				this.locationReasonTermDelegate.create(
 					locationTerm, new DateRange(effectiveDate, endDate),
 					reason);
-			} catch (DuplicateEntityFoundException e) {
+			} catch (LocationReasonTermExistsException e) {
 				throw new AssertionError(
 					"It is virtually impossible for a reason to exist for newly"
 					+ " created location term", e);
@@ -546,7 +575,7 @@ public class ChangeCorrectionalStatusServiceImpl
 	@Override
 	public ProgramPlacement placeOnProgram(final Offender offender,
 			final Date effectiveDate, final Date endDate,
-			final Program program) throws DuplicateEntityFoundException {
+			final Program program) throws ProgramPlacementExistsException {
 		ProgramPlacement existingProgramPlacement
 				= this.programPlacementDelegate.findByOffenderOnDate(
 						offender, effectiveDate);
@@ -559,7 +588,7 @@ public class ChangeCorrectionalStatusServiceImpl
 									effectiveDate), program,
 							existingProgramPlacement.getPlacementTerm(),
 							existingProgramPlacement.getLocationTerm());
-			} catch (DuplicateEntityFoundException e) {
+			} catch (ProgramPlacementExistsException e) {
 				
 				// The business key of the program placement should prevent
 				// this - SA
@@ -592,8 +621,9 @@ public class ChangeCorrectionalStatusServiceImpl
 									DateRange.getStartDate(locationTerm
 											.getDateRange()),
 									effectiveDate,
-									locationTerm.getLocked());
-				} catch (DuplicateEntityFoundException e) {
+									locationTerm.getLocked(),
+									locationTerm.getNotes());
+				} catch (LocationTermExistsException e) {
 					throw new AssertionError("Location term cannot exist", e);
 				}
 			}
@@ -616,7 +646,7 @@ public class ChangeCorrectionalStatusServiceImpl
 									DateRange.adjustEndDate(locationReasonTerm
 											.getDateRange(), effectiveDate),
 									locationReasonTerm.getReason());
-					} catch (DuplicateEntityFoundException e) {
+					} catch (LocationReasonTermExistsException e) {
 						throw new AssertionError(
 								"Nearly impossible condition encountered", e);
 					}
@@ -697,7 +727,7 @@ public class ChangeCorrectionalStatusServiceImpl
 						effectiveDate),
 						placementTerm.getCorrectionalStatusTerm()
 							.getCorrectionalStatus());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (CorrectionalStatusTermExistsException e) {
 			throw new AssertionError(
 					"Correctional status term cannot exist", e);
 		}
@@ -715,7 +745,7 @@ public class ChangeCorrectionalStatusServiceImpl
 										.getDateRange(), effectiveDate),
 							placementTerm.getSupervisoryOrganizationTerm()
 									.getSupervisoryOrganization());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (SupervisoryOrganizationTermExistsException e) {
 			throw new AssertionError(
 					"Supervisory organization term cannot exist", e);
 		}			
@@ -731,7 +761,7 @@ public class ChangeCorrectionalStatusServiceImpl
 					placementTerm.getStartChangeReason(),
 					changeReason,
 					placementTerm.getLocked());
-		} catch (DuplicateEntityFoundException e) {
+		} catch (PlacementTermExistsException e) {
 			throw new AssertionError("Placement term cannot exist", e);
 		}
 	}
@@ -797,9 +827,13 @@ public class ChangeCorrectionalStatusServiceImpl
 		List<SupervisoryOrganization> organizations
 			= this.supervisoryOrganizationDelegate
 				.findForCorrectionalStatus(correctionalStatus);
-		return this.locationDelegate
-			.findByOrganizations(
-					organizations.toArray(
-							new SupervisoryOrganization[] { }));
+		if (organizations.size() > 0) {
+			return this.locationDelegate
+					.findByOrganizations(
+							organizations.toArray(
+									new SupervisoryOrganization[] { }));
+		} else {
+			return Collections.emptyList();
+		}
 	}
 }

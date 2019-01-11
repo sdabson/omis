@@ -24,4 +24,14 @@
 		<many-to-one name="referredByProviderAssignment" entity-name="omis.health.domain.ProviderAssignment" not-null="false" column="`REF_BY_PROVIDER_ASSIGNMENT_ID`"/>
 		<property name="referredDate" type="java.util.Date" not-null="false" column="`REFERRED_DATE`"/>
 	</class>
+	<query name="findExistingExternalReferralAuthorizationRequest"><![CDATA[
+	  select request
+	    from
+	      omis.health.domain.ExternalReferralAuthorizationRequest as request
+	    where
+	      request.offender = :offender
+	      and request.facility = :facility
+	      and request.date = :date
+	      and request.medicalFacility = :medicalFacility
+	]]></query>
 </hibernate-mapping>

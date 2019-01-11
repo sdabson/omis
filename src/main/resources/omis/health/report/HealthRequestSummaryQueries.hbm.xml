@@ -2,8 +2,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!--
- - Author: Stephen Abson
- - Version: 0.1.0 (Apr 14, 2014)
+ - Author: Stephen Abson, Yidong Li
+ - Version: 0.1.0 (Oct 22, 2018)
  - Since: OMIS 3.0
  -->
 <hibernate-mapping package="omis.health.report">
@@ -322,5 +322,55 @@
 	  where facility = :facility
 	    and healthRequest.category in (:categories)
    order by healthRequest.date asc
+  ]]></query>
+  <query name="countHealthRequestSummariesByStatusAndCategory"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.status = :status
+	    and healthRequest.category in (:categories)
+  ]]></query>
+  <query name="countHealthRequestSummariesByStatus"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	   where facility = :facility
+	     and healthRequest.status = :status
+	]]></query>
+	<query name="countHealthRequestSummariesByCategoryExcludingStatus"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.status <> :status
+	    and healthRequest.category in (:categories)
+  ]]></query>
+  <query name="countHealthRequestSummariesExcludingStatus"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	   where facility = :facility
+	     and healthRequest.status <> :status
+  ]]></query>
+  <query name="countHealthRequestSummariesByCategory"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	  where facility = :facility
+	    and healthRequest.category in (:categories)
+  ]]></query>
+  <query name="countHealthRequestSummariesByOffenderStatus"><![CDATA[
+ 	select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.offender offender
+	   where offender = :offender
+	     and healthRequest.status = :status
+  ]]></query>
+  <query name="countHealthRequestSummaries"><![CDATA[
+	  select count(healthRequest.id)
+	   from omis.health.domain.HealthRequest healthRequest
+	   inner join healthRequest.facility facility
+	   where facility = :facility
   ]]></query>
 </hibernate-mapping>

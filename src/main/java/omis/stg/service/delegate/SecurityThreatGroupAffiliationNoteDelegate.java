@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.delegate;
 
 import java.util.Date;
@@ -6,16 +23,17 @@ import java.util.List;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.stg.dao.SecurityThreatGroupAffiliationNoteDao;
 import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupAffiliationNote;
+import omis.stg.exception.SecurityThreatGroupAffiliationNoteExistsException;
 
 /**
  * Security threat group affiliation note.
  * 
  * @author Trevor Isles
+ * @author Sheronda Vaughn
  * @version 0.1.0 (October 20, 2016)
  * @since OMIS 3.0
  */
@@ -53,15 +71,15 @@ public class SecurityThreatGroupAffiliationNoteDelegate {
 	 * @param Date - date
 	 * @param String - note
 	 * @return Creates security threat group note.
-	 * @throws DuplicateEntityFoundException - when security threat group
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException - when security threat group
 	 * affiliation note already exists.
 	 */
 	public SecurityThreatGroupAffiliationNote addNote(
 			final SecurityThreatGroupAffiliation affiliation,
 			final Date date, String note)
-	throws DuplicateEntityFoundException {
+	throws SecurityThreatGroupAffiliationNoteExistsException {
 		if (this.affiliationNoteDao.findAffiliationNote(affiliation, date, note) != null) {
-			throw new DuplicateEntityFoundException("Duplicate security threat "
+			throw new SecurityThreatGroupAffiliationNoteExistsException("Duplicate security threat "
 					+ "group affiliation note found.");
 		}
 		SecurityThreatGroupAffiliationNote affiliationNote = 
@@ -83,17 +101,17 @@ public class SecurityThreatGroupAffiliationNoteDelegate {
 	 * @param Date - date
 	 * @param String - note
 	 * @return Updates security threat group note.
-	 * @throws DuplicateEntityFoundException - when security threat group
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException - when security threat group
 	 * affiliation note already exists.
 	 */
 	public SecurityThreatGroupAffiliationNote update(
 			SecurityThreatGroupAffiliationNote affiliationNote, Date date, 
 			String note)
-		throws DuplicateEntityFoundException {
+		throws SecurityThreatGroupAffiliationNoteExistsException {
 		if (this.affiliationNoteDao.findExcluding( 
 				affiliationNote, affiliationNote.getAffiliation(), date, note) 
 				!= null) {
-			throw new DuplicateEntityFoundException(
+			throw new SecurityThreatGroupAffiliationNoteExistsException(
 					"Duplicate security threat group note found.");
 		}
 		this.populateSecurityThreatGroupAffiliationNote(affiliationNote, date, 
@@ -106,7 +124,7 @@ public class SecurityThreatGroupAffiliationNoteDelegate {
 	 * @param Date - date
 	 * @param String - note
 	 * @return Removes security threat group note.
-	 * @throws DuplicateEntityFoundException - when security threat group
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException - when security threat group
 	 * affiliation note already exists.
 	 */
 	public void remove(final SecurityThreatGroupAffiliationNote affiliationNote) {

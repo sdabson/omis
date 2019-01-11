@@ -47,7 +47,7 @@
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingAnalysis/scripts/JQuery/jquery.omis.hearingAnalysis.js?VERSION=1"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingAnalysis/scripts/hearingAnalysis.js?VERSION=1"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearingAnalysis/scripts/hearingAnalysis.js?VERSION=2"></script>
 	<script type="text/javascript">
 		//Track current indexes
 		var currentHearingAnalysisNoteIndex = ${hearingAnalysisNoteIndex};
@@ -57,7 +57,7 @@
 <body>
 	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
 	<h1>
-		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/hearingAnalysis/hearingAnalysisActionMenu.html?offender=${offenderSummary.id}"></a>
+		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/hearingAnalysis/hearingAnalysisActionMenu.html?paroleEligibility=${eligibility.id}"></a>
 		<c:choose>
 			<c:when test="${not empty hearingAnalysis}">
 				<fmt:message key="editHearingAnalysisTitle"/>

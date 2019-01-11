@@ -5,10 +5,10 @@
 <hibernate-mapping package="omis.document.domain">
 	<query name="findDocumentSummariesByOffender"><![CDATA[
 		select new omis.document.report.DocumentSummary(mdocument.id,
-				coalesce(courtCaseDocumentAssociation.id,null),
-				coalesce(courtCaseDocumentAssociationCategory.name,null),
-				case when courtCaseDocumentAssociation is not null then
-					'courtCase'
+				coalesce(courtDocumentAssociation.id,null),
+				coalesce(courtDocumentAssociationCategory.name,null),
+				case when courtDocumentAssociation is not null then
+					'court'
 				end,
 				mdocument.title,
 				name.firstName,
@@ -18,10 +18,10 @@
 		    from omis.document.domain.Document mdocument
       left outer join mdocument.updateSignature updateSignature
       left outer join updateSignature.userAccount.user.name name,
-                 omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
- left outer join courtCaseDocumentAssociation.category courtCaseDocumentAssociationCategory
-           where courtCaseDocumentAssociation.courtCase.docket.person = :offender
-             and courtCaseDocumentAssociation.document = mdocument
+                 omis.courtdocument.domain.CourtDocumentAssociation courtDocumentAssociation
+ left outer join courtDocumentAssociation.category courtDocumentAssociationCategory
+           where courtDocumentAssociation.docket.person = :offender
+             and courtDocumentAssociation.document = mdocument
         order by updateSignature.date desc 
 	]]></query>
 </hibernate-mapping>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!-- 
+ - Officer case assignment summary query configuration.
+ -
+ - Author: Josh Divine
+ - Version: 0.1.4 (Dec 10, 2018)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.caseload.report">
+	<query name="findOfficerCaseAssignmentSummariesByOffender"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca),
+		(select jur.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 left join ica.jurisdiction jur
+		 where ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join oca.supervisionOffice location
+		left join location.organization organization
+		left join oca.supervisionLevel supervisionLevel
+		where
+			oca.offender = :offender	
+		order by
+			oca.dateRange.endDate desc
+	]]></query>
+	<query name="findOfficerCaseAssignmentSummariesByOffenderOnDateRange"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+			from
+				omis.caseload.domain.InterstateCompactAssignment ica
+			where
+				ica.officerCaseAssignment = oca),
+		(select jur.name
+			from
+				omis.caseload.domain.InterstateCompactAssignment ica
+			left join
+				ica.jurisdiction jur
+			where
+				ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+			from
+				omis.caseload.domain.InterstateCompactAssignment ica
+			where
+				ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join
+			oca.supervisionOffice location
+		left join
+			location.organization organization
+		left join
+			oca.supervisionLevel supervisionLevel
+		where
+			oca.offender = :offender
+		and
+			((:startDate is null and :endDate is null)
+			or (oca.dateRange.startDate is null and oca.dateRange.endDate is null)
+			or ((oca.dateRange.startDate is null or oca.dateRange.startDate <= :endDate or :endDate is null)
+				and (oca.dateRange.endDate is null or oca.dateRange.endDate >= :startDate or :startDate is null)))
+		order by
+			oca.dateRange.endDate desc
+	]]></query>
+	<query name="findOfficerCaseAssignmentSummariesByUserAccountAndDate"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca),
+		(select jur.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 left join ica.jurisdiction jur
+		 where ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join oca.supervisionOffice location
+		left join location.organization organization
+		left join oca.supervisionLevel supervisionLevel
+		where
+			oca.officer = :userAccount
+		and
+			oca.dateRange.startDate <= :effectiveDate
+		and
+			(oca.dateRange.endDate > :effectiveDate
+			or oca.dateRange.endDate is null)
+		order by
+			oca.offender.name.lastName,
+			oca.dateRange.startDate desc,
+			oca.dateRange.endDate desc nulls first
+	]]></query>
+	<query name="findOfficerCaseAssignmentSummariesByUserAccountAndDateRange"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca),
+		(select jur.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 left join ica.jurisdiction jur
+		 where ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join oca.supervisionOffice location
+		left join location.organization organization
+		left join oca.supervisionLevel supervisionLevel
+		where
+			oca.officer = :userAccount
+		and
+			((:startDate is null and :endDate is null)
+           OR
+           	   (oca.dateRange.startDate is null and
+           	    oca.dateRange.endDate is null)
+           OR
+         	   ((oca.dateRange.startDate is null or
+         	    oca.dateRange.startDate <= :endDate or 
+         	    :endDate is null) and
+         	    (oca.dateRange.endDate is null or
+         	     oca.dateRange.endDate >= :startDate or
+         	     :startDate is null)))
+		order by
+			oca.offender.name.lastName,
+			oca.dateRange.startDate desc,
+			oca.dateRange.endDate desc nulls first
+	]]></query>
+	<query name="findOfficerCaseAssignmentSummariesByOffenderBeforeDate"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca),
+		(select jur.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 left join ica.jurisdiction jur
+		 where ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join oca.supervisionOffice location
+		left join location.organization organization
+		left join oca.supervisionLevel supervisionLevel
+		where
+			oca.offender = :offender
+		and
+           oca.dateRange.endDate <= :date
+		order by
+			oca.dateRange.startDate desc,
+			oca.dateRange.endDate desc nulls first
+	]]></query>
+	<query name="findOfficerCaseAssignmentSummariesByOffenderAfterDate"><![CDATA[
+		select new omis.caseload.report.OfficerCaseAssignmentSummary(
+		oca.id, oca.dateRange.startDate, oca.dateRange.endDate, 
+		oca.officer.user.name.lastName, oca.officer.user.name.firstName, 
+		oca.officer.user.name.middleName, oca.officer.username,
+		oca.offender.name.lastName, oca.offender.name.middleName,
+		oca.offender.name.firstName, oca.offender.offenderNumber,
+		organization.name, supervisionLevel.description,
+		(select ica.interstateCompactStatus.correctionalStatus.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca),
+		(select jur.name
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 left join ica.jurisdiction jur
+		 where ica.officerCaseAssignment = oca),
+		(select ica.projectedEndDate
+		 from omis.caseload.domain.InterstateCompactAssignment ica
+		 where ica.officerCaseAssignment = oca)
+		)
+		from
+			omis.caseload.domain.OfficerCaseAssignment oca
+		left join oca.supervisionOffice location
+		left join location.organization organization
+		left join oca.supervisionLevel supervisionLevel
+		where
+			oca.offender = :offender
+		and
+			oca.dateRange.startDate >= :date
+		order by
+			oca.dateRange.startDate desc,
+			oca.dateRange.endDate desc nulls first
+	]]></query>
+</hibernate-mapping>

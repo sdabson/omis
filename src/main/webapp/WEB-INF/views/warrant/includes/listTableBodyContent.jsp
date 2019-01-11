@@ -6,7 +6,7 @@
 <tr>
 	<td><a class="actionMenuItem rowActionMenuItem" href="${pageContext.request.contextPath}/warrant/warrantsRowActionMenu.html?warrant=${summary.warrantId}&warrantRelease=${summary.warrantReleaseId}&warrantCancellation=${summary.warrantCancellationId}&warrantArrest=${summary.warrantArrestId}"></a></td>
 	<td>
-		<fmt:message key="${summary.warrantReasonCategory}CategoryLabel"/>
+		<fmt:message key="categoryLabel.${summary.warrantReasonCategory}"/>
 	</td>
 	<td>
 		<fmt:formatDate value="${summary.warrantDate}" pattern="MM/dd/yyyy" />
@@ -17,7 +17,9 @@
 	<td>
 		<c:set var="clearedMethod" value="${not empty summary.warrantCancellationId ? 'canceled' : not empty summary.warrantArrestId ? 'arrested' : 'none'}"/>
 		<c:set var="released" value="${not empty summary.warrantArrestId && not empty summary.warrantReleaseId ? 'released' : ''}" />
+		<c:if test="${clearedMethod != 'none'}">
 		<fmt:message key="${clearedMethod}${released}ClearedMethodLabel"/>
+		</c:if>
 	</td>
 </tr>
 </c:forEach>

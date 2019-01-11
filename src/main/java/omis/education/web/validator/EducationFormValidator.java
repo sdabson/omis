@@ -184,8 +184,8 @@ public class EducationFormValidator implements Validator{
 										+ "].date", 
 								ACHIEVEMENT_DATE_OUT_OF_ATTENDED_RANGE_MSG_KEY);
 							}
-							index++;
 						}
+						index++;
 					}
 				}
 				if(form.getGraduated()){

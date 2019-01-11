@@ -18,31 +18,29 @@
 package omis.hearinganalysis.web.form;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import omis.hearinganalysis.domain.HearingAnalysisCategory;
-import omis.paroleboarditinerary.domain.BoardAttendee;
-import omis.paroleboarditinerary.domain.BoardMeetingSite;
-import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboardmember.domain.ParoleBoardMember;
 
 /**
  * Hearing analysis form.
  *
  * @author Josh Divine
- * @version 0.1.0 (Dec 19, 2017)
+ * @author Annie Wahl
+ * @version 0.1.3 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class HearingAnalysisForm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private ParoleBoardItinerary boardItinerary;
-	
-	private BoardMeetingSite boardMeetingSite;
-	
 	private HearingAnalysisCategory category;
 	
-	private BoardAttendee analyst;
+	private ParoleBoardMember analyst;
+	
+	private Date dueDate;
 	
 	private List<HearingAnalysisNoteItem> hearingAnalysisNoteItems;
 	
@@ -51,42 +49,6 @@ public class HearingAnalysisForm implements Serializable {
 	 */
 	public HearingAnalysisForm() {
 		// Default instantiation
-	}
-
-	/**
-	 * Returns the parole board itinerary.
-	 * 
-	 * @return parole board itinerary
-	 */
-	public ParoleBoardItinerary getBoardItinerary() {
-		return boardItinerary;
-	}
-
-	/**
-	 * Sets the parole board itinerary.
-	 * 
-	 * @param boardItinerary parole board itinerary
-	 */
-	public void setBoardItinerary(final ParoleBoardItinerary boardItinerary) {
-		this.boardItinerary = boardItinerary;
-	}
-
-	/**
-	 * Returns the board meeting site.
-	 * 
-	 * @return board meeting site
-	 */
-	public BoardMeetingSite getBoardMeetingSite() {
-		return boardMeetingSite;
-	}
-
-	/**
-	 * Sets the board meeting site.
-	 * 
-	 * @param boardMeetingSite board meeting site
-	 */
-	public void setBoardMeetingSite(final BoardMeetingSite boardMeetingSite) {
-		this.boardMeetingSite = boardMeetingSite;
 	}
 
 	/**
@@ -112,7 +74,7 @@ public class HearingAnalysisForm implements Serializable {
 	 * 
 	 * @return analyst
 	 */
-	public BoardAttendee getAnalyst() {
+	public ParoleBoardMember getAnalyst() {
 		return analyst;
 	}
 
@@ -121,8 +83,24 @@ public class HearingAnalysisForm implements Serializable {
 	 * 
 	 * @param analyst board attendee
 	 */
-	public void setAnalyst(final BoardAttendee analyst) {
+	public void setAnalyst(final ParoleBoardMember analyst) {
 		this.analyst = analyst;
+	}
+	
+	/**
+	 * Returns the dueDate.
+	 * @return dueDate - Date
+	 */
+	public Date getDueDate() {
+		return this.dueDate;
+	}
+
+	/**
+	 * Sets the dueDate.
+	 * @param dueDate - Date
+	 */
+	public void setDueDate(final Date dueDate) {
+		this.dueDate = dueDate;
 	}
 
 	/**

@@ -33,10 +33,20 @@
 				/* <![CDATA[ */
 					//offender photo association note item index used to track offender photo association note items on the form 
 					var currentOffenderPhotoAssociationNoteItemIndex = ${offenderPhotoAssociationNoteItemIndex};
+					<c:choose>
+						<c:when test="${allowEnhancedImageEditor}">
+							var allowEnhancedImageEditor = ${allowEnhancedImageEditor};
+						</c:when>
+						<c:otherwise>
+							var allowEnhancedImageEditor = false;
+						</c:otherwise>
+					</c:choose>
 				/* ]]> */
 	</script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/offenderPhoto/scripts/jquery/jquery.omis.offenderPhoto.js"> </script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/offenderPhoto/scripts/offenderPhoto.js"> </script>
+	<jsp:include page="/WEB-INF/views/common/includes/enhancedImageUploaderResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/mediaResources.jsp"/>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/offenderPhoto/scripts/jquery/jquery.omis.offenderPhoto.js?VERSION=1.1"> </script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/offenderPhoto/scripts/offenderPhoto.js?VERSION=1.1"> </script>
 </head>
 <body>	
 	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>

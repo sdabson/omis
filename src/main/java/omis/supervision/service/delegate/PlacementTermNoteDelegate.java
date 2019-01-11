@@ -33,7 +33,8 @@ import omis.supervision.exception.PlacementTermNoteExistsException;
  * Delegate for notes for placement terms.
  * 
  * @author Stephen Abson
- * @version 0.0.1 (Dec 13, 2017)
+ * @author Joel Norris
+ * @version 0.0.2 (December 5, 2017)
  * @since OMIS 3.0
  */
 public class PlacementTermNoteDelegate {
@@ -144,6 +145,15 @@ public class PlacementTermNoteDelegate {
 	public List<PlacementTermNote> findByPlacementTerm(
 			final PlacementTerm placementTerm) {
 		return this.placementTermNoteDao.findByPlacementTerm(placementTerm);
+	}
+	
+	/**
+	 * Removes placement term notes for the specified placement term.
+	 * 
+	 * @param placementTerm placement term
+	 */
+	public void removeByPlacementTerm(final PlacementTerm placementTerm) {
+		this.placementTermNoteDao.removeByPlacementTerm(placementTerm);
 	}
 	
 	/* Helper methods. */

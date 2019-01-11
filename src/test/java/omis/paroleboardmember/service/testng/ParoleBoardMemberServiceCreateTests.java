@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.paroleboardmember.service.testng;
 
 import java.text.ParseException;
@@ -29,7 +46,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create parole board members.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.1 (Aug 2, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardMemberServiceCreateTests
@@ -161,6 +178,37 @@ public class ParoleBoardMemberServiceCreateTests
 				endDate);
 	}
 
+	/**
+	 * Test that {@code DateConflictException} is thrown.
+	 * 
+	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws DateConflictException if parole board member date range not 
+	 * within staff assignment date range
+	 */
+	@Test(expectedExceptions = {DateConflictException.class})
+	public void testDateConflictExceptionMemberAlreadyExists() 
+			throws DuplicateEntityFoundException, DateConflictException {
+		// Arrangements
+		Date startDate = this.parseDateText("01/01/2017");
+		Date endDate = null;
+		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
+				null);
+		SupervisoryOrganization supervisoryOrganization = this
+				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
+		DateRange dateRange = new DateRange(startDate, endDate);
+		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
+				true);
+		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
+				staffMember, supervisoryOrganization, null, dateRange, title, 
+				true, null, null, null, null, null);
+		this.paroleBoardMemberDelegate.create(staffAssignment, dateRange);
+		Date secondStartDate = this.parseDateText("02/01/2017");
+		
+		// Action
+		this.paroleBoardMemberService.create(staffAssignment, secondStartDate, 
+				endDate);
+	}
+	
 	// Parses date text
 	private Date parseDateText(final String text) {
 		try {

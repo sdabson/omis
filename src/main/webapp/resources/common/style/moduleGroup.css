@@ -1,0 +1,77 @@
+.moduleGroupLinkContainer {
+	text-align: center;
+	padding: 4px;
+	width: inherit;
+	margin-bottom: 4px;
+	margin-top: 4px;
+}
+
+.moduleGroupLinkContainer + .moduleGroupDisplayContainer {
+	width: 90%;
+	height: auto;
+	min-height: 700px;
+	display: block;
+	margin: 0 auto;
+	margin-bottom: 8px;
+/* 	border-style: solid; */
+/* 	border-width: 1px; */
+}
+
+.moduleGroupDisplayContainer div {
+	height: 100%;
+	min-height: inherit;
+	width: 100%;
+}
+
+.moduleGroupDisplayContent {
+	width: inherit;
+	height: inherit;
+	min-height: calc(100% + 5px);
+}
+
+.moduleGroupLinkContainer > a {
+	text-decoration: none;
+	padding: 4px;
+	margin-bottom: 4px;
+	margin-left: 4px;
+	width: 120px;
+	display: inline-block;
+}
+
+.moduleGroupLinkContainer > a:hover {
+	text-decoration: none;
+	color: none;
+}
+
+.moduleGroupLinkContainer > a:not(.activeModuleGroupLink ):hover {
+	opacity: .7;
+}
+
+.activeModuleGroupLink {
+	font-weight: bold;
+}
+
+.moduleGroupLinkRefresh:after {
+	background-image: url('../images/refresh.png');
+	background-size: 16px 24px;
+	display: inline-block;
+	width: 16px; 
+	height: 24px;
+	content:"";
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.moduleGroupLinkRefreshCurrent {
+	position: absolute;
+	top: 10px;
+	right: 25px;
+}
+
+.hiddenModuleGroupDisplay {
+	z-index: -1231231;
+	position:absolute;
+	top:0; left:0;
+	opacity:0;
+	width: inherit;
+}

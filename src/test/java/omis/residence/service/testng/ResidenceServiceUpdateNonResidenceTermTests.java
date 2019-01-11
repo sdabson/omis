@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.residence.service.testng;
 
 import java.text.ParseException;
@@ -30,8 +47,11 @@ import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
+import omis.residence.dao.NonResidenceTermDao;
 import omis.residence.domain.NonResidenceTerm;
 import omis.residence.domain.ResidenceStatus;
+import omis.residence.exception.AllowedResidentialLocationRuleExistsException;
+import omis.residence.exception.NonResidenceTermExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
 import omis.residence.service.ResidenceService;
 import omis.residence.service.delegate.AllowedResidentialLocationRuleDelegate;
@@ -52,6 +72,12 @@ import omis.util.PropertyValueAsserter;
 public class ResidenceServiceUpdateNonResidenceTermTests 
 	extends AbstractHibernateTransactionalTestNGSpringContextTests {
 
+	/* Data access objects. */
+	
+	@Autowired
+	@Qualifier("nonResidenceTermDao")
+	private NonResidenceTermDao nonResidenceTermDao;
+	
 	/* Service delegates. */
 	
 	@Autowired
@@ -122,11 +148,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException  nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
 	@Test
 	public void testUpdateNonResidenceTermDateRange() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -148,7 +178,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -156,7 +186,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 		NonResidenceTerm nonResidenceTerm = this.nonResidenceTermDelegate
 				.createNonResidenceTerm(person, dateRange, status, location, 
 						confirmed, notes, verificationSignature);
-		DateRange newDateRange = new DateRange(this.parseDateText("03/01/2017"), 
+		DateRange newDateRange = new DateRange(this.parseDateText("03/01/2017"),
 				this.parseDateText("06/01/2017"));
 		
 		// Action
@@ -183,11 +213,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
 	@Test
 	public void testUpdateNonResidenceTermResidenceStatus() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -209,7 +243,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -237,18 +271,10 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 			.performAssertions(nonResidenceTerm);
 	}
 	
-	/**
-	 * Tests update of the location for a non-residence term.
-	 * 
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
-	 * @throws ResidenceStatusConflictException if residence term conflict 
-	 * exists
-	 * @throws LocationNotAllowedException if location is not allowed
-	 */
-	@Test
-	public void testUpdateNonResidenceTermLocation() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+	public void testResidenceServiceEndNonResidenceTerm() 
+			throws AllowedResidentialLocationRuleExistsException, NonResidenceTermExistsException, 
+			LocationNotAllowedException, ResidenceStatusConflictException, 
+			DuplicateEntityFoundException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -270,7 +296,67 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
+				"Method", (short) 1, true);
+		VerificationSignature verificationSignature = new VerificationSignature(
+				this.accountDelegate.findByUsername("AUDIT"), 
+				this.parseDateText("02/01/2017"), true, method);
+		NonResidenceTerm nonResidenceTerm = this.nonResidenceTermDelegate
+				.createNonResidenceTerm(person, dateRange, status, location, 
+						confirmed, notes, verificationSignature);
+		Date endDate = this.parseDateText("06/01/2017");
+		DateRange newDateRange = new DateRange(null, endDate);
+		nonResidenceTerm = this.residenceService.updateNonResidenceTerm(
+				nonResidenceTerm, newDateRange, status, location, confirmed, 
+				notes, verificationSignature);
+		
+		// Action
+		this.residenceService.endNonResidenceTerm(nonResidenceTerm, endDate);
+		
+		// Assertions
+		assert this.nonResidenceTermDao.findExcluding(
+				person, newDateRange, location, state, city, status, nonResidenceTerm) == null
+				: "NonResidence term was not ended.";		
+	}
+	
+	/**
+	 * Tests update of the location for a non-residence term.
+	 * 
+	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws ResidenceStatusConflictException if residence term conflict 
+	 * exists
+	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
+	 */
+	@Test
+	public void testUpdateNonResidenceTermLocation() 
+			throws DuplicateEntityFoundException, 
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
+		// Arrangements
+		Person person = this.personDelegate.create("Smith", "John", "Jay", 
+				null);
+		DateRange dateRange = new DateRange(this.parseDateText("01/01/2017"), 
+				this.parseDateText("06/01/2017"));
+		Country country = this.countryDelegate.create("Country", "C", true);
+		State state = this.stateDelegate.create("State", "ST", country, true, 
+				true);
+		City city = this.cityDelegate.create("City", true, state, country);
+		String notes = "Notes";
+		ResidenceStatus status = ResidenceStatus.GROUP_HOME;
+		ZipCode zipCode = this.zipCodeDelegate.create(city, "00001", null, 
+				true);
+		Address address = this.addressDelegate.findOrCreate("1 A Street", null, 
+				null, null, zipCode);
+		Organization organization = this.organizationDelegate.create("Org", 
+				null, null);
+		Location location = this.locationDelegate.create(organization, 
+				dateRange, address);
+		this.allowedResidentialLocationRuleDelegate.create(location, status);
+		Boolean confirmed = false;		
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -308,11 +394,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
 	@Test
 	public void testUpdateNonResidenceTermConfirmed() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -334,7 +424,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -368,11 +458,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
 	@Test
 	public void testUpdateNonResidenceTermNotes() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -394,7 +488,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -428,11 +522,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
 	@Test
 	public void testUpdateNonResidenceTermVerificationSignature() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -454,7 +552,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -491,11 +589,15 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
+	 * @throws AllowedResidentialLocationRuleExistsException 
 	 */
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
-	public void testDuplicateEntityFoundException() 
+	@Test(expectedExceptions = {NonResidenceTermExistsException.class})
+	public void testNonResidenceTermExistsException() 
 			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			ResidenceStatusConflictException, LocationNotAllowedException, 
+			NonResidenceTermExistsException, 
+			AllowedResidentialLocationRuleExistsException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -517,22 +619,45 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 				dateRange, address);
 		this.allowedResidentialLocationRuleDelegate.create(location, status);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
 				this.parseDateText("02/01/2017"), true, method);
-		this.nonResidenceTermDelegate.createNonResidenceTerm(person, dateRange, 
-				status, location, confirmed, notes, verificationSignature);
-		ResidenceStatus secondStatus = ResidenceStatus.GROUP_HOME;
-		NonResidenceTerm nonResidenceTerm = this.nonResidenceTermDelegate
-				.createNonResidenceTerm(person, dateRange, secondStatus, 
-						location, confirmed, notes, verificationSignature);
+		this.nonResidenceTermDelegate
+				.createNonResidenceTerm(person, dateRange, status, location, 
+						confirmed, notes, verificationSignature);
+		VerificationSignature newVerificationSignature = 
+				new VerificationSignature(
+				this.accountDelegate.findByUsername("AUDIT"), 
+				this.parseDateText("02/01/2017"), false, method);
+		DateRange newateRange = new DateRange(this.parseDateText("05/01/2017"), 
+				this.parseDateText("08/01/2017"));
+		Country newCountry = this.countryDelegate
+				.create("nCountry", "nC", true);
+		State newState = this.stateDelegate.create("nState", "nST", 
+				newCountry, true, 
+				true);
+		City newCity = this.cityDelegate.create("nCity", true, newState, 
+				newCountry);
+		ZipCode newZipCode = this.zipCodeDelegate.create(newCity, "n00001", 
+				null,  true);
+		Address newAddress = this.addressDelegate.findOrCreate("n1 A Street", 
+				null, null, null, newZipCode);
+		
+		Location newLocation = this.locationDelegate.create(organization, 
+				newateRange, newAddress);
+		this.allowedResidentialLocationRuleDelegate.create(newLocation, 
+				ResidenceStatus.HOTEL);
+		NonResidenceTerm nonResidenceTerm 
+			= this.nonResidenceTermDelegate.createNonResidenceTerm(
+					person, newateRange, ResidenceStatus.HOTEL, 
+					newLocation, confirmed, notes, newVerificationSignature);
 		
 		// Action
-		this.residenceService.updateNonResidenceTerm(nonResidenceTerm, 
-				dateRange, status, location, confirmed, notes, 
-				verificationSignature);
+		nonResidenceTerm = this.residenceService.updateNonResidenceTerm(
+				nonResidenceTerm, dateRange, status, location, confirmed, 
+				notes, newVerificationSignature);
 	}
 		
 	/**
@@ -542,11 +667,13 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	 * @throws ResidenceStatusConflictException if residence term conflict 
 	 * exists
 	 * @throws LocationNotAllowedException if location is not allowed
+	 * @throws NonResidenceTermExistsException nonResidence term exists
 	 */
 	@Test(expectedExceptions = {LocationNotAllowedException.class})
 	public void testLocationNotAllowedException() 
-			throws DuplicateEntityFoundException, 
-			ResidenceStatusConflictException, LocationNotAllowedException {
+			throws ResidenceStatusConflictException, 
+			LocationNotAllowedException, 
+			NonResidenceTermExistsException, DuplicateEntityFoundException {
 		// Arrangements
 		Person person = this.personDelegate.create("Smith", "John", "Jay", 
 				null);
@@ -567,7 +694,7 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 		Location location = this.locationDelegate.create(organization, 
 				dateRange, address);
 		Boolean confirmed = false;		
-		VerificationMethod method= this.verificationMethodDelegate.create(
+		VerificationMethod method = this.verificationMethodDelegate.create(
 				"Method", (short) 1, true);
 		VerificationSignature verificationSignature = new VerificationSignature(
 				this.accountDelegate.findByUsername("AUDIT"), 
@@ -587,11 +714,11 @@ public class ResidenceServiceUpdateNonResidenceTermTests
 	}
 	
 	// Parses date text
-		private Date parseDateText(final String text) {
-			try {
-				return new SimpleDateFormat("MM/dd/yyyy").parse(text);
-			} catch (ParseException e) {
-				throw new RuntimeException("Parse error", e);
-			}
+	private Date parseDateText(final String text) {
+		try {
+			return new SimpleDateFormat("MM/dd/yyyy").parse(text);
+		} catch (ParseException e) {
+			throw new RuntimeException("Parse error", e);
 		}
+	}
 }

@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
@@ -12,11 +29,12 @@
 				<param name="sequence">`PAROLE_BOARD_ITINERARY_SEQ`</param>
 			</generator>
 		</id>
-		<many-to-one name="paroleBoardLocation" entity-name="omis.paroleboarditinerary.domain.ParoleBoardLocation" not-null="true" column="`PAROLE_BOARD_LOCATION_ID`"/>
+		<many-to-one name="paroleBoardLocation" entity-name="omis.paroleboardlocation.domain.ParoleBoardLocation" not-null="false" column="`PAROLE_BOARD_LOCATION_ID`"/>
 		<component name="dateRange" class="omis.datatype.DateRange">
-			<property name="startDate" type="java.util.Date" not-null="false" column="`START_DATE`"/>
-			<property name="endDate" type="java.util.Date" not-null="false" column="`END_DATE`"/>
+			<property name="startDate" type="java.util.Date" not-null="true" column="`START_DATE`"/>
+			<property name="endDate" type="java.util.Date" not-null="true" column="`END_DATE`"/>
 		</component>
+		<property name="onsite" column="`ON_SITE`" type="yes_no" not-null="true" />
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 			             not-null="true"/>
@@ -34,11 +52,11 @@
 		where
 			paroleBoardItinerary.paroleBoardLocation = :paroleBoardLocation
 		and
-			(paroleBoardItinerary.dateRange.startDate = :startDate
-			or (paroleBoardItinerary.dateRange.startDate is null and :startDate is null))
+			paroleBoardItinerary.dateRange.startDate = :startDate
 		and
-			(paroleBoardItinerary.dateRange.endDate = :endDate
-			or (paroleBoardItinerary.dateRange.endDate is null and :endDate is null))
+			paroleBoardItinerary.dateRange.endDate = :endDate
+		order by
+			paroleBoardItinerary.dateRange.startDate desc
 	]]></query>
 	<query name="findParoleBoardItineraryExcluding"><![CDATA[
 		select paroleBoardItinerary
@@ -46,22 +64,22 @@
 		where
 			paroleBoardItinerary.paroleBoardLocation = :paroleBoardLocation
 		and
-			(paroleBoardItinerary.dateRange.startDate = :startDate
-			or (paroleBoardItinerary.dateRange.startDate is null and :startDate is null))
+			paroleBoardItinerary.dateRange.startDate = :startDate
 		and
-			(paroleBoardItinerary.dateRange.endDate = :endDate
-			or (paroleBoardItinerary.dateRange.endDate is null and :endDate is null))
+			paroleBoardItinerary.dateRange.endDate = :endDate
 		and
 			paroleBoardItinerary <> :excludedItinerary
 	]]></query>
-	<query name="findParoleBoardItineraryAfterDate"><![CDATA[
-		select paroleBoardItinerary
+	<query name="findParoleBoardItineraryByEffectiveDate"><![CDATA[
+		select distinct paroleBoardItinerary
 		from omis.paroleboarditinerary.domain.ParoleBoardItinerary paroleBoardItinerary
 		where
 			(paroleBoardItinerary.dateRange.startDate <= :date
-			or paroleBoardItinerary.dateRange.startDate is null)
 		and
-			(paroleBoardItinerary.dateRange.endDate >= :date
-			or paroleBoardItinerary.dateRange.endDate is null)
+			paroleBoardItinerary.dateRange.endDate >= :date)
+		or
+			paroleBoardItinerary.dateRange.startDate > :date
+		order by
+			paroleBoardItinerary.dateRange.startDate desc
 	]]></query>
 </hibernate-mapping>

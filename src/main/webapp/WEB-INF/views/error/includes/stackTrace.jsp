@@ -8,8 +8,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <fmt:bundle basename="omis.error.msgs.error">
 	<h2><fmt:message key="stackTraceLabel"/></h2>
-	<span class="exception"><c:out value="${pageContext.exception}"/></span>
-	<ul class="stackTraceElements">
+	<span class="exception foreground "><c:out value="${pageContext.exception}"/></span>
+	<ul class="stackTraceElements foreground">
 	<c:forEach var="stackTraceElement" items="${pageContext.exception.stackTrace}">
 		<li class="stackTraceElement">
 			<span class="stackTraceElementClassName"><c:out value="${stackTraceElement.className}"/></span>

@@ -14,7 +14,7 @@
 		<td>
 			<a class="actionMenuItem rowActionMenuLinks" id="photoSummaryActionMenuLink${status.index}" href="${pageContext.request.contextPath}/offenderPhoto/photosRowActionMenu.html?association=${association.id}"></a>
 		</td>	
-		<td class="smallPhoto"><img height="60" width="90" src="${pageContext.request.contextPath}/offenderPhoto/displayPhoto.html?association=${association.id}&amp;contentType=image/jpeg"/></td>
+		<td class="smallPhoto"><img class="viewableImage" height="60" width="90" src="${pageContext.request.contextPath}/offenderPhoto/displayPhoto.html?association=${association.id}&amp;contentType=image/jpeg"/></td>
 		<td><fmt:formatDate value="${association.photo.date}" pattern="MM/dd/yyyy"/></td>
 		<td>
 			<fmt:message key="updateUserAccountFormat" bundle="${auditBundle}">

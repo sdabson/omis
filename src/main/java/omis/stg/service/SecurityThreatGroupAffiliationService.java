@@ -1,3 +1,20 @@
+/* 
+* OMIS - Offender Management Information System 
+* Copyright (C) 2011 - 2017 State of Montana 
+* 
+* This program is free software: you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation, either version 3 of the License, or 
+* (at your option) any later version. 
+* 
+* This program is distributed in the hope that it will be useful, 
+* but WITHOUT ANY WARRANTY; without even the implied warranty of 
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+* GNU General Public License for more details. 
+* 
+* You should have received a copy of the GNU General Public License 
+* along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 package omis.stg.service;
 
 import java.util.Date;
@@ -6,7 +23,6 @@ import java.util.List;
 import omis.audit.domain.VerificationMethod;
 import omis.audit.domain.VerificationSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -16,11 +32,16 @@ import omis.stg.domain.SecurityThreatGroupAffiliation;
 import omis.stg.domain.SecurityThreatGroupAffiliationNote;
 import omis.stg.domain.SecurityThreatGroupChapter;
 import omis.stg.domain.SecurityThreatGroupRank;
+import omis.stg.exception.SecurityThreatGroupAffiliationExistsException;
+import omis.stg.exception.SecurityThreatGroupAffiliationNoteExistsException;
+import omis.stg.exception.SecurityThreatGroupChapterExistsException;
+import omis.stg.exception.SecurityThreatGroupRankExistsException;
 
 /**
  * Service for security threat group affiliations.
  * 
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Jan 17, 2014)
  * @since OMIS 3.0
  */
@@ -49,7 +70,7 @@ public interface SecurityThreatGroupAffiliationService {
 	 * @param comment comment
 	 * @param verificationSignature verification signature
 	 * @return security threat group affiliation
-	 * @throws DuplicateEntityFoundException if the affiliation exists
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation exists
 	 */
 	SecurityThreatGroupAffiliation create(Offender offender,
 			DateRange dateRange, SecurityThreatGroup group,
@@ -58,7 +79,7 @@ public interface SecurityThreatGroupAffiliationService {
 			SecurityThreatGroupRank rank, State state, City city,
 			String moniker, String comment,
 			VerificationSignature verificationSignature)
-				throws DuplicateEntityFoundException;
+				throws SecurityThreatGroupAffiliationExistsException;
 	
 	/**
 	 * Updates a security threat group affiliation.
@@ -75,7 +96,7 @@ public interface SecurityThreatGroupAffiliationService {
 	 * @param comment comment
 	 * @param verificationSignature verification signature
 	 * @return security threat group affiliation
-	 * @throws DuplicateEntityFoundException if the affiliation existst
+	 * @throws SecurityThreatGroupAffiliationExistsException if the affiliation existst
 	 */
 	SecurityThreatGroupAffiliation update(
 			SecurityThreatGroupAffiliation affiliation,
@@ -85,7 +106,7 @@ public interface SecurityThreatGroupAffiliationService {
 			SecurityThreatGroupRank rank, State state, City city,
 			String moniker, String comment,
 			VerificationSignature verificationSignature)
-				throws DuplicateEntityFoundException;
+				throws SecurityThreatGroupAffiliationExistsException;
 	
 	/**
 	 * Removes a security threat group affiliation.
@@ -102,25 +123,25 @@ public interface SecurityThreatGroupAffiliationService {
 	 * @param date date
 	 * @param note note
 	 * @return newly created security threat group affiliation note
-	 * @throws DuplicateEntityFoundException thrown when a duplicate
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException thrown when a duplicate
 	 * security threat group affiliation note is found
 	 */
 	SecurityThreatGroupAffiliationNote createNote(SecurityThreatGroupAffiliation affiliation, 
-			Date date, String note) throws DuplicateEntityFoundException;
+			Date date, String note) throws SecurityThreatGroupAffiliationNoteExistsException;
 	
 	/**
 	 * Updates the specified security threat group affiliation note.
-	 * 
+	 *  
 	 * @param affiliationNote security threat group affiliation note
 	 * @param date date
 	 * @param note note
 	 * @return updated security threat group affiliation note
-	 * @throws DuplicateEntityFoundException thrown when a duplicate
+	 * @throws SecurityThreatGroupAffiliationNoteExistsException thrown when a duplicate
 	 * security threat group affiliation note is found
 	 */
 	SecurityThreatGroupAffiliationNote updateNote(
 			SecurityThreatGroupAffiliationNote affiliationNote,
-			Date date, String note) throws DuplicateEntityFoundException;
+			Date date, String note) throws SecurityThreatGroupAffiliationNoteExistsException;
 	
 	/**
 	 * Removes the specified security threat group affiliation note.
@@ -137,7 +158,7 @@ public interface SecurityThreatGroupAffiliationService {
 	 */
 	SecurityThreatGroupChapter createChapter(String name, 
 			SecurityThreatGroup securityThreatGroup) 
-					throws DuplicateEntityFoundException;
+					throws SecurityThreatGroupChapterExistsException;
 	
 	/**
 	 * Creates a new security threat group rank with the specified name and 
@@ -145,11 +166,11 @@ public interface SecurityThreatGroupAffiliationService {
 	 * @param name security threat group rank name
 	 * @param securityThreatGroup security threat group
 	 * @return security threat group rank
-	 * @throws DuplicateEntityFoundException
+	 * @throws SecurityThreatGroupRankExistsException
 	 */
 	SecurityThreatGroupRank createRank(String name, 
 			SecurityThreatGroup securityThreatGroup) 
-					throws DuplicateEntityFoundException;
+					throws SecurityThreatGroupRankExistsException;
 
 	/**
 	 * Returns security threat groups.

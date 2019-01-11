@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.program.service.delegate;
 
 import java.util.List;
@@ -7,6 +24,7 @@ import omis.instance.factory.InstanceFactory;
 import omis.location.domain.Location;
 import omis.program.dao.ProgramDao;
 import omis.program.domain.Program;
+import omis.program.exception.ProgramExistsException;
 import omis.supervision.domain.SupervisoryOrganization;
 
 /**
@@ -80,9 +98,9 @@ public class ProgramDelegate {
 	 * @throws DuplicateEntityFoundException thrown when program already exists
 	 */
 	public Program create(final String name) 
-			throws DuplicateEntityFoundException {
+			throws ProgramExistsException {
 		if (this.programDao.find(name) != null) {
-			throw new DuplicateEntityFoundException("Program already exists.");
+			throw new ProgramExistsException("Program already exists.");
 		}
 		Program program = this.programInstanceFactory.createInstance();
 		program.setName(name);

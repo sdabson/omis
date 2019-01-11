@@ -44,8 +44,17 @@ div.modalContainer .modalImage {
 div.modalContainer a.modalClose:before {
 	content: url('../images/modalClose.png');
 	position: absolute;
-	right: 1%;
-	top: 1%;
+	right: 5px;
+	top: 5px;
+	cursor: pointer;
+}
+
+div.modalContainer a.modalAccept:before {
+	content: url('../images/modalAccept.png');
+	position: absolute;
+	right: 34px;
+	top: 5px;
+	/* display: inline-block; */
 	cursor: pointer;
 }
 

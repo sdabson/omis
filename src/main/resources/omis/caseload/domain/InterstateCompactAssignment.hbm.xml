@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+ <!-- 
+ - Interstate compact assignment hibernate configuration.
+ -
+ - Author: Josh Divine
+ - Version: 0.1.0 (Sep 7, 2018)
+ - Since: OMIS 3.0
+ -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.caseload.domain">
+	<class entity-name="omis.caseload.domain.InterstateCompactAssignment"
+		proxy="omis.caseload.domain.InterstateCompactAssignment"
+		name="omis.caseload.domain.impl.InterstateCompactAssignmentImpl"
+		table="`INTRSTATE_COMPCT_ASSIGNMNT`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+			<generator class="sequence">
+				<param name="sequence">`INTRSTATE_COMPCT_ASSIGNMNT_SEQ`</param>
+			</generator>
+		</id>
+		<many-to-one name="officerCaseAssignment" column="`OFFICER_CASE_ASSIGNMENT_ID`" not-null="true" entity-name="omis.caseload.domain.OfficerCaseAssignment" unique="true"/>
+		<many-to-one name="interstateCompactStatus" column="`INTRSTAT_CPCT_CRRCTNL_STAT_ID`"  not-null="true" entity-name="omis.caseload.domain.InterstateCompactCorrectionalStatus"/>
+		<many-to-one name="interstateCompactType" column="`INTRSTATE_CMPCT_TYP_CATG_ID`"  not-null="true" entity-name="omis.caseload.domain.InterstateCompactTypeCategory"/>
+		<many-to-one name="endReason" column="`INTRSTAT_CMPCT_END_RSN_CAT_ID`" not-null="false" entity-name="omis.caseload.domain.InterstateCompactEndReasonCategory"/>
+		<many-to-one name="jurisdiction" column="`STATE_ID`"  not-null="false" entity-name="omis.region.domain.State"/>
+		<property name="jurisdictionStateId" column="`JURISDICTION_STATE_ID`" not-null="false" type="java.lang.String"/>
+		<property name="projectedEndDate" column="`PROJECTED_END_DATE`" not-null="false" type="java.util.Date"/>
+		<component name="creationSignature">
+			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`CREATE_DATE`" not-null="true"/>
+		</component>
+		<component name="updateSignature">
+			<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+		</component>	
+	</class>
+	<query name="findInterstateCompactAssignment"><![CDATA[
+		select ica
+		from
+			omis.caseload.domain.InterstateCompactAssignment ica
+		where
+			ica.officerCaseAssignment = :officerCaseAssignment
+	]]></query>
+	<query name="findInterstateCompactAssignmentExcluding"><![CDATA[
+		select ica
+		from
+			omis.caseload.domain.InterstateCompactAssignment ica
+		where
+			ica.officerCaseAssignment = :officerCaseAssignment
+		and
+			ica != :excludedInterstateCompactAssignment
+	]]></query>
+	<query name="findInterstateCompactAssignmentByOfficerCaseAssignment"><![CDATA[
+		select ica
+		from
+			omis.caseload.domain.InterstateCompactAssignment ica
+		where
+			ica.officerCaseAssignment = :officerCaseAssignment
+	]]></query>
+</hibernate-mapping>

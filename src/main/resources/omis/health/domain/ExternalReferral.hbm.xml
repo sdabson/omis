@@ -66,4 +66,9 @@
 	  	 or pera.cancelled = false)
 	  	and (er not in (:excludedExternalReferral))
 	]]></query>
+	<query name="findExistingExternalReferral"><![CDATA[
+	  select er
+	  	from omis.health.domain.ExternalReferral er
+	  where er.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
 </hibernate-mapping>

@@ -50,9 +50,9 @@ import omis.offender.service.delegate.OffenderDelegate;
 import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
-import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
-import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
+import omis.paroleboardlocation.domain.ParoleBoardLocation;
+import omis.paroleboardlocation.service.delegate.ParoleBoardLocationDelegate;
 import omis.paroleeligibility.domain.ParoleEligibility;
 import omis.paroleeligibility.service.delegate.ParoleEligibilityDelegate;
 import omis.region.domain.City;
@@ -66,7 +66,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to update hearing decision notes.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.4 (Apr 18, 2018)
  * @since OMIS 3.0
  */
 @Test
@@ -170,10 +170,10 @@ public class BoardHearingDecisionServiceUpdateHearingDecisionNoteTests
 				this.paroleBoardLocationDelegate.create(location, true);
 		ParoleBoardItinerary itinerary =
 				this.paroleBoardItineraryDelegate.create(paroleBoardLocation,
-						this.parseDateText("01/01/2015"), null);
-		BoardHearing hearing = this.boardHearingDelegate
-				.create(itinerary, null, null, paroleEligibility, null, null,
-						false);
+						true, this.parseDateText("01/01/2015"), 
+						this.parseDateText("01/01/2015"));
+		BoardHearing hearing = this.boardHearingDelegate.create(itinerary, null, 
+				paroleEligibility, null, null, false);
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
@@ -232,10 +232,10 @@ public class BoardHearingDecisionServiceUpdateHearingDecisionNoteTests
 				this.paroleBoardLocationDelegate.create(location, true);
 		ParoleBoardItinerary itinerary =
 				this.paroleBoardItineraryDelegate.create(paroleBoardLocation,
-						this.parseDateText("01/01/2015"), null);
-		BoardHearing hearing = this.boardHearingDelegate
-				.create(itinerary, null, null, paroleEligibility, null, null,
-						false);
+						true, this.parseDateText("01/01/2015"), 
+						this.parseDateText("01/01/2015"));
+		BoardHearing hearing = this.boardHearingDelegate.create(itinerary, null, 
+				paroleEligibility, null, null, false);
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
@@ -294,10 +294,10 @@ public class BoardHearingDecisionServiceUpdateHearingDecisionNoteTests
 				this.paroleBoardLocationDelegate.create(location, true);
 		ParoleBoardItinerary itinerary =
 				this.paroleBoardItineraryDelegate.create(paroleBoardLocation,
-						this.parseDateText("01/01/2015"), null);
-		BoardHearing hearing = this.boardHearingDelegate
-				.create(itinerary, null, null, paroleEligibility, null, null,
-						false);
+						true, this.parseDateText("01/01/2015"), 
+						this.parseDateText("01/01/2015"));
+		BoardHearing hearing = this.boardHearingDelegate.create(itinerary, null, 
+				paroleEligibility, null, null, false);
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);

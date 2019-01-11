@@ -4,10 +4,13 @@
 <%@ taglib prefix="address" uri="/WEB-INF/tld/address.tld" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <fmt:setBundle basename="omis.staff.msgs.staff" var="staffSearchBundle"/>
-<c:forEach var="staffSummary" items="${searchSummaries}">
+<c:forEach var="staffSummary" items="${searchSummaries}" varStatus="status">
 <c:if test="${not empty staffSummary.staffId}">
 <tr>
-	<td></td><td id="displayStaffNameWithWithOutPhoto">	
+	<td>
+		<a class="actionMenuItem staffResultsRowActionMenuItem" id="staffResultsRowActionMenu${status.index}" href="${pageContext.request.contextPath}/staffSearch/searchResultsRowActionMenu.html?staffAssignment=${staffSummary.staffAssignment.id}"></a>
+	</td>
+	<td id="displayStaffNameWithWithOutPhoto${status.index}">	
 		<fmt:message key="fullNameLabel" bundle="${staffSearchBundle}">
 			<c:choose>
 				<c:when test="${not empty staffSummary.staffMemberMiddleName}">

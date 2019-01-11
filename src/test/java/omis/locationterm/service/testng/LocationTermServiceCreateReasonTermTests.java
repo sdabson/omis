@@ -40,6 +40,7 @@ import omis.region.domain.State;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
+import omis.util.PropertyValueAsserter;
 
 /**
  * Location term servce reason term creation tests.
@@ -159,7 +160,7 @@ public class LocationTermServiceCreateReasonTermTests
 						prisonAddress);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, prisonLocation,
-						this.parseDateText("09/23/2016"), null, false);
+						this.parseDateText("09/23/2016"), null, false, null);
 		LocationReason reason = this.locationReasonDelegate
 				.create("Initial Commit", (short) 1, true);
 		DateRange dateRange = new DateRange(this.parseDateText("09/23/2016"), 
@@ -212,7 +213,7 @@ public class LocationTermServiceCreateReasonTermTests
 						prisonAddress);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, prisonLocation,
-						this.parseDateText("09/23/2016"), null, false);
+						this.parseDateText("09/23/2016"), null, false, null);
 		LocationReason reason = this.locationReasonDelegate
 				.create("Initial Commit", (short) 1, true);
 		DateRange dateRange = new DateRange(this.parseDateText("09/23/2016"), 
@@ -263,7 +264,7 @@ public class LocationTermServiceCreateReasonTermTests
 						prisonAddress);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, prisonLocation,
-						this.parseDateText("09/23/2016"), null, false);
+						this.parseDateText("09/23/2016"), null, false, null);
 		LocationReason reason = this.locationReasonDelegate
 				.create("Initial Commit", (short) 1, true);
 		DateRange dateRange = new DateRange(this.parseDateText("09/23/2015"), 
@@ -272,6 +273,68 @@ public class LocationTermServiceCreateReasonTermTests
 		// Action
 		this.locationTermService.createReasonTerm(locationTerm, dateRange,
 				reason);
+	}
+	
+	/**
+	 * Tests that multiple reasons are allowed providing date ranges
+	 * do not overlap.
+	 * 
+	 * @throws DateRangeOutOfBoundsException if date range is out of bounds
+	 * @throws LocationReasonTermExistsAfterException if location reason term
+	 * exists after
+	 * @throws LocationReasonTermConflictException if location reason term
+	 * exists before
+	 * @throws DuplicateEntityFoundException if any entities exist 
+	 */
+	public void testMultipleReasonsAllowed()
+			throws LocationReasonTermConflictException,
+				LocationReasonTermExistsAfterException,
+				DateRangeOutOfBoundsException,
+				DuplicateEntityFoundException {
+		
+		// Arrangements - locate Blofeld in jail - first pending new charges
+		Offender blofeld = this.offenderDelegate.createWithoutIdentity(
+				"Blofeld", "Ernst", "Stavro", null);
+		Organization jail = this.organizationDelegate
+				.create("Jail", "JL", null);
+		Country usa = this.countryDelegate.create(
+				"United States of America", "USA", true);
+		State mt = this.stateDelegate.create(
+				"Montana", "MT", usa, true, true);
+		City helena = this.cityDelegate.create("Helena", true, mt, usa);
+		ZipCode mt59601 = this.zipCodeDelegate.create(
+				helena, "59601", null, true);
+		Address address = this.addressDelegate.findOrCreate(
+				"1111 1ST ST W", null, null, BuildingCategory.CONDO, mt59601);
+		Location location = this.locatioDelegate
+				.create(jail, new DateRange(
+						this.parseDateText("12/12/2012"), null), address);
+		Date locationStartDate = this.parseDateText("12/12/2012");
+		Date locationEndDate = this.parseDateText("14/14/2014");
+		LocationTerm locationTerm = this.locationTermDelegate.create(
+				blofeld, location, locationStartDate, locationEndDate, false,
+				null);
+		LocationReason pendingNewCharges = this.locationReasonDelegate
+				.create("Pending New Charges", (short) 1, true);
+		Date revokationDate = this.parseDateText("13/01/2013");
+		this.locationReasonTermDelegate.create(locationTerm,
+					new DateRange(locationStartDate, revokationDate),
+					pendingNewCharges);
+		
+		// Action - hold Blofeld in jail while pending revocation
+		LocationReason pendingRevocation = this.locationReasonDelegate
+				.create("Pending Revocation", (short) 1, true);
+		LocationReasonTerm pendingRevocationReasonTerm
+			= this.locationTermService.createReasonTerm(locationTerm,
+					new DateRange(revokationDate, locationEndDate),
+					pendingRevocation);
+		
+		// Asserts pending revokation values
+		PropertyValueAsserter.create()
+			.addExpectedValue("dateRange.startDate", revokationDate)
+			.addExpectedValue("dateRange.endDate", locationEndDate)
+			.addExpectedValue("reason", pendingRevocation)
+			.performAssertions(pendingRevocationReasonTerm);
 	}
 	
 	/**
@@ -313,7 +376,7 @@ public class LocationTermServiceCreateReasonTermTests
 						prisonAddress);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, prisonLocation,
-						this.parseDateText("09/23/2016"), null, false);
+						this.parseDateText("09/23/2016"), null, false, null);
 		LocationReason reason = this.locationReasonDelegate
 				.create("Initial Commit", (short) 1, true);
 		DateRange dateRange = new DateRange(this.parseDateText("01/23/2017"), 
@@ -367,7 +430,7 @@ public class LocationTermServiceCreateReasonTermTests
 						prisonAddress);
 		LocationTerm locationTerm = this.locationTermDelegate
 				.create(offender, prisonLocation,
-						this.parseDateText("09/23/2016"), null, false);
+						this.parseDateText("09/23/2016"), null, false, null);
 		LocationReason reason = this.locationReasonDelegate
 				.create("Initial Commit", (short) 1, true);
 		DateRange dateRange = new DateRange(this.parseDateText("01/23/2017"), 

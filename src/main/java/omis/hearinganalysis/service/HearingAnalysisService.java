@@ -24,16 +24,17 @@ import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.hearinganalysis.domain.HearingAnalysisCategory;
 import omis.hearinganalysis.domain.HearingAnalysisNote;
-import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
+import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
 /**
  * Service for hearing analysis.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Dec 18, 2017)
+ * @author Annie Wahl
+ * @version 0.1.4 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public interface HearingAnalysisService {
@@ -42,31 +43,29 @@ public interface HearingAnalysisService {
 	 * Creates a new hearing analysis.
 	 * 
 	 * @param eligibility parole eligibility
-	 * @param meetingSite board meeting site
-	 * @param analyst board attendee
+	 * @param analyst parole board member
 	 * @param category hearing analysis category
+	 * @param expectedCompletionDate expected completion date
 	 * @return hearing analysis
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	HearingAnalysis createHearingAnalysis(ParoleEligibility eligibility, 
-			BoardMeetingSite meetingSite, BoardAttendee analyst, 
-			HearingAnalysisCategory category) 
-					throws DuplicateEntityFoundException;
+			ParoleBoardMember analyst, HearingAnalysisCategory category, 
+			Date expectedCompletionDate) throws DuplicateEntityFoundException;
 	
 	/**
 	 * Updates an existing hearing analysis.
 	 * 
 	 * @param hearingAnalysis hearing analysis
-	 * @param meetingSite board meeting site
-	 * @param analyst board attendee
+	 * @param analyst parole board member
 	 * @param category hearing analysis category
+	 * @param expectedCompletionDate expected completion date
 	 * @return hearing analysis
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	HearingAnalysis updateHearingAnalysis(HearingAnalysis hearingAnalysis, 
-			BoardMeetingSite meetingSite, BoardAttendee analyst, 
-			HearingAnalysisCategory category) 
-					throws DuplicateEntityFoundException;
+			ParoleBoardMember analyst, HearingAnalysisCategory category, 
+			Date expectedCompletionDate) throws DuplicateEntityFoundException;
 	
 	/**
 	 * Removes a hearing analysis.
@@ -124,8 +123,9 @@ public interface HearingAnalysisService {
 	 * @param effectiveDate effective date
 	 * @return list of parole board itineraries
 	 */
-	List<ParoleBoardItinerary> findItinerariesAfterDate(Date effectiveDate);
-
+	List<ParoleBoardItinerary> findItinerariesByEffectiveDate(
+			Date effectiveDate);
+	
 	/**
 	 * Returns a list of board meeting sites for the specified parole board 
 	 * itinerary.
@@ -137,14 +137,12 @@ public interface HearingAnalysisService {
 			ParoleBoardItinerary itinerary);
 
 	/**
-	 * Returns a list of board attendees for the specified parole board 
-	 * itinerary.
+	 * Returns a list of board members for the specified date.
 	 * 
-	 * @param itinerary parole board itinerary
+	 * @param effectiveDate effective date
 	 * @return list of board attendees
 	 */
-	List<BoardAttendee> findBoardAttendeesByItinerary(
-			ParoleBoardItinerary itinerary);
+	List<ParoleBoardMember> findBoardMembersByDate(Date effectiveDate);
 
 	/**
 	 * Returns the hearing analysis for the specified parole eligibility.

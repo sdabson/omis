@@ -1,17 +1,39 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.task.report.impl.hibernate;
 
 import java.util.List;
 
 import org.hibernate.SessionFactory;
 
+import omis.task.domain.Task;
+import omis.task.report.TaskAssignmentSummary;
 import omis.task.report.TaskReportService;
 import omis.task.report.TaskSummary;
+import omis.user.domain.UserAccount;
 
 /**
  * Hibernate implementation of report service for tasks.
  *
  * @author Stephen Abson
- * @version 0.0.1
+ * @author Josh Divine
+ * @author Annie Wahl
+ * @version 0.1.3 (Sep 13, 2018)
  * @since OMIS 3.0
  */
 public class TaskReportServiceHibernateImpl
@@ -22,9 +44,23 @@ public class TaskReportServiceHibernateImpl
 	private static final String SUMMARIZE_BY_SOURCE_ACCOUNT_USERNAME_QUERY_NAME
 		= "summarizeTasksBySourceAccountUsername";
 	
+	private static final String FIND_UNINVOKED_COUNT_BY_ASSIGNEE_QUERY_NAME =
+			"findUninvokedTaskCountByAssigneeUserAccount";
+	
+	private static final String SUMMARIZE_BY_TASK_QUERY_NAME = 
+			"summarizeTaskByTask";
+	
+	private static final String SUMMARIZE_TASK_ASSIGNMENTS_BY_TASK_QUERY_NAME = 
+			"summarizeTaskAssignmentsByTask";
+	
 	/* Parameters. */
 	
 	private static final String USERNAME_PARAM_NAME = "username";
+	
+	private static final String ASSIGNEE_ACCOUNT_PARAM_NAME =
+			"assigneeAccount";
+	
+	private static final String TASK_PARAM_NAME = "task";
 	
 	/* Resources. */
 	
@@ -46,13 +82,53 @@ public class TaskReportServiceHibernateImpl
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<TaskSummary> summarizeBySourceAccountUsername(final String username) {
+	public List<TaskSummary> summarizeBySourceAccountUsername(
+			final String username) {
 		@SuppressWarnings("unchecked")
 		List<TaskSummary> taskSummaries
 			= this.sessionFactory.getCurrentSession().getNamedQuery(
 					SUMMARIZE_BY_SOURCE_ACCOUNT_USERNAME_QUERY_NAME)
 				.setParameter(USERNAME_PARAM_NAME, username)
+				.setReadOnly(true)
 				.list();
 		return taskSummaries;
+	}
+
+	/**{@inheritDoc} */
+	@Override
+	public Long findUninvokedTaskCountByAssigneeUserAccount(
+			final UserAccount assigneeAccount) {
+		return (Long) this.sessionFactory.getCurrentSession()
+				.getNamedQuery(
+						FIND_UNINVOKED_COUNT_BY_ASSIGNEE_QUERY_NAME)
+				.setParameter(ASSIGNEE_ACCOUNT_PARAM_NAME, assigneeAccount)
+				.setReadOnly(true)
+				.uniqueResult();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public TaskSummary summarize(final Task task) {
+		TaskSummary taskSummary = (TaskSummary) this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(SUMMARIZE_BY_TASK_QUERY_NAME)
+				.setParameter(TASK_PARAM_NAME, task)
+				.setReadOnly(true)
+				.uniqueResult();
+		return taskSummary;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<TaskAssignmentSummary> summarizeAssignmentsByTask(
+			final Task task) {
+		@SuppressWarnings("unchecked")
+		List<TaskAssignmentSummary> summaries = this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(SUMMARIZE_TASK_ASSIGNMENTS_BY_TASK_QUERY_NAME)
+				.setParameter(TASK_PARAM_NAME, task)
+				.setReadOnly(true)
+				.list();
+		return summaries;
 	}
 }

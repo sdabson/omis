@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System.
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.family.report;
 
 import java.io.Serializable;
@@ -6,9 +23,12 @@ import omis.address.domain.Address;
 import omis.address.domain.BuildingCategory;
 import omis.address.report.AddressSummarizable;
 import omis.address.report.delegate.AddressSummaryDelegate;
+import omis.contact.domain.Contact;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
+import omis.contact.report.PoBoxSummarizable;
 import omis.contact.report.TelephoneNumberSummarizable;
+import omis.contact.report.delegate.PoBoxSummaryDelegate;
 import omis.contact.report.delegate.TelephoneNumberSummaryDelegate;
 import omis.family.domain.FamilyAssociation;
 import omis.offender.domain.Offender;
@@ -18,12 +38,13 @@ import omis.offender.domain.Offender;
  * @author Yidong Li
  * @author Joel Norris
  * @author Sheronda Vaughn
- * @version 0.1.0 (June 7, 2017)
+ * @version 0.1.0 (Sept 25, 2018)
  * @since OMIS 3.0
  */
 
 public class FamilyAssociationSummary
-	implements AddressSummarizable, TelephoneNumberSummarizable, Serializable {
+	implements AddressSummarizable, TelephoneNumberSummarizable,
+	PoBoxSummarizable, Serializable {
 	private static final long serialVersionUID = 1L;
 	private final Long id;
 	private final String offenderLastName;
@@ -43,7 +64,9 @@ public class FamilyAssociationSummary
 	private final Boolean emergencyContact;
 	private final AddressSummaryDelegate addressSummaryDelegate;
 	private final TelephoneNumberSummaryDelegate telephoneNumberSummaryDelegate;
-	private final Boolean hasAddress; 
+	private final Boolean hasAddress;
+	private final Boolean hasPoBox;
+	private final PoBoxSummaryDelegate poBoxSummaryDelegate;
 	
 	/**
 	 * Instantiates family association summary.
@@ -52,12 +75,14 @@ public class FamilyAssociationSummary
 	 * @param address address
 	 * @param telephoneNumber telephone number
 	 * @param familyMember family member
+	 * @param contact contact
 	 */
 	public FamilyAssociationSummary(
 			final FamilyAssociation familyAssociation,
 			final Address address,
 			final TelephoneNumber telephoneNumber,
-			final Offender familyMember) {
+			final Offender familyMember,
+			final Contact contact) {
 		this.id = familyAssociation.getId();
 		this.offenderLastName = familyAssociation.getRelationship()
 			.getFirstPerson().getName().getLastName();
@@ -105,6 +130,22 @@ public class FamilyAssociationSummary
 			hasAddress = true;
 		} else {
 			hasAddress = false;
+		}
+		if(contact!=null) {
+			this.poBoxSummaryDelegate = new PoBoxSummaryDelegate(
+			contact.getPoBox());
+		} else {
+			this.poBoxSummaryDelegate = new PoBoxSummaryDelegate(
+			null);
+		}
+		if(contact!=null) {
+			if(contact.getPoBox()==null) {
+				hasPoBox = false;
+			} else {
+				hasPoBox = true;
+			}
+		} else {
+			hasPoBox = false;
 		}
 	}
 	
@@ -356,5 +397,62 @@ public class FamilyAssociationSummary
 	 */
 	public Boolean getHasAddress() {
 		return this.hasAddress;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxValue() {
+		return this.poBoxSummaryDelegate.getValue();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxCityName() {
+		return this.poBoxSummaryDelegate.getCityName();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxStateName() {
+		return this.poBoxSummaryDelegate.getStateName();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxStateAbbreviation() {
+		return this.poBoxSummaryDelegate.getStateAbbreviation();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxZipCodeValue() {
+		return this.poBoxSummaryDelegate.getZipCodeValue();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxZipCodeExtension() {
+		return this.poBoxSummaryDelegate.getZipCodeExtension();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxCountryName() {
+		return this.poBoxSummaryDelegate.getCountryName();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getPoBoxCountryAbbreviation() {
+		return this.poBoxSummaryDelegate.getCountryAbbreviation();
+	}
+	
+	/**
+	 * Returns whether po box exists or not.
+	 * 
+	 * @return hasPoBox whether po box exists or not
+	 */
+	public Boolean getHasPoBox() {
+		return this.hasPoBox;
 	}
 }

@@ -17,7 +17,7 @@
 </head>
 <body>
 	<h1><fmt:message key="throwableTitle"/></h1>
-	<p class="exceptionMessage">
+	<p class="exceptionMessage foreground">
 		<fmt:message key="throwableMessage"/>
 	</p>
 	<p>

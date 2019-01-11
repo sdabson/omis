@@ -22,6 +22,7 @@
   		<constructor-arg name="locationDelegate" ref="locationDelegate"/>
   		<constructor-arg name="organizationDelegate" ref="organizationDelegate"/>
   		<constructor-arg name="verificationMethodDelegate" ref="verificationMethodDelegate"/>
+  		<constructor-arg name="contactDelegate" ref="contactDelegate"/>
 	</bean>
   		
   <!--  Report services -->

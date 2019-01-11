@@ -24,4 +24,9 @@
 		<property name="sortOrder" column="`SORT_ORDER`" not-null="true" type="short"/>
 		<property name="valid" column="`VALID`" not-null="true" type="yes_no"/>
 	</class>
+	<query name="findExistingProviderTitle"><![CDATA[
+	  select title
+	  from omis.health.domain.ProviderTitle title
+	  where title.name = :name
+	]]></query>
 </hibernate-mapping>

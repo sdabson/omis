@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -10,7 +27,11 @@
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearing/scripts/resolution.js?VERSION=2"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearing/scripts/includes/jquery.omis.resolution.js?VERSION=1"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/hearing/scripts/resolution.js?VERSION=3"></script>
+	<script type="text/javascript">
+		var currentUserAttendanceItemIndex = ${userAttendanceItemIndex};
+	</script>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/hearing/style/hearing.css" />
 	<title>
 		<fmt:message key="${resolutionCategory}ResolutionHeader" />
@@ -21,7 +42,7 @@
 	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
 	<c:choose>
 		<c:when test="${resolutionCategory eq 'FORMAL'}">
-		<div id="hearingHeader">
+		<div id="hearingHeader" class="foregroundRegular">
 			<fieldset>
 				<span class="oneline">
 					<span class="onelineHalf">

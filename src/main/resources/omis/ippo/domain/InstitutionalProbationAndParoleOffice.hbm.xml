@@ -1,0 +1,59 @@
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+ <!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.ippo.domain">
+	<class entity-name="omis.ippo.domain.InstitutionalProbationAndParoleOffice"
+		   proxy="omis.ippo.domain.InstitutionalProbationAndParoleOffice"
+		   name="omis.ippo.domain.impl.InstitutionalProbationAndParoleOfficeImpl"
+		   table="`INSTITUTIONAL_PROB_OFF`">
+		<id name="id" column="`ID`" type="java.lang.Long">
+		  <generator class="sequence">
+		    <param name="sequence">`INSTITUTIONAL_PROB_OFF_SEQ`</param>
+		  </generator>
+		</id>
+		<properties name="uniqueInstitutionalProbationAndParoleOffice">
+		  <many-to-one name="location" entity-name="omis.location.domain.Location" not-null="true" column="`LOCATION_ID`"/>
+		  <property name="name" type="string" not-null="true" column="`NAME`"/>
+		</properties>
+		<property name="telephoneNumber" type="java.lang.Long" not-null="false" column="`TELEPHONE_NUMBER`"/>
+	</class>
+	<query name="findInstitutionalProbationAndParoleOffice"><![CDATA[
+		from
+			omis.ippo.domain.InstitutionalProbationAndParoleOffice as institutionalProbationAndParoleOffice
+		where
+			institutionalProbationAndParoleOffice.location = :location
+		and
+			institutionalProbationAndParoleOffice.name = :name
+		and
+			institutionalProbationAndParoleOffice.telephoneNumber = :telephoneNumber
+	]]></query>
+	<query name="findInstitutionalProbationAndParoleOfficeExcluding"><![CDATA[
+		from
+			omis.ippo.domain.InstitutionalProbationAndParoleOffice as institutionalProbationAndParoleOffice
+		where
+			institutionalProbationAndParoleOffice.location = :location
+		and
+			institutionalProbationAndParoleOffice.name = :name
+		and
+			institutionalProbationAndParoleOffice.telephoneNumber = :telephoneNumber
+		and
+			institutionalProbationAndParoleOffice <> :excludedInstitutionalProbationAndParoleOffice
+	]]></query>
+</hibernate-mapping>

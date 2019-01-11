@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
@@ -101,11 +118,11 @@
 		and
 			hearing
 			in
-				(select hearing from omis.hearing.domain.Infraction infraction
+				(select infraction.hearing from omis.hearing.domain.Infraction infraction
 				where
 				infraction.hearing = hearing
 				and
-				infraction.resolution.date is null)
+				infraction.resolution.reason is null)
 		order by hearing.date asc
 	]]></query>
 	<query name="findUnresolvedDisciplinaryViolationSummariesByHearing"><![CDATA[
@@ -113,8 +130,10 @@
 			infraction.disciplinaryCodeViolation.id,
 			infraction.disciplinaryCodeViolation.violationEvent.category,
 			infraction.disciplinaryCodeViolation.disciplinaryCode.description,
+			infraction.disciplinaryCodeViolation.disciplinaryCode.value,
 			infraction.disciplinaryCodeViolation.violationEvent.event.details,
-			infraction.disciplinaryCodeViolation.violationEvent.event.date)
+			infraction.disciplinaryCodeViolation.violationEvent.event.date,
+			infraction.disciplinaryCodeViolation.details)
 		from
 			omis.hearing.domain.Infraction infraction
 		inner join
@@ -124,15 +143,19 @@
 		and
 			infraction.disciplinaryCodeViolation is not null
 		and
-			infraction.resolution.date is null
+			infraction.resolution.reason is null
+		order by
+			infraction.disciplinaryCodeViolation.violationEvent.event.date desc
 	]]></query>
 	<query name="findUnresolvedConditionViolationSummariesByHearing"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			infraction.conditionViolation.violationEvent.category,
 			infraction.conditionViolation.id,
 			infraction.conditionViolation.condition.clause,
+			infraction.conditionViolation.condition.conditionClause.conditionTitle.title,
 			infraction.conditionViolation.violationEvent.event.details,
-			infraction.conditionViolation.violationEvent.event.date)
+			infraction.conditionViolation.violationEvent.event.date,
+			infraction.conditionViolation.details)
 		from
 			omis.hearing.domain.Infraction infraction
 		inner join
@@ -142,15 +165,19 @@
 		and
 			infraction.conditionViolation is not null
 		and
-			infraction.resolution.date is null
+			infraction.resolution.reason is null
+		order by
+			infraction.conditionViolation.violationEvent.event.date desc
 	]]></query>
 	<query name="findDisciplinaryViolationSummariesByHearing"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			infraction.disciplinaryCodeViolation.id,
 			infraction.disciplinaryCodeViolation.violationEvent.category,
 			infraction.disciplinaryCodeViolation.disciplinaryCode.description,
+			infraction.disciplinaryCodeViolation.disciplinaryCode.value,
 			infraction.disciplinaryCodeViolation.violationEvent.event.details,
-			infraction.disciplinaryCodeViolation.violationEvent.event.date)
+			infraction.disciplinaryCodeViolation.violationEvent.event.date,
+			infraction.disciplinaryCodeViolation.details)
 		from
 			omis.hearing.domain.Infraction infraction
 		inner join
@@ -159,14 +186,18 @@
 			hearing = :hearing
 		and
 			infraction.disciplinaryCodeViolation is not null
+		order by
+			infraction.disciplinaryCodeViolation.violationEvent.event.date desc
 	]]></query>
 	<query name="findConditionViolationSummariesByHearing"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			infraction.conditionViolation.violationEvent.category,
 			infraction.conditionViolation.id,
 			infraction.conditionViolation.condition.clause,
+			infraction.conditionViolation.condition.conditionClause.conditionTitle.title,
 			infraction.conditionViolation.violationEvent.event.details,
-			infraction.conditionViolation.violationEvent.event.date)
+			infraction.conditionViolation.violationEvent.event.date,
+			infraction.conditionViolation.details)
 		from
 			omis.hearing.domain.Infraction infraction
 		inner join
@@ -175,14 +206,18 @@
 			hearing = :hearing
 		and
 			infraction.conditionViolation is not null
+		order by
+			infraction.conditionViolation.violationEvent.event.date desc
 	]]></query>
 	<query name="findUnresolvedDisciplinaryViolationSummaries"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			disciplinaryCodeViolation.id,
 			violationEvent.category,
 			disciplinaryCode.description,
+			disciplinaryCode.value,
 			violationEvent.event.details,
-			violationEvent.event.date)
+			violationEvent.event.date,
+			disciplinaryCodeViolation.details)
 		from
 			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
 		inner join
@@ -202,14 +237,18 @@
 				where
 					disciplinaryCodeViolationSub = disciplinaryCodeViolation
 			)
+		order by
+			violationEvent.event.date desc
 	]]></query>
 	<query name="findUnresolvedConditionViolationSummaries"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			violationEvent.category,
 			conditionViolation.id,
 			condition.clause,
+			condition.conditionClause.conditionTitle.title,
 			violationEvent.event.details,
-			violationEvent.event.date)
+			violationEvent.event.date,
+			conditionViolation.details)
 		from
 			omis.violationevent.domain.ConditionViolation conditionViolation
 		inner join
@@ -229,62 +268,104 @@
 				where
 					conditionViolationSub = conditionViolation
 			)
+		order by
+			violationEvent.event.date desc
 	]]></query>
 	<query name="findResolvedConditionViolationSummaries"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			infraction.id,
-			infraction.conditionViolation.violationEvent.category,
-			infraction.conditionViolation.id,
-			infraction.conditionViolation.condition.clause,
-			infraction.conditionViolation.violationEvent.event.details,
-			infraction.conditionViolation.violationEvent.event.date,
+			violationEvent.category,
+			conditionViolation.id,
+			condition.clause,
+			conditionTitle.title,
+			conditionTitle2.title,
+			violationEvent.event.details,
+			violationEvent.event.date,
 			infraction.resolution.reason,
-			infraction.resolution.descision,
+			infraction.resolution.decision,
 			cast(infraction.resolution.disposition as string),
+			infraction.resolution.appealDate,
 			imposedSanction.description,
-			infraction.resolution.category)
+			infraction.resolution.category,
+			conditionViolation.details)
 		from
 			omis.hearing.domain.ImposedSanction imposedSanction
 		right outer join
 			imposedSanction.infraction infraction
+		inner join
+			infraction.conditionViolation conditionViolation
+		inner join
+			conditionViolation.condition condition
+		inner join
+			condition.conditionClause conditionClause
+		inner join
+			conditionClause.conditionTitle conditionTitle
+		inner join
+			conditionViolation.violationEvent violationEvent
+		left outer join
+			infraction.resolution.adjustedCondition adjustedCondition
+		left outer join
+			adjustedCondition.conditionClause conditionClause2
+		left outer join
+			conditionClause2.conditionTitle conditionTitle2
 		where
-			infraction.conditionViolation is not null
+			conditionViolation is not null
 		and
-			infraction.conditionViolation.violationEvent.offender = :offender
+			conditionViolation.violationEvent.offender = :offender
 		and
-			infraction.resolution.date is not null
+			infraction.resolution.reason is not null
+		order by
+			violationEvent.event.date desc
 	]]></query>
 	<query name="findResolvedDisciplinaryCodeViolationSummaries"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
 			infraction.id,
-			infraction.disciplinaryCodeViolation.id,
-			infraction.disciplinaryCodeViolation.violationEvent.category,
-			infraction.disciplinaryCodeViolation.disciplinaryCode.description,
-			infraction.disciplinaryCodeViolation.violationEvent.event.details,
-			infraction.disciplinaryCodeViolation.violationEvent.event.date,
+			disciplinaryCodeViolation.id,
+			violationEvent.category,
+			disciplinaryCode.description,
+			disciplinaryCode.value,
+			adjustedCode.description,
+			violationEvent.event.details,
+			violationEvent.event.date,
 			infraction.resolution.reason,
-			infraction.resolution.descision,
+			infraction.resolution.decision,
 			cast(infraction.resolution.disposition as string),
+			infraction.resolution.appealDate,
 			imposedSanction.description,
-			infraction.resolution.category)
+			infraction.resolution.category,
+			disciplinaryCodeViolation.details)
 		from
 			omis.hearing.domain.ImposedSanction imposedSanction
 		right outer join
 			imposedSanction.infraction infraction
+		inner join
+			infraction.disciplinaryCodeViolation disciplinaryCodeViolation
+		inner join
+			disciplinaryCodeViolation.disciplinaryCode disciplinaryCode
+		inner join
+			disciplinaryCodeViolation.violationEvent violationEvent
+		left outer join
+			infraction.resolution.adjustedCode adjustedCode
 		where
-			infraction.disciplinaryCodeViolation is not null
+			disciplinaryCodeViolation is not null
 		and
-			infraction.disciplinaryCodeViolation.violationEvent.offender = :offender
+			violationEvent.offender = :offender
 		and
-			infraction.resolution.date is not null
+			infraction.resolution.reason is not null
+		order by
+			violationEvent.event.date desc
 	]]></query>
 	<query name="summarizeConditionViolation"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
+			conditionViolation.id,
 			violationEvent.event.details,
 			violationEvent.category,
 			'',
+			'',
 			condition.clause,
-			violationEvent.event.date)
+			condition.conditionClause.conditionTitle.title,
+			violationEvent.event.date,
+			conditionViolation.details)
 		from
 			omis.violationevent.domain.ConditionViolation conditionViolation
 		inner join
@@ -296,11 +377,15 @@
 	]]></query>
 	<query name="summarizeDisciplinaryCodeViolation"><![CDATA[
 		select new omis.hearing.report.ViolationSummary(
+			disciplinaryCodeViolation.id,
 			violationEvent.event.details,
 			violationEvent.category,
 			disciplinaryCode.description,
+			disciplinaryCode.value,
 			'',
-			violationEvent.event.date)
+			'',
+			violationEvent.event.date,
+			disciplinaryCodeViolation.details)
 		from
 			omis.violationevent.domain.DisciplinaryCodeViolation disciplinaryCodeViolation
 		inner join

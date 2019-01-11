@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.program.service.delegate;
 
 import java.util.Date;
@@ -7,19 +24,20 @@ import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.locationterm.domain.LocationTerm;
 import omis.offender.domain.Offender;
 import omis.program.dao.ProgramPlacementDao;
 import omis.program.domain.Program;
 import omis.program.domain.ProgramPlacement;
+import omis.program.exception.ProgramPlacementExistsException;
 import omis.supervision.domain.PlacementTerm;
 
 /**
  * Delegate for program placements.
  *
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.0.1 (Dec 14, 2015)
  * @since OMIS 3.0
  */
@@ -69,7 +87,7 @@ public class ProgramPlacementDelegate {
 	 * @param program program
 	 * @param placementTerm placement term
 	 * @return created program placement
-	 * @throws DuplicateEntityFoundException if program placement exists
+	 * @throws ProgramPlacementExistsException if program placement exists
 	 */
 	public ProgramPlacement create(
 			final Offender offender,
@@ -77,10 +95,10 @@ public class ProgramPlacementDelegate {
 			final Program program,
 			final PlacementTerm placementTerm,
 			final LocationTerm locationTerm)
-				throws DuplicateEntityFoundException {
+				throws ProgramPlacementExistsException {
 		if (this.programPlacementDao
 				.find(offender, dateRange, program) != null) {
-			throw new DuplicateEntityFoundException("Program placement exists");
+			throw new ProgramPlacementExistsException("Program placement exists");
 		}
 		ProgramPlacement placement = this.programPlacementInstanceFactory
 				.createInstance();
@@ -101,7 +119,7 @@ public class ProgramPlacementDelegate {
 	 * @param program program
 	 * @param placementTerm placement term
 	 * @return updated program placement
-	 * @throws DuplicateEntityFoundException if program placement exists
+	 * @throws ProgramPlacementExistsException if program placement exists
 	 */
 	public ProgramPlacement update(
 			final ProgramPlacement placement,
@@ -109,11 +127,12 @@ public class ProgramPlacementDelegate {
 			final Program program,
 			final PlacementTerm placementTerm,
 			final LocationTerm locationTerm)
-				throws DuplicateEntityFoundException {
+				throws ProgramPlacementExistsException {
 		if (this.programPlacementDao
 				.findExcluding(placement.getOffender(), dateRange,
 						program, placement) != null) {
-			throw new DuplicateEntityFoundException("Program placement exists");
+			throw new ProgramPlacementExistsException(
+					"Program placement exists");
 		}
 		this.populatePlacement(
 				placement, dateRange, program, placementTerm, locationTerm);
@@ -163,8 +182,11 @@ public class ProgramPlacementDelegate {
 	 * @param excludedProgramPlacements program placements to exclude
 	 * @return number of program placements for offender between dates
 	 */
-	public long countExcluding(Offender offender, Date startDate, Date endDate,
-			ProgramPlacement... excludedProgramPlacements) {
+	public long countExcluding(
+			final Offender offender,
+			final Date startDate,
+			final Date endDate,
+			final ProgramPlacement... excludedProgramPlacements) {
 		return this.programPlacementDao.countExcluding(offender, startDate, 
 				endDate, excludedProgramPlacements);
 	}
@@ -179,8 +201,10 @@ public class ProgramPlacementDelegate {
 	 * @return number of program placements for an offender after the specified 
 	 * date
 	 */
-	public long countAfterDateExcluding(Offender offender, Date startDate, 
-			ProgramPlacement excludedProgramPlacement) {
+	public long countAfterDateExcluding(
+			final Offender offender,
+			final Date startDate,
+			final ProgramPlacement excludedProgramPlacement) {
 		return this.programPlacementDao.countAfterDateExcluding(offender, 
 				startDate, excludedProgramPlacement);
 	}
@@ -193,8 +217,8 @@ public class ProgramPlacementDelegate {
 	 * @param program program
 	 * @return program placement for the specified values
 	 */
-	public ProgramPlacement find(Offender offender, DateRange dateRange,
-			Program program) {
+	public ProgramPlacement find(final Offender offender,
+			final DateRange dateRange, final Program program) {
 		return this.programPlacementDao.find(offender, dateRange, 
 				program);
 	}
@@ -208,8 +232,10 @@ public class ProgramPlacementDelegate {
 	 * @param excludedProgramPlacements program placements to exclude
 	 * @return program placement other than those excluded
 	 */
-	public ProgramPlacement findExcluding(Offender offender, DateRange dateRange,
-			Program program, ProgramPlacement... excludedProgramPlacements) {
+	public ProgramPlacement findExcluding(
+			final Offender offender, final DateRange dateRange,
+			final Program program,
+			final ProgramPlacement... excludedProgramPlacements) {
 		return this.programPlacementDao.findExcluding(offender, dateRange, 
 				program, excludedProgramPlacements);
 	}

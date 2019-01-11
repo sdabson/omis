@@ -67,14 +67,13 @@ import omis.task.domain.TaskTemplateParameterValue;
 import omis.user.domain.UserAccount;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
-
 /**
  * Controller for presentence investigation home.
  * 
- * @author Annie Jacques 
+ * @author Annie Wahl 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.3 (Jac 3, 2018)
+ * @version 0.1.5 (Oct 24, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -197,15 +196,14 @@ public class PresentenceInvestigationHomeController {
 	private static final String RESIDENCE_TYPE_TYPE_NAME =
 			"omis.residence.report.ResidenceType";
 	
-	private static final String DOCKET_TYPE_NAME =
-			"omis.docket.domain.Docket";
-	
 	private static final String COURT_CASE_TYPE_NAME = 
 			"omis.courtcase.domain.CourtCase";
 	
 	private static final String STRING_TYPE_NAME = "java.lang.String";
 	
 	private static final String BOOLEAN_TYPE_NAME = "java.lang.Boolean";
+	
+	private static final String DOCKET_TYPE_NAME = "omis.docket.domain.Docket";
 	
 	/* Constructor */
 	
@@ -244,13 +242,11 @@ public class PresentenceInvestigationHomeController {
 						presentenceInvestigationRequest);
 		
 		if (this.presentenceInvestigationRequestService.isOffender(
-				presentenceInvestigationRequest.getDocket().getPerson())) {
+				presentenceInvestigationRequest.getPerson())) {
 			this.offenderSummaryModelDelegate.add(map, (Offender)
-							presentenceInvestigationRequest.getDocket()
-							.getPerson());
+							presentenceInvestigationRequest.getPerson());
 			map.addAttribute(OFFENDER_MODEL_KEY, (Offender)
-							presentenceInvestigationRequest.getDocket()
-							.getPerson());
+							presentenceInvestigationRequest.getPerson());
 		}
 		
 		List<PresentenceInvestigationTaskItem> basicInformationTaskItems =
@@ -372,13 +368,11 @@ public class PresentenceInvestigationHomeController {
 			map.addAttribute(PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY, 
 							presentenceInvestigationRequest);
 			if (this.presentenceInvestigationRequestService.isOffender(
-					presentenceInvestigationRequest.getDocket().getPerson())) {
+					presentenceInvestigationRequest.getPerson())) {
 				this.offenderSummaryModelDelegate.add(map, (Offender)
-								presentenceInvestigationRequest.getDocket()
-								.getPerson());
+								presentenceInvestigationRequest.getPerson());
 				map.addAttribute(OFFENDER_MODEL_KEY, (Offender)
-								presentenceInvestigationRequest.getDocket()
-								.getPerson());
+								presentenceInvestigationRequest.getPerson());
 			}
 			map.addAttribute(
 					PRESENTENCE_INVESTIGATION_REQUEST_NOTE_ITEM_INDEX_MODEL_KEY,
@@ -457,7 +451,7 @@ public class PresentenceInvestigationHomeController {
 		map.addAttribute(PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY, 
 						presentenceInvestigationRequest);
 		map.addAttribute(OFFENDER_MODEL_KEY, (Offender)
-				presentenceInvestigationRequest.getDocket().getPerson());
+				presentenceInvestigationRequest.getPerson());
 		map.addAttribute(ASSIGNED_USER_MODEL_KEY, this.retrieveUserAccount());
 		return new ModelAndView(HOME_ACTION_MENU_VIEW_NAME, map);
 	}
@@ -475,7 +469,7 @@ public class PresentenceInvestigationHomeController {
 			final PresentenceInvestigationRequest presentenceInvestigationRequest)
 					throws DuplicateEntityFoundException {
 		if (this.presentenceInvestigationRequestService.isOffender(
-				presentenceInvestigationRequest.getDocket().getPerson())) {
+				presentenceInvestigationRequest.getPerson())) {
 			PresentenceInvestigationTaskGroup taskGroup =
 					this.presentenceInvestigationTaskService
 		.findPresentenceInvestigationTaskGroupByPresentenceInvestigationCategory(
@@ -502,6 +496,10 @@ public class PresentenceInvestigationHomeController {
 					this.presentenceInvestigationTaskService
 						.createPresentenceInvestigationTaskAssociation(
 						task, presentenceInvestigationRequest, taskSource);
+					
+					this.presentenceInvestigationTaskService
+						.createTaskAssignment(task, new Date(), 
+								this.retrieveUserAccount());
 				}
 				List<TaskTemplateParameterValue> templateParameterValues =
 						this.presentenceInvestigationTaskService
@@ -520,7 +518,7 @@ public class PresentenceInvestigationHomeController {
 						case OFFENDER_TYPE_NAME:
 						case PERSON_TYPE_NAME:
 							instanceValue = presentenceInvestigationRequest
-									.getDocket().getPerson().getId().toString();
+									.getPerson().getId().toString();
 							break;
 						case PRESENTENCE_INVESTIGATION_REQUEST_TYPE_NAME:
 							instanceValue =
@@ -534,9 +532,6 @@ public class PresentenceInvestigationHomeController {
 							instanceValue = "0";
 							break;
 						case DOCKET_TYPE_NAME:
-							instanceValue = presentenceInvestigationRequest
-									.getDocket().getId().toString();
-							break;
 						case COURT_CASE_TYPE_NAME:
 						case STRING_TYPE_NAME:
 						case BOOLEAN_TYPE_NAME:

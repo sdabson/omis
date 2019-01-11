@@ -12,7 +12,7 @@ window.addEventListener("load", assignViewableImageInteractions);
 
 /**
  * Checks for viewable image (img DOM elements with the class "viewableImage")
- * and uses the applyImagePreview function to assign on click functionality. If
+ * and uses the applyInteractiveImagePreview function to assign on click functionality. If
  * no viewable images are found, nothing is done.
  */
 function assignViewableImageInteractions() {
@@ -34,7 +34,30 @@ function assignViewableImageInteractions() {
 function wrap(el, wrapper) {
 	el.parentNode.insertBefore(wrapper, el);
 	wrapper.appendChild(el);
+	return wrapper;
 }
+
+/*
+ * Wraps the specified element in the specified wrapper, unless the parent element
+ * is an interactive image wrapper. Returns the appropriate wrapper assignment.
+ * 
+ * @param el element to wrap
+ * 
+ * @param wrapper potential wrapper element
+ * @returns
+ */
+function interactiveImageWrap(el) {
+	if(el.parentNode.classList.contains("interactiveImageWrapper")) {
+		wrapper = el.parentNode;
+		wrapper.innerHTML = '';
+		return wrap(el,wrapper);
+	} else {
+		newWrapper = document.createElement('div');
+		newWrapper.classList.add("interactiveImageWrapper");
+		return wrap(el, newWrapper);
+	}
+}
+
 
 /**
  * Preview the specified image in a modal photo previewer.
@@ -52,11 +75,16 @@ function applyInteractiveImagePreview(imgElt, modalContainer) {
             html.clientWidth, html.scrollWidth, html.offsetWidth);
 	if (imgElt.tagName.toLowerCase() == 'img') {
 		if (typeof imgElt.naturalWidth !== "undefined" && imgElt.naturalWidth !== 0 && imgElt.complete) {
-			var wrapper = document.createElement('span');
+			var wrapper = interactiveImageWrap(imgElt, wrapper);
 			imgElt.classList.add("hoverableImage");
-			wrap(imgElt, wrapper);
-			wrapper.classList.add("viewableImageWrapper");
-			imgElt.onclick = function() {
+			
+//			wrapper.classList.add("viewableImageWrapper");
+		//	wrapper.classList.add("interactiveImageWrapper");
+			var afterElement = document.createElement('div');
+			afterElement.classList.add("hoverableImageAfter");
+			afterElement.classList.add("viewableImageAfter");
+			wrapper.appendChild(afterElement);
+			afterElement.onclick = function() {
 				var maxImageHeight;
 				if (imgElt.naturalHeight > (documentHeight * .8)) {
 					maxImageHeight = documentHeight * .8;

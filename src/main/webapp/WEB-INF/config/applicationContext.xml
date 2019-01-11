@@ -77,6 +77,7 @@
    <constructor-arg><value>MM/dd/yyyy</value></constructor-arg>
    <constructor-arg><value>h:mm a</value></constructor-arg>
    <constructor-arg><value>MM/dd/yyyy k:mm</value></constructor-arg>
+   <constructor-arg><value>false</value></constructor-arg>
   </bean>
   
   <!--  AOP configuration -->
@@ -97,13 +98,16 @@
     			<value>/WEB-INF/classes/omis/adaaccommodation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/address/msgs/form</value>
     			<value>/WEB-INF/classes/omis/alert/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/assessment/msgs/form</value>
     			<value>/WEB-INF/classes/omis/audit/msgs/form</value>
     			<value>/WEB-INF/classes/omis/biographicandcontactsection/msgs/form</value>
     			<value>/WEB-INF/classes/omis/bedplacement/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/boardconsideration/msgs/form</value>
     			<value>/WEB-INF/classes/omis/boardhearing/msgs/form</value>
     			<value>/WEB-INF/classes/omis/boardhearingdecision/msgs/form</value>
     			<value>/WEB-INF/classes/omis/caseload/msgs/form</value>
     			<value>/WEB-INF/classes/omis/caution/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/chronologicalnote/msgs/form</value>
     			<value>/WEB-INF/classes/omis/citation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/condition/msgs/form</value>
     			<value>/WEB-INF/classes/omis/conviction/msgs/form</value>
@@ -133,17 +137,23 @@
     			<value>/WEB-INF/classes/omis/grievance/msgs/form</value>
     			<value>/WEB-INF/classes/omis/location/msgs/form</value>
     			<value>/WEB-INF/classes/omis/locationterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/mentalhealthreview/msgs/form</value>
     			<value>/WEB-INF/classes/omis/military/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/medicalreview/msgs/form</value>
     			<value>/WEB-INF/classes/omis/need/msgs/form</value>
     			<value>/WEB-INF/classes/omis/offenderflag/msgs/form</value>
     			<value>/WEB-INF/classes/omis/offender/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/offendercontact/msgs/form</value>
     			<value>/WEB-INF/classes/omis/offenderrelationship/msgs/form</value>
     			<value>/WEB-INF/classes/omis/offense/msgs/form</value>
     			<value>/WEB-INF/classes/omis/offenseterm/msgs/form</value>
     			<value>/WEB-INF/classes/omis/paroleboardcondition/msgs/form</value>
     			<value>/WEB-INF/classes/omis/paroleboarditinerary/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleboardlocation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/paroleboardmember/msgs/form</value>
     			<value>/WEB-INF/classes/omis/paroleeligibility/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/paroleplan/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/parolereview/msgs/form</value>
     			<value>/WEB-INF/classes/omis/person/msgs/form</value>
     			<value>/WEB-INF/classes/omis/photo/msgs/form</value>
     			<value>/WEB-INF/classes/omis/physicalfeature/msgs/form</value>
@@ -151,6 +161,7 @@
     			<value>/WEB-INF/classes/omis/placementscreening/msgs/form</value>
     			<value>/WEB-INF/classes/omis/presentenceinvestigation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/prisonterm/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/probationparole/msgs/form</value>
     			<value>/WEB-INF/classes/omis/probationterm/msgs/form</value>
     			<value>/WEB-INF/classes/omis/program/msgs/form</value>
     			<value>/WEB-INF/classes/omis/questionnaire/msgs/form</value>
@@ -169,7 +180,7 @@
     			<value>/WEB-INF/classes/omis/task/msgs/form</value>
     			<value>/WEB-INF/classes/omis/tierdesignation/msgs/form</value>
     			<value>/WEB-INF/classes/omis/trackeddocument/msgs/form</value>
-    			<value>/WEB-INF/classes/omis/unitmanagerreview/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/travelpermit/msgs/form</value>
     			<value>/WEB-INF/classes/omis/user/msgs/form</value>
     			<value>/WEB-INF/classes/omis/userpreference/msgs/form</value>
     			<value>/WEB-INF/classes/omis/victim/msgs/form</value>
@@ -215,6 +226,16 @@
   </bean>
   
   <util:properties id="offenderProfileItemsProperties" location="classpath:offenderProfileItems.properties"/>
+  
+  <!-- Feature toggle repository -->
+  
+  <bean id="featureToggles" class="omis.config.util.impl.FeatureTogglesImpl">
+  	<constructor-arg name="profileName" value="${application.hosting.env}"/>
+  	<constructor-arg name="allowedProfileNames" value="standalone,dev,test"/>
+  	<constructor-arg name="featureToggles">
+  		<util:properties location="classpath:featureToggles.properties"/>
+  	</constructor-arg>
+  </bean>
   
   <!--
     - Configuration property files for profiles that do not support report

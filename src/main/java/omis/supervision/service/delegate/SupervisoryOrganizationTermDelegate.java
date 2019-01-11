@@ -17,18 +17,20 @@
  */
 package omis.supervision.service.delegate;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.supervision.dao.SupervisoryOrganizationTermDao;
 import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
+import omis.supervision.exception.SupervisoryOrganizationTermExistsException;
 
 /**
  * Delegate for supervisory organization terms.
@@ -97,20 +99,20 @@ public class SupervisoryOrganizationTermDelegate {
 	 * @param dateRange date range
 	 * @param supervisoryOrganization supervisory organization
 	 * @return newly created supervisory organization term
-	 * @throws DuplicateEntityFoundException if supervisory organization term
-	 * exists
+	 * @throws SupervisoryOrganizationTermExistsException if supervisory
+	 * organization term exists
 	 */
 	public SupervisoryOrganizationTerm create(
 			final Offender offender,
 			final DateRange dateRange,
 			final SupervisoryOrganization supervisoryOrganization) 
-				throws DuplicateEntityFoundException {
+				throws SupervisoryOrganizationTermExistsException {
 		if (this.supervisoryOrganizationTermDao.find(
 				offender,
 				supervisoryOrganization,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange)) != null ) {
-			throw new DuplicateEntityFoundException(
+			throw new SupervisoryOrganizationTermExistsException(
 					"Supervisory organization term exists");
 		}
 		SupervisoryOrganizationTerm supervisoryOrganizationTerm
@@ -133,21 +135,21 @@ public class SupervisoryOrganizationTermDelegate {
 	 * @param dateRange date range
 	 * @param supervisoryOrganization supervisory organization
 	 * @return updated supervisory organization term
-	 * @throws DuplicateEntityFoundException if supervisory organization term
-	 * exists
+	 * @throws SupervisoryOrganizationTermExistsException if supervisory
+	 * organization term exists
 	 */
 	public SupervisoryOrganizationTerm  update(
 			final SupervisoryOrganizationTerm supervisoryOrganizationTerm,
 			final DateRange dateRange,
 			final SupervisoryOrganization supervisoryOrganization)
-				throws DuplicateEntityFoundException {
+				throws SupervisoryOrganizationTermExistsException {
 		if (this.supervisoryOrganizationTermDao.findExcluding(
 				supervisoryOrganizationTerm.getOffender(),
 				supervisoryOrganization,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange),
 				supervisoryOrganizationTerm) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new SupervisoryOrganizationTermExistsException(
 					"Supervisory organization term exists");
 		}
 		this.populateSupervisoryOrganizationTerm(
@@ -155,6 +157,48 @@ public class SupervisoryOrganizationTermDelegate {
 				supervisoryOrganization);
 		return this.supervisoryOrganizationTermDao.makePersistent(
 				supervisoryOrganizationTerm);
+	}
+	
+	/**
+	 * Counts supervisory organization terms for offender between dates with
+	 * option of excluding terms.
+	 * 
+	 * <p>Ignores excluded terms that are {@code null}.
+	 * 
+	 * @param offender offender
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @param excluded excluded terms; {@code null}s are ignored
+	 * @return count of supervisory organization terms for offender between
+	 * dates with option of excluding terms
+	 */
+	public long countForOffenderBetweenDatesExcluding(
+			final Offender offender,
+			final Date startDate, Date endDate,
+			final SupervisoryOrganizationTerm... excluded) {
+		if (excluded.length > 0) {
+			List<SupervisoryOrganizationTerm> notNullTerms
+				= new ArrayList<SupervisoryOrganizationTerm>();
+			for (SupervisoryOrganizationTerm term : excluded) {
+				if (term != null) {
+					notNullTerms.add(term);
+				}
+			}
+			if (notNullTerms.size() > 0) {
+				return this.supervisoryOrganizationTermDao
+					.countForOffenderBetweenDatesExcluding(
+						offender, startDate, endDate,
+						notNullTerms.toArray(
+								new SupervisoryOrganizationTerm[] { }));
+			} else {
+				return this.supervisoryOrganizationTermDao
+						.countForOffenderBetweenDates(
+								offender, startDate, endDate);
+			}
+		} else {
+			return this.supervisoryOrganizationTermDao
+					.countForOffenderBetweenDates(offender, startDate, endDate);
+		}
 	}
 	
 	/* Helper methods. */

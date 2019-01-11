@@ -27,13 +27,13 @@
 		<jsp:include page="/WEB-INF/views/common/includes/formResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/index.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/multi.css?VERSION=5"/>	
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/multi.css?VERSION=7"/>	
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/applicationToolbar.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/user/admin/style/userAdmin.css"/>
 		<link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/resources/common/images/appIcon.ico" />
 		<jsp:include page="common/includes/searchResources.jsp"/>
 		<jsp:include page="common/includes/tabsResources.jsp"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/index/scripts/multi.js?VERSION=5"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/index/scripts/multi.js?VERSION=6"></script>
   </head>
   <body class="containerPage">
 		<div id="contentFrameContainer">
@@ -45,11 +45,14 @@
 						<sec:authorize access="hasRole('ADMIN') or hasRole('NOCR_HOME_VIEW')">
 							<a id="reportHomeLink" class="reportHomeLink iconLink" href='${omis:getSystemProperty("jasperServerNocr")}' title="<fmt:message key='reportHomeLink'/>"></a>
 						</sec:authorize>
+						<sec:authorize access="hasRole('ADMIN') or hasRole('TASK_LIST') and hasRole('APP_DEV')">
+							<a id="taskListLink" class="taskListLink iconLink" href="${pageContext.request.contextPath}/task/list.html" title="<fmt:message key='taskLink'/>"></a>
+						</sec:authorize>
 						<c:if test="${not empty helpLinkPropertyHolder.propertyValue}">
 							<a id="applicationHelpLink" class="applicationHelpLink" target="_blank" href="${helpLinkPropertyHolder.propertyValue}" title="<fmt:message key='helpLink'/>"></a>
 						</c:if>
 						<input id="offenderSearch" autocomplete="off" type="text" title="${searchTitle}"/>
-						<div id="offenderSearchResults" class="backgroundLight"></div>
+						<div id="offenderSearchResults" class="foregroundLight hide"></div>
 					</div>
 					<ul id="offenderTabs_tabLinks" class="tabs">	
 					</ul>

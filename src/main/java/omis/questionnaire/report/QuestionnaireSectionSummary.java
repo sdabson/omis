@@ -18,7 +18,7 @@ public class QuestionnaireSectionSummary implements Serializable {
 	
 	private final String title;
 	
-	private final Integer number;
+	private final String number;
 	
 	private final String sectionHelpText;
 	
@@ -32,7 +32,7 @@ public class QuestionnaireSectionSummary implements Serializable {
 	 * @param sectionTypeDescription
 	 */
 	public QuestionnaireSectionSummary(final Long questionnaireSectionId,
-			final String title, final Integer number,
+			final String title, final String number,
 			final String sectionHelpText,
 			final String sectionTypeDescription) {
 		this.questionnaireSectionId = questionnaireSectionId;
@@ -59,7 +59,7 @@ public class QuestionnaireSectionSummary implements Serializable {
 	/**
 	 * @return the number
 	 */
-	public Integer getNumber() {
+	public String getNumber() {
 		return this.number;
 	}
 

@@ -38,24 +38,18 @@
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/audit/style/audit.css"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery.ptTimeSelect.css"/>
 		<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/address/includes/addressFieldsResources.jsp"/>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/MessageResolver.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"> </script>
+		<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/formResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/messageResolverResources.jsp"/>
+		<jsp:include page="/WEB-INF/views/common/includes/sessionConfigResources.jsp"/>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery.ptTimeSelect.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/JQuery/jquery.omis.search.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/tools.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/search.js"></script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/form.js"> </script>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/user/scripts/searchUserAccount.js"> </script>
-		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"> </script>
 		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/employment/scripts/employment.js"></script>
 		<script>
 			var create = ${create};

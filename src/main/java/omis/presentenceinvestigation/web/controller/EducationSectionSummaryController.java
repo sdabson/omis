@@ -40,12 +40,12 @@ import omis.presentenceinvestigation.web.validator.EducationSectionSummaryFormVa
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * EducationSectionSummaryController.java
+ * Education section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Mar 16, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine 
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/educationSummary/")
@@ -426,10 +426,6 @@ public class EducationSectionSummaryController {
 		return new ModelAndView(EDUCATIONS_ACTION_MENU_VIEW_NAME, map);
 	}
 	
-	
-	
-	
-	
 	/**
 	 * Prepares a ModelAndView for editing a EducationSectionSummary
 	 * @param request - PresentenceInvestigationRequest associated with the
@@ -447,15 +443,15 @@ public class EducationSectionSummaryController {
 						request);
 		
 		List<EducationSummary> summaries = this.educationSummaryReportService
-				.findByOffender((Offender) request.getDocket().getPerson());
+				.findByOffender((Offender) request.getPerson());
 		List<EducationDocumentSummary> educationDocumentSummaries =
 				this.educationSummaryReportService
 				.findEducationDocumentSummariesByOffender(
-						(Offender)request.getDocket().getPerson());
+						(Offender)request.getPerson());
 		
 		map.addAttribute(PRESENTENCE_INVESTIGATION_REQUEST_MODEL_KEY, request);
 		map.addAttribute(OFFENDER_MODEL_KEY,
-				(Offender) request.getDocket().getPerson());
+				(Offender) request.getPerson());
 		map.addAttribute(SUMMARIES_MODEL_KEY, summaries);
 		map.addAttribute(DOCUMENT_SUMMARIES_MODEL_KEY,
 				educationDocumentSummaries);
@@ -467,7 +463,7 @@ public class EducationSectionSummaryController {
 				(form.getEducationSectionSummaryNoteItems() != null ?
 						form.getEducationSectionSummaryNoteItems().size() : 0));
 		this.offenderSummaryModelDelegate.add(map,
-				(Offender) request.getDocket().getPerson());
+				(Offender) request.getPerson());
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				request);
 		
@@ -564,6 +560,4 @@ public class EducationSectionSummaryController {
 				this.educationAssociableDocumentPropertyEditorFactory
 				.createPropertyEditor());
 	}
-	
-	
 }

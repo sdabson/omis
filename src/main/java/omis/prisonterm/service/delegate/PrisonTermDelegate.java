@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.prisonterm.service.delegate;
 
 import java.util.Date;
@@ -10,6 +27,7 @@ import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 import omis.prisonterm.dao.PrisonTermDao;
 import omis.prisonterm.domain.PrisonTerm;
+import omis.prisonterm.domain.PrisonTermDocumentAssociation;
 import omis.prisonterm.domain.PrisonTermStatus;
 import omis.prisonterm.exception.ActivePrisonTermExistsException;
 import omis.user.domain.UserAccount;
@@ -19,7 +37,8 @@ import omis.user.domain.UserAccount;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Oct 17, 2017)
+ * @author Annie Wahl
+ * @version 0.1.2 (Dec 18, 2018)
  * @since OMIS 3.0
  */
 
@@ -44,6 +63,7 @@ public class PrisonTermDelegate {
 	 * 
 	 * @param prisonTermInstanceFactory instance factory for prison terms.
 	 * @param prisonTermDao data access object for prison terms.
+	 * @param auditComponentRetriever audit component retriever
 	 */
 	public PrisonTermDelegate(
 			final InstanceFactory<PrisonTerm> prisonTermInstanceFactory,
@@ -68,8 +88,12 @@ public class PrisonTermDelegate {
 	 * @param status prison term status
 	 * @param sentenceToFollow boolean
 	 * @param comments text 
-	 * @return Creates a new prison term
+	 * @param verificationUser Verification User
+	 * @param verificationDate Verification Date
+	 * @param sentenceCalculation Sentence Calculation
+	 * @return Created a new prison term
 	 * @throws DuplicateEntityFoundException if new prison term already exists.
+	 * @throws ActivePrisonTermExistsException When an active Prison Term exists
 	 */
 	public PrisonTerm create(final Offender offender, 
 			final Date actionDate, 
@@ -84,23 +108,26 @@ public class PrisonTermDelegate {
 			final Boolean sentenceToFollow, 
 			final String comments,
 			final UserAccount verificationUser,
-			final Date verificationDate)
-	throws DuplicateEntityFoundException, ActivePrisonTermExistsException {
-	if (this.prisonTermDao.find(offender, actionDate, status) != null) {
-		throw new DuplicateEntityFoundException("Duplicate prison term found");
-	}
-			
-	PrisonTerm prisonTerm = 
-		this.prisonTermInstanceFactory.createInstance();
-			prisonTerm.setCreationSignature(new CreationSignature(
-		this.auditComponentRetriever.retrieveUserAccount(), 
-		this.auditComponentRetriever.retrieveDate()));
-			prisonTerm.setOffender(offender);
-		this.populatePrisonTerm(prisonTerm, actionDate, preSentenceCredits, 
-				sentenceDate, sentenceTermYears, sentenceTermDays, 
-				paroleEligibilityDate, projectedDischargeDate, 
-				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+			final Date verificationDate,
+			final PrisonTermDocumentAssociation sentenceCalculation)
+		throws DuplicateEntityFoundException, ActivePrisonTermExistsException {
+		if (this.prisonTermDao.find(offender, actionDate, status) != null) {
+			throw new DuplicateEntityFoundException(
+					"Duplicate prison term found");
+		}
+				
+		PrisonTerm prisonTerm = 
+				this.prisonTermInstanceFactory.createInstance();
+		prisonTerm.setCreationSignature(new CreationSignature(
+			this.auditComponentRetriever.retrieveUserAccount(), 
+			this.auditComponentRetriever.retrieveDate()));
+		prisonTerm.setOffender(offender);
+		this.populatePrisonTerm(prisonTerm, actionDate,
+				preSentenceCredits, sentenceDate, sentenceTermYears,
+				sentenceTermDays, paroleEligibilityDate,
+				projectedDischargeDate, maximumDischargeDate, status,
+				sentenceToFollow, comments, verificationUser,
+				verificationDate, sentenceCalculation);
 		return this.prisonTermDao.makePersistent(prisonTerm);
 	}
 	
@@ -118,7 +145,10 @@ public class PrisonTermDelegate {
 	 * @param status prison term status
 	 * @param sentenceToFollow boolean
 	 * @param comments text 
-	 * @return Updates prison term
+	 * @param verificationUser Verification User
+	 * @param verificationDate Verification Date
+	 * @param sentenceCalculation Sentence Calculation
+	 * @return Updated prison term
 	 * @throws DuplicateEntityFoundException if new prison term already exists.
 	 * @throws ActivePrisonTermExistsException if an active prison term already
 	 * exists.
@@ -137,36 +167,49 @@ public class PrisonTermDelegate {
 			final Boolean sentenceToFollow, 
 			final String comments,
 			final UserAccount verificationUser,
-			final Date verificationDate)
-	throws DuplicateEntityFoundException, ActivePrisonTermExistsException {
-	if (this.prisonTermDao.findExcluding(prisonTerm.getOffender(), actionDate, 
-			status, prisonTerm) != null) {
-		throw new DuplicateEntityFoundException("Duplicate prison term found");
+			final Date verificationDate,
+			final PrisonTermDocumentAssociation sentenceCalculation)
+					throws DuplicateEntityFoundException,
+					ActivePrisonTermExistsException {
+		if (this.prisonTermDao.findExcluding(prisonTerm.getOffender(),
+				actionDate, status, prisonTerm) != null) {
+			throw new DuplicateEntityFoundException(
+					"Duplicate prison term found");
+		}
+		
+		if (this.prisonTermDao.findExcludingActiveByOffender(prisonTerm
+				.getOffender(), prisonTerm) != null
+				&& PrisonTermStatus.ACTIVE.equals(status)) {
+			throw new ActivePrisonTermExistsException(
+					"An active prison term already exists");
+		}
+		
+		this.populatePrisonTerm(prisonTerm, actionDate, preSentenceCredits,
+				sentenceDate, sentenceTermYears, sentenceTermDays,
+				paroleEligibilityDate, projectedDischargeDate,
+				maximumDischargeDate, status, sentenceToFollow, comments,
+				verificationUser, verificationDate, sentenceCalculation);
+		return this.prisonTermDao.makePersistent(prisonTerm);
 	}
 	
-	if (this.prisonTermDao.findExcludingActiveByOffender(prisonTerm
-			.getOffender(), prisonTerm) !=null && 
-				PrisonTermStatus.ACTIVE.equals(status)) {
-		throw new ActivePrisonTermExistsException(
-				"An active prison term already exists");
-	}
-	
-	this.populatePrisonTerm(prisonTerm, actionDate, preSentenceCredits, 
-			sentenceDate, sentenceTermYears, sentenceTermDays, 
-			paroleEligibilityDate, projectedDischargeDate, maximumDischargeDate, 
-			status, sentenceToFollow, comments, verificationUser, 
-			verificationDate);
-	return this.prisonTermDao.makePersistent(prisonTerm);
-	}
-	
-	/** Removes a prison term.
-	 * @param PrisonTerm - prisonTerm
-	 * @param  - .
-	 * @return Removes a prison term.
-	 * @throws DuplicateEntityFoundException - when prison term already exists. 
+	/**
+	 * Removes a prison term.
+	 * 
+	 * @param prisonTerm - Prison Term to remove
 	 */
 	public void remove(final PrisonTerm prisonTerm) {
 		this.prisonTermDao.makeTransient(prisonTerm);
+	}
+	
+	/**
+	 * Returns the active prison term for the specified offender.
+	 * 
+	 * @param offender Offender
+	 * @return active prison term for the specified offender.
+	 */
+	public PrisonTerm findActiveByOffender(final Offender offender) {
+		return this.prisonTermDao.findExcludingActiveByOffender(
+				offender, null);
 	}
 	
 	/**
@@ -184,6 +227,9 @@ public class PrisonTermDelegate {
 	 * @param status prison term status
 	 * @param sentenceToFollow boolean
 	 * @param comments text 
+	 * @param verificationUser Verification User
+	 * @param verificationDate Verification Date
+	 * @param sentenceCalculation Sentence Calculation
 	 * @return populated prison term.
 	 */
 	private void populatePrisonTerm(
@@ -200,7 +246,8 @@ public class PrisonTermDelegate {
 			final Boolean sentenceToFollow, 
 			final String comments,
 			final UserAccount verificationUser,
-			final Date verificationDate) {
+			final Date verificationDate,
+			final PrisonTermDocumentAssociation sentenceCalculation) {
 		prisonTerm.setActionDate(actionDate);
 		prisonTerm.setPreSentenceCredits(preSentenceCredits);
 		prisonTerm.setSentenceDate(sentenceDate);
@@ -214,6 +261,7 @@ public class PrisonTermDelegate {
 		prisonTerm.setComments(comments);
 		prisonTerm.setVerificationUser(verificationUser);
 		prisonTerm.setVerificationDate(verificationDate);
+		prisonTerm.setSentenceCalculation(sentenceCalculation);
 		prisonTerm.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));

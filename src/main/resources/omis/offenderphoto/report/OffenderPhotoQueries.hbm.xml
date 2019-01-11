@@ -7,9 +7,9 @@
  <![CDATA[
           select new omis.offenderphoto.report.OffenderPhotoAssociationSummary(p3.id, op.date, a.id)
  	        from omis.offenderphoto.domain.OffenderPhotoAssociation a
-right outer join a.person p3
- left outer join a.photo op
+inner join a.person p3
+ inner join a.photo op
            where p3 = :offender
-             and a.profile = 'Y'
+             and a.profile = true
  ]]></query>
  </hibernate-mapping>

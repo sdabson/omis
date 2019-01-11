@@ -109,6 +109,7 @@
   <bean id="victimNoteCategoryDelegate"
         class="omis.victim.service.delegate.VictimNoteCategoryDelegate">
     <constructor-arg name="victimNoteCategoryDao" ref="victimNoteCategoryDao"/>
+    <constructor-arg name="victimNoteCategoryInstanceFactory" ref="victimNoteCategoryInstanceFactory"/>
   </bean>
   
   <bean id="victimDocketAssociationDelegate"
@@ -180,6 +181,12 @@
         class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
     <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
     <constructor-arg name="entityName" value="omis.victim.domain.VictimNote"/>
+  </bean>
+  
+   <bean id="victimNoteCategoryInstanceFactory"
+        class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+    <constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+    <constructor-arg name="entityName" value="omis.victim.domain.VictimNoteCategory"/>
   </bean>
   
   <bean id="victimDocketAssociationInstanceFactory"
@@ -262,5 +269,12 @@
 		<bean id="victimDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
 			<constructor-arg name="fileLocator" ref="victimDocumentLocator"/>
 		</bean>
+	
+	<!-- Operations -->
+	
+	<bean class="omis.victim.service.delegate.impl.VictimAssociationRemovalByRelationshipOperationImpl">
+		<constructor-arg name="registry" ref="relationshipAssociatedRemovalOperationRegistry"/>
+		<constructor-arg name="victimAssociationDao" ref="victimAssociationDao"/>
+	</bean>
 	
 </beans>

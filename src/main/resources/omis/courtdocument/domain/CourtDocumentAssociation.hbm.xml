@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
+  - Court document association hibernate configuration.
+  -
+  - Author: Ryan Johns
+  - Author: Josh Divine
+  - Version: 0.1.1 (Aug 6, 2018)
+  - Since: OMIS 3.0
+  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.courtdocument.domain">
-	<class entity-name="omis.courtdocument.domain.CourtCaseDocumentAssociation"
-		proxy="omis.courtdocument.domain.CourtCaseDocumentAssociation"
-		name="omis.courtdocument.domain.impl.CourtCaseDocumentAssociationImpl"
+	<class entity-name="omis.courtdocument.domain.CourtDocumentAssociation"
+		proxy="omis.courtdocument.domain.CourtDocumentAssociation"
+		name="omis.courtdocument.domain.impl.CourtDocumentAssociationImpl"
 		table="`COURT_DOCUMENT_ASSOCIATION`">
 		<id name="id" column="`ID`">
 			<generator class="sequence">
 				<param name="sequence">`COURT_DOCUMENT_ASSOCIATION_SEQ`</param>
 			</generator>
 		</id>
-		<many-to-one name="courtCase" 
-			entity-name="omis.courtcase.domain.CourtCase"
-			column="`COURT_CASE_ID`"/>
+		<many-to-one name="docket" 
+			entity-name="omis.docket.domain.Docket"
+			column="`DOCKET_ID`" not-null="false"/>
+		<many-to-one name="offender" 
+			entity-name="omis.offender.domain.Offender"
+			column="`OFFENDER_ID`" not-null="false"/>
 		<property name="date" type="java.util.Date" not-null="true" 
 			column="`DATE`"/>
 		<many-to-one name="category" 
@@ -22,7 +50,7 @@
 			not-null="true" column="`COURT_DOCUMENT_CATEGORY_ID`"/>
 		<many-to-one name="document" 
 			entity-name="omis.document.domain.Document" not-null="true" 
-			column="`DOCUMENT_ID`"/>
+			column="`DOCUMENT_ID`" unique="true"/>
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" 
 				not-null="true"/>
@@ -34,24 +62,23 @@
 			<property name="date" column="`UPDATE_DATE`" not-null="true"/>
 		</component>
 	</class>
-	<query name="findCourtDocumentAssociationsByDocumentAndCourtCase"><![CDATA[
-		select courtCaseDocumentAssociation
-		  from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
-		 where courtCaseDocumentAssociation.courtCase = :courtCase
-		   and courtCaseDocumentAssociation.document = :document
+	<query name="findCourtDocumentAssociations"><![CDATA[
+		select courtDocumentAssociation
+		  from omis.courtdocument.domain.CourtDocumentAssociation courtDocumentAssociation
+		 where courtDocumentAssociation.document = :document
 	]]></query>
-	<query name="findCourtDocumentAssociationsByDocumentAndCourtCaseExcluding"><![CDATA[
-		select courtCaseDocumentAssociation
-		  from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
-		 where courtCaseDocumentAssociation.courtCase = :courtCase
-		   and courtCaseDocumentAssociation.document = :document
-		   and courtCaseDocumentAssociation not in (:excluding)
+	<query name="findCourtDocumentAssociationsExcluding"><![CDATA[
+		select courtDocumentAssociation
+		  from omis.courtdocument.domain.CourtDocumentAssociation courtDocumentAssociation
+		 where courtDocumentAssociation.document = :document
+		   and courtDocumentAssociation not in (:excluding)
 	]]></query>
 	<query name="findCourtDocumentAssociationByOffender"><![CDATA[
-		 select count(courtCaseDocumentAssociation.id)
-		   from omis.courtdocument.domain.CourtCaseDocumentAssociation courtCaseDocumentAssociation
-left outer join courtCaseDocumentAssociation.courtCase courtCase
-          where courtCase.docket.person = :offender
+		 select distinct count(courtDocumentAssociation.id)
+		   from omis.courtdocument.domain.CourtDocumentAssociation courtDocumentAssociation
+	  left join courtDocumentAssociation.docket docket
+          where docket.person = :offender
+             or courtDocumentAssociation.offender = :offender
 	]]></query>
 	
 </hibernate-mapping>

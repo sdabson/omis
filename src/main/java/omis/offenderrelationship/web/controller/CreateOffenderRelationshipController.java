@@ -23,6 +23,22 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
 import omis.address.domain.Address;
 import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
@@ -42,6 +58,8 @@ import omis.contact.domain.component.PoBox;
 import omis.contact.exception.ContactExistsException;
 import omis.contact.exception.OnlineAccountExistsException;
 import omis.contact.exception.TelephoneNumberExistsException;
+import omis.contact.report.ContactReportService;
+import omis.contact.report.ContactSummary;
 import omis.contact.web.controller.delegate.OnlineAccountFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.PoBoxFieldsControllerDelegate;
 import omis.contact.web.controller.delegate.TelephoneNumberFieldsControllerDelegate;
@@ -63,6 +81,8 @@ import omis.offender.report.OffenderReportService;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.offenderrelationship.service.CreateRelationshipsService;
 import omis.offenderrelationship.web.form.CreateRelationshipsForm;
+import omis.offenderrelationship.web.form.OffenderRelationshipNoteItem;
+import omis.offenderrelationship.web.form.OffenderRelationshipNoteItemOperation;
 import omis.offenderrelationship.web.form.OnlineAccountContactItem;
 import omis.offenderrelationship.web.form.TelephoneNumberItem;
 import omis.offenderrelationship.web.validator.CreateRelationshipsFormValidator;
@@ -75,6 +95,8 @@ import omis.person.web.form.PersonFields;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.exception.CityExistsException;
+import omis.relationship.domain.RelationshipNote;
+import omis.relationship.domain.RelationshipNoteCategory;
 import omis.relationship.exception.ReflexiveRelationshipException;
 import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.util.StringUtility;
@@ -87,22 +109,6 @@ import omis.visitation.domain.VisitationAssociationFlags;
 import omis.visitation.exception.VisitationExistsException;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
 /**
  * Offender relationship controller.
  * 
@@ -110,7 +116,8 @@ import org.springframework.web.servlet.ModelAndView;
  * @author Sheronda Vaughn
  * @author Yidong Li
  * @author Josh Divine
- * @version 0.1.1 (Nov 21, 2017)
+ * @author Stephen Abson
+ * @version 0.1.2 (Feb 12, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -120,6 +127,12 @@ public class CreateOffenderRelationshipController {
 	/* Redirect URLs */
 	private static final String LIST_REDIRECT 
 		= "redirect:/offenderRelationship/list.html?offender=%d";
+	
+	/* URLs. */
+	
+	// Base URL of all operations - including links in controller 
+	// Operations that do not use this URL should be updated to do so - SA
+	private static final String BASE_URL = "/offenderRelationship/create";
 
 	/* View names. */
 	private static final String CREATE_VIEW_NAME 
@@ -136,9 +149,15 @@ public class CreateOffenderRelationshipController {
 		= "offenderRelationship/includes/create/createTelephoneNumberTableRow";
 	private static final String CREATE_ONLINE_ACCOUNT_TABLE_ROW_VIEW_NAME 
 		= "offenderRelationship/includes/create/createOnlineAccountTableRow";
+	private static final String CREATE_RELATIONSHIP_NOTE_TABLE_ROW_VIEW_NAME
+		= "offenderRelationship/includes/offenderRelationshipNoteItemTableRow";
 	private static final String EMAILS_ACTION_MENU_VIEW_NAME
 		= "offenderRelationship/includes/create/"
 				+ "offenderRelationshipCreateEmailActionMenu";
+	private static final String
+	OFFENDER_RELATION_NOTE_ITEMS_ACTION_MENU_VIEW_NAME
+		= "offenderRelationship/includes/create/"
+				+ "offenderRelationshipNoteItemsActionMenu";
 	private static final String ADDRESSES_VIEW_NAME
 		= "address/json/addresses";
 
@@ -149,6 +168,8 @@ public class CreateOffenderRelationshipController {
 	private static final String 
 		OFFENDER_RELATIONSHIP_ONLINE_ACCOUNT_INDEX_MODEL_KEY 
 		= "offenderRelationshipOnlineAccountIndex";
+	private static final String OFFENDER_RELATIONSHIP_NOTE_INDEX_MODEL_KEY
+		= "offenderRelationshipNoteItemIndex";
 	private static final String OFFENDER_MODEL_KEY = "offender";
 	private static final String CREATE_RELATIONSHIPS_FORM_MODEL_KEY
 		= "createRelationshipsForm";
@@ -185,6 +206,25 @@ public class CreateOffenderRelationshipController {
 	private static final String BIRTH_COUNTRIES_MODEL_KEY = "birthCountries";
 	private static final String PO_BOX_COUNTRIES_MODEL_KEY = "poBoxCountries";
 	private static final String NEW_RELATION_MODEL_KEY = "newRelation";
+	private static final String NOTE_CATEGORIES_MODEL_KEY
+		= "offenderRelationshipNoteCategories";
+	private static final String OFFENDER_RELATIONSHIP_NOTE_ITEM_MODEL_KEY
+		= "offenderRelationshipNoteItem";
+	private static final String SPAUSE_STATUS 
+	= "spauseStatus";
+	
+	// Used to add base URL to views
+	private static final String BASE_URL_MODEL_KEY = "baseUrl";
+	
+	// Field name of note items
+	private static final String
+	OFFENDER_RELATIONSHIP_NOTE_ITEMS_FIELD_NAME_MODEL_KEY
+		= "offenderRelationshipNoteItemsFieldName";
+	
+	private static final String EXISTING_CONTACT_SUMMARY_MODEL_KEY
+	= "existingContactSummary";
+	
+	/* Message keys. */
 	private static final String ADDRESS_EXISTS_EXCEPTION_MESSAGE_KEY
 		= "address.Conflicts";
 	private static final String VICTIM_EXISTS_EXCEPTION_MESSAGE_KEY
@@ -192,7 +232,7 @@ public class CreateOffenderRelationshipController {
 	private static final String VISITATION_EXISTS_EXCEPTION_MESSAGE_KEY
 		= "visitation.Conflicts";
 	private static final String ZIPCODE_EXISTS_EXCEPTION_MESSAGE_KEY
-		= "zipcode.Conflicts";
+		= "zipCode.exists";
 	private static final String CONTACT_EXISTS_EXCEPTION_MESSAGE_KEY
 		= "contact.Conflicts";
 	private static final String PERSON_EXISTS_EXCEPTION_MESSAGE_KEY
@@ -220,6 +260,13 @@ public class CreateOffenderRelationshipController {
 		= "addressFields";
 	private static final String PO_BOX_FIELDS_NAME = "poBoxFields";
 
+	private static final String OFFENDER_RELATIONSHIP_NOTE_ITEMS_FIELD_NAME
+		= "noteItems";
+	
+	/* Message bundles. */
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.offenderrelationship.msgs.form";
+	
 	/* Property Editors. */
 	@Autowired
 	private CustomDateEditorFactory customDateEditorFactory;
@@ -282,6 +329,14 @@ public class CreateOffenderRelationshipController {
 	@Qualifier("onlineAccountPropertyEditorFactory")
 	private PropertyEditorFactory onlineAccountPropertyEditorFactory;
 	
+	@Autowired
+	@Qualifier("relationshipNoteCategoryPropertyEditorFactory")
+	private PropertyEditorFactory relationshipNoteCategoryPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("relationshipNotePropertyEditorFactory")
+	private PropertyEditorFactory relationshipNotePropertyEditorFactory;
+	
 	/* Services. */
 	@Autowired
 	@Qualifier("createRelationshipsService")
@@ -290,6 +345,10 @@ public class CreateOffenderRelationshipController {
 	@Autowired
 	@Qualifier("offenderReportService")
 	private OffenderReportService offenderReportService;
+	
+	@Autowired
+	@Qualifier("contactReportService")
+	private ContactReportService contactReportService;
 
 	/* Validators. */
 	@Autowired
@@ -327,14 +386,14 @@ public class CreateOffenderRelationshipController {
 	@Autowired
 	@Qualifier("businessExceptionHandlerDelegate")
 	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
+	
+	/*@Autowired
+	@Qualifier("contactSummaryModelDelegate")
+	private ContactSummaryModelDelegate contactSummaryModelDelegate;*/
 
 	/* Helpers. */
 	@Autowired
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
-	
-	/* Message bundles. */
-	private static final String ERROR_BUNDLE_NAME
-		= "omis.offenderrelationship.msgs.form";
 
 	/* Constructor. */
 	/**
@@ -413,6 +472,7 @@ public class CreateOffenderRelationshipController {
 			ContactExistsException, TelephoneNumberExistsException,
 			FamilyAssociationExistsException, VictimExistsException,
 			VisitationExistsException, OnlineAccountExistsException {
+		Person relation;
 		if (associatedPerson == null) {
 			// Create new
 			if (createRelationshipsForm.getPoBoxFields().getCountry()
@@ -1285,6 +1345,19 @@ public class CreateOffenderRelationshipController {
 				
 			if (!createRelationshipsForm.getPersonFields().getNewCity()) {
 				// Exiting city
+				Integer socialSecurityNumber;
+				if (createRelationshipsForm.getPersonFields()
+						.getSocialSecurityNumber() != null
+						&& !createRelationshipsForm.getPersonFields()
+							.getSocialSecurityNumber().isEmpty()) {
+					socialSecurityNumber
+						= Integer.valueOf(createRelationshipsForm
+								.getPersonFields()
+									.getSocialSecurityNumber()
+										.replaceAll("-", ""));
+				} else {
+					socialSecurityNumber = null;
+				}
 				Person newCreatedAssociated = this.createRelationshipsService
 					.createRelation(
 					createRelationshipsForm.getPersonFields().getLastName(), 
@@ -1296,12 +1369,12 @@ public class CreateOffenderRelationshipController {
 					createRelationshipsForm.getPersonFields().getBirthCountry(),
 					createRelationshipsForm.getPersonFields().getBirthState(), 
 					createRelationshipsForm.getPersonFields().getBirthCity(), 
-					createRelationshipsForm.getPersonFields()
-						.getSocialSecurityNumber(), 
+					socialSecurityNumber, 
 					createRelationshipsForm.getPersonFields()
 					.getStateIdNumber(),
 					createRelationshipsForm.getPersonFields().getDeceased(), 
 					createRelationshipsForm.getPersonFields().getDeathDate());
+				relation = newCreatedAssociated;
 				/* Create victim association */
 				if (createRelationshipsForm.getCreateVictim() != null
 					&& createRelationshipsForm.getCreateVictim()) {
@@ -1433,6 +1506,19 @@ public class CreateOffenderRelationshipController {
 				}
 			} else {
 				// New city
+				Integer socialSecurityNumber;
+				if (createRelationshipsForm.getPersonFields()
+						.getSocialSecurityNumber() != null
+						&& !createRelationshipsForm.getPersonFields()
+							.getSocialSecurityNumber().isEmpty()) {
+					socialSecurityNumber
+						= Integer.valueOf(createRelationshipsForm
+								.getPersonFields()
+									.getSocialSecurityNumber()
+										.replaceAll("-", ""));
+				} else {
+					socialSecurityNumber = null;
+				}
 				Person newCreatedAssociated = this.createRelationshipsService
 					.createRelation(
 					createRelationshipsForm.getPersonFields().getLastName(), 
@@ -1444,13 +1530,12 @@ public class CreateOffenderRelationshipController {
 					createRelationshipsForm.getPersonFields().getBirthCountry(),
 					createRelationshipsForm.getPersonFields().getBirthState(), 
 					newCreatedPersonFieldsCity,
-					createRelationshipsForm.getPersonFields()
-						.getSocialSecurityNumber(), 
+					socialSecurityNumber, 
 					createRelationshipsForm.getPersonFields()
 						.getStateIdNumber(), 
 					createRelationshipsForm.getPersonFields().getDeceased(), 
 					createRelationshipsForm.getPersonFields().getDeathDate());
-				
+				relation = newCreatedAssociated;
 				/* Create victim association */
 				if (createRelationshipsForm.getCreateVictim() != null
 					&& createRelationshipsForm.getCreateVictim()) {
@@ -1597,8 +1682,6 @@ public class CreateOffenderRelationshipController {
 					}
 				}
 			}
-			return new ModelAndView(String.format(LIST_REDIRECT, 
-					offender.getId()));
 		} else {
 			// Existing... click the "Create Family Association" link on the 
 			// left side of each row on the search result screen
@@ -1608,6 +1691,8 @@ public class CreateOffenderRelationshipController {
 				return this.prepareRedisplayEditMav(createRelationshipsForm, 
 					offender, associatedPerson, result);
 			}
+			
+			relation = associatedPerson;
 			/* Create victim association */
 			if (createRelationshipsForm.getCreateVictim() != null
 				&& createRelationshipsForm.getCreateVictim()) {
@@ -1697,10 +1782,26 @@ public class CreateOffenderRelationshipController {
 				visitationAssociation.setNotes(createRelationshipsForm
 							.getVisitationAssociationFields().getNotes());
 			}
-			
-			return new ModelAndView(String.format(LIST_REDIRECT, 
+		}
+		if (createRelationshipsForm.getNoteItems() != null) {
+			for (OffenderRelationshipNoteItem item
+					: createRelationshipsForm.getNoteItems()) {
+				if (OffenderRelationshipNoteItemOperation.CREATE
+						.equals(item.getOperation())) {
+					this.createRelationshipsService
+						.createNote(offender, relation,
+								item.getFields().getCategory(),
+								item.getFields().getValue(),
+								item.getFields().getDate());
+				} else if (item.getOperation() != null) {
+					throw new UnsupportedOperationException(
+							String.format("Note operation not supported: %s",
+									item.getOperation()));
+				}
+			}
+		}
+		return new ModelAndView(String.format(LIST_REDIRECT, 
 				offender.getId()));
-		}	
 	}
 	
 	/* Helper methods. */
@@ -1719,7 +1820,20 @@ public class CreateOffenderRelationshipController {
 	private ModelAndView prepareCreateMav(final CreateRelationshipsForm form, 
 			final Offender offender, final Person relation) {
 		ModelAndView mav = new ModelAndView(CREATE_VIEW_NAME);
-		
+		if(form.getFamilyAssociationFields()!=null){
+			if(form.getFamilyAssociationFields().getCategory()!=null){
+				if(FamilyAssociationCategoryClassification.SPOUSE.equals(form
+					.getFamilyAssociationFields().getCategory().getClassification())){
+					mav.addObject(SPAUSE_STATUS, true);
+				} else {
+					mav.addObject(SPAUSE_STATUS, false);
+				}
+			} else {
+				mav.addObject(SPAUSE_STATUS, false);
+			}
+		}else {
+			mav.addObject(SPAUSE_STATUS, false);
+		}
 		if (form.getCreateFamilyMember() == null) {
 			mav.addObject(CREATE_FAMILY_MEMBER_STATUS, false);
 		} else {
@@ -1741,11 +1855,15 @@ public class CreateOffenderRelationshipController {
 			= form.getTelephoneNumberItems().size();
 		int onlineAccountItemIndexValue
 			= form.getOnlineAccountContactItems().size();
+		int offenderRelationshipNoteIndex
+			= form.getNoteItems().size();
 		
 		mav.addObject(OFFENDER_RELATIONSHIP_TELEPHONE_NUMBER_INDEX_MODEL_KEY, 
 			offenderRelationshipTelephoneNumberIndex);
 		mav.addObject(OFFENDER_RELATIONSHIP_ONLINE_ACCOUNT_INDEX_MODEL_KEY, 
 			onlineAccountItemIndexValue);
+		mav.addObject(OFFENDER_RELATIONSHIP_NOTE_INDEX_MODEL_KEY,
+				offenderRelationshipNoteIndex);
 		mav.addObject(CREATE_RELATIONSHIPS_FORM_MODEL_KEY, form);
 		List<Suffix> nameSuffixes 
 			= this.createRelationshipsService.findNameSuffixes();
@@ -1794,6 +1912,12 @@ public class CreateOffenderRelationshipController {
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
 		
 		ModelMap map = mav.getModelMap();
+		if (relation != null) {
+			ContactSummary existingContactSummary = this.contactReportService
+					.summarizeByPerson(relation);
+				map.addAttribute(EXISTING_CONTACT_SUMMARY_MODEL_KEY,
+						existingContactSummary);
+		}
 		map.addAttribute(TELEPHONE_NUMBER_CATEGORY_MODEL_KEY,
 				TelephoneNumberCategory.values());
 		AddressFields addressFields = form.getAddressFields();
@@ -1899,8 +2023,6 @@ public class CreateOffenderRelationshipController {
 		if (form.getPoBoxFields() != null) {
 			PoBoxFields poBoxFields = form.getPoBoxFields();
 //			poBoxFields.setNewZipCode(false);
-			poBoxFields.setNewZipCode(form.getPoBoxFields().getNewZipCode());
-			form.setPoBoxFields(poBoxFields);
 			if (poBoxFields != null) {
 				if (poBoxFields.getCity() != null) {
 					if (this.createRelationshipsService.hasStates(
@@ -2101,6 +2223,9 @@ public class CreateOffenderRelationshipController {
 		final BindingResult result) {
 		ModelAndView mav = this.prepareCreateMav(createRelationshipsForm, 
 			offender, relation); 
+		List<RelationshipNoteCategory> noteCategories
+			= this.createRelationshipsService.findDesignatedNoteCategories();
+		mav.addObject(NOTE_CATEGORIES_MODEL_KEY, noteCategories);
 		mav.addObject(BindingResult.MODEL_KEY_PREFIX
 			+ CREATE_RELATIONSHIPS_FORM_MODEL_KEY, result);
 		return mav;
@@ -2284,6 +2409,17 @@ public class CreateOffenderRelationshipController {
 	}
 	
 	/**
+	 * Displays action menu for relationship note items.
+	 * 
+	 * @return action menu for relationship note items
+	 */
+	@RequestMapping(value = "/create/noteItemsActionMenu.html")
+	public ModelAndView displayOffenderRelationshipNoteItemsActionMenu() {
+		return new ModelAndView(
+				OFFENDER_RELATION_NOTE_ITEMS_ACTION_MENU_VIEW_NAME);
+	}
+	
+	/**
 	 * Returns a view for telephone number action menu pertaining to the 
 	 * specified offender.
 	 * 
@@ -2348,6 +2484,40 @@ public class CreateOffenderRelationshipController {
 		map.addAttribute(ONLINE_ACCOUNT_CONTACT_ITEM_MODEL_KEY, 
 			onlineAccountContactItem);
 		return new ModelAndView(CREATE_ONLINE_ACCOUNT_TABLE_ROW_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Adds offender relationship note item.
+	 * 
+	 * @param offenderRelationshipNoteItemIndex item index of offender
+	 * relationship note
+	 * @return offender relationship note item
+	 */
+	@RequestMapping(
+			value = "/create/createRelationshipNoteItem.html",
+			method = RequestMethod.GET)
+	public ModelAndView createRelationshipNoteItem(
+			@RequestParam(
+					value = "offenderRelationshipNoteItemIndex",
+					required = true)
+				final Integer offenderRelationshipNoteItemIndex) {
+		List<RelationshipNoteCategory> noteCategories
+			= this.createRelationshipsService.findDesignatedNoteCategories();
+		OffenderRelationshipNoteItem offenderRelationshipNoteItem
+			= new OffenderRelationshipNoteItem();
+		offenderRelationshipNoteItem.setOperation(
+				OffenderRelationshipNoteItemOperation.CREATE);
+		ModelAndView mav = new ModelAndView(
+				CREATE_RELATIONSHIP_NOTE_TABLE_ROW_VIEW_NAME);
+		mav.addObject(OFFENDER_RELATIONSHIP_NOTE_INDEX_MODEL_KEY,
+				offenderRelationshipNoteItemIndex);
+		mav.addObject(OFFENDER_RELATIONSHIP_NOTE_ITEM_MODEL_KEY,
+				offenderRelationshipNoteItem);
+		mav.addObject(OFFENDER_RELATIONSHIP_NOTE_ITEMS_FIELD_NAME_MODEL_KEY,
+				OFFENDER_RELATIONSHIP_NOTE_ITEMS_FIELD_NAME);
+		mav.addObject(BASE_URL_MODEL_KEY, BASE_URL);
+		mav.addObject(NOTE_CATEGORIES_MODEL_KEY, noteCategories);
+		return mav;
 	}
 	
 	/**
@@ -2543,7 +2713,7 @@ public class CreateOffenderRelationshipController {
 	 * Handles {@code CityExistsException}.
 	 * 
 	 * @param cityExistsException city exists exception
-	 * @return screen to handle {@code AddressExistsException}
+	 * @return screen to handle {@code CityExistsException}
 	 */
 	@ExceptionHandler(CityExistsException.class)
 	public ModelAndView handleCityExistsException(
@@ -2608,6 +2778,12 @@ public class CreateOffenderRelationshipController {
 			this.telephoneNumberPropertyEditorFactory.createPropertyEditor());
 		binder.registerCustomEditor(OnlineAccount.class,
 			this.onlineAccountPropertyEditorFactory.createPropertyEditor());
+		binder.registerCustomEditor(RelationshipNote.class,
+				this.relationshipNotePropertyEditorFactory
+					.createPropertyEditor());
+		binder.registerCustomEditor(RelationshipNoteCategory.class,
+			this.relationshipNoteCategoryPropertyEditorFactory
+				.createPropertyEditor());
 	}
 	
 	// Returns true if value is true; false otherwise

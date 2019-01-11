@@ -1,6 +1,25 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.staff.report;
 
 import java.io.Serializable;
+
+import omis.staff.domain.StaffAssignment;
 
 /**
  * Staff search summary.
@@ -13,6 +32,8 @@ import java.io.Serializable;
 public class StaffSearchSummary implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private final StaffAssignment staffAssignment;
 	
 	private Long staffId;
 	
@@ -47,7 +68,8 @@ public class StaffSearchSummary implements Serializable {
 	 * @param organizationName organization name
 	 * @param active active
 	 */
-	public StaffSearchSummary(final Long staffId, 
+	public StaffSearchSummary(final StaffAssignment staffAssignment, 
+			final Long staffId, 
 			final String staffMemberFirstName, 
 			final String staffMemberMiddleName, 
 			final String staffMemberLastName,
@@ -57,6 +79,7 @@ public class StaffSearchSummary implements Serializable {
 			final String organizationDivision, 
 			final Long telephoneNumber,
 			final String emailAddress, final Boolean active) {
+		this.staffAssignment = staffAssignment;
 		this.staffId = staffId;
 		this.staffMemberFirstName = staffMemberFirstName;
 		this.staffMemberMiddleName = staffMemberMiddleName;
@@ -68,6 +91,15 @@ public class StaffSearchSummary implements Serializable {
 		this.telephoneNumber = telephoneNumber;
 		this.emailAddress = emailAddress;
 		this.active = active;
+	}
+
+	/**
+	 * Gets the staff assignment. 
+	 * 
+	 * @return staff assignment
+	 */
+	public StaffAssignment getStaffAssignment() {
+		return this.staffAssignment;
 	}
 
 	/**

@@ -17,7 +17,7 @@
 </head>
 <body>
 	<h1><fmt:message key="businessExceptionTitle"/></h1>
-	<p class="exceptionMessage">
+	<p class="exceptionMessage foreground">
 		<fmt:message key="businessExceptionMessage"/>
 	</p>
 	<jsp:include page="includes/stackTrace.jsp"/>

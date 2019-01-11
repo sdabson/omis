@@ -86,7 +86,7 @@ public class PrisonTermServiceCreateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -137,20 +137,20 @@ public class PrisonTermServiceCreateTests
 				sentenceDate, sentenceTermYears, sentenceTermDays, 
 				paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Action
 		this.prisonTermService.create(offender, actionDate, preSentenceCredits, 
 				sentenceDate, sentenceTermYears, sentenceTermDays, 
 				paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		this.prisonTermService.create(offender, actionDate, preSentenceCredits, 
 				sentenceDate, sentenceTermYears, sentenceTermDays, 
 				paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 	}
 	
 	// Parses date text

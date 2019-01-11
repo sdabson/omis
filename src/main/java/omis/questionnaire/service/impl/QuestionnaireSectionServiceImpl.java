@@ -11,21 +11,23 @@ import omis.questionnaire.service.delegate.QuestionnaireSectionDelegate;
 import omis.questionnaire.service.delegate.SectionTypeDelegate;
 
 /**
- * QuestionnaireSectionServiceImpl.java
+ * Questionnaire Section Service Implementation.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Nov 16, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
-public class QuestionnaireSectionServiceImpl implements QuestionnaireSectionService {
+public class QuestionnaireSectionServiceImpl
+		implements QuestionnaireSectionService {
 	
 	private final QuestionnaireSectionDelegate questionnaireSectionDelegate;
 	
 	private final SectionTypeDelegate sectionTypeDelegate;
 
 	/**
-	 * @param questionnaireSectionDelegate
+	 * @param questionnaireSectionDelegate - questionnaire section delegate
+	 * @param sectionTypeDelegate - section type delegate
 	 */
 	public QuestionnaireSectionServiceImpl(
 			final QuestionnaireSectionDelegate questionnaireSectionDelegate,
@@ -38,7 +40,7 @@ public class QuestionnaireSectionServiceImpl implements QuestionnaireSectionServ
 	@Override
 	public QuestionnaireSection create(
 			final String title, final Short sortOrder,
-			final Integer sectionNumber, final SectionType sectionType, 
+			final String sectionNumber, final SectionType sectionType, 
 			final String sectionHelp,
 			final QuestionnaireType questionnaireType)
 					throws DuplicateEntityFoundException {
@@ -52,7 +54,7 @@ public class QuestionnaireSectionServiceImpl implements QuestionnaireSectionServ
 	public QuestionnaireSection update(
 			final QuestionnaireSection questionnaireSection,
 			final String title, final Short sortOrder,
-			final Integer sectionNumber, final SectionType sectionType,
+			final String sectionNumber, final SectionType sectionType,
 			final String sectionHelp,
 			final QuestionnaireType questionnaireType)
 					throws DuplicateEntityFoundException {

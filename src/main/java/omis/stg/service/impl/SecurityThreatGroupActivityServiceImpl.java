@@ -1,15 +1,34 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.stg.service.impl;
 
 import java.util.Date;
 import java.util.List;
 
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.stg.domain.SecurityThreatGroupActivity;
 import omis.stg.domain.SecurityThreatGroupActivityInvolvement;
 import omis.stg.domain.SecurityThreatGroupActivityNote;
 import omis.stg.exception.InvolvedOffenderRequiredException;
+import omis.stg.exception.SecurityThreatGroupActivityExistsException;
+import omis.stg.exception.SecurityThreatGroupActivityInvolvementExistsException;
+import omis.stg.exception.SecurityThreatGroupActivityNoteExistsException;
 import omis.stg.service.SecurityThreatGroupActivityService;
 import omis.stg.service.delegate.SecurityThreatGroupActivityDelegate;
 import omis.stg.service.delegate.SecurityThreatGroupActivityInvolvementDelegate;
@@ -19,6 +38,7 @@ import omis.stg.service.delegate.SecurityThreatGroupActivityNoteDelegate;
  * Implementation of service for security threat group activity service.
  * 
  * @author Trevor Isles
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Dec 1, 2016)
  * @since OMIS 3.0
  */
@@ -57,7 +77,7 @@ public class SecurityThreatGroupActivityServiceImpl
 			final Date reportDate, 
 			final Person reportedBy, 
 			final String summary) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityExistsException {
 		return this.activityDelegate.create(reportDate, reportedBy, summary);
 	}
 
@@ -68,7 +88,7 @@ public class SecurityThreatGroupActivityServiceImpl
 			final Person reportedBy, 
 			final Date reportDate,
 			final String summary) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityExistsException {
 		return this.activityDelegate.update(activity, reportDate, reportedBy, 
 				summary);
 	}
@@ -81,11 +101,11 @@ public class SecurityThreatGroupActivityServiceImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public SecurityThreatGroupActivityInvolvement involveOffender(
+	public SecurityThreatGroupActivityInvolvement   involveOffender(
 			final Offender offender, 
 			final SecurityThreatGroupActivity activity,
 			final String narrative)
-			throws DuplicateEntityFoundException {
+			throws SecurityThreatGroupActivityInvolvementExistsException {
 		return this.involvementDelegate.involveOffender(offender, activity, 
 				narrative);
 	}
@@ -95,7 +115,7 @@ public class SecurityThreatGroupActivityServiceImpl
 	public SecurityThreatGroupActivityInvolvement updateInvolvementNarrative(
 			final SecurityThreatGroupActivityInvolvement involvement,
 			final String narrative) 
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityInvolvementExistsException {
 		return this.involvementDelegate.updateInvolvementNarrative(involvement, 
 				narrative);
 	}
@@ -121,7 +141,7 @@ public class SecurityThreatGroupActivityServiceImpl
 			final SecurityThreatGroupActivity activity, 
 			final Date date, 
 			final String value)
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityNoteExistsException {
 		return this.noteDelegate.addNote(activity, date, value);
 	}
 
@@ -131,7 +151,7 @@ public class SecurityThreatGroupActivityServiceImpl
 			final SecurityThreatGroupActivityNote note, 
 			final Date date, 
 			final String value)
-					throws DuplicateEntityFoundException {
+					throws SecurityThreatGroupActivityNoteExistsException {
 		return this.noteDelegate.updateNote(note, date, value);
 	}
 
@@ -155,5 +175,4 @@ public class SecurityThreatGroupActivityServiceImpl
 			SecurityThreatGroupActivity activity) {
 		return this.noteDelegate.findNotes(activity);
 	}
-
 }

@@ -19,8 +19,8 @@
 	  </id>
 	  <many-to-one name="address" column="`ADDRESS_ID`" not-null="true"
 	   			entity-name="omis.address.domain.Address"/>
-	  <many-to-one name="organization" column="`ORGANIZATION_ID`" not-null="true"
-	   			       entity-name="omis.organization.domain.Organization" lazy="false"/>
+	  <many-to-one name="organization" lazy="false" fetch="join" column="`ORGANIZATION_ID`" not-null="true"
+	   			       entity-name="omis.organization.domain.Organization"/>
 	  <component name="dateRange">
 	  	<property name="startDate" not-null="false" type="java.util.Date"
 	  	          column="`START_DATE`"/>

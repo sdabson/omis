@@ -64,4 +64,12 @@ public interface PlacementTermNoteDao
 	 * @return notes by placement term
 	 */
 	List<PlacementTermNote> findByPlacementTerm(PlacementTerm placementTerm);
+	
+	/**
+	 * Removes all notes with the specified placement term.
+	 * 
+	 * @param placementTerm placement term
+	 * @return count of placement term notes removed
+	 */
+	int removeByPlacementTerm(PlacementTerm placementTerm);
 }

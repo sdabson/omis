@@ -21,14 +21,11 @@ import java.util.Date;
 import java.util.List;
 
 import omis.address.domain.Address;
-import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
-import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
 import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.address.service.delegate.AddressDelegate;
-import omis.address.service.delegate.AddressUnitDesignatorDelegate;
-import omis.address.service.delegate.StreetSuffixDelegate;
 import omis.address.service.delegate.ZipCodeDelegate;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.VerificationSignature;
@@ -38,6 +35,7 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
 import omis.contact.exception.OnlineAccountExistsException;
 import omis.contact.exception.TelephoneNumberExistsException;
 import omis.contact.service.delegate.ContactDelegate;
@@ -48,22 +46,18 @@ import omis.country.domain.Country;
 import omis.country.service.delegate.CountryDelegate;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
 import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
 import omis.family.exception.FamilyAssociationExistsException;
-import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.family.service.FamilyAssociationService;
 import omis.family.service.delegate.FamilyAssociationCategoryDelegate;
 import omis.family.service.delegate.FamilyAssociationDelegate;
-import omis.family.service.delegate.FamilyAssociationNoteDelegate;
+import omis.family.service.delegate.FamilyAssociationNoteCategoryDesignatorDelegate;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
-import omis.person.dao.PersonDao;
-import omis.person.dao.SuffixDao;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
 import omis.person.service.delegate.PersonDelegate;
@@ -74,16 +68,19 @@ import omis.region.domain.State;
 import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
-import omis.relationship.dao.RelationshipDao;
 import omis.relationship.domain.Relationship;
+import omis.relationship.domain.RelationshipNote;
+import omis.relationship.domain.RelationshipNoteCategory;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.relationship.service.delegate.RelationshipDelegate;
-import omis.residence.dao.ResidenceTermDao;
+import omis.relationship.service.delegate.RelationshipNoteDelegate;
 import omis.residence.domain.ResidenceCategory;
 import omis.residence.domain.ResidenceStatus;
 import omis.residence.domain.ResidenceTerm;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 import omis.residence.service.delegate.ResidenceTermDelegate;
 
 /**
@@ -97,7 +94,6 @@ import omis.residence.service.delegate.ResidenceTermDelegate;
 public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	private final FamilyAssociationCategoryDelegate 
 		familyAssociationCategoryDelegate;
-	private final FamilyAssociationNoteDelegate familyAssociationNoteDelegate;
 	private final FamilyAssociationDelegate familyAssociationDelegate;
 	private final AddressDelegate addressDelegate;
 	private final ResidenceTermDelegate residenceTermDelegate;
@@ -111,10 +107,10 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	private final ZipCodeDelegate zipCodeDelegate;
 	private final StateDelegate stateDelegate;
 	private final CityDelegate cityDelegate;
-	private final StreetSuffixDelegate streetSuffixDelegate;
-	private final AddressUnitDesignatorDelegate addressUnitDesignatorDelegate;
-	private final SuffixDao suffixDao;
 	private final SuffixDelegate suffixDelegate;
+	private final RelationshipNoteDelegate relationshipNoteDelegate;
+	private final FamilyAssociationNoteCategoryDesignatorDelegate
+			familyAssociationNoteCategoryDesignatorDelegate;
 	
 	/**
 	 * Instantiates an instance of family association service with the
@@ -123,12 +119,9 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	 * @param familyAssociationCategoryDelegate 
 	 * family association category delegate
 	 * @param auditComponentRetriever audit component retriever
-	 * @param relationshipDao relationship data access object
-	 * @param residenceTermDao residence term data access object
 	 * @param relationshipInstanceFactory relationship instance factory
 	 * @param familyAssociationNoteInstanceFactory family association note 
 	 * 	instance factory
-	 * @param familyAssociationNoteDelegate family association note delegate
 	 * @param familyAssociationDelegate family association delegate
 	 * @param addressDelegate address delegate
 	 * @param residenceTermDelegate residence term delegate
@@ -142,19 +135,16 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	 * @param zipCodeDelegate zip code delegate
 	 * @param stateDelegate state delegate
 	 * @param cityDelegate city delegate
-	 * @param streetSuffixDelegate street suffix delegate
-	 * @param addressUnitDesignatorDelegate address unit designator delegate
 	 * @param personIdentityDelegate person identity delegate 
-	 * @param personDao person dao
-	 * @param suffixDao suffix dao
 	 * @param suffixDelegate suffix delegate
+	 * @param relationshipNoteDelegate relationship note delegate
+	 * @param familyAssociationNoteCategoryDesignatorDelegate family association
+	 * @param familyAssociationDelegate familyAssociationDelegate
+	 * note category designator delegate
 	 */
 	public FamilyAssociationServiceImpl(
 		final FamilyAssociationCategoryDelegate 
 		familyAssociationCategoryDelegate,
-		final RelationshipDao relationshipDao,
-		final FamilyAssociationNoteDelegate familyAssociationNoteDelegate,
-		final ResidenceTermDao residenceTermDao,
 		final AuditComponentRetriever auditComponentRetriever,
 		final InstanceFactory<Relationship> relationshipInstanceFactory,
 		final InstanceFactory<FamilyAssociationNote> 
@@ -172,15 +162,13 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 		final ZipCodeDelegate zipCodeDelegate,
 		final StateDelegate stateDelegate,
 		final CityDelegate cityDelegate,
-		final StreetSuffixDelegate streetSuffixDelegate,
-		final AddressUnitDesignatorDelegate addressUnitDesignatorDelegate,
 		final PersonIdentityDelegate personIdentityDelegate,
-		final PersonDao personDao,
-		final SuffixDao suffixDao,
-		final SuffixDelegate suffixDelegate) {
+		final SuffixDelegate suffixDelegate,
+		final RelationshipNoteDelegate relationshipNoteDelegate,
+		final FamilyAssociationNoteCategoryDesignatorDelegate
+		familyAssociationNoteCategoryDesignatorDelegate) {
 		this.familyAssociationCategoryDelegate 
 			= familyAssociationCategoryDelegate;
-		this.familyAssociationNoteDelegate = familyAssociationNoteDelegate;
 		this.familyAssociationDelegate = familyAssociationDelegate;
 		this.addressDelegate = addressDelegate;
 		this.residenceTermDelegate = residenceTermDelegate;
@@ -194,10 +182,10 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 		this.zipCodeDelegate = zipCodeDelegate;
 		this.cityDelegate = cityDelegate;
 		this.stateDelegate = stateDelegate;
-		this.streetSuffixDelegate = streetSuffixDelegate;
-		this.addressUnitDesignatorDelegate = addressUnitDesignatorDelegate;
-		this.suffixDao = suffixDao;
 		this.suffixDelegate = suffixDelegate;
+		this.relationshipNoteDelegate = relationshipNoteDelegate;
+		this.familyAssociationNoteCategoryDesignatorDelegate
+			= familyAssociationNoteCategoryDesignatorDelegate;
 	}
 	
 	/**{@inheritDoc} */
@@ -261,7 +249,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	/**{@inheritDoc}*/
 	@Override
 	public List<Suffix> findNameSuffixes() {
-		return this.suffixDao.findAll();
+		return this.suffixDelegate.findAll();
 	}
 	
 	/**{@inheritDoc}*/
@@ -278,7 +266,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	public ResidenceTerm createResidenceTerm(final Person person, 
 		final Address address, 
 		final VerificationSignature verificationSignature) 
-			throws DuplicateEntityFoundException, 
+			throws ResidenceTermExistsException, 
 			PrimaryResidenceExistsException, ResidenceStatusConflictException {
 		return this.residenceTermDelegate
 			.createResidenceTerm(person, null, ResidenceCategory.PRIMARY, 
@@ -288,7 +276,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	/**{@inheritDoc}*/
 	@Override	
 	public Contact addContact(final Person person, final Address mailingAddress,
-		final PoBox poBox) throws DuplicateEntityFoundException {
+		final PoBox poBox) throws ContactExistsException {
 		return this.contactDelegate.create(person, mailingAddress, poBox);
 	}
 	
@@ -316,7 +304,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	@Override
 	public Contact updateContact(final Contact contact, 
 			final Address mailingAddress, final PoBox poBox) 
-		throws DuplicateEntityFoundException {
+		throws ContactExistsException {
 		return this.contactDelegate.update(contact, mailingAddress, poBox);
 	}
 	
@@ -386,33 +374,10 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	
 	/**{@inheritDoc}*/
 	@Override
-	public FamilyAssociationNote addNote(final FamilyAssociation association, 
-		final Date date, final String value) 
-				throws FamilyAssociationNoteExistsException {
-		return this.familyAssociationNoteDelegate.create(association, 
-				date, value);
-	}
-	
-	/**{@inheritDoc}*/
-	@Override
-	public FamilyAssociationNote updateNote(final FamilyAssociationNote note, 
-		final Date date, final String value) 
-				throws FamilyAssociationNoteExistsException {
-		return this.familyAssociationNoteDelegate.update(note, date, value);
-	}
-	
-	/**{@inheritDoc}*/
-	@Override
-	public List<FamilyAssociationNote> findNotesByAssociation(
-		final FamilyAssociation	association) {
-		return this.familyAssociationNoteDelegate
-				.findByAssociation(association);
-	}
-	
-	/**{@inheritDoc}*/
-	@Override
-	public void removeNote(final FamilyAssociationNote note) {
-		this.familyAssociationNoteDelegate.remove(note);
+	public List<RelationshipNote> findNotesByRelationship(
+		final Relationship relationship) {
+		return this.familyAssociationNoteCategoryDesignatorDelegate
+				.findDesignatedNotesByRelationship(relationship);
 	}
 	
 	/**{@inheritDoc}*/
@@ -450,7 +415,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	/** {@inheritDoc} */
 	@Override
 	public ZipCode createZipCode(final String value, final String extension, 
-		final City city) throws DuplicateEntityFoundException {
+		final City city) throws ZipCodeExistsException {
 		return this.zipCodeDelegate.create(city, value, extension, true);
 	}
 	
@@ -474,18 +439,6 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<AddressUnitDesignator> findAddressUnitDesignators() {
-		return this.addressUnitDesignatorDelegate.findAll();
-	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public List<StreetSuffix> findStreetSuffixes() {
-		return this.streetSuffixDelegate.findAll();
-	}
-	
-	/** {@inheritDoc} */
-	@Override
 	public City createCity(final String name, final State state, 
 		final Country country) 
 		throws CityExistsException {
@@ -493,6 +446,7 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	}
 	
 	/** {@inheritDoc} */
+	@SuppressWarnings("deprecation")
 	@Override
 	public List<Address> findAddresses(final String addressQuery) {
 		return this.addressDelegate.findAddressesByValue(addressQuery);
@@ -515,5 +469,49 @@ public class FamilyAssociationServiceImpl implements FamilyAssociationService {
 	public List<City> findCitiesByCountryWithoutState(
 			final Country country) {
 		return this.cityDelegate.findByCountryWithoutState(country);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public RelationshipNote addRelationshipNote(
+		final FamilyAssociation familyAssociation,
+		final RelationshipNoteCategory category, final Date date,
+		final String value)	throws RelationshipNoteExistsException {
+		return this.relationshipNoteDelegate.create(
+			familyAssociation.getRelationship(), category, value, date);
+	};
+		
+	/** {@inheritDoc} */
+	@Override
+	public RelationshipNote updateRelationshipNote(
+		final RelationshipNote relationshipNote,
+		final RelationshipNoteCategory category, final Date date,
+		final String value)	throws RelationshipNoteExistsException {
+		return this.relationshipNoteDelegate.update(relationshipNote, category,
+			value, date);
+	};
+		
+	/** {@inheritDoc} */
+	@Override
+	public void removeRelationshipNote(
+		final RelationshipNote relationshipNote) {
+		this.relationshipNoteDelegate.remove(relationshipNote);
+	};
+		
+	/** {@inheritDoc} */
+	@Override
+	public List<RelationshipNoteCategory>
+		findDesignatedRelationshipNoteCategories() {
+		return this.familyAssociationNoteCategoryDesignatorDelegate
+			.findDesignatedRelationshipNoteCategories();
+	};
+		
+	/** {@inheritDoc} */
+	@Override
+	public List<RelationshipNote> findRelationshipNotes(final FamilyAssociation
+		familyAssociation) {
+		return this.familyAssociationNoteCategoryDesignatorDelegate
+			.findDesignatedNotesByRelationship(
+					familyAssociation.getRelationship());
 	}
 }

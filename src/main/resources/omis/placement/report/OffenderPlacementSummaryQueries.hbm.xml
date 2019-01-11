@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
+  - Queries for summary of offender placement.
+  -
+  - Author: Stephen Abson
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.placement.domain">
+
+	<!-- 
+	  - Summarizes offender placement.
+	  -->
+	<query name="summarizeOffenderPlacement"><![CDATA[
+		select new omis.placement.report.impl.OffenderPlacementSummaryImpl(
+			(select locationReasonTerm
+			from omis.locationterm.domain.LocationReasonTerm locationReasonTerm
+			where locationReasonTerm.offender = offender
+				and locationReasonTerm.dateRange.startDate <= :effectiveDate
+				and (locationReasonTerm.dateRange.endDate is null
+					or locationReasonTerm.dateRange.endDate > :effectiveDate)),
+			(select placementTerm
+			from omis.supervision.domain.PlacementTerm placementTerm
+			where placementTerm.offender = offender
+				and placementTerm.dateRange.startDate <= :effectiveDate
+				and (placementTerm.dateRange.endDate is null
+					or placementTerm.dateRange.endDate > :effectiveDate)),
+			(select officerCaseAssignment
+			from omis.caseload.domain.OfficerCaseAssignment officerCaseAssignment
+			where officerCaseAssignment.offender = offender
+				and officerCaseAssignment.dateRange.startDate <= :effectiveDate
+				and (officerCaseAssignment.dateRange.endDate is null
+					or officerCaseAssignment.dateRange.endDate > :effectiveDate)),
+			(select confidentialOffenderDesignator
+	  			from omis.confidentialoffender.domain.ConfidentialOffenderDesignator confidentialOffenderDesignator
+	  			where confidentialOffenderDesignator.offender = offender),
+			(select prisonTerm
+			from omis.prisonterm.domain.PrisonTerm prisonTerm
+			where prisonTerm.offender = offender
+				and prisonTerm.status = omis.prisonterm.domain.PrisonTermStatus.ACTIVE))
+		from omis.offender.domain.Offender offender
+		where offender = :offender
+	]]></query>
+</hibernate-mapping>

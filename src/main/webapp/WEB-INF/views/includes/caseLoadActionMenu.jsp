@@ -10,7 +10,7 @@
 <fmt:bundle basename="omis.msgs.homeLinks">
 	<ul>
 	<sec:authorize access="(hasRole('ADMIN') and hasRole('APP_DEV'))">	<li>
-	<a href="${pageContext.request.contextPath}/caseLoad/list.html">
+	<a href="${pageContext.request.contextPath}/caseload/officerCaseAssignment/list.html">
 		<img src="${pageContext.request.contextPath}/resources/common/images/myCaseloads.png" height="25" width="25"/>
 		<span class="visibleLinkLabel"><fmt:message key="myCaseloadsLabel"/></span>
 	</a>

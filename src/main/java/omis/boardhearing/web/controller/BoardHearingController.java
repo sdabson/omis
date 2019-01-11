@@ -20,6 +20,7 @@ package omis.boardhearing.web.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
 import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.boardhearing.domain.BoardHearing;
@@ -46,6 +48,7 @@ import omis.boardhearing.web.form.BoardHearingItemOperation;
 import omis.boardhearing.web.form.BoardHearingNoteItem;
 import omis.boardhearing.web.validator.BoardHearingFormValidator;
 import omis.exception.DuplicateEntityFoundException;
+import omis.facility.domain.Unit;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.location.domain.Location;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
@@ -56,15 +59,16 @@ import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleeligibility.domain.ParoleEligibility;
+import omis.util.DateManipulator;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
  * Board Hearing Controller.
  * 
- *@author Annie Wahl 
- *@version 0.1.0 (Jan 2, 2018)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.3 (Dec 3, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/boardHearing")
@@ -93,8 +97,8 @@ public class BoardHearingController {
 	private static final String BOARD_MEMBERS_VIEW_NAME =
 			"/boardHearing/includes/boardMembers";
 	
-	private static final String HEARING_DATE_VIEW_NAME =
-			"/boardHearing/includes/json/hearingDate";
+	private static final String BOARD_HEARING_DATE_VALUE_VIEW_NAME 
+			= "/boardHearing/includes/boardHearingDateValue";
 	
 	/* Model Keys */
 	
@@ -128,7 +132,8 @@ public class BoardHearingController {
 	private static final String BOARD_HEARING_NOTE_ITEM_MODEL_KEY =
 			"boardHearingNoteItem";
 	
-	private static final String HEARING_DATE_MODEL_KEY = "hearingDate";
+	private static final String BOARD_HEARING_DATE_MODEL_KEY 
+		= "boardHearingDate";
 	
 	private static final String BOARD_MEMBER_ONE_MODEL_KEY = "boardMember1";
 	
@@ -210,6 +215,10 @@ public class BoardHearingController {
 	@Autowired
 	private CustomDateEditorFactory customDateEditorFactory;
 	
+	@Autowired
+	@Qualifier("unitPropertyEditorFactory")
+	private PropertyEditorFactory unitPropertyEditorFactory;
+	
 	/* Controller Model Delegates */
 	
 	@Autowired
@@ -251,8 +260,8 @@ public class BoardHearingController {
 	public ModelAndView create(@RequestParam(
 			value = "paroleEligibility", required = true)
 		final ParoleEligibility paroleEligibility) {
-		return this.prepareEditMav(paroleEligibility.getOffender(),
-				this.prepareForm(paroleEligibility), new ModelMap());
+		return this.prepareEditMav(paroleEligibility, new BoardHearingForm(), 
+				new ModelMap());
 	}
 	
 	/**
@@ -280,16 +289,14 @@ public class BoardHearingController {
 		this.boardHearingFormValidator.validate(form, bindingResult);
 		
 		if (bindingResult.hasErrors()) {
-			return this.prepareEditMav(paroleEligibility.getOffender(),
-					form, new ModelMap());
+			return this.prepareEditMav(paroleEligibility, form, new ModelMap());
 		} else {
 			CancellationCategory reason = null;
-			if (form.getCancelled()) {
+			/*if (form.getCancelled()) {
 				reason = form.getReason();
-			}
+			}*/
 			BoardHearing boardHearing = this.boardHearingService
 					.createBoardHearing(form.getParoleBoardItinerary(),
-							form.getHearingLocation(),
 							form.getHearingDate(), paroleEligibility,
 							form.getBoardHearingCategory(), reason,
 							form.getVideoConference());
@@ -356,13 +363,12 @@ public class BoardHearingController {
 			return this.prepareEditMav(boardHearing, form, new ModelMap());
 		} else {
 			CancellationCategory reason = null;
-			if (form.getCancelled()) {
+			/*if (form.getCancelled()) {
 				reason = form.getReason();
-			}
+			}*/
 			this.boardHearingService
 					.updateBoardHearing(boardHearing,
 							form.getParoleBoardItinerary(),
-							form.getHearingLocation(),
 							form.getHearingDate(),
 							boardHearing.getParoleEligibility(),
 							form.getBoardHearingCategory(), reason,
@@ -469,9 +475,12 @@ public class BoardHearingController {
 			method = RequestMethod.GET)
 	public ModelAndView displayBoardHearingActionMenu(@RequestParam(
 			value = "paroleEligibility", required = true)
-			final ParoleEligibility paroleEligibility) {
+			final ParoleEligibility paroleEligibility, @RequestParam(
+			value = "boardHearing", required = true)
+			final BoardHearing boardHearing) {
 		ModelMap map = new ModelMap();
 		map.addAttribute(PAROLE_ELIGIBILITY_MODEL_KEY, paroleEligibility);
+		map.addAttribute(BOARD_HEARING_MODEL_KEY, boardHearing);
 		
 		return new ModelAndView(BOARD_HEARING_ACTION_MENU_VIEW_NAME, map);
 	}
@@ -556,23 +565,24 @@ public class BoardHearingController {
 	}
 	
 	/**
-	 * Returns the Model and View for the Hearing Date from the selected
-	 * Hearing Location.
+	 * Returns the ModelAndView for Board Hearing date for the selected
+	 * Parole Board Itinerary.
 	 * 
-	 * @param hearingLocation - Hearing Location
-	 * @return Model and View for the Hearing Date from the selected
-	 * Hearing Location.
+	 * @param paroleBoardItinerary - Parole Board Itinerary
+	 * @return model and view for board hearing date for the selected parole
+	 * board itinerary
 	 */
-	@RequestMapping(value = "/setHearingDate.json",
+	@RequestMapping(value = "/defaultBoardHearingDate.html", 
 			method = RequestMethod.GET)
-	public ModelAndView setHearingDate(
-			@RequestParam(value = "hearingLocation", required = true)
-			final BoardMeetingSite hearingLocation) {
+	public ModelAndView defaultBoardHearingDate(@RequestParam(
+			value = "paroleBoardItinerary", required = true)
+	final ParoleBoardItinerary paroleBoardItinerary) {
 		ModelMap map = new ModelMap();
-		
-		map.addAttribute(HEARING_DATE_MODEL_KEY, hearingLocation.getDate());
-		
-		return new ModelAndView(HEARING_DATE_VIEW_NAME, map);
+		if (paroleBoardItinerary.getDateRange() != null) {
+		map.addAttribute(BOARD_HEARING_DATE_MODEL_KEY, 
+				paroleBoardItinerary.getDateRange().getStartDate());	
+		}
+		return new ModelAndView(BOARD_HEARING_DATE_VALUE_VIEW_NAME, map);
 	}
 	
 	/* Helper Methods */
@@ -641,12 +651,12 @@ public class BoardHearingController {
 	/**
 	 * Prepares the Model And View for creating/updating a Board Hearing.
 	 * 
-	 * @param offender - Offender
+	 * @param eligibility parole eligibility
 	 * @param boardHearingForm - Board Hearing Form
 	 * @param map - Model Map
 	 * @return Prepared Model And View for creating/updating a Board Hearing.
 	 */
-	private ModelAndView prepareEditMav(final Offender offender,
+	private ModelAndView prepareEditMav(final ParoleEligibility eligibility, 
 			final BoardHearingForm form, final ModelMap map) {
 		ParoleBoardItinerary paroleBoardItinerary =
 				form.getParoleBoardItinerary();
@@ -654,21 +664,28 @@ public class BoardHearingController {
 				this.boardHearingService
 				.findBoardAttendeesByBoardItinerary(
 						paroleBoardItinerary));
-		map.addAttribute(BOARD_MEETING_SITES_MODEL_KEY,
-				this.boardHearingService
-				.findBoardMeetingSitesByBoardItinerary(
-						paroleBoardItinerary));
-		map.addAttribute(PAROLE_ELIGIBILITY_MODEL_KEY,
-				form.getEligibility());
+		map.addAttribute(PAROLE_ELIGIBILITY_MODEL_KEY, eligibility);
 		map.addAttribute(BOARD_HEARING_NOTE_ITEM_INDEX_MODEL_KEY,
 				form.getBoardHearingNoteItems().size());
-		map.addAttribute(PAROLE_ITINERARIES_MODEL_KEY,
-				this.boardHearingService.findItinerariesByEffectiveDate(
-						new Date()));
+		if (form.getHearingDate() != null) {
+			map.addAttribute(PAROLE_ITINERARIES_MODEL_KEY, this
+					.boardHearingService.findItinerariesByEffectiveDate(
+							form.getHearingDate()));
+		} else if (paroleBoardItinerary != null) {
+			map.addAttribute(PAROLE_ITINERARIES_MODEL_KEY, this
+					.boardHearingService.findItinerariesByEffectiveDate(
+							paroleBoardItinerary.getDateRange().getStartDate()));
+		} else {
+			DateManipulator dateManipulator = new DateManipulator(new Date());
+			dateManipulator.setToEarliestTimeInDay();
+			map.addAttribute(PAROLE_ITINERARIES_MODEL_KEY, this
+					.boardHearingService.findItinerariesByEffectiveDate(
+							dateManipulator.getDate()));
+			}
 		map.addAttribute(BOARD_HEARING_CATEGORIES_MODEL_KEY,
 				 this.boardHearingService
 				 .findBoardHearingCategoriesByAppearanceCategory(
-						 form.getEligibility().getAppearanceCategory()));
+						 eligibility.getAppearanceCategory()));
 		map.addAttribute(CANCELLATION_CATEGORIES,
 				CancellationCategory.values());
 		if (paroleBoardItinerary != null) {
@@ -678,8 +695,8 @@ public class BoardHearingController {
 			}
 		}
 		map.addAttribute(BOARD_HEARING_FORM_MODEL_KEY, form);
-		map.addAttribute(OFFENDER_MODEL_KEY, offender);
-		this.offenderSummaryModelDelegate.add(map, offender);
+		map.addAttribute(OFFENDER_MODEL_KEY, eligibility.getOffender());
+		this.offenderSummaryModelDelegate.add(map, eligibility.getOffender());
 		
 		return new ModelAndView(EDIT_VIEW_NAME, map);
 	}
@@ -695,8 +712,8 @@ public class BoardHearingController {
 	private ModelAndView prepareEditMav(final BoardHearing boardHearing,
 			final BoardHearingForm form, final ModelMap map) {
 		map.addAttribute(BOARD_HEARING_MODEL_KEY, boardHearing);
-		return this.prepareEditMav(
-				boardHearing.getParoleEligibility().getOffender(), form, map);
+		return this.prepareEditMav(boardHearing.getParoleEligibility(), form, 
+				map);
 	}
 	
 	/**
@@ -707,9 +724,6 @@ public class BoardHearingController {
 	 */
 	private BoardHearingForm prepareForm(final BoardHearing boardHearing) {
 		BoardHearingForm form = new BoardHearingForm();
-		ParoleEligibility paroleEligibility = boardHearing
-				.getParoleEligibility();
-		
 		List<BoardHearingParticipant> boardHearingParticipants =
 				this.boardHearingService.findBoardHearingParticipantsByHearing(
 						boardHearing);
@@ -726,12 +740,10 @@ public class BoardHearingController {
 				form.setBoardMember3(boardHearingParticipant.getBoardMember());
 			}
 		}
-		
 		List<BoardHearingNote> boardHearingNotes = this.boardHearingService
 				.findBoardHearingNotesByHearing(boardHearing);
 		List<BoardHearingNoteItem> boardHearingNoteItems =
 				new ArrayList<BoardHearingNoteItem>();
-		
 		for (BoardHearingNote note : boardHearingNotes) {
 			BoardHearingNoteItem item = new BoardHearingNoteItem();
 			item.setBoardHearingNote(note);
@@ -741,60 +753,14 @@ public class BoardHearingController {
 			boardHearingNoteItems.add(item);
 		}
 		form.setBoardHearingNoteItems(boardHearingNoteItems);
-		form.setEligibility(paroleEligibility);
 		form.setBoardHearingCategory(boardHearing.getCategory());
 		form.setVideoConference(boardHearing.getVideoConference());
 		form.setParoleBoardItinerary(boardHearing.getItinerary());
-		form.setHearingLocation(boardHearing.getLocation());
 		form.setHearingDate(boardHearing.getHearingDate());
-		if (boardHearing.getCancellation() != null) {
+		/*if (boardHearing.getCancellation() != null) {
 			form.setCancelled(true);
 			form.setReason(boardHearing.getCancellation());
-		}
-		
-		return form;
-	}
-	
-	/**
-	 * Populates a Board Hearing Form from the specified Parole Eligibility.
-	 * 
-	 * @param paroleEligibility - Parole Eligibility
-	 * @return Populated Board Hearing Form
-	 */
-	private BoardHearingForm prepareForm(
-			final ParoleEligibility paroleEligibility) {
-		BoardHearingForm form = new BoardHearingForm();
-		form.setEligibility(paroleEligibility);
-		HearingAnalysis hearingAnalysis = this.boardHearingService
-				.findHearingAnalysisByParoleEligibility(paroleEligibility);
-		if (hearingAnalysis != null) {
-			BoardMeetingSite boardMeetingSite =
-					hearingAnalysis.getBoardMeetingSite();
-			if (boardMeetingSite != null) {
-				ParoleBoardItinerary paroleBoardItinerary =
-						boardMeetingSite.getBoardItinerary();
-				List<BoardAttendee> boardAttendees = this.boardHearingService
-						.findBoardAttendeesByBoardItinerary(
-								paroleBoardItinerary);
-				for (BoardAttendee boardAttendee : boardAttendees) {
-					if (boardAttendee.getNumber() != null) {
-						if (boardAttendee.getNumber().equals(ONE)) {
-							form.setBoardMember1(
-									boardAttendee.getBoardMember());
-						} else if (boardAttendee.getNumber().equals(TWO)) {
-							form.setBoardMember2(
-									boardAttendee.getBoardMember());
-						} else if (boardAttendee.getNumber().equals(THREE)) {
-							form.setBoardMember3(
-									boardAttendee.getBoardMember());
-						}
-					}
-				}
-				form.setHearingLocation(boardMeetingSite.getLocation());
-				form.setParoleBoardItinerary(paroleBoardItinerary);
-				form.setHearingDate(boardMeetingSite.getDate());
-			}
-		}
+		}*/
 		return form;
 	}
 	
@@ -858,5 +824,7 @@ public class BoardHearingController {
 		binder.registerCustomEditor(
 				Date.class, this.customDateEditorFactory
 				.createCustomDateOnlyEditor(true));
+		binder.registerCustomEditor(Unit.class,
+				this.unitPropertyEditorFactory.createPropertyEditor());
 	}
 }

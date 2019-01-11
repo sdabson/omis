@@ -23,9 +23,9 @@ import java.util.List;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.person.domain.Person;
+import omis.relationship.domain.Relationship;
 import omis.victim.dao.VictimNoteDao;
 import omis.victim.domain.VictimAssociation;
 import omis.victim.domain.VictimNote;
@@ -76,7 +76,6 @@ public class VictimNoteDelegate {
 	 * @param victim victim
 	 * @param category category
 	 * @param association association
-	 * @param contact contact
 	 * @param date date
 	 * @param value value
 	 * @return created victim note
@@ -99,7 +98,7 @@ public class VictimNoteDelegate {
 		}
 		
 		// Checks whether victim note exists
-		if (this.victimNoteDao.find(victim, category, date) != null) {
+		if (this.victimNoteDao.find(victim, category, date, value) != null) {
 			throw new VictimNoteExistsException("Victim note exists");
 		}
 		
@@ -145,7 +144,7 @@ public class VictimNoteDelegate {
 		
 		// Checks whether victim note exists
 		if (this.victimNoteDao.findExcluding(victimNote.getVictim(), category,
-				date, victimNote) != null) {
+				date, value, victimNote) != null) {
 			throw new VictimNoteExistsException("Victim note exists");
 		}
 		
@@ -219,6 +218,36 @@ public class VictimNoteDelegate {
 	 * @return count of notes by association
 	 */
 	public long countByAssociation(final VictimAssociation association) {
-		return this.victimNoteDao.countNotes(association);
+		return this.victimNoteDao.countByAssociation(association);
+	}
+	
+	/**
+	 * Removes notes by association.
+	 * 
+	 * @param association association by which to remove notes
+	 * @return number of notes removed by association
+	 */
+	public int removeByAssociation(final VictimAssociation association) {
+		return this.victimNoteDao.removeByAssociation(association);
+	}
+
+	/**
+	 * Returns count of notes by victim.
+	 * 
+	 * @param relation relation
+	 * @return count of notes by victim
+	 */
+	public long countByVictim(final Person victim) {
+		return this.victimNoteDao.countByVictim(victim);
+	}
+
+	/**
+	 * Removes notes by relationship.
+	 * 
+	 * @param relationship relationship
+	 * @return number of notes removed
+	 */
+	public int removeByRelationship(final Relationship relationship) {
+		return this.victimNoteDao.removeByRelationship(relationship);
 	}
 }

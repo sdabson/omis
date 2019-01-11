@@ -18,6 +18,7 @@
 		<constructor-arg name="personFieldsValidatorDelegate" ref="personFieldsValidatorDelegate"/>
 		<constructor-arg name="telephoneNumberFieldsValidatorDelegate" ref="telephoneNumberFieldsValidatorDelegate"/>
 		<constructor-arg name="onlineAccountFieldsValidatorDelegate" ref="onlineAccountFieldsValidatorDelegate"/>
+		<constructor-arg name="offenderRelationshipNoteFieldsValidatorDelegate" ref="offenderRelationshipNoteFieldsValidatorDelegate"/>
 	</bean>
   	<bean id="familyAssociationFieldsCreateValidatorDelegate"
 		class="omis.family.web.validator.delegate.FamilyAssociationFieldsCreateValidatorDelegate">
@@ -27,6 +28,7 @@
 		<constructor-arg name="familyAssociationFieldsValidatorDelegate" ref="familyAssociationFieldsValidatorDelegate"/>
 	</bean> 
 	<bean id="familyAssociationFieldsEditValidator" class="omis.family.web.validator.FamilyAssociationFieldsEditValidator">
+		<constructor-arg name="offenderRelationshipNoteFieldsValidatorDelegate" ref="offenderRelationshipNoteFieldsValidatorDelegate"/>
 	</bean>
 
 	<!-- Profile Items -->
@@ -49,7 +51,12 @@
   
   <!-- Use controller transactions -->
    <aop:config>
-      <aop:pointcut id="familyAssociationControllerOperation" expression="execution(* omis.family.web.controller.FamilyAssociationController.*(..))"/>
+      <aop:pointcut id="familyAssociationControllerOperation" expression="execution(* omis.family.web.controller.ManageFamilyAssociationController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="familyAssociationControllerOperation"/>
+  </aop:config>
+  
+  <aop:config>
+      <aop:pointcut id="reportFamilyAssociationControllerOperation" expression="execution(* omis.family.web.controller.ReportFamilyAssociationController.*(..))"/>
+      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="reportFamilyAssociationControllerOperation"/>
   </aop:config>
 </beans>

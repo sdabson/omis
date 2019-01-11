@@ -61,12 +61,36 @@ public class OffenderRelationshipSearchFormValidator implements Validator {
 			if (offenderRelationshipSearchForm.getBirthDate() == null) {
 				errors.rejectValue("birthDate",
 						"offenderRelationshipSearchBirthDate.empty");
-			}
+			} 
+		} else if (OffenderRelationshipSearchType.ADDRESS.equals(
+				offenderRelationshipSearchForm.getType()))	 {
+			if (offenderRelationshipSearchForm.getAddressValue() == null
+					|| offenderRelationshipSearchForm.getAddressValue().isEmpty()
+				&& (offenderRelationshipSearchForm.getZipCodeValue() == null
+					|| offenderRelationshipSearchForm.getZipCodeValue().length() < 1)
+				&& (offenderRelationshipSearchForm.getStateName() == null
+					|| (offenderRelationshipSearchForm.getStateName().isEmpty()))
+				&& (offenderRelationshipSearchForm.getCityName() == null
+					|| (offenderRelationshipSearchForm.getCityName().isEmpty()))) {
+				errors.rejectValue("addressValue", "offenderRelationshipSearchAddressValue.empty");
+				}
+		} else if (OffenderRelationshipSearchType.TELEPHONE_NUMBER.equals(
+					offenderRelationshipSearchForm.getType())) {
+				if (offenderRelationshipSearchForm.getTelephoneNumberValue() == null) {
+					errors.rejectValue("telephoneNumberValue",
+							"offenderRelationshipSearchTelephoneNumberValue.empty");
+				}
+		} else if (OffenderRelationshipSearchType.ONLINE_ACCOUNT.equals(
+				offenderRelationshipSearchForm.getType())) {
+				if (offenderRelationshipSearchForm.getOnlineAccountName() == null
+						|| offenderRelationshipSearchForm.getOnlineAccountName().isEmpty()) {
+					errors.rejectValue("onlineAccountName", 
+							"offenderRelationshipSearchOnlineAccountName.empty");
+				}
 		} else {
 			throw new UnsupportedOperationException(String.format(
 					"Unsupported search type: %s",
 					offenderRelationshipSearchForm.getType()));
 		}
 	}
-
 }

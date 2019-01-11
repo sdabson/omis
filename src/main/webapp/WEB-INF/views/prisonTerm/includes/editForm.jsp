@@ -10,9 +10,10 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:setBundle basename="omis.audit.msgs.audit" var="auditBundle"/>
+<fmt:setBundle basename="omis.document.msgs.document" var="documentBundle" />
 <fmt:bundle basename="omis.prisonterm.msgs.prisonTerm">
 <sec:authorize var="editPrisonTerm" access="hasRole('PRISON_TERM_EDIT') or hasRole('PRISON_TERM_CREATE') or hasRole('ADMIN')"/>
-<form:form commandName="prisonTermForm" class="editForm">
+<form:form commandName="prisonTermForm" class="editForm" enctype="multipart/form-data">
 <fieldset>
 	<legend><fmt:message key="prisonTermDetailsTitle"/></legend>
 	
@@ -121,6 +122,72 @@
 	</span>
 	
 </fieldset>
+<fieldset>
+	<legend><fmt:message key="sentenceCalculationTitle"/>
+		<c:if test="${not empty sentenceCalculation}">
+			<a id="removeSentenceCalculationLink" href="#" class="removeLink"></a>
+		</c:if>
+	</legend>
+			<span class="fieldGroup">
+				<form:label path="title" class="fieldLabel">
+					<fmt:message key="titleLabel" />
+				</form:label>
+				<form:input path="title" />
+				<form:errors path="title" cssClass="error" />
+			</span>
+			<span class="fieldGroup">
+				<form:label path="date" class="fieldLabel">
+					<fmt:message key="dateLabel" />
+				</form:label>
+				<form:input path="date" class="date" />
+				<form:errors path="date" cssClass="error" />
+			</span>
+			<c:set var="form" value="${prisonTermForm}" scope="request" />
+			<jsp:include page="/WEB-INF/views/document/includes/documentTags.jsp" />
+	<c:choose>
+		<c:when test="${empty sentenceCalculation}">
+			<span class="fieldGroup">
+				<form:label path="data" class="fieldLabel">
+					<fmt:message key="documentLabel" />
+				</form:label>
+				<input id="documentData" type="file" name="data">
+				<form:hidden path="fileExtension" id="dataFileExtension" />
+				<form:errors path="data" cssClass="error" />
+			</span>
+		</c:when>
+		<c:otherwise>
+			<span class="fieldGroup">
+				<form:label path="data" class="fieldLabel">
+					<fmt:message key="documentLabel" />
+				</form:label>
+				<form:input type="hidden" path="removeSentenceCalculation" />
+				<c:choose>
+					<c:when test="${prisonTermForm.removeSentenceCalculation}">
+						<c:set var="hiddenDownload" value="hidden" />
+					</c:when>
+					<c:otherwise>
+						<c:set var="hiddenData" value="hidden" />
+					</c:otherwise>
+				</c:choose>
+				<form:input type="hidden" path="data" />
+				<input id="documentData" class="${hiddenData}" type="file" name="replaceData">
+				<form:hidden path="fileExtension" id="dataFileExtension" />
+				<form:errors path="data" cssClass="error" />
+				<form:errors path="replaceData" cssClass="error" />
+				
+				<c:set var="filename" value="${sentenceCalculation.document.filename}" />
+				<a id="prisonTermDocumentDownloadLink" href="${pageContext.request.contextPath}/prisonTerm/retrieveFile.html?document=${sentenceCalculation.document.id}" class="${hiddenDownload} downloadLink">
+					<fmt:message key="titleExtensionFormat" bundle="${documentBundle}">
+						<fmt:formatDate value="${sentenceCalculation.document.date}" pattern="MM/dd/yyyy" var="documentDate" />
+							<fmt:param value="${filename}" />
+							<fmt:param value="${documentDate}" />
+					</fmt:message>
+				</a>
+			</span>
+		</c:otherwise>
+	</c:choose>
+</fieldset>
+
 <c:if test="${not empty prisonTerm}">
 <c:set var="updatable" value="${prisonTerm}" scope="request"/>
 <jsp:include page="/WEB-INF/views/audit/includes/updateSignature.jsp"/>

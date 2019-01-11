@@ -1,7 +1,25 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.staff.service.delegate;
 
+import java.util.List;
+
 import omis.datatype.DateRange;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.location.domain.Location;
 import omis.organization.domain.OrganizationDivision;
@@ -9,13 +27,15 @@ import omis.person.domain.Person;
 import omis.staff.dao.StaffAssignmentDao;
 import omis.staff.domain.StaffAssignment;
 import omis.staff.domain.StaffTitle;
+import omis.staff.exception.StaffAssignmentExistsException;
 import omis.supervision.domain.SupervisoryOrganization;
 
 /**
  * Staff assignment delegate.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 9, 2017)
+ * @author Yidong Li
+ * @version 0.1.0 (Sept. 20, 2018)
  * @since OMIS 3.0
  */
 public class StaffAssignmentDelegate {
@@ -59,7 +79,7 @@ public class StaffAssignmentDelegate {
 	 * @param telephoneNumber telephone number
 	 * @param telephoneExtension telephone extension
 	 * @return staff assignment
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws StaffAssignmentExistsException if duplicate entity exists
 	 */
 	public StaffAssignment create(final Person staffMember, 
 			final SupervisoryOrganization supervisoryOrganization, 
@@ -68,11 +88,11 @@ public class StaffAssignmentDelegate {
 			final OrganizationDivision organizationDivision, 
 			final String staffId, final String emailAddress, 
 			final Long telephoneNumber, final Integer telephoneExtension) 
-					throws DuplicateEntityFoundException {
+					throws StaffAssignmentExistsException {
 		if (this.staffAssignmentDao.find(staffMember, supervisoryOrganization, 
 				location, DateRange.getStartDate(dateRange), 
 				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new StaffAssignmentExistsException(
 					"Staff assignment already exists.");
 		}
 		StaffAssignment staffAssignment = this.staffAssignmentInstanceFactory
@@ -100,7 +120,7 @@ public class StaffAssignmentDelegate {
 	 * @param telephoneNumber telephone number
 	 * @param telephoneExtension telephone extension
 	 * @return staff assignment
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws StaffAssignmentExistsException if duplicate entity exists
 	 */
 	public StaffAssignment update(final StaffAssignment staffAssignment,
 			final Person staffMember, 
@@ -110,12 +130,12 @@ public class StaffAssignmentDelegate {
 			final OrganizationDivision organizationDivision, 
 			final String staffId, final String emailAddress, 
 			final Long telephoneNumber, final Integer telephoneExtension) 
-					throws DuplicateEntityFoundException {
+					throws StaffAssignmentExistsException {
 		if (this.staffAssignmentDao.findExcluding(staffMember, 
 				supervisoryOrganization, location, 
 				DateRange.getStartDate(dateRange), 
 				DateRange.getEndDate(dateRange), staffAssignment) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new StaffAssignmentExistsException(
 					"Staff assignment already exists.");
 		}
 		populateStaffAssignment(staffAssignment, staffMember, 
@@ -155,4 +175,15 @@ public class StaffAssignmentDelegate {
 		staffAssignment.setTelephoneExtension(telephoneExtension);
 		staffAssignment.setTitle(title);
 	}
+	
+	/**
+	 * Find staff assignments associated with staff member.
+	 * 
+	 * @param staffMember staff member
+	 */
+	public List<StaffAssignment> findByStaffMember(
+		final Person staffMember){
+		return this.staffAssignmentDao.findByStaffMember(staffMember);
+	}
+	
 }

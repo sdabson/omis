@@ -31,4 +31,11 @@
 		  join ir.offenderAppointmentAssociation.appointment ha
 		 where ir = :internalReferral
 	]]></query>
+	<query name="findExistingHealthAppointment"><![CDATA[
+		select ha
+		  from omis.health.domain.HealthAppointment ha
+		where ha.date = :date
+		and ha.startTime = :startTime
+		and ha.facility = :facility
+	]]></query>
 </hibernate-mapping>

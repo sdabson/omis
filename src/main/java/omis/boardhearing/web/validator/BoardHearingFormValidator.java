@@ -27,17 +27,15 @@ import omis.boardhearing.web.form.BoardHearingNoteItem;
 /**
  * Board Hearing Form Validator.
  * 
- *@author Annie Wahl 
- *@version 0.1.0 (Jan 2, 2018)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.2 (May 31, 2018)
+ * @since OMIS 3.0
  */
 public class BoardHearingFormValidator implements Validator {
 	
 	private static final String ITINERARY_REQUIRED_MSG_KEY =
 			"boardHearing.itinerary.empty";
-	
-	private static final String LOCATION_REQUIRED_MSG_KEY = "location.required";
 	
 	private static final String DATE_REQUIRED_MSG_KEY = "date.required";
 	
@@ -47,7 +45,7 @@ public class BoardHearingFormValidator implements Validator {
 	private static final String BOARD_MEMBER_REQUIRED_MSG_KEY =
 			"boardHearing.boardMember.required";
 
-
+	@SuppressWarnings("unused")
 	private static final String REASON_REQUIRED_MSG_KEY =
 			"boardHearing.reason.required";
 	
@@ -60,8 +58,6 @@ public class BoardHearingFormValidator implements Validator {
 	/**{@inheritDoc} */
 	@Override
 	public void validate(final Object target, final Errors errors) {
-		ValidationUtils.rejectIfEmpty(errors, "hearingLocation", 
-				LOCATION_REQUIRED_MSG_KEY);
 		ValidationUtils.rejectIfEmpty(errors, "paroleBoardItinerary", 
 				ITINERARY_REQUIRED_MSG_KEY);
 		ValidationUtils.rejectIfEmpty(errors, "hearingDate",
@@ -69,10 +65,10 @@ public class BoardHearingFormValidator implements Validator {
 		
 		BoardHearingForm form = (BoardHearingForm) target;
 		
-		if (form.getCancelled()) {
+		/*if (form.getCancelled()) {
 			ValidationUtils.rejectIfEmpty(errors, "reason", 
 					REASON_REQUIRED_MSG_KEY);
-		}
+		}*/
 		
 		if (form.getBoardHearingNoteItems() != null) {
 			int i = 0;

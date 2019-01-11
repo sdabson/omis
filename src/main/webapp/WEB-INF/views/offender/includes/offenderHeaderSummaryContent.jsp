@@ -5,8 +5,8 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <div id="offenderHeaderDetails">
 <fmt:bundle basename="omis.offender.msgs.offenderHeader">
-<div id="offenderHeaderBadge" class="offenderHeaderContainer accentDark">
-	<div class="item foregroundUltraLight">
+<div id="offenderHeaderBadge" class="offenderHeaderContainer">
+	<div class="item">
 		<c:forEach var="summaryItem" items="${basicInformationSummaryItemRegistry.items}" varStatus="i">
 				<c:if test="${summaryItem.enabled}">
 					<jsp:include page="${summaryItem.includedPageName}"/>
@@ -14,12 +14,13 @@
 		</c:forEach>
 	</div>
 </div>
-<div id="scrollWrapper" class="offenderHeaderContainer accentDark">
+<div id="scrollWrapper" class="offenderHeaderContainer">
 	<div id="leftArrow" class="arrow"></div>
 	<div id="rightArrow" class="arrow"></div>
 	<div id="scroll" class="noSelect">
-<%-- 		<div title="<fmt:message key='placementSummaryItemRegistryLabel'/>" id="placementSummaryItemRegistry" class="scrollDot"></div> --%>
-		<div title="<fmt:message key='legacyPlacementSummaryItemRegistryLabel'/>" id="legacyPlacementSummaryItemRegistry" class="scrollDot"></div>
+		<sec:authorize access="hasRole('ADMIN')">
+			<div title="<fmt:message key='placementSummaryItemRegistryLabel'/>" id="placementSummaryItemRegistry" class="scrollDot"></div>
+		</sec:authorize>
 		<div title="<fmt:message key='dischargeDataSummaryItemRegistryLabel'/>" id="dischargeDataSummaryItemRegistry" class="scrollDot"></div>
 		<div title="<fmt:message key='offenderFlagSummaryItemRegistryLabel'/>" id="offenderFlagSummaryItemRegistry" class="scrollDot"></div>
 		<div title="<fmt:message key='facilitySummaryItemRegistryLabel'/>" id="facilitySummaryItemRegistry" class="scrollDot"></div>
@@ -28,11 +29,8 @@
 		<div title="<fmt:message key='identificationSummaryItemRegistryLabel'/>" id="identificationSummaryItemRegistry" class="scrollDot"></div>
 	</div>
 	<div id="itemWrapper">
-<%-- 		<c:set var="summaryItemRegistry" value="${placementSummaryItemRegistry}" scope="request" /> --%>
-<%-- 		<c:set var="summaryItemRegistryTitle" value="placementSummaryItemRegistry" scope="request" /> --%>
-<%-- 			<jsp:include page="summaryItemRegistry.jsp"/> --%>
-		<c:set var="summaryItemRegistry" value="${legacyPlacementSummaryItemRegistry}" scope="request" />
-		<c:set var="summaryItemRegistryTitle" value="legacyPlacementSummaryItemRegistry" scope="request" />
+		<c:set var="summaryItemRegistry" value="${placementSummaryItemRegistry}" scope="request" />
+		<c:set var="summaryItemRegistryTitle" value="placementSummaryItemRegistry" scope="request" />
 			<jsp:include page="summaryItemRegistry.jsp"/>
 		<c:set var="summaryItemRegistry" value="${dischargeDataSummaryItemRegistry}" scope="request" />
 		<c:set var="summaryItemRegistryTitle" value="dischargeDataSummaryItemRegistry" scope="request" />

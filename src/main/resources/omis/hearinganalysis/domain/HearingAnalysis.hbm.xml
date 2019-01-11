@@ -30,9 +30,9 @@
 			</generator>
 		</id>
 		<many-to-one name="eligibility" entity-name="omis.paroleeligibility.domain.ParoleEligibility" not-null="true" column="`ELIGIBILITY_ID`"/>
-		<many-to-one name="boardMeetingSite" entity-name="omis.paroleboarditinerary.domain.BoardMeetingSite" not-null="false" column="`BOARD_MEETING_ID`"/>
 		<many-to-one name="category" entity-name="omis.hearinganalysis.domain.HearingAnalysisCategory" not-null="true" column="`HEARING_ANALYSIS_CATEGORY_ID`"/>
-		<many-to-one name="analyst" entity-name="omis.paroleboarditinerary.domain.BoardAttendee" not-null="false" column="`BOARD_ATTENDEE_ID`"/>
+		<many-to-one name="analyst" entity-name="omis.paroleboardmember.domain.ParoleBoardMember" not-null="false" column="`BOARD_MEMBER_ID`"/>
+		<property name="expectedCompletionDate" column="`EXPECTED_COMPLETION_DATE`" type="java.util.Date" not-null="false" />
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 			             not-null="true"/>
@@ -50,8 +50,6 @@
 		where
 			hearingAnalysis.eligibility = :eligibility
 		and
-			hearingAnalysis.boardMeetingSite = :meetingSite
-		and
 			hearingAnalysis.analyst = :analyst
 		and
 			hearingAnalysis.category = :category
@@ -61,8 +59,6 @@
 		from omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
 		where
 			hearingAnalysis.eligibility = :eligibility
-		and
-			hearingAnalysis.boardMeetingSite = :meetingSite
 		and
 			hearingAnalysis.analyst = :analyst
 		and

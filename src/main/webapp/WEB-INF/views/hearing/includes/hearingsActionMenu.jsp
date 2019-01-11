@@ -22,9 +22,16 @@
 		<sec:authorize access="hasRole('HEARING_VIEW') or hasRole('ADMIN')">
 		<c:if test="${not empty offender}">
 			<li>
-				<a href="${pageContext.request.contextPath}/hearing/hearingListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="hearingListingReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/hearing/hearingInvestigationReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="hearingInvestigationReportLinkLabel"/></a>
 			</li>
 		</c:if>
 		</sec:authorize>
+		<sec:authorize access="hasRole('HEARING_VIEW') or hasRole('ADMIN')">
+		<c:if test="${not empty offender}">
+			<li>
+				<a href="${pageContext.request.contextPath}/hearing/hearingListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="hearingListingReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

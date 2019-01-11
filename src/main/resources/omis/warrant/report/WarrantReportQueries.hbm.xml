@@ -30,6 +30,7 @@
 					warrantCancellation.warrant warrant2
 				where
 					warrant2 = warrant)
+		order by warrant.date desc
 	]]></query>
 	<query name="findReleasedWarrantSummariesByOffender"><![CDATA[
 		select new omis.warrant.report.WarrantSummary(
@@ -55,6 +56,7 @@
 			person.name clearedByPersonName
 		where
 			warrant.offender = :offender
+		order by warrant.date desc
 	]]></query>
 	<query name="findCancelledWarrantSummariesByOffender"><![CDATA[
 		select new omis.warrant.report.WarrantSummary(
@@ -80,5 +82,11 @@
 			person.name clearedByPersonName
 		where
 			warrant.offender = :offender
+		order by warrant.date desc
+	]]></query>
+	<query name="countWarrantsByOffender"><![CDATA[
+		select count(warrant.id)
+		from omis.warrant.domain.Warrant warrant
+		where warrant.offender = :offender
 	]]></query>
 </hibernate-mapping>

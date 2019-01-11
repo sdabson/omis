@@ -18,15 +18,29 @@
 					<img id="photoPreview" class="viewableImage" height="120" width="180" src="${pageContext.request.contextPath}/offenderPhoto/displayPhoto.html?association=${association.id}&amp;contentType=image/jpeg"/>
 				</c:when>
 				<c:otherwise>
-					<img id="photoPreview" class="viewableImage" height="120" width="180" src=""/>
+					<c:choose>
+						<c:when test="${not empty photoData}">
+							<img id="photoPreview" class="enhancedImageUploadResultImage hoverableImage" height="120" width="180" src="data:image/jpeg;base64,${photoData}"/>
+						</c:when>
+						<c:otherwise>
+							<img id="photoPreview" class="viewableImage hoverableUploadImage" height="120" width="180" src=""/>
+						</c:otherwise>
+					</c:choose>
 				</c:otherwise>
 			</c:choose>
 		</span>
 		<c:if test="${empty association}">
 			<span class="fieldGroup">
-				<label for="photoData" class="fieldLabel">
-					<fmt:message key="photoFileLabel" bundle="${mediaBundle}"/></label>
-				<input id="photoData" type="file" name="photoData" accept="image/jpeg"/>
+				<label for="photoFile" class="fieldLabel"><fmt:message key="photoFileLabel" bundle="${mediaBundle}"/></label>
+				<input id="photoFile" name="photoFile" type="file" accept="image/jpeg"/>
+				<c:choose>
+					<c:when test="${not empty photoData}">
+						<input id="photoData" name="photoData" type="hidden" value="${photoData}"/>
+					</c:when>
+					<c:otherwise>
+						<input id="photoData" name="photoData" type="hidden" value=""/>
+					</c:otherwise>
+				</c:choose>
 				<form:errors path="photoData" cssClass="error"/>
 			</span>
 		</c:if>

@@ -52,7 +52,7 @@ public interface OffenderSearchSummaryReportService {
 	 */
 	List<OffenderSearchSummary> searchForOffender(Integer offenderNumber, 
 	  	String firstName, String middleName, String lastName, Sex sex,
-	  	Date dateOfBirth, Integer socialSecurityNumber);
+	  	Date dateOfBirth, Integer socialSecurityNumber, Date effectiveDate);
 	
 	/**
 	 * Returns alternate name summaries for the specified offender.

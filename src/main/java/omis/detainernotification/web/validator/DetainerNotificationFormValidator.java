@@ -180,8 +180,8 @@ public class DetainerNotificationFormValidator implements Validator {
 						this.stringLengthChecks.getVeryHugeCheck().check("noteItems[" + index 
 								+ "].value", item.getValue(), errors);
 					}
-					index++;
 				}
+				index++;
 			}
 		}
 		if (Boolean.TRUE.equals(form.getProcessed())) {

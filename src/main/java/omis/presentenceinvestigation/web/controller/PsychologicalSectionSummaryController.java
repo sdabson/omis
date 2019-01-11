@@ -49,17 +49,19 @@ import omis.presentenceinvestigation.web.validator.PsychologicalSectionSummaryFo
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
- * PsychologicalSectionSummaryController.java
+ * Psychological section summary controller.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Mar 2, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl
+ * @author Josh Divine
+ * @version 0.1.1 (Oct 24, 2018)
+ * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/presentenceInvestigation/psychologicalSummary/")
 @PreAuthorize("hasRole('USER')")
 public class PsychologicalSectionSummaryController {
+	
+	/* View Names */
 	
 	private static final String EDIT_VIEW_NAME =
 			"/presentenceInvestigation/psychologicalSummary/edit";
@@ -94,8 +96,7 @@ public class PsychologicalSectionSummaryController {
 			"/presentenceInvestigation/psychologicalSummary/includes/"
 			+ "psychologicalSectionSummaryDocumentItemsActionMenu";
 	
-	
-	
+	/* Model Keys */
 	
 	private static final String PSYCHOLOGICAL_SECTION_SUMMARY_MODEL_KEY =
 			"psychologicalSectionSummary";
@@ -154,7 +155,6 @@ public class PsychologicalSectionSummaryController {
 	@Autowired
 	@Qualifier("psychologicalSectionSummaryService")
 	private PsychologicalSectionSummaryService psychologicalSectionSummaryService;
-	
 	
 	/* Property Editor Factories */
 	
@@ -225,13 +225,11 @@ public class PsychologicalSectionSummaryController {
 	private PsychologicalSectionSummaryFormValidator
 			psychologicalSectionSummaryFormValidator;
 	
-	
 	/**
 	 * Default Constructor for PsychologicalSectionSummaryController
 	 */
 	public PsychologicalSectionSummaryController() {
 	}
-	
 	
 	/**
 	 * Displays the ModelAndView for editing a PsychologicalSectionSummary
@@ -458,9 +456,10 @@ public class PsychologicalSectionSummaryController {
 	 */
 	@RequestMapping(value = "createPsychologicalSectionSummaryDocumentItem.html",
 			method = RequestMethod.GET)
-	public ModelAndView displayPsychologicalSectionSummaryDocumentItem(@RequestParam(
-			value = "psychologicalSectionSummaryDocumentItemIndex", required = true)
-				final Integer psychologicalSectionSummaryDocumentItemIndex){
+	public ModelAndView displayPsychologicalSectionSummaryDocumentItem(
+			@RequestParam(value = "psychologicalSectionSummaryDocumentItemIndex", 
+			required = true) 
+			final Integer psychologicalSectionSummaryDocumentItemIndex){
 		ModelMap map = new ModelMap();
 		
 		PsychologicalSectionSummaryDocumentItem noteItem =
@@ -477,7 +476,8 @@ public class PsychologicalSectionSummaryController {
 		
 		
 		return new ModelAndView(
-				PSYCHOLOGICAL_SECTION_SUMMARY_DOCUMENT_ITEM_CONTENT_VIEW_NAME, map);
+				PSYCHOLOGICAL_SECTION_SUMMARY_DOCUMENT_ITEM_CONTENT_VIEW_NAME, 
+				map);
 	}
 	
 	/**
@@ -505,12 +505,6 @@ public class PsychologicalSectionSummaryController {
 		return new ModelAndView(DOCUMENT_TAG_ITEM_CONTENT_VIEW_NAME,
 				map);
 	}
-	
-	
-	
-	
-	
-	
 	
 	/**
 	 * Displays the PsychologicalSectionSummary Action Menu
@@ -544,7 +538,6 @@ public class PsychologicalSectionSummaryController {
 				PSYCHOLOGICAL_SECTION_SUMMARY_NOTE_ITEMS_ACTION_MENU_VIEW_NAME);
 	}
 	
-	
 	/**
 	 * Displays the PsychologicalSectionSummaryDocument Items Action Menu
 	 * @return ModelAndView - PsychologicalSectionSummaryDocument Items Action Menu
@@ -555,12 +548,6 @@ public class PsychologicalSectionSummaryController {
 		return new ModelAndView(
 				PSYCHOLOGICAL_SECTION_SUMMARY_DOCUMENT_ITEMS_ACTION_MENU_VIEW_NAME);
 	}
-	
-	
-	
-	
-	
-	
 	
 	/**
 	 * Prepares a ModelAndView for editing a PsychologicalSectionSummary
@@ -611,7 +598,7 @@ public class PsychologicalSectionSummaryController {
 		
 		this.offenderSummaryModelDelegate.add(map, (Offender)
 				psychologicalSectionSummary.getPresentenceInvestigationRequest()
-				.getDocket().getPerson());;
+				.getPerson());;
 		this.presentenceInvestigationRequestSummaryModelDelegate.add(map,
 				psychologicalSectionSummary.getPresentenceInvestigationRequest());
 				
@@ -697,8 +684,6 @@ public class PsychologicalSectionSummaryController {
 		return form;
 	}
 	
-	
-	
 	/** Retrieves document file.
 	 * @param document - document
 	 * @param httpServletResponse - HTTP Servlet response. */
@@ -725,8 +710,6 @@ public class PsychologicalSectionSummaryController {
 		}
 	}
 	
-	
-	
 	/**
 	 * Handles duplicate entity found exceptions.
 	 * 
@@ -740,8 +723,6 @@ public class PsychologicalSectionSummaryController {
 		(ENTITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
 				exception);
 	}
-	
-	
 	
 	/* InitBinder */
 	
@@ -773,5 +754,4 @@ public class PsychologicalSectionSummaryController {
 		binder.registerCustomEditor(byte[].class,
 				new ByteArrayMultipartFileEditor());
 	}
-	
 }

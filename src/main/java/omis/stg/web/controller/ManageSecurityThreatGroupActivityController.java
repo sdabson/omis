@@ -1,3 +1,21 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package omis.stg.web.controller;
 
 import java.util.ArrayList;
@@ -11,6 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,7 +40,6 @@ import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.content.RequestContentMapping;
 import omis.content.RequestContentType;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -30,6 +48,9 @@ import omis.stg.domain.SecurityThreatGroupActivity;
 import omis.stg.domain.SecurityThreatGroupActivityInvolvement;
 import omis.stg.domain.SecurityThreatGroupActivityNote;
 import omis.stg.exception.InvolvedOffenderRequiredException;
+import omis.stg.exception.SecurityThreatGroupActivityExistsException;
+import omis.stg.exception.SecurityThreatGroupActivityInvolvementExistsException;
+import omis.stg.exception.SecurityThreatGroupActivityNoteExistsException;
 import omis.stg.service.SecurityThreatGroupActivityService;
 import omis.stg.web.form.SecurityThreatGroupActivityForm;
 import omis.stg.web.form.SecurityThreatGroupActivityInvolvementItem;
@@ -37,11 +58,13 @@ import omis.stg.web.form.SecurityThreatGroupActivityInvolvementItemOperation;
 import omis.stg.web.form.SecurityThreatGroupActivityNoteItem;
 import omis.stg.web.form.SecurityThreatGroupActivityNoteItemOperation;
 import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
+import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
  * Controller for managing security threat group activities.
  * 
  * @author Trevor Isles
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Dec 7, 2016)
  * @since OMIS 3.0
  */
@@ -144,6 +167,32 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 	@Autowired
 	@Qualifier("offenderSummaryModelDelegate")
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
+	
+	@Autowired
+	@Qualifier("businessExceptionHandlerDelegate")
+	private BusinessExceptionHandlerDelegate businessExceptionHandlerDelegate;
+	
+	/* Message Keys. */
+	
+	private static final String SECURITY_THREAT_GROUP_ACTIVITY_EXISTS_EXCEPTION
+		= "stgActivity.exists";
+	
+	private static final String 
+		SECURITY_THREAT_GROUP_ACTIVITY_NOTE_EXISTS_EXCEPTION 
+		= "stgActivityNote.exists";
+	
+	private static final String 
+		SECURITY_THREAT_GROUP_ACTIVITY_INVOLVEMENT_EXISTS_EXCEPTION 
+		= "stgActivityInvolvement.exists";
+	
+	private static final String 
+		INVOLVED_OFFENDER_REQUIRED_EXCEPTION 
+		= "stgInvolvedOffenderRequired.exists";
+	
+	/* Message bundles. */
+	
+	private static final String ERROR_BUNDLE_NAME
+		= "omis.stg.msgs.form";
 	
 	/* Constructor. */
 	
@@ -369,8 +418,10 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 	 * activity
 	 * @param result binding result
 	 * @return redirect to list security threat group by offender
-	 * @throws DuplicateEntityFoundException if the activity exists
 	 * @throws InvolvedOffenderRequiredException 
+	 * @throws SecurityThreatGroupActivityExistsException 
+	 * @throws SecurityThreatGroupActivityNoteExistsException 
+	 * @throws SecurityThreatGroupActivityInvolvementExistsException 
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('STG_ACTIVITY_CREATE') or hasRole('ADMIN')")
@@ -378,8 +429,10 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 			@RequestParam(value = "offender", required = true)
 			final Offender offender,
 			final SecurityThreatGroupActivityForm activityForm,
-			final BindingResult result) throws DuplicateEntityFoundException, 
-			InvolvedOffenderRequiredException {
+			final BindingResult result) throws InvolvedOffenderRequiredException, 
+				SecurityThreatGroupActivityExistsException, 
+				SecurityThreatGroupActivityNoteExistsException, 
+				SecurityThreatGroupActivityInvolvementExistsException {
 		this.securityThreatGroupActivityFormValidator.validate(
 				activityForm, result);
 		if (result.hasErrors()) {
@@ -408,8 +461,10 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 	 * activity involvement
 	 * @param result binding result
 	 * @return redirect to list security threat activity by offender
-	 * @throws DuplicateEntityFoundException if the activity involvement exists
 	 * @throws InvolvedOffenderRequiredException 
+	 * @throws SecurityThreatGroupActivityExistsException 
+	 * @throws SecurityThreatGroupActivityInvolvementExistsException 
+	 * @throws SecurityThreatGroupActivityNoteExistsException 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('STG_ACTIVITY_EDIT') or hasRole('ADMIN')")
@@ -418,8 +473,10 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 				final Offender offender,
 				final SecurityThreatGroupActivityForm activityForm,
 				final BindingResult result) 
-						throws DuplicateEntityFoundException, 
-						InvolvedOffenderRequiredException {
+						throws InvolvedOffenderRequiredException, 
+						SecurityThreatGroupActivityExistsException, 
+						SecurityThreatGroupActivityInvolvementExistsException, 
+						SecurityThreatGroupActivityNoteExistsException {
 		this.securityThreatGroupActivityFormValidator.validate(activityForm, 
 				result);
 		if (result.hasErrors()) {
@@ -443,13 +500,15 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 	 * 
 	 * @param items security threat group affiliation note items
 	 * @param activity security threat group activity
-	 * @throws DuplicateEntityFoundException thrown when a duplicate security
+	 * @throws SecurityThreatGroupActivityExistsException thrown when a duplicate security
 	 * threat group activity note is found
+	 * @throws SecurityThreatGroupActivityNoteExistsException 
 	 */
 	private void processSecurityThreatGroupActivityNoteItems(
 			final List<SecurityThreatGroupActivityNoteItem> items,
 			final SecurityThreatGroupActivity activity)
-		throws DuplicateEntityFoundException {
+		throws SecurityThreatGroupActivityExistsException, 
+		SecurityThreatGroupActivityNoteExistsException {
 		if (items != null) {
 			for (SecurityThreatGroupActivityNoteItem item 
 					: items) {
@@ -478,13 +537,15 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 	 * 
 	 * @param items security threat group activity involvement items
 	 * @param activity security threat group activity
-	 * @throws DuplicateEntityFoundException thrown when a duplicate security
+	 * @throws InvolvedOffenderRequiredException 
+	 * @throws SecurityThreatGroupActivityInvolvementExistsException thrown when a duplicate security
 	 * threat group activity involvement is found
 	 */
 	private void processSecurityThreatGroupActivityInvolvementItems(
 			final List<SecurityThreatGroupActivityInvolvementItem> items,
 			final SecurityThreatGroupActivity activity)
-		throws DuplicateEntityFoundException, InvolvedOffenderRequiredException {
+		throws InvolvedOffenderRequiredException, 
+			SecurityThreatGroupActivityInvolvementExistsException {
 		if (items != null) {
 			for (SecurityThreatGroupActivityInvolvementItem item 
 					: items) {
@@ -541,6 +602,64 @@ import omis.stg.web.validator.SecurityThreatGroupActivityFormValidator;
 		ModelAndView mav = new ModelAndView(ACTIVITY_ACTION_MENU_VIEW_NAME);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
 		return mav;
+	}
+	
+	/* Exception handlers. */
+	
+	/**
+	 * Security threat group affiliation exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupActivityExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupActivityExistsException(
+			final SecurityThreatGroupActivityExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_ACTIVITY_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group affiliation note exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupActivityNoteExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupActivityNoteExistsException(
+			final SecurityThreatGroupActivityNoteExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_ACTIVITY_NOTE_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group rank exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(SecurityThreatGroupActivityInvolvementExistsException.class) 
+	public ModelAndView handleSecurityThreatGroupActivityInvolvementExistsException(
+			final SecurityThreatGroupActivityInvolvementExistsException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				SECURITY_THREAT_GROUP_ACTIVITY_INVOLVEMENT_EXISTS_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
+	}
+	
+	/**
+	 * Security threat group chapter exists exception.
+	 * 
+	 * @param exception exception
+	 * @return exception message
+	 */
+	@ExceptionHandler(InvolvedOffenderRequiredException.class) 
+	public ModelAndView handleInvolvedOffenderRequiredException(
+			final InvolvedOffenderRequiredException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				INVOLVED_OFFENDER_REQUIRED_EXCEPTION, 
+				ERROR_BUNDLE_NAME, exception);
 	}
 	
 	/* Init binder. */

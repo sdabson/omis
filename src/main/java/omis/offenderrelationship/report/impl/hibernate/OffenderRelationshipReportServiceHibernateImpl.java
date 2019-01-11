@@ -1,9 +1,32 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offenderrelationship.report.impl.hibernate;
+
 import java.util.Date;
 import java.util.List;
+
+import org.hibernate.SessionFactory;
+
+import omis.offender.domain.Offender;
 import omis.offenderrelationship.report.OffenderRelationshipReportService;
 import omis.offenderrelationship.report.OffenderRelationshipSummary;
-import org.hibernate.SessionFactory;
+import omis.person.domain.Person;
+import omis.relationship.domain.Relationship;
 
 /**
  * Hibernate implementation of service to report offender relationships
@@ -11,7 +34,9 @@ import org.hibernate.SessionFactory;
  *
  * @author Stephen Abson
  * @author Yidong Li
- * @version 0.0.1 (Jun 30, 2015)
+ * @author Josh Divine
+ * @author Sheronda Vaughn
+ * @version 0.0.2 (Feb 14, 2018)
  * @since OMIS 3.0
  */
 public class OffenderRelationshipReportServiceHibernateImpl
@@ -33,7 +58,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 		= "summarizeOffenderRelationshipsBySocialSecurityNumber";
 	
 	private static final String SUMMARIZE_BY_BIRTH_DATE_QUERY_NAME
-		= "summarizeOffenderRelationshipsByBirthDate";
+		= "summarizeOffenderRelationshipsByBirthDate";	
 	
 	private static final String 
 		COUNT_APPROPRIMATE_BY_FIRSTNAME_LASTNAME_QUERY_NAME
@@ -66,7 +91,23 @@ public class OffenderRelationshipReportServiceHibernateImpl
 	private static final String SUMMARIZE_BY_FIRSTNAME_EXACT_QUERY_NAME
 		= "summarizeOffenderRelationshipsByFirstNameExact";
 		
+	private static final String 
+		COUNT_RELATIONSHIPS_BY_OFFENDER_RELATION_QUERY_NAME 
+			= "countRelationshipsByOffenderRelation";
 	
+	private static final String FIND_RELAIONSHIP_BY_OFFENDER_RELATION_QUERY_NAME 
+		= "findRelationshipsByOffenderRelation";
+	
+	private static final String 
+		SUMMARIZE_RELATIONSHIPS_BY_TELEPHONE_NUMBER_QUERY_NAME
+			= "summarizeRelationshipsByTelephoneNumber";
+
+	private static final String SUMMARIZE_RELATIONSHIPS_BY_ONLINE_ACCOUNT_QUERY_NAME
+		= "summarizeRelationshipsByOnlineAccount";
+	
+	private static final String SUMMARIZE_RELATIONSHIPS_BY_ADDRESS_QUERY_NAME
+		= "summarizeRelationshipsByAddress";
+		
 	/* Parameter names. */
 	
 	private static final String LAST_NAME_PARAM_NAME = "lastName";
@@ -81,6 +122,23 @@ public class OffenderRelationshipReportServiceHibernateImpl
 		= "socialSecurityNumber";
 	
 	private static final String EFFECTIVE_DATE_PARAM_NAME = "effectiveDate";
+	
+	private static final String OFFENDER_PARAM_NAME = "offender";
+	
+	private static final String RELATION_PARAM_NAME = "relation";
+
+	private static final String TELEPHONE_NUMBER_VALUE_PARAM_NAME 
+		= "telephoneNumberValue";
+
+	private static final String ONLINE_ACCOUNT_NAME_PARAM_NAME = "onlineAccountName";
+
+	private static final String ADDRESS_VALUE_PARAM_NAME = "addressValue";
+	
+	private final static String CITY_NAME_PARAM_NAME = "cityName";
+	
+	private final static String STATE_NAME_PARAM_NAME = "stateName";
+	
+	private final static String ZIP_CODE_VALUE_PARAM_NAME = "zipCodeValue";
 	
 	/* Resources. */
 	
@@ -124,6 +182,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			} else if ((lastName != null && !lastName.isEmpty())
@@ -135,6 +194,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			} else {
@@ -145,6 +205,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			}
@@ -159,6 +220,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			} else if	((lastName != null && !lastName.isEmpty())
@@ -170,6 +232,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			} else {
@@ -180,6 +243,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
 					.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+					.setReadOnly(true)
 					.list();
 				return summaries;
 			}
@@ -196,6 +260,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					SUMMARIZE_BY_OFFENDER_NUMBER_QUERY_NAME)
 			.setParameter(OFFENDER_NUMBER_PARAM_NAME, offenderNumber)
 			.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+			.setReadOnly(true)
 			.list();
 		return summaries;
 	}
@@ -211,6 +276,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 			.setParameter(SOCIAL_SECURITY_NUMBER_PARAM_NAME,
 					socialSecurityNumber)
 			.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+			.setReadOnly(true)
 			.list();
 		return summaries;
 	}
@@ -225,6 +291,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					SUMMARIZE_BY_BIRTH_DATE_QUERY_NAME)
 			.setTimestamp(BIRTH_DATE_PARAM_NAME, birthDate)
 			.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+			.setReadOnly(true)
 			.list();
 		return summaries;
 	}
@@ -242,6 +309,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			} else if ((lastName != null && !lastName.isEmpty())
@@ -251,6 +319,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(
 						COUNT_APPROPRIMATE_BY_LASTNAME_QUERY_NAME)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			} else {
@@ -258,6 +327,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 				Long count = (Long) this.sessionFactory
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			}
@@ -269,6 +339,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			} else if ((lastName != null && !lastName.isEmpty())
@@ -277,6 +348,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 				Long count = (Long) this.sessionFactory
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(LAST_NAME_PARAM_NAME, lastName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			} else {
@@ -284,6 +356,7 @@ public class OffenderRelationshipReportServiceHibernateImpl
 				Long count = (Long) this.sessionFactory
 					.getCurrentSession().getNamedQuery(queryName)
 					.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+					.setReadOnly(true)
 					.uniqueResult();
 				return count.intValue();
 			}
@@ -303,5 +376,73 @@ public class OffenderRelationshipReportServiceHibernateImpl
 		return countByPerson(lastName, firstName, approximateMatch) 
 			> 
 			this.maximumResults;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Boolean relationshipExists(
+			final Offender offender, final Person relation) {
+		final Boolean query = (Boolean) this.sessionFactory.getCurrentSession()
+				.getNamedQuery(
+						COUNT_RELATIONSHIPS_BY_OFFENDER_RELATION_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setParameter(RELATION_PARAM_NAME, relation)
+				.uniqueResult();
+		return query;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Relationship findRelationship(Offender offender, Person relation) {
+		Relationship relationship = (Relationship) this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(FIND_RELAIONSHIP_BY_OFFENDER_RELATION_QUERY_NAME)
+				.setParameter(RELATION_PARAM_NAME, relation)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.uniqueResult();
+		return relationship;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<OffenderRelationshipSummary> summarizeByTelephoneNumber(
+			final Long telephoneNumberValue) {
+		@SuppressWarnings("unchecked")
+		List<OffenderRelationshipSummary> summaries = this.sessionFactory.getCurrentSession()
+				.getNamedQuery(
+						SUMMARIZE_RELATIONSHIPS_BY_TELEPHONE_NUMBER_QUERY_NAME)
+				.setParameter(TELEPHONE_NUMBER_VALUE_PARAM_NAME, telephoneNumberValue)
+				.setReadOnly(true)
+				.list();
+		return summaries;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<OffenderRelationshipSummary> summarizeByOnlineAccount(
+			final String onlineAccountName) {
+		@SuppressWarnings("unchecked")
+		List<OffenderRelationshipSummary> summaries = this.sessionFactory.getCurrentSession()
+				.getNamedQuery(SUMMARIZE_RELATIONSHIPS_BY_ONLINE_ACCOUNT_QUERY_NAME)
+				.setParameter(ONLINE_ACCOUNT_NAME_PARAM_NAME, onlineAccountName)
+				.setReadOnly(true)
+				.list();
+		return summaries;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<OffenderRelationshipSummary> summarizeByAddress(
+			final String addressValue, final String cityName, final String stateName, final String zipCodeValue) {	
+		@SuppressWarnings("unchecked")
+		List<OffenderRelationshipSummary> summaries = this.sessionFactory.getCurrentSession()
+				.getNamedQuery(SUMMARIZE_RELATIONSHIPS_BY_ADDRESS_QUERY_NAME)
+				.setParameter(ADDRESS_VALUE_PARAM_NAME, addressValue)
+				.setParameter(CITY_NAME_PARAM_NAME, cityName)
+				.setParameter(STATE_NAME_PARAM_NAME, stateName)
+				.setParameter(ZIP_CODE_VALUE_PARAM_NAME, zipCodeValue)
+				.setReadOnly(true)
+				.list();
+		return summaries;
 	}
 }

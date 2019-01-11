@@ -1,6 +1,23 @@
 <%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
+<%--
  - Author: Josh Divine
- - Version: 0.1.0 (Dec 4, 2017)
+ - Version: 0.1.2 (Aug 1, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
@@ -16,7 +33,7 @@
 		<form:errors path="boardMeetingSiteItems[${boardMeetingSiteIndex}].operation" cssClass="error"/>
 	</td>
 	<td>
-		<select name="boardMeetingSiteItems[${boardMeetingSiteIndex}].location" id="boardMeetingSiteItems[${boardMeetingSiteIndex}].location">
+		<select name="boardMeetingSiteItems[${boardMeetingSiteIndex}].location" id="boardMeetingSiteItems${boardMeetingSiteIndex}Location">
 			<option value="">...</option>
 			<c:forEach var="location" items="${boardMeetingSites}">
 			<c:choose>
@@ -32,11 +49,36 @@
 		<form:errors path="boardMeetingSiteItems[${boardMeetingSiteIndex}].location" cssClass="error"/>
 	</td>
 	<td>
-		<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].order" type="text" class="veryShortNumber" value="${paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].order}"/>
+		<select name="boardMeetingSiteItems[${boardMeetingSiteIndex}].unit" id="boardMeetingSiteItems${boardMeetingSiteIndex}Unit">
+			<c:if test="${not empty boardMeetingSiteUnits}">
+				<c:set var="units" value="${boardMeetingSiteUnits[paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex]]}" scope="request"/>
+				<c:set var="boardMeetingSiteUnit" value="${paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].unit}" scope="request"/>
+				<jsp:include page="/WEB-INF/views/paroleBoardItinerary/includes/unitOptions.jsp"/>
+			</c:if>
+		</select>
+		<form:errors path="boardMeetingSiteItems[${boardMeetingSiteIndex}].unit" cssClass="error"/>
+	</td>
+	<td>
+		<c:choose>
+			<c:when test="${not empty paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].order}">
+				<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].order" type="text" class="veryShortNumber" value="${paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].order}"/>
+			</c:when>
+			<c:otherwise>
+				<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].order" type="text" class="veryShortNumber" value="${sortOrder}"/>
+			</c:otherwise>
+		</c:choose>
+		
 		<form:errors path="boardMeetingSiteItems[${boardMeetingSiteIndex}].order" cssClass="error"/>
 	</td>
 	<td>
-		<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].date" id="boardMeetingSite${boardMeetingSiteIndex}Date" type="text" class="date" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].date}'/>"/>
+		<c:choose>
+			<c:when test="${not empty paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].date}">
+				<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].date" id="boardMeetingSite${boardMeetingSiteIndex}Date" type="text" class="date" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${paroleBoardItineraryForm.boardMeetingSiteItems[boardMeetingSiteIndex].date}'/>"/>
+			</c:when>
+			<c:otherwise>
+				<input name="boardMeetingSiteItems[${boardMeetingSiteIndex}].date" id="boardMeetingSite${boardMeetingSiteIndex}Date" type="text" class="date" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${siteDate}'/>"/>
+			</c:otherwise>
+		</c:choose>
 		<form:errors path="boardMeetingSiteItems[${boardMeetingSiteIndex}].date" cssClass="error"/>
 	</td>
 	<td>

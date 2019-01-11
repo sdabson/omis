@@ -86,7 +86,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newActionDate = this.parseDateText("01/02/2017");
 		
 		// Action
@@ -94,7 +94,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -145,7 +145,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Integer newPreSentenceCredits = 1;
 		
 		// Action
@@ -153,7 +153,7 @@ public class PrisonTermServiceUpdateTests
 				newPreSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -204,7 +204,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newSentenceDate = this.parseDateText("01/06/2017");
 		
 		// Action
@@ -212,7 +212,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, newSentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -263,7 +263,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Integer newSentenceTermYears = 20;
 		
 		// Action
@@ -271,7 +271,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, newSentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -322,7 +322,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Integer newSentenceTermDays = 180;
 		
 		// Action
@@ -330,7 +330,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				newSentenceTermDays, paroleEligibilityDate, 
 				projectedDischargeDate, maximumDischargeDate, status,  
-				sentenceToFollow, comments, verificationUser, verificationDate);
+				sentenceToFollow, comments, verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -381,7 +381,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newParoleEligibilityDate = this.parseDateText("01/05/2037");
 		
 		// Action
@@ -389,7 +389,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, newParoleEligibilityDate, 
 				projectedDischargeDate, maximumDischargeDate, status,  
-				sentenceToFollow, comments, verificationUser, verificationDate);
+				sentenceToFollow, comments, verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -440,7 +440,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newProjectedDischargeDate = this.parseDateText("01/05/2022");
 		
 		// Action
@@ -448,7 +448,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, 
 				newProjectedDischargeDate, maximumDischargeDate, status,  
-				sentenceToFollow, comments, verificationUser, verificationDate);
+				sentenceToFollow, comments, verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -499,7 +499,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newMaximumDischargeDate = this.parseDateText("01/05/2035");
 		
 		// Action
@@ -507,7 +507,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				newMaximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -557,7 +557,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		PrisonTermStatus newStatus = PrisonTermStatus.HISTORICAL;
 		
 		// Action
@@ -565,7 +565,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, newStatus, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -617,7 +617,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Boolean newSentenceToFollow = true;
 		
 		// Action
@@ -625,7 +625,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, newSentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -675,7 +675,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		String newComments = "More comments go here";
 		
 		// Action
@@ -683,7 +683,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, newComments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -734,7 +734,7 @@ public class PrisonTermServiceUpdateTests
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		Date newVerificationDate = this.parseDateText("03/01/2017");
 		
 		// Action
@@ -742,7 +742,7 @@ public class PrisonTermServiceUpdateTests
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, newVerificationDate);
+				verificationUser, newVerificationDate, null);
 		
 		// Assertions
 		PropertyValueAsserter.create()
@@ -794,20 +794,20 @@ public class PrisonTermServiceUpdateTests
 				sentenceDate, sentenceTermYears, sentenceTermDays, 
 				paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		PrisonTermStatus secondStatus = PrisonTermStatus.HISTORICAL;
 		PrisonTerm prisonTerm = this.prisonTermDelegate.create(offender, 
 				actionDate, preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, secondStatus, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		
 		// Action
 		this.prisonTermService.update(prisonTerm, actionDate, 
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 	}
 	
 	/**
@@ -842,21 +842,21 @@ public class PrisonTermServiceUpdateTests
 				sentenceDate, sentenceTermYears, sentenceTermDays, 
 				paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 		PrisonTermStatus secondStatus = PrisonTermStatus.HISTORICAL;
 		Date secondActionDate = this.parseDateText("02/02/2017");
 		PrisonTerm prisonTerm = this.prisonTermDelegate.create(offender, 
 				secondActionDate, preSentenceCredits, sentenceDate, 
 				sentenceTermYears, sentenceTermDays, paroleEligibilityDate, 
 				projectedDischargeDate, maximumDischargeDate, secondStatus,  
-				sentenceToFollow, comments, verificationUser, verificationDate);
+				sentenceToFollow, comments, verificationUser, verificationDate, null);
 		
 		// Action
 		this.prisonTermService.update(prisonTerm, secondActionDate, 
 				preSentenceCredits, sentenceDate, sentenceTermYears, 
 				sentenceTermDays, paroleEligibilityDate, projectedDischargeDate, 
 				maximumDischargeDate, status, sentenceToFollow, comments, 
-				verificationUser, verificationDate);
+				verificationUser, verificationDate, null);
 	}
 	// Parses date text
 	private Date parseDateText(final String text) {

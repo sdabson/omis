@@ -1,13 +1,33 @@
 <%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
+
+<%--
   - Form to edit offender relationships.
   -
   - Author: Yidong Li
   - Author: Joel Norris
   - Author: Stephen Abson
+  - Author: Sheronda Vaughn
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:bundle basename="omis.offenderrelationship.msgs.editOffenderRelationship">
 <form:form commandName="editRelationshipsForm" class="editForm">
@@ -19,6 +39,9 @@
 	<c:set var="personFieldsPropertyName" value="personFields" scope="request"/>
 	<fieldset id="personFields">
 		<legend><fmt:message key="personDetailsLegendLabel"/></legend>
+		<sec:authorize access="hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_SSN_EDIT')" var="canEditSsn"/>
+		<c:set var="readOnlySsn" value="${not canEditSsn}" scope="request"/>
+		<form:hidden path="validateSocialSecurityNumber"/>
 		<jsp:include page="/WEB-INF/views/person/includes/personFields.jsp"/>
 	</fieldset>
 	<fieldset id="addressFields">
@@ -74,6 +97,14 @@
 		<form:errors cssClass="error" path="onlineAccountContactItems"/>
 		<c:set var="onlineAccountContactItems" value="${editRelationshipsForm.onlineAccountContactItems}" scope="request"/>
 			<jsp:include page="../../offenderRelationship/includes/update/editOnlineAccountTableBody.jsp"/>
+	</fieldset>
+	<fieldset id="noteFields">
+		<legend><fmt:message key="noteDetailsLegendLabel"/></legend>
+			<form:errors cssClass="error" path="noteItems"/>
+			<c:set var="offenderRelationshipNoteItems" value="${editRelationshipsForm.noteItems}" scope="request"/>
+			<c:set var="offenderRelationshipNoteItemsFieldName" value="noteItems" scope="request"/>
+			<c:set var="baseUrl" value="${pageContext.request.contextPath}/offenderRelationship/update" scope="request"/>
+		<jsp:include page="offenderRelationshipNoteItemsTable.jsp"/>
 	</fieldset>
 	<p class="buttons">
 		<input type="submit" value="<fmt:message key='saveFamilyLabel' />"/>

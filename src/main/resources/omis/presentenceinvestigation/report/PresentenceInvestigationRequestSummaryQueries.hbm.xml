@@ -1,66 +1,171 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
+  - Presentence investigation request summary queries.
+  -
+  - Author: Ryan Johns
+  - Author: Annie Wahl
+  - Author: Josh Divine
+  - Version: 0.1.9 (May 2, 2018)
+  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="omis.presentenceinvestigation.domain">
-<query name="findPresentenceInvestigationRequestSummariesByUser"><![CDATA[
-	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
-		   psir.id,
-		   offender.id,
-			docket.value,
-		   psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
-		   psir.expectedCompletionDate, psir.completionDate,
-		   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
-		   psir.sentenceDate, category.name)
-      from
-	omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
-		inner join psir.category category
-		inner join psir.docket docket
-		inner join psir.assignedUser userAccount
-		inner join userAccount.user user
-		left outer join user.name personName
-		left outer join docket.person offender
-		left outer join offender.name offenderName
-		where userAccount = :assignedUser
-	 
-]]></query>
-<query name="findPresentenceInvestigationRequestSummariesByOffender"><![CDATA[
-	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
-		   psir.id,
-		   offender.id,
-			docket.value,
-		   psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
-		   psir.expectedCompletionDate, psir.completionDate,
-		   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
-		   psir.sentenceDate, category.name)
-      from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
-		inner join psir.category category
-		inner join psir.docket docket
-		inner join psir.assignedUser userAccount
-		inner join userAccount.user user
-		left outer join user.name personName
-		inner join docket.person offender
-		left outer join offender.name offenderName
-		where offender = :offender
-]]></query>
-<query name="findPresentenceInvestigationRequestSummary"><![CDATA[
-	select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
-			psir.id,
-			offender.id,
-			docket.value,
-			psir.requestDate, 'started', personName.firstName, personName.lastName, userAccount.username,
-			psir.expectedCompletionDate, psir.completionDate,
-			offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
-		   psir.sentenceDate, category.name)
-	from
-	omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
-		inner join psir.category category
-		inner join psir.docket docket
-		inner join psir.assignedUser userAccount
-		inner join userAccount.user user
-		left outer join user.name personName
-		left outer join docket.person offender
-		left outer join offender.name offenderName
-	where psir = :presentenceInvestigationRequest
-]]></query>
+	<query name="findSubmittedPresentenceInvestigationRequestSummariesByUser"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			   psir.id,
+			   offender.id,
+			   psir.requestDate, personName.firstName, personName.lastName, userAccount.username,
+			   psir.expectedCompletionDate, 
+			   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name,
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+			       from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			            omis.task.domain.TaskTemplate tt
+			      where pitg.presentenceInvestigationCategory = category
+			        and pitg.group = tt.group),
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+	      from
+		omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+			where userAccount = :assignedUser
+		 	and psir.submissionDate is not null
+	]]></query>
+	<query name="findPresentenceInvestigationRequestSummariesByOffender"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			   psir.id,
+			   offender.id,
+			   psir.requestDate, personName.firstName, personName.lastName, userAccount.username,
+			   psir.expectedCompletionDate, 
+			   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name,
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			           omis.task.domain.TaskTemplate tt
+			     where pitg.presentenceInvestigationCategory = category
+			       and pitg.group = tt.group),
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+	      from omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+			where offender = :offender
+	]]></query>
+	<query name="findPresentenceInvestigationRequestSummary"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+				psir.id,
+				offender.id,
+				psir.requestDate,  personName.firstName, personName.lastName, userAccount.username,
+				psir.expectedCompletionDate, 
+				offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name, 
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+		          from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			           omis.task.domain.TaskTemplate tt
+			     where pitg.presentenceInvestigationCategory = category
+			       and pitg.group = tt.group), 
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+		from
+		omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+		where psir = :presentenceInvestigationRequest
+	]]></query>
+	<query name="findUnsubmittedPresentenceInvestigationRequestSummariesByUser"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			   psir.id,
+			   offender.id,
+			   psir.requestDate, personName.firstName, personName.lastName, userAccount.username,
+			   psir.expectedCompletionDate, 
+			   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name,
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+			       from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			            omis.task.domain.TaskTemplate tt
+			      where pitg.presentenceInvestigationCategory = category
+			        and pitg.group = tt.group),
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+	      from
+		omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+			where userAccount = :assignedUser
+		 	and psir.submissionDate is null
+	]]></query>
+	<query name="findDocketValuesByPresentenceInvestigationRequest"><![CDATA[
+		select docket.value
+		from omis.presentenceinvestigation.domain.PresentenceInvestigationDocketAssociation docketAssoc
+		inner join docketAssoc.docket docket
+		where docketAssoc.presentenceInvestigationRequest.id = :presentenceInvestigationRequestId
+		order by docket.value
+	]]></query>
 </hibernate-mapping>

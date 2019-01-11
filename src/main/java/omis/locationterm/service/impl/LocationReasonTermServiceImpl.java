@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.service.impl;
 
 import java.util.List;
@@ -7,7 +24,6 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
 import omis.exception.DateRangeOutOfBoundsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.locationterm.dao.LocationReasonDao;
 import omis.locationterm.dao.LocationReasonTermDao;
@@ -16,6 +32,7 @@ import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
 import omis.locationterm.domain.LocationTerm;
 import omis.locationterm.exception.LocationReasonTermConflictException;
+import omis.locationterm.exception.LocationReasonTermExistsException;
 import omis.locationterm.service.LocationReasonTermService;
 import omis.offender.domain.Offender;
 import omis.offender.exception.OffenderMismatchException;
@@ -24,6 +41,7 @@ import omis.offender.exception.OffenderMismatchException;
  * Implementation of service for location reason terms.
  * 
  * @author Stephen Abson
+ * @author Sheronda Vaughn
  * @version 0.1.0 (Jan 16, 2014)
  * @since OMIS 3.0
  */
@@ -104,7 +122,7 @@ public class LocationReasonTermServiceImpl
 	public LocationReasonTerm create(final Offender offender,
 			final LocationTerm locationTerm,
 			final LocationReason reason, final DateRange dateRange)
-					throws DuplicateEntityFoundException,
+					throws LocationReasonTermExistsException,
 						OffenderMismatchException,
 						LocationReasonTermConflictException,
 						DateRangeOutOfBoundsException {
@@ -113,7 +131,7 @@ public class LocationReasonTermServiceImpl
 		if (this.locationReasonTermDao.find(offender, locationTerm,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException("Location term exists");
+			throw new LocationReasonTermExistsException("Location term exists");
 		}
 		
 		// Throws exception if offenders do not match
@@ -162,7 +180,7 @@ public class LocationReasonTermServiceImpl
 			final LocationTerm locationTerm,
 			final LocationReason reason,
 			final DateRange dateRange)
-					throws DuplicateEntityFoundException,
+					throws LocationReasonTermExistsException,
 						OffenderMismatchException,
 						LocationReasonTermConflictException,
 						DateRangeOutOfBoundsException {
@@ -172,7 +190,7 @@ public class LocationReasonTermServiceImpl
 				locationReasonTerm.getOffender(), locationTerm,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange), locationReasonTerm) != null) {
-			throw new DuplicateEntityFoundException("Location term exists");
+			throw new LocationReasonTermExistsException("Location term exists");
 		}
 		
 		// Throws exception if offenders do not match

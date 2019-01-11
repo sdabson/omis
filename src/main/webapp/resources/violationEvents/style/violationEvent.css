@@ -1,3 +1,11 @@
+#violationNameHeader {
+	width: 21%;
+}
+
+#violationDescriptionHeader, #detailsHeader {
+	width:36%;
+}
+
 .violationEventDocumentItem {
 	clear:both;
 	float:left;
@@ -9,6 +17,12 @@
 	border-style: solid;
 	border-width: 1px;
 	margin-bottom: 10px;
+}
+
+textarea.details, select.conditionSelect {
+	display:inline;
+	max-width:96%;
+	margin:13px;
 }
 
 .addLink{

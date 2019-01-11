@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offender.web.controller;
 
 import java.util.ArrayList;
@@ -61,10 +78,11 @@ public class OffenderSearchController {
 	
 	private static final String SEXES_MODEL_KEY
 		= "sexes";
+		
+	private static final String ALTERNATE_NAME_SUMMARIES_MAP_MODEL_KEY 
+		= "altNameSummaries";
 	
-	private static final String LOCATIONS_MODEL_KEY
-		= "locations";
-	private static final String ALTERNATE_NAME_SUMMARIES_MAP_MODEL_KEY = "altNameSummaries";
+	private static final String EFFECTIVE_DATE_MODEL_KEY = "effectiveDate";
 	
 	/* Report services. */
 	
@@ -125,7 +143,8 @@ public class OffenderSearchController {
 		if (result.hasErrors()) {	
 			mav = this.prepareRedisplayMav(offenderSearchForm, result);
 			return mav;
-		}		
+		}	
+		Date effectiveDate = new Date();
 		Sex sex = null;
 		if (offenderSearchForm.getSex() != null) {
 			if (Sex.FEMALE.equals(offenderSearchForm.getSex())) {
@@ -135,7 +154,7 @@ public class OffenderSearchController {
 			}
 		} else {
 			mav.addObject(SEXES_MODEL_KEY, Sex.values());
-		}
+		}	
 		List<OffenderSearchSummary> searchSummaries 
 			= new ArrayList<OffenderSearchSummary>();
 		searchSummaries = this.offenderSearchSummaryService.searchForOffender(
@@ -145,7 +164,8 @@ public class OffenderSearchController {
 				offenderSearchForm.getLastName(),
 				offenderSearchForm.getSex(),
 				offenderSearchForm.getBirthDate(),
-				offenderSearchForm.getSocialSecurityNumber());
+				offenderSearchForm.getSocialSecurityNumber(),
+				effectiveDate);
 		
 		//  Create a map and have it hold collections of alternate name summaries that will be displayed
 		//  along with the offender search summaries.
@@ -159,8 +179,8 @@ public class OffenderSearchController {
 		mav.addObject(ALTERNATE_NAME_SUMMARIES_MAP_MODEL_KEY, altNameMap);
 		mav.addObject(OFFENDER_SEARCH_SUMMARIES_MODEL_KEY, searchSummaries);
 		mav.addObject(SEX_MODEL_KEY, sex);
-		mav.addObject(SEXES_MODEL_KEY, Sex.values());
-		
+		mav.addObject(SEXES_MODEL_KEY, Sex.values());		
+		mav.addObject(EFFECTIVE_DATE_MODEL_KEY, effectiveDate);
 		return mav;
 	}
 
@@ -197,7 +217,6 @@ public class OffenderSearchController {
 		ModelAndView mav = new ModelAndView(VIEW_NAME);
 		mav.addObject(OFFENDER_SEARCH_FORM_MODEL_KEY, offenderSearchForm);	
 		mav.addObject(SEXES_MODEL_KEY, Sex.values());
-		mav.addObject(LOCATIONS_MODEL_KEY, offenderSearchForm.getLocations());
 		return mav;
 	}
 	

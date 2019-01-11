@@ -52,4 +52,13 @@ public interface OffenderPhotoAssociationNoteDao
 	OffenderPhotoAssociationNote findExcluding(String value, Date date,
 			OffenderPhotoAssociation association,
 			OffenderPhotoAssociationNote note);
+
+	/**
+	 * Removes all offender photo association notes for the specified
+	 * offender photo association.
+	 * 
+	 * @param association offender photo association
+	 * @return count of removed offender photo association notes
+	 */
+	int removeByAssociation(OffenderPhotoAssociation association);
 }

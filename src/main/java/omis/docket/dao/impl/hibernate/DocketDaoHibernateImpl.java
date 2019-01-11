@@ -31,7 +31,8 @@ import omis.person.domain.Person;
  * Hibernate implementation of data access object for dockets.
  *
  * @author Stephen Abson
- * @version 0.0.1
+ * @author Josh Divine
+ * @version 0.1.1 (Aug 15, 2018)
  * @since OMIS 3.0
  */
 public class DocketDaoHibernateImpl
@@ -46,6 +47,8 @@ public class DocketDaoHibernateImpl
 		= "findDocketExcluding";
 
 	private static final String FIND_BY_PERSON_QUERY_NAME = "findDocketsByPerson";
+	
+	private static final String FIND_BY_VALUE_QUERY_NAME = "findDocketsByValue";
 	
 	/* Parameters. */
 	
@@ -107,6 +110,18 @@ public class DocketDaoHibernateImpl
 		List<Docket> dockets = this.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_BY_PERSON_QUERY_NAME)
 				.setParameter(PERSON_PARAM_NAME, person)
+				.list();
+		return dockets;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<Docket> findByValue(final String value) {
+		@SuppressWarnings("unchecked")
+		List<Docket> dockets = this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(FIND_BY_VALUE_QUERY_NAME)
+				.setParameter(VALUE_PARAM_NAME, value)
+				.setMaxResults(25)
 				.list();
 		return dockets;
 	}

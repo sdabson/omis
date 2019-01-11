@@ -505,6 +505,18 @@ public class ManageVictimAssociationController {
 				birthCity = victimAssociationForm.getPersonFields()
 						.getBirthCity();
 			}
+			Integer socialSecurityNumber;
+			if (victimAssociationForm.getPersonFields()
+						.getSocialSecurityNumber() != null
+						&& !victimAssociationForm
+								.getPersonFields()
+									.getSocialSecurityNumber().isEmpty()) {
+				socialSecurityNumber = Integer.valueOf(
+						victimAssociationForm.getPersonFields()
+							.getSocialSecurityNumber().replaceAll("-", ""));
+			} else {
+				socialSecurityNumber = null;
+			}
 			victimToAssociate = this.victimAssociationService.createVictim(
 					victimAssociationForm.getPersonFields().getLastName(),
 					victimAssociationForm.getPersonFields().getFirstName(),
@@ -514,9 +526,7 @@ public class ManageVictimAssociationController {
 					victimAssociationForm.getPersonFields().getBirthDate(),
 					victimAssociationForm.getPersonFields().getBirthCountry(),
 					victimAssociationForm.getPersonFields().getBirthState(),
-					birthCity,
-					victimAssociationForm.getPersonFields()
-						.getSocialSecurityNumber(),
+					birthCity, socialSecurityNumber,
 					victimAssociationForm.getPersonFields().getStateIdNumber(),
 					victimAssociationForm.getPersonFields().getDeceased(),
 					victimAssociationForm.getPersonFields().getDeathDate());
@@ -1200,7 +1210,7 @@ public class ManageVictimAssociationController {
 	 * @return model and view to handle {@code VictimExistsException} 
 	 */
 	@ExceptionHandler(VictimExistsException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
+	public ModelAndView handleVictimExistsException(
 			final VictimExistsException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				VICTIM_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
@@ -1214,7 +1224,7 @@ public class ManageVictimAssociationController {
 	 * @return model and view to handle {@code VictimNoteExistsException} 
 	 */
 	@ExceptionHandler(VictimNoteExistsException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
+	public ModelAndView handleVictimNoteExistsException(
 			final VictimNoteExistsException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				VICTIM_NOTE_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,

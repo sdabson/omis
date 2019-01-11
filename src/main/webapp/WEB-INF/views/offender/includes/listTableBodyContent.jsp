@@ -44,21 +44,21 @@
 						<fmt:param value="${offenderSummary.firstName}"/>
 						<fmt:param value="${middleName}"/>	
 						<fmt:param value="${suffix}"/>		
-					</fmt:message></a>
-				
-		
-			
-		</td>	
-		<td rowspan="2"><fmt:formatDate value="${offenderSummary.dateOfBirth}" pattern="MM/dd/yyyy"/></td>
-		<td rowspan="2"><c:out value="${offenderSummary.sexLabel.name}"/></td>
+					</fmt:message></a>			
+		</td>			
+		<td><fmt:formatDate value="${offenderSummary.dateOfBirth}" pattern="MM/dd/yyyy"/></td>
+		<td><c:out value="${offenderSummary.sexLabel.name}"/></td>
 		<%-- <td>
 			<c:if test="${offenderSummary.address == true}">
 				<address:formatSummary value="${offenderSummary}" format="LINE1"/> <address:formatSummary value="${offenderSummary}" format="LINE2"/>
-			</c:if>
-		
-		<td><c:out value="${offenderSummary.supervisoryOrganizationDescription}"/></td>
-		<td><c:out value="${offenderSummary.correctionalStatusDescription}"/></td> --%>
-		
+			</c:if> --%>
+		<sec:authorize access="hasRole('LOCATION_TERM_VIEW') or hasRole('ADMIN')">
+			<td><c:out value="${offenderSummary.locationName}"/></td>
+		</sec:authorize>
+<%-- 		<td><c:out value="${offenderSummary.supervisoryOrganizationName}"/></td> --%>
+		<sec:authorize access="hasRole('CORRECTIONAL_STATUS_TERM_VIEW') or hasRole('ADMIN')">
+			<td><c:out value="${offenderSummary.correctionalStatusName}"/></td>		
+		</sec:authorize>
 	</tr>
 	
 		<c:choose>

@@ -32,8 +32,9 @@
 </span>
 <span class="subSectionLine">
 	<c:if test="${not empty telephoneNumberSummarizable.telephoneNumberExtension}">
+		<fmt:formatNumber pattern="####" value="${telephoneNumberSummarizable.telephoneNumberExtension}" var="telephoneNumberExtension"/>
 		<fmt:message key="extLabel" bundle="${telephoneNumber}">
-			<fmt:param value="${telephoneNumberSummarizable.telephoneNumberExtension}"/>
+			<fmt:param value="${telephoneNumberExtension}"/>
 		</fmt:message>
 	</c:if>
 </span>

@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!--
   - Queries for reporting tasks.
   -
   - Author: Stephen Abson
+  - Author: Annie Wahl
+  - Author: Ryan Johns
+  - Author: Josh Divine
+  - Version: 0.1.3 (Sep 13, 2018)
+  - Since: OMIS 3.0
   -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -13,11 +35,59 @@
 			task.id, task.controllerName, task.methodName, task.description,
 			sourceUserName.lastName, sourceUserName.firstName, sourceUserName.middleName,
 			sourceUserName.suffix, sourceAccount.username, task.originationDate,
-			task.completionDate)
+			task.completionDate, case when taskAssignment.lastInvokedDate is null then false else true end)
+		from omis.task.domain.TaskAssignment taskAssignment
+			inner join taskAssignment.task task
+			inner join task.sourceAccount sourceAccount
+			inner join sourceAccount.user sourceUser
+			inner join sourceUser.name sourceUserName
+		where taskAssignment.assigneeAccount.username = :username
+		order by task.completionDate desc nulls first, task.originationDate
+	]]></query>
+	<query name="findUninvokedTaskCountByAssigneeUserAccount"><![CDATA[
+		select count(task.id)
+			from
+				omis.task.domain.TaskAssignment taskAssignment
+			inner join
+				taskAssignment.task task
+			where
+				taskAssignment.assigneeAccount = :assigneeAccount
+			and
+				taskAssignment.lastInvokedDate = null
+	]]></query>
+	<query name="summarizeTaskByTask"><![CDATA[
+		select new omis.task.report.TaskSummary(
+			task.id, task.controllerName, task.methodName, task.description,
+			sourceUserName.lastName, sourceUserName.firstName, sourceUserName.middleName,
+			sourceUserName.suffix, sourceAccount.username, task.originationDate,
+			task.completionDate,
+			case when (select taskAssignment.lastInvokedDate 
+					   from omis.task.domain.TaskAssignment taskAssignment
+					   where taskAssignment.task = :task) is null then false else true end)
 		from omis.task.domain.Task task
 			inner join task.sourceAccount sourceAccount
 			inner join sourceAccount.user sourceUser
 			inner join sourceUser.name sourceUserName
-		where sourceAccount.username = :username
+		where task = :task
+	]]></query>
+	<query name="summarizeTaskAssignmentsByTask"><![CDATA[
+		select new omis.task.report.TaskAssignmentSummary(
+			taskAssignment.id,
+			assigneeUserName.lastName,
+			assigneeUserName.firstName,
+			assigneeUserName.middleName,
+			assigneeUserName.suffix,
+			assigneeAccount.username,
+			taskAssignment.assignedDate)
+		from omis.task.domain.TaskAssignment taskAssignment
+		inner join taskAssignment.task task
+		inner join taskAssignment.assigneeAccount assigneeAccount
+		inner join assigneeAccount.user assigneeUser
+		inner join assigneeUser.name assigneeUserName
+		where
+			task = :task
+		order by taskAssignment.task.completionDate desc nulls first, 
+				 taskAssignment.assignedDate, 
+				 taskAssignment.assigneeAccount.username
 	]]></query>
 </hibernate-mapping>

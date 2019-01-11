@@ -124,16 +124,6 @@ public interface PlacementReportService {
 	OffenderPlacementSummary findOffenderPlacementSummaryByOffender(
 			 	Offender offender, Date effectiveDate);
 	
-	/** Returns summary of offenders placement by offender and date.
-	 * * TODO: We'll want to return to the implementation of this when we are 
-	 * getting ready to bring placement to production, This is using a 
-	 * summary that is tailored to the information exposed via OMIS 2.
-	 * @param offender - offender.
-	 * @param effectiveDate - effective date. 
-	 * @return offender placement summary. */
-	LegacyOffenderPlacementSummary findLegacyOffenderPlacementSummaryByOffender(
-			 	Offender offender, Date effectiveDate);
-	
 	/**
 	 * Returns placement term change action summaries for supervisory
 	 * organization change.

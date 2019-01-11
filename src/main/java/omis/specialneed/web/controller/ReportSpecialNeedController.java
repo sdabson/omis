@@ -39,6 +39,7 @@ import omis.specialneed.service.SpecialNeedService;
  * @author Joel Norris
  * @author Sheronda Vaughn
  * @author Josh Divine
+ * @author Sierra Haynes
  * @version 0.1.2 (Nov 2, 2017)
  * @since OMIS 3.0
  */
@@ -108,6 +109,9 @@ public class ReportSpecialNeedController {
 
 	private static final String SPECIAL_NEED_DETAILS_REPORT_NAME 
 		= "/Safety/SpecialManagementDesignation/Special_Management_Designation_Details";
+	
+	private static final String SPECIAL_NEED_DETAILS_REDACTED_REPORT_NAME 
+	= "/Safety/SpecialManagementDesignation/Special_Management_Designation_Details_Redacted";
 
 	/* Report parameter names. */
 	
@@ -241,7 +245,7 @@ public class ReportSpecialNeedController {
 	 */
 	@RequestMapping(value = "/specialNeedDetailsReport.html",
 			method = RequestMethod.GET)
-	@PreAuthorize("hasRole('SPECIAL_NEED_LIST') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('SPECIAL_NEED_VIEW') or hasRole('ADMIN')")
 	public ResponseEntity<byte []> reportSpecialNeedDetails(@RequestParam(
 			value = "specialNeed", required = true)
 			final SpecialNeed specialNeed,
@@ -252,6 +256,31 @@ public class ReportSpecialNeedController {
 				Long.toString(specialNeed.getId()));
 		byte[] doc = this.reportRunner.runReport(
 				SPECIAL_NEED_DETAILS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the redacted report for the specified special need.
+	 * 
+	 * @param specialNeed special need
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/specialNeedDetailsRedactedReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('SPECIAL_NEED_VIEW') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportSpecialNeedDetailsRedacted(@RequestParam(
+			value = "specialNeed", required = true)
+			final SpecialNeed specialNeed,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(SPECIAL_NEED_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(specialNeed.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				SPECIAL_NEED_DETAILS_REDACTED_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);

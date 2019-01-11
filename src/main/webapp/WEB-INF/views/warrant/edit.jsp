@@ -10,18 +10,20 @@
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/warrant/scripts/includes/jquery.omis.warrant.js?VERSION=1"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/warrant/scripts/warrant.js?VERSION=1"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/warrant/scripts/includes/jquery.omis.warrant.js?VERSION=2"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/warrant/scripts/warrant.js?VERSION=2"></script>
 	<script type="text/javascript">
 		var currentWarrantNoteItemIndex = ${warrantNoteItemIndex};
 		var currentWarrantCauseViolationItemIndex = ${warrantCauseViolationItemIndex};
+		var currentViolationToWitItemIndex = ${violationToWitItemIndex};
+		var offenderId = ${offender.id};
 	</script>
 	<title>
 		<c:if test="${empty warrant}">
-			<fmt:message key="create${warrantReasonCategory}Header"/>
+			<fmt:message key="createHeader.${warrantReasonCategory}"/>
 		</c:if>
 		<c:if test="${not empty warrant}">
-			<fmt:message key="edit${warrantReasonCategory}Header" />
+			<fmt:message key="editHeader.${warrantReasonCategory}" />
 		</c:if>
 		<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
 	</title>
@@ -31,10 +33,10 @@
 	<h1>
 		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/warrant/warrantActionMenu.html?offender=${offender.id}"></a>
 		<c:if test="${empty warrant}">
-			<fmt:message key="create${warrantReasonCategory}Header"/>
+			<fmt:message key="createHeader.${warrantReasonCategory}"/>
 		</c:if>
 		<c:if test="${not empty warrant}">
-			<fmt:message key="edit${warrantReasonCategory}Header" />
+			<fmt:message key="editHeader.${warrantReasonCategory}" />
 		</c:if>
 	</h1>
 	<jsp:include page="includes/editForm.jsp"/>

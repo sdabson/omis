@@ -18,7 +18,8 @@
 
 <%--
  - Author: Josh Divine
- - Version: 0.1.0 (Dec 20, 2017)
+ - @author Annie Wahl
+ - @version 0.1.4 (Dec 3, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -30,15 +31,39 @@
 <fieldset>
 	<legend><fmt:message key="eligibilityDetailsTitle"/></legend>
 	<span class="fieldGroup">
-		<label class="fieldLabel"><fmt:message key="hearingEligibleDateLabel"/></label>
+		<label class="fieldLabel"><fmt:message key="paroleEligibleDateLabel"/></label>
 		<span id="hearingEligibilityDate">
-			<fmt:formatDate value="${eligibility.hearingEligibilityDate}" pattern="MM/dd/yyyy"/>
+			<fmt:formatDate value="${eligibilitySummary.hearingEligibilityDate}" pattern="MM/dd/yyyy"/>
 		</span>
 	</span>
 	<span class="fieldGroup">
 		<label class="fieldLabel"><fmt:message key="nextReviewDateLabel"/></label>
 		<span id="nextReviewDate">
-			<fmt:formatDate value="${eligibility.reviewDate}" pattern="MM/dd/yyyy"/>
+			<fmt:formatDate value="${eligibilitySummary.reviewDate}" pattern="MM/dd/yyyy"/>
+		</span>
+	</span>
+	<span class="fieldGroup">
+		<label class="fieldLabel"><fmt:message key="appearanceTypeLabel"/></label>
+		<span id="nextReviewDate">
+			<c:out value="${eligibilitySummary.appearanceCategoryName}" />
+		</span>
+	</span>
+	<span class="fieldGroup">
+		<label class="fieldLabel"><fmt:message key="dueDateLabel"/></label>
+		<span id="nextReviewDate">
+			<fmt:formatDate value="${eligibilitySummary.hearingAnalysisExpectedCompletionDate}" pattern="MM/dd/yyyy"/>
+		</span>
+	</span>
+	<span class="fieldGroup">
+		<label class="fieldLabel"><fmt:message key="scheduledHearingDateLabel"/></label>
+		<span id="nextReviewDate">
+			<fmt:formatDate value="${eligibilitySummary.hearingDate}" pattern="MM/dd/yyyy"/>
+		</span>
+	</span>
+	<span class="fieldGroup">
+		<label class="fieldLabel"><fmt:message key="scheduledHearingLocationLabel"/></label>
+		<span id="nextReviewDate">
+			<c:out value="${eligibilitySummary.boardHearingItineraryLocationName}" />
 		</span>
 	</span>
 </fieldset>
@@ -65,46 +90,29 @@
 	</span>
 	
 	<span class="fieldGroup">
-		<form:label path="boardItinerary" class="fieldLabel">
-		<fmt:message key="boardItineraryLabel"/></form:label>
-		<form:select path="boardItinerary">
-			<option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></option>
-			<c:forEach var="itinerary" items="${itineraries}">
-				<c:choose>
-					<c:when test="${hearingAnalysisForm.boardItinerary eq itinerary}">
-						<option value="${itinerary.id}" selected="selected"><c:out value="${itinerary.paroleBoardLocation.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
-					</c:when>
-					<c:otherwise>
-						<option value="${itinerary.id}"><c:out value="${itinerary.paroleBoardLocation.location.organization.name}"/> (<fmt:formatDate value="${itinerary.dateRange.startDate}" pattern="MM/dd/yyyy"/>-<fmt:formatDate value="${itinerary.dateRange.endDate}" pattern="MM/dd/yyyy"/>)</option>
-					</c:otherwise>
-				</c:choose>
-			</c:forEach>
-		</form:select>
-		<form:errors path="boardItinerary" cssClass="error"/>
-	</span>
-	
-	<span class="fieldGroup">
-		<form:label path="boardMeetingSite" class="fieldLabel">
-			<fmt:message key="boardMeetingSiteLabel"/></form:label>
-		<c:set var="meetingSite" value="${hearingAnalysisForm.boardMeetingSite}" scope="request"/>
-		<form:select path="boardMeetingSite">
-			<jsp:include page="/WEB-INF/views/hearingAnalysis/includes/boardMeetingSiteOptions.jsp"/>
-		</form:select>
-		<form:errors path="boardMeetingSite" cssClass="error"/>
-	</span>
-	
-	<span class="fieldGroup">
 		<form:label path="analyst" class="fieldLabel">
 			<fmt:message key="analystLabel"/></form:label>
-		<c:set var="analyst" value="${hearingAnalysisForm.analyst}" scope="request"/>
 		<form:select path="analyst">
-			<jsp:include page="/WEB-INF/views/hearingAnalysis/includes/boardAttendeeOptions.jsp"/>
+			<jsp:include page="/WEB-INF/views/includes/nullOption.jsp"/>
+			<c:forEach var="boardMember" items="${boardMembers}">
+				<option value="${boardMember.id}" ${boardMember == hearingAnalysisForm.analyst ? 'selected="selected"' : ''}>
+					<c:out value="${boardMember.staffAssignment.staffMember.name.lastName}, ${boardMember.staffAssignment.staffMember.name.firstName} ${boardMember.staffAssignment.staffMember.name.middleName} (${boardMember.staffAssignment.title.name})"/>
+				</option>
+			</c:forEach>
 		</form:select>
 		<form:errors path="analyst" cssClass="error"/>
 	</span>
+	<span class="fieldGroup">
+			<form:label path="dueDate" class="fieldLabel">
+				<fmt:message key="dueDateLabel"/>
+			</form:label>
+			<form:input path="dueDate" class="date"/>
+			<form:errors path="dueDate" cssClass="error"/>
+		</span>
 </fieldset>
 <fieldset id="hearingAnalysisNotesHolder">
 	<legend><fmt:message key="hearingAnalysisNotesTitle"/></legend>
+	<c:set var="hearingAnalysisNoteItems" value="${hearingAnalysisForm.hearingAnalysisNoteItems}" scope="request"/>
 	<jsp:include page="hearingAnalysisNotesTable.jsp"/>
 	<form:errors path="hearingAnalysisNoteItems" cssClass="error"/>
 </fieldset>

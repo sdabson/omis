@@ -1,9 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+ 
+<!--
  - Queries for reporting parole eligibilities.
  -
  - Author: Trevor Isles
- - Version: 0.1.0 (Dec 6, 2017)
+ - Author: Josh Divine
+ - Author: Ryan Johns
+ - Author: Annie Wahl
+ - Version: 0.1.6 (July 10, 2018)
  - Since: OMIS 3.0
  -->
  <!DOCTYPE hibernate-mapping PUBLIC
@@ -26,5 +47,427 @@
 	 	  left join eligibility.status as status
 	  	  left join status.reason as reason
 		where eligibility.offender = :offender
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnresolvedParoleEligibilities"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				boardHearing.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing not in (select boardHearingDecision.hearing
+								 from omis.boardhearingdecision.domain.BoardHearingDecision boardHearingDecision
+								 where boardHearingDecision.hearing = boardHearing)
+		and
+			status is null
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+ 	
+ 	<query name="findUnscheduledParoleEligibilitySummaries"><![CDATA[
+	select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				cast(1 as long),
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing is null
+		and
+			status.category in ('APPEARING')
+		order by eligibility.hearingEligibilityDate asc
+ 	]]></query>
+	<query name="summarizeParoleEligibility"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = :paroleEligibility),
+				boardHearing.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = :paroleEligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = :paroleEligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			eligibility = :paroleEligibility
+	]]></query>
+	<query name="findParoleEligibilitiesByItinerary"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				boardHearing.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where boardHearing.itinerary = :itinerary
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnresolvedParoleEligibilitiesByDateRange"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				boardHearing.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing not in (select boardHearingDecision.hearing
+								 from omis.boardhearingdecision.domain.BoardHearingDecision boardHearingDecision
+								 where boardHearingDecision.hearing = boardHearing)
+		and
+			(((eligibility.hearingEligibilityDate >= :startDate or :startDate is null)
+			and (eligibility.hearingEligibilityDate < :endDate or :endDate is null))
+			or eligibility.hearingEligibilityDate is null)
+		and
+			status is null
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnscheduledParoleEligibilitiesByDateRange"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				cast(1 as long),
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing is null
+		and
+			status.category in ('APPEARING')
+		and
+			(((eligibility.hearingEligibilityDate >= :startDate or :startDate is null)
+			and (eligibility.hearingEligibilityDate < :endDate or :endDate is null))
+			or eligibility.hearingEligibilityDate is null)
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnresolvedParoleEligibilitiesByDate"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				boardHearing.id,
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing not in (select boardHearingDecision.hearing
+								 from omis.boardhearingdecision.domain.BoardHearingDecision boardHearingDecision
+								 where boardHearingDecision.hearing = boardHearing)
+		and
+			eligibility.hearingEligibilityDate = :date
+		and
+			status is null
+		order by eligibility.hearingEligibilityDate asc
+	]]></query>
+	<query name="findUnscheduledParoleEligibilitiesByDate"><![CDATA[
+		select new omis.paroleeligibility.report.ParoleEligibilitySummary(
+				eligibility.id,
+				(select hearingAnalysis.id
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis
+				 	inner join hearingAnalysis.eligibility eligibility2
+			 		where
+						eligibility2 = eligibility),
+				cast(1 as long),
+				eligibility.hearingEligibilityDate,
+				appearanceCategory.name,
+				status.category,
+				status.date,
+				eligibility.reviewDate,
+				reason.name,
+				name.lastName,
+				name.firstName,
+				name.middleName,
+				offender.offenderNumber,
+				(select hearingAnalysis2.expectedCompletionDate
+					from 
+			 			omis.hearinganalysis.domain.HearingAnalysis hearingAnalysis2
+			 		inner join hearingAnalysis2.eligibility eligibility3
+			 		where
+						eligibility3 = eligibility),
+				(select organization.name
+					from 
+			 			omis.boardhearing.domain.BoardHearing as boardHearing2
+		 			inner join boardHearing2.paroleEligibility eligibility4
+		 			inner join boardHearing2.itinerary paroleBoardItinerary
+					inner join paroleBoardItinerary.paroleBoardLocation paroleBoardLocation
+		 			inner join paroleBoardLocation.location location
+					inner join location.organization organization
+			 		where
+						eligibility4 = eligibility),
+				boardHearing.hearingDate
+			)
+		from omis.boardhearing.domain.BoardHearing as boardHearing
+			right outer join boardHearing.paroleEligibility as eligibility
+			left join eligibility.appearanceCategory as appearanceCategory
+			inner join eligibility.status as status
+			left join status.reason as reason
+			inner join eligibility.offender offender
+			inner join offender.name name
+		where
+			boardHearing is null
+		and
+			status.category in ('APPEARING')
+		and
+			eligibility.hearingEligibilityDate = :date
+		order by eligibility.hearingEligibilityDate asc
 	]]></query>
 </hibernate-mapping>

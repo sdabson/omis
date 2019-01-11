@@ -1,7 +1,7 @@
 <%--
  - Author: Yidong Li
  - Author: Sheronda Vaughn
- - Version: 0.1.0 (June 22, 2015)
+ - Version: 0.1.0 (Sept. 25, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -57,9 +57,21 @@
 					<fmt:param value="${familyMemberOffenderNumber}" />
 				</fmt:message></td>
 			<td><c:out value="${familyAssociationItem.categoryName}" /></td>
-			<td><c:if test="${familyAssociationItem.hasAddress}">
-					<address:formatSummary value="${familyAssociationItem}" format="LINE1"/> <address:formatSummary value="${familyAssociationItem}" format="LINE2"/>
-				</c:if></td>
+			<td>
+				<c:choose>
+					<c:when test="${familyAssociationItem.hasAddress}">
+						<address:formatSummary value="${familyAssociationItem}" format="LINE1"/> <address:formatSummary value="${familyAssociationItem}" format="LINE2"/>
+					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${familyAssociationItem.hasPoBox}">
+								<c:set value="${familyAssociationItem}" var="poBoxSummarizable" scope="request"/>
+								<jsp:include page="../../contact/includes/poBoxSummary.jsp"/>
+							</c:when>
+						</c:choose>
+					</c:otherwise>
+				</c:choose>
+			</td>
 			<td>		
 				<c:if test="${not empty familyAssociationItem.telephoneNumberValue}">		
 					<c:set value="${familyAssociationItem}" var="telephoneNumberSummarizable" scope="request"/>

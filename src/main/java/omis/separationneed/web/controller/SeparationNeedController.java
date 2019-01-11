@@ -1,5 +1,19 @@
-/**
- * 
+/*
+ * OMIS - Offender Management Information System.
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package omis.separationneed.web.controller;
 
@@ -47,7 +61,6 @@ import omis.separationneed.domain.SeparationNeedRemoval;
 import omis.separationneed.domain.SeparationNeedRemovalReason;
 import omis.separationneed.report.SeparationNeedReportService;
 import omis.separationneed.report.SeparationNeedSummary;
-import omis.separationneed.report.delegate.LegacyLocationLookupDelegate;
 import omis.separationneed.service.SeparationNeedService;
 import omis.separationneed.validator.SeparationNeedFormValidator;
 import omis.separationneed.web.form.SeparationNeedForm;
@@ -58,8 +71,9 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 /**
  * Controller for separation need.
  * 
- * @author Joel Norris 
- * @version 0.1.0 (Feb, 21 2013)
+ * @author Joel Norris
+ * @author Yidong Li 
+ * @version 0.1.0 (May, 1 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -132,6 +146,9 @@ public class SeparationNeedController {
 	private static final String SEPARATION_NEED_OR_NOTE_EXISTS_MESSAGE_KEY
 		= "separationNeed.needOrNoteExists";
 	
+	private static final String REFLECTIVE_RELATIONSHIP_MESSAGE_KEY
+	= "separationNeed.personsEqual";
+	
 	/* Bundles */
 	
 	private static final String ERROR_BUNDLE_NAME
@@ -149,13 +166,7 @@ public class SeparationNeedController {
 	
 	@Autowired
 	@Qualifier("separationNeedReportService")
-	SeparationNeedReportService separationNeedReportService;
-	
-	/* Delegates */
-	
-	@Autowired
-	@Qualifier("legacyLocationLookupDelegate")
-	private LegacyLocationLookupDelegate legacyLocationLookupDelegate;
+	private SeparationNeedReportService separationNeedReportService;
 	
 	/* Property editor factories */
 	
@@ -284,7 +295,7 @@ public class SeparationNeedController {
 				final Offender offender) {
 		ModelMap map = new ModelMap();
 		SeparationNeedForm form = new SeparationNeedForm();
-		this.prepareSeparationNeedEditForm(form, separationNeed);
+		this.prepareSeparationNeedEditForm(form, separationNeed, offender);
 		map.addAttribute(SEPARATION_NEED_MODEL_KEY, separationNeed);
 		return this.prepareEditMav(map, form, offender);
 	}
@@ -320,6 +331,7 @@ public class SeparationNeedController {
 			map.addAttribute(BindingResult.MODEL_KEY_PREFIX 
 					+ SEPARATION_NEED_FORM_MODEL_KEY, result);
 			map.addAttribute(SEPARATION_NEED_MODEL_KEY, separationNeed);
+			form.setCreateTargetOffender(false);
 			return prepareEditMav(map, form, offender);
 		}
 		this.separationNeedService.update(separationNeed,
@@ -352,6 +364,7 @@ public class SeparationNeedController {
 		required = true) final Offender offender) {
 		ModelMap map = new ModelMap();
 		SeparationNeedForm form = new SeparationNeedForm();
+		form.setCreateTargetOffender(true);
 		return this.prepareEditMav(map, form, offender);
 	}
 	
@@ -384,6 +397,7 @@ public class SeparationNeedController {
 			ModelMap map = new ModelMap();
 			map.addAttribute(BindingResult.MODEL_KEY_PREFIX 
 					+ SEPARATION_NEED_FORM_MODEL_KEY, result);
+			form.setCreateTargetOffender(true);
 			return prepareEditMav(map, form, offender);
 		}
 		Relationship relationship = this.separationNeedService.findRelationship(
@@ -624,6 +638,20 @@ public class SeparationNeedController {
 				exception);
 	}
 	
+	/**
+	 * Handles reflexive relationship exception.
+	 * 
+	 * @param exception reflexive relationship exception
+	 * @return model and view for displaying exception explanation
+	 */
+	@ExceptionHandler(ReflexiveRelationshipException.class)
+	public ModelAndView handleReflexiveRelationshipException(
+			final ReflexiveRelationshipException exception) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+			REFLECTIVE_RELATIONSHIP_MESSAGE_KEY, ERROR_BUNDLE_NAME, 
+			exception);
+	}
+	
 	/* Helper methods. */
 	
 	/*
@@ -631,7 +659,7 @@ public class SeparationNeedController {
 	 * with the values of the specified separation need.
 	 */
 	private void prepareSeparationNeedEditForm(final SeparationNeedForm form, 
-				 final SeparationNeed separationNeed) {
+		final SeparationNeed separationNeed, final Offender offender) {
 		List<SeparationNeedReasonAssociation> reasonAssociations
 			= this.separationNeedService
 			.findReasonAssociationsBySeparationNeed(separationNeed);
@@ -655,14 +683,20 @@ public class SeparationNeedController {
 		form.setDate(separationNeed.getDate());
 		form.setReportingStaff(separationNeed.getReportingStaff());
 		form.setCreationComment(separationNeed.getCreationComment());
+		form.setCreateTargetOffender(false);
 		SeparationNeedRemoval removal = separationNeed.getRemoval();
 		if (removal != null) {
 			form.setRemovalDate(removal.getDate());
 			form.setRemovalReason(removal.getReason());
 			form.setRemovalComment(removal.getComment());
 		}
-		form.setTargetOffender(((Offender)
-				separationNeed.getRelationship().getSecondPerson()));
+		if(offender.equals(separationNeed.getRelationship().getSecondPerson())){
+			form.setTargetOffender(((Offender)separationNeed.getRelationship()
+			.getFirstPerson()));
+		} else {
+			form.setTargetOffender(((Offender)separationNeed.getRelationship()
+			.getSecondPerson()));
+		}
 	}
 	
 	/*

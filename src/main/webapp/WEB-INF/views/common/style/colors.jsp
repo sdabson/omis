@@ -14,30 +14,27 @@
 	 		<c:when test="${not empty  userAppearance.foregroundColorValue}">
 		 		<c:set var="foregroundHue" value="${userAppearance.foregroundColorValue.hue}"/>
 		 		<c:set var="foregroundSaturation" value="${userAppearance.foregroundColorValue.saturation}"/>
+		 		<c:set var="foregroundOpacity" value="${userAppearance.foregroundColorValue.opacity}"/>
+		 		<c:set var="foregroundLightness" value="${userAppearance.foregroundColorValue.lightness}"/>
 	 		</c:when>
 	 		<c:otherwise>
 	 			<c:set var="foregroundHue" value="0"/>
  				<c:set var="foregroundSaturation" value="0"/>
+ 				<c:set var="foregroundOpacity" value="1"/>
+ 				<c:set var="foregroundLightness" value="91"/>
 	 		</c:otherwise>
  		</c:choose>
  		<c:choose>
 	 		<c:when test="${not empty  userAppearance.backgroundColorValue}">
 		 		<c:set var="backgroundHue" value="${userAppearance.backgroundColorValue.hue}"/>
  				<c:set var="backgroundSaturation" value="${userAppearance.backgroundColorValue.saturation}"/>
+ 				<c:set var="backgroundLightness" value="${userAppearance.backgroundColorValue.lightness}"/>
 	 		</c:when>
 	 		<c:otherwise>
 	 			<c:set var="backgroundHue" value="0"/>
 		 		<c:set var="backgroundSaturation" value="0"/>
 		 		<c:set var="backgroundLightness" value="100"/>
 	 		</c:otherwise>
- 		</c:choose>
- 		<c:choose>
- 			<c:when test="${not empty userAppearance.whiteBackground and not userAppearance.whiteBackground}">
- 				<c:set var="backgroundLightness" value="90"/>
- 			</c:when>
- 			<c:otherwise>
- 				<c:set var="backgroundLightness" value="100"/>
- 			</c:otherwise>
  		</c:choose>
  		<c:choose>
 	 		<c:when test="${not empty  userAppearance.accentColorValue}">
@@ -53,6 +50,8 @@
  	<c:otherwise>
  		<c:set var="foregroundHue" value="0"/>
  		<c:set var="foregroundSaturation" value="0"/>
+ 		<c:set var="foregroundOpacity" value="1"/>
+ 		<c:set var="foregroundLightness" value="91"/>
  		<c:set var="backgroundHue" value="0"/>
  		<c:set var="backgroundSaturation" value="0"/>
  		<c:set var="backgroundLightness" value="100"/>
@@ -148,11 +147,16 @@ ul.profileItemToolbar, h2.actionMenuHeader {
   background-color: #000;
 }
 
+body h1 {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+}
+
 /* Forms and list table headers. */
 table.listTable th, .profileItemHeader, form.editForm table.editTable thead tr th,
 form.editForm table.editTable th, table.formTable thead tr th,
 table.formTable thead tr{
-	background-color: hsla(${accentHue}, ${accentSaturation}%, 40%, 1);
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
 	color: #FFFFFF;
 	border-color: #000000;
 }
@@ -306,11 +310,33 @@ form.editForm {
 }
 
 form.editForm fieldset {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 91%, 1);
-	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 91%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
 }
 
 form.editForm fieldset legend {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 80%, 1);
+}
+
+<%-- Search form colors --%>
+
+form.searchForm fieldset {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+}
+
+form.searchForm fieldset legend {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 80%, 1);
+}
+
+<%-- List form colors --%>
+
+form.listForm fieldset {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+}
+
+form.listForm fieldset legend {
 	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 80%, 1);
 }
 
@@ -395,6 +421,12 @@ ul.tabs li span a, span.tab a {
 	color:#000;
 }
 
+/* Module Group */
+
+.moduleGroupLinkContainer > a {
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 40%, 1);
+	color: white;
+}
 
 /* Panels */
 .horizontalPanel {
@@ -425,7 +457,7 @@ ul.tabs li span a, span.tab a {
 	opacity: 0.4;
 }
 .profileItem.active {
-	background-color:  hsla(${backgroundHue}, ${backgroundSaturation}%, 90%, 1);
+	background-color:  hsla(${backgroundHue}, ${backgroundSaturation}%, 80%, 1);
 }
 
 .active {
@@ -434,7 +466,7 @@ ul.tabs li span a, span.tab a {
 
 /* Tabbed index page. */
 body.containerPage {
-	background-color: hsla(${backgroundHue}, ${backgroundSaturation}%, 99%, 1);
+	background-color: hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1);
     background-size: 100% 100%;
 }
 
@@ -507,10 +539,15 @@ tr.disabled {
 
 
 /* Action Menus */
-a.actionMenuItem:hover, .homeLink:hover, .reportHomeLink:hover, .applicationHelpLink:hover, .identifyingInformation a:hover, a.profileLink:hover, a.moduleLink:hover {
+/*a.actionMenuItem:hover, .homeLink:hover, .reportHomeLink:hover, .applicationHelpLink:hover, .identifyingInformation a:hover, a.profileLink:hover, a.moduleLink:hover {
 	background-color: #fafafa;
 	transition: background-color .25s;
 	border: 1px solid #aeaeae;
+}*/
+
+a.actionMenuItem:hover, .homeLink:hover, .reportHomeLink:hover, .applicationHelpLink:hover, .identifyingInformation a:hover, a.profileLink:hover, a.moduleLink:hover, a.taskListLink:hover {
+
+	box-shadow: inset 0 0 1px 1px  hsla(${accentHue}, ${accentSaturation}%, 80%, 1), inset 0 0 15px 15px  hsla(${accentHue}, ${accentSaturation}%, 100%, 1);
 }
 
 a.actionMenuItem.open {
@@ -526,10 +563,6 @@ a.actionMenuItem.open {
 	border-color: #000;
 }
 
-a.actionMenuItem:hover {
-		
-}
-
 .actionListContainer {
 	background-color: #FFF;
 }
@@ -543,27 +576,32 @@ div.panel {
 /* Foreground Colors */
 
 .foregroundUltraDark {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 10%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 10%, ${foregroundOpacity});
 	color: white;
 }
 
 .foregroundDark {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 20%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 20%, ${foregroundOpacity});
 	color: white;
 }
 
 .foregroundRegular {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 60%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 60%, ${foregroundOpacity});
 	color: black;
 }
 
 .foregroundLight {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 80%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 80%, ${foregroundOpacity});
 	color: black;
 }
 
 .foregroundUltraLight {
-	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 90%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, 90%, ${foregroundOpacity});
+	color: black;
+}
+
+.foreground {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
 	color: black;
 }
 
@@ -629,24 +667,99 @@ div.panel {
 /* Hoverable Colors. */
 
 .hoverable:hover, .profileItem a:hover, .moduleLink > a:hover {
-	background-color: hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1);
-	color: black;
+	box-shadow: inset 0 0 15px 15px  hsla(0, 100%, 100%, .33), 0 0 3px 3px  hsla(0, 100%, 100%, .33) ;
+	transition: box-shadow 150ms ease-in-out;
+}
+
+.hoverable:hover:after, .profileItem a:hover:after, .moduleLink > a:hover:after {
+	box-shadow: inset 0 0 5px 5px  hsla(0, 100%, 100%, .33);
+	transition: box-shadow 150ms ease-in-out;
+}
+
+.active {
+	color: #FF1493;
+<%-- 	text-shadow: 0px 0px 3px black, 0 0 10px hsla(${accentHue}, 100%, 50%, 1), 0 0 5px hsla(${accentHue}, 100%, 85%, 1); --%>
 }
 
 span.banner {
-	background-color:  hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1);
+	background-color:  hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	color: white;
+	text-decoration: none;
 }
 
 span.banner:hover {
-	background-color:  hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1);
+	background-color:  hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	color: white;
 }
 
 span.banner:hover::before {
-background:
-  linear-gradient(45deg,  hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1) 33.333%, transparent 33.333%, transparent 66.667%,  hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1) 66.667%), linear-gradient(135deg,  hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1) 33.333%, transparent 33.333%, transparent 66.667%, hsla(${backgroundHue}, ${backgroundSaturation}%, 95%, 1) 66.667%);
+	background: linear-gradient(45deg,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 33.333%, transparent 33.333%, transparent 66.667%,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 66.667%), linear-gradient(135deg,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 33.333%, transparent 33.333%, transparent 66.667%, hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 66.667%);
 }
 
 span.banner:before {
 background:
-  linear-gradient(45deg,  hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1) 33.333%, transparent 33.333%, transparent 66.667%,  hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1) 66.667%), linear-gradient(135deg,  hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1) 33.333%, transparent 33.333%, transparent 66.667%, hsla(${backgroundHue}, ${backgroundSaturation}%, 85%, 1) 66.667%);
+  linear-gradient(45deg,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 33.333%, transparent 33.333%, transparent 66.667%,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 66.667%), linear-gradient(135deg,  hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 33.333%, transparent 33.333%, transparent 66.667%, hsla(${accentHue}, ${accentSaturation}%, 50%, 1) 66.667%);
+}
+
+<%-- Offender Profile Screen colors --%>
+div.offenderProfile div.profileItems h2 {
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	color: black;
+}
+
+div.offenderProfile div.profileItems div.profileItemsInnerWrapper {
+	border-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+}
+
+<%-- Offender Header --%>
+div#offenderHeader div#offenderHeaderDetails div.offenderHeaderContainer div.item{
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, 1);
+	color: black;
+}
+
+div#offenderHeader div#offenderHeaderDetails div.offenderHeaderContainer {
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+}
+
+div#offenderNavHeader div#fullNavBarWrapper div#navBarWrapper div#navBar a.navBarItem {
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	color:white;
+}
+
+div#offenderNavHeader div#navContentWrapper.navContentWrapper div.navContent {
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+}
+
+div#offenderNavHeader div#navContentWrapper.navContentWrapper div.navContent div.navItems div.navItemContainer {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, 1);
+	color: black;
+}
+
+<%--link container for list screens --%>
+span.linkContainer {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	color: black;
+}
+
+<%-- Home links --%>
+body ul.content {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, ${foregroundOpacity});
+	color: black;
+}
+
+<%-- Image Join and Edit color selections--%>
+div.offenderPhotosContainer {	
+	background-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	border-color: hsla(${accentHue}, ${accentSaturation}%, 50%, 1);
+	color: black;
+}
+
+div.photoItem {
+	background-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%, 1);
+	border-color: hsla(${foregroundHue}, ${foregroundSaturation}%, ${foregroundLightness}%,1);
+	color: black;
 }

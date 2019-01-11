@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.offender.web.controller;
 
 import java.util.Collections;
@@ -26,14 +43,12 @@ import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.country.domain.Country;
 import omis.demographics.domain.Sex;
-import omis.instance.factory.InstanceFactory;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.service.OffenderPersonalDetailsService;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
 import omis.offender.web.form.OffenderPersonalDetailsForm;
 import omis.offender.web.validator.OffenderPersonalDetailsFormValidator;
-import omis.person.domain.PersonIdentity;
 import omis.person.domain.Suffix;
 import omis.person.exception.PersonIdentityExistsException;
 import omis.person.exception.PersonNameExistsException;
@@ -99,9 +114,6 @@ public class OffenderPersonalDetailsController {
 
 	/* Errors messages. */
 	
-	private static final String BIRTH_CITY_EXISTS_MESSAGE_KEY
-		= "birthCity.exists";
-	
 	private static final String PERSON_NAME_EXISTS_MESSAGE_KEY
 		= "personName.exists";
 
@@ -143,12 +155,6 @@ public class OffenderPersonalDetailsController {
 	
 	@Autowired
 	private CustomDateEditorFactory customDateEditorFactory;
-	
-	/* Instance factories. */
-	
-	@Autowired
-	@Qualifier("personIdentityInstanceFactory")
-	private InstanceFactory<PersonIdentity> personIdentityInstanceFactory;
 	
 	/* Validators. */
 	
@@ -280,7 +286,6 @@ public class OffenderPersonalDetailsController {
 	 * @param result validation results
 	 * @return redirect to profile or redisplay of submitted form if
 	 * validation fails
-	 * @throws CityExistsException if city exists
 	 * @throws PersonIdentityExistsException if identity exists for person
 	 * @throws PersonNameExistsException if name exists for person
 	 */
@@ -292,7 +297,7 @@ public class OffenderPersonalDetailsController {
 				final Offender offender,
 			final OffenderPersonalDetailsForm offenderPersonalDetailsForm,
 			final BindingResult result)
-					throws CityExistsException,
+					throws
 						PersonIdentityExistsException,
 						PersonNameExistsException {
 		this.offenderPersonalDetailsFormValidator.validate(
@@ -309,10 +314,14 @@ public class OffenderPersonalDetailsController {
 		City birthPlace;
 		if (offenderPersonalDetailsForm.getCreateNewBirthPlace() != null
 				&& offenderPersonalDetailsForm.getCreateNewBirthPlace()) {
-			birthPlace = this.offenderPersonalDetailsService.createCity(
+			try {
+				birthPlace = this.offenderPersonalDetailsService.createCity(
 					offenderPersonalDetailsForm.getBirthPlaceName(),
 					offenderPersonalDetailsForm.getBirthState(),
 					offenderPersonalDetailsForm.getBirthCountry());
+			} catch (CityExistsException e) {
+				birthPlace = e.getCity();
+			}
 		} else {
 			birthPlace = offenderPersonalDetailsForm.getBirthPlace();
 		}
@@ -493,20 +502,6 @@ public class OffenderPersonalDetailsController {
 	}
 	
 	/* Exception handlers. */
-	
-	/**
-	 * Handles {@code CityExistsException}.
-	 * 
-	 * @param cityExistsException exception
-	 * @return screen to handle {@code CityExistsException}
-	 */
-	@ExceptionHandler(CityExistsException.class)
-	public ModelAndView handleCityExistsException(
-			final CityExistsException cityExistsException) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				BIRTH_CITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
-				cityExistsException);
-	}
 	
 	/**
 	 * Handles {@code PersonNameExistsException}.

@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
 
+import omis.datatype.DateRange;
+import omis.exception.DateConflictException;
 import omis.exception.DuplicateEntityFoundException;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.hearinganalysis.domain.HearingAnalysisCategory;
@@ -38,10 +40,18 @@ import omis.hearinganalysis.service.delegate.HearingAnalysisTaskAssociationDeleg
 import omis.hearinganalysis.service.delegate.ParoleHearingAnalysisTaskSourceDelegate;
 import omis.offender.domain.Offender;
 import omis.offender.service.delegate.OffenderDelegate;
+import omis.paroleboardmember.domain.ParoleBoardMember;
+import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 import omis.paroleeligibility.domain.ParoleEligibility;
 import omis.paroleeligibility.service.delegate.ParoleEligibilityDelegate;
 import omis.person.domain.Person;
 import omis.person.service.delegate.PersonDelegate;
+import omis.staff.domain.StaffAssignment;
+import omis.staff.domain.StaffTitle;
+import omis.staff.service.delegate.StaffAssignmentDelegate;
+import omis.staff.service.delegate.StaffTitleDelegate;
+import omis.supervision.domain.SupervisoryOrganization;
+import omis.supervision.service.delegate.SupervisoryOrganizationDelegate;
 import omis.task.domain.Task;
 import omis.task.domain.TaskTemplate;
 import omis.task.domain.TaskTemplateGroup;
@@ -57,7 +67,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create hearing analysis task associations.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.3 (Dec 3, 2018)
  * @since OMIS 3.0
  */
 public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
@@ -66,51 +76,52 @@ public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
 	/* Delegates. */
 
 	@Autowired
-	@Qualifier("userAccountDelegate")
 	private UserAccountDelegate userAccountDelegate;
 	
 	@Autowired
-	@Qualifier("personDelegate")
 	private PersonDelegate personDelegate;
 	
 	@Autowired
-	@Qualifier("taskDelegate")
 	private TaskDelegate taskDelegate;
 	
 	@Autowired
-	@Qualifier("hearingAnalysisDelegate")
 	private HearingAnalysisDelegate hearingAnalysisDelegate;
 	
 	@Autowired
-	@Qualifier("hearingAnalysisCategoryDelegate")
 	private HearingAnalysisCategoryDelegate hearingAnalysisCategoryDelegate;
 	
 	@Autowired
-	@Qualifier("paroleEligibilityDelegate")
 	private ParoleEligibilityDelegate paroleEligibilityDelegate;
 	
 	@Autowired
-	@Qualifier("offenderDelegate")
 	private OffenderDelegate offenderDelegate;
 	
 	@Autowired
-	@Qualifier("paroleHearingAnalysisTaskSourceDelegate")
 	private ParoleHearingAnalysisTaskSourceDelegate 
 			paroleHearingAnalysisTaskSourceDelegate;
 	
 	@Autowired
-	@Qualifier("taskTemplateDelegate")
 	private TaskTemplateDelegate taskTemplateDelegate;
 	
 	@Autowired
-	@Qualifier("taskTemplateGroupDelegate")
 	private TaskTemplateGroupDelegate taskTemplateGroupDelegate;
 	
 	@Autowired
-	@Qualifier("hearingAnalysisTaskAssociationDelegate")
 	private HearingAnalysisTaskAssociationDelegate 
 			hearingAnalysisTaskAssociationDelegate;
 	
+	@Autowired
+	private StaffAssignmentDelegate staffAssignmentDelegate;
+	
+	@Autowired
+	private SupervisoryOrganizationDelegate supervisoryOrganizationDelegate;
+	
+	@Autowired
+	private StaffTitleDelegate staffTitleDelegate;
+	
+	@Autowired
+	private ParoleBoardMemberDelegate paroleBoardMemberDelegate;
+
 	/* Services. */
 
 	@Autowired
@@ -123,10 +134,11 @@ public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
 	 * Tests the creation of hearing analysis task associations.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws DateConflictException if date conflicts
 	 */
 	@Test
 	public void testCreateHearingAnalysisTaskAssociation() 
-			throws DuplicateEntityFoundException {
+			throws DuplicateEntityFoundException, DateConflictException {
 		// Arrangements
 		Person user = this.personDelegate.create("Smith", "John", "Jay", null);
 		UserAccount sourceAccount = this.userAccountDelegate.create(user, 
@@ -140,8 +152,21 @@ public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
 				offender, this.parseDateText("01/01/2018"), null, null, null);
 		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
 				.create("Category", true);
+		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
+				null);
+		SupervisoryOrganization supervisoryOrganization = this
+				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
+		DateRange dateRange = new DateRange(this.parseDateText("01/01/2017"), 
+				null);
+		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
+				true);
+		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
+				staffMember, supervisoryOrganization, null, dateRange, title, 
+				true, null, null, null, null, null);
+		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
+				staffAssignment, dateRange);
 		HearingAnalysis hearingAnalysis = this.hearingAnalysisDelegate.create(
-				eligibility, null, category, null);
+				eligibility, category, boardMember, null);
 		TaskTemplateGroup group = this.taskTemplateGroupDelegate.create("Name");
 		TaskTemplate taskTemplate = this.taskTemplateDelegate.create(group, 
 				"Name", "controllerName", "methodName");
@@ -167,10 +192,11 @@ public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
 	 * Test that {@code DuplicateEntityFoundException} is thrown.
 	 * 
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @throws DateConflictException if date conflicts
 	 */
 	@Test(expectedExceptions = {DuplicateEntityFoundException.class})
 	public void testDuplicateEntityFoundException() 
-			throws DuplicateEntityFoundException {
+			throws DuplicateEntityFoundException, DateConflictException {
 		// Arrangements
 		Person user = this.personDelegate.create("Smith", "John", "Jay", null);
 		UserAccount sourceAccount = this.userAccountDelegate.create(user, 
@@ -184,8 +210,21 @@ public class HearingAnalysisTaskServiceCreateHearingAnalysisTaskAssociationTests
 				offender, this.parseDateText("01/01/2018"), null, null, null);
 		HearingAnalysisCategory category = this.hearingAnalysisCategoryDelegate
 				.create("Category", true);
+		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
+				null);
+		SupervisoryOrganization supervisoryOrganization = this
+				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
+		DateRange dateRange = new DateRange(this.parseDateText("01/01/2017"), 
+				null);
+		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
+				true);
+		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
+				staffMember, supervisoryOrganization, null, dateRange, title, 
+				true, null, null, null, null, null);
+		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
+				staffAssignment, dateRange);
 		HearingAnalysis hearingAnalysis = this.hearingAnalysisDelegate.create(
-				eligibility, null, category, null);
+				eligibility, category, boardMember, null);
 		TaskTemplateGroup group = this.taskTemplateGroupDelegate.create("Name");
 		TaskTemplate taskTemplate = this.taskTemplateDelegate.create(group, 
 				"Name", "controllerName", "methodName");

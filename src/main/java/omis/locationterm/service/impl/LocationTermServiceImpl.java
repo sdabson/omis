@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.service.impl;
 
 import java.util.ArrayList;
@@ -10,7 +27,6 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.datatype.DateRange;
 import omis.exception.DateRangeOutOfBoundsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
@@ -19,16 +35,21 @@ import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
 import omis.locationterm.domain.LocationTerm;
 import omis.locationterm.domain.LocationTermChangeAction;
+import omis.locationterm.domain.LocationTermChangeActionAssociation;
 import omis.locationterm.exception.LocationReasonTermConflictException;
 import omis.locationterm.exception.LocationReasonTermExistsAfterException;
+import omis.locationterm.exception.LocationReasonTermExistsException;
+import omis.locationterm.exception.LocationTermChangeActionAssociationExistsException;
 import omis.locationterm.exception.LocationTermConflictException;
 import omis.locationterm.exception.LocationTermExistsAfterException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.locationterm.exception.LocationTermLockedException;
 import omis.locationterm.service.LocationTermService;
 import omis.locationterm.service.delegate.AllowedLocationChangeDelegate;
 import omis.locationterm.service.delegate.AllowedLocationChangeReasonRuleDelegate;
 import omis.locationterm.service.delegate.LocationReasonDelegate;
 import omis.locationterm.service.delegate.LocationReasonTermDelegate;
+import omis.locationterm.service.delegate.LocationTermChangeActionAssociationDelegate;
 import omis.locationterm.service.delegate.LocationTermChangeActionDelegate;
 import omis.offender.domain.Offender;
 import omis.organization.domain.Organization;
@@ -70,6 +91,9 @@ public class LocationTermServiceImpl
 	private final AllowedLocationChangeReasonRuleDelegate
 	allowedLocationChangeReasonRuleDelegate;
 	
+	private final LocationTermChangeActionAssociationDelegate
+	locationTermChangeActionAssociationDelegate;
+	
 	private final PlacementTermDelegate placementTermDelegate;
 	
 	private final SupervisoryOrganizationDelegate
@@ -96,6 +120,8 @@ public class LocationTermServiceImpl
 	 * changes
 	 * @param allowedLocationChangeReasonRuleDelegate delegate for allowed
 	 * location change reason rules
+	 * @param locationTermChangeActionAssociationDelegate delegate for
+	 * association of location term to change action
 	 * @param placementTermDelegate delegate for placement terms
 	 * @param supervisoryOrganizationDelegate delegate for supervisory
 	 * organizations
@@ -113,6 +139,8 @@ public class LocationTermServiceImpl
 			final AllowedLocationChangeDelegate allowedLocationChangeDelegate,
 			final AllowedLocationChangeReasonRuleDelegate
 				allowedLocationChangeReasonRuleDelegate,
+			final LocationTermChangeActionAssociationDelegate
+				locationTermChangeActionAssociationDelegate,
 			final PlacementTermDelegate placementTermDelegate,
 			final SupervisoryOrganizationDelegate
 				supervisoryOrganizationDelegate,
@@ -128,6 +156,8 @@ public class LocationTermServiceImpl
 		this.allowedLocationChangeReasonRuleDelegate
 			= allowedLocationChangeReasonRuleDelegate;
 		this.allowedLocationChangeDelegate = allowedLocationChangeDelegate;
+		this.locationTermChangeActionAssociationDelegate
+			= locationTermChangeActionAssociationDelegate;
 		this.placementTermDelegate = placementTermDelegate;
 		this.supervisoryOrganizationDelegate = supervisoryOrganizationDelegate;
 		this.locationDelegate = locationDelegate;
@@ -142,15 +172,6 @@ public class LocationTermServiceImpl
 	public List<LocationTerm> findByOffender(final Offender offender) {
 		return this.locationTermDao.findByOffender(offender);
 	}
-
-	/** {@inheritDoc} */
-	@Override
-	public List<Location> findLocations() {
-		
-		// TODO: Remove - SA
-		throw new UnsupportedOperationException(
-				"Finding locations not supported");
-	}
 	
 	/** {@inheritDoc} */
 	@Override
@@ -163,6 +184,10 @@ public class LocationTermServiceImpl
 	@Override
 	public void remove(final LocationTerm locationTerm) {
 		
+		// Removes change action association
+		this.locationTermChangeActionAssociationDelegate.removeByLocationTerm(
+				locationTerm);
+		
 		// Removes term reasons
 		this.locationReasonTermDelegate.removeByLocationTerm(locationTerm);
 		
@@ -170,49 +195,58 @@ public class LocationTermServiceImpl
 		this.locationTermDao.makeTransient(locationTerm);
 	}
 
-	/** {@inheritDoc}  */
+	/** {@inheritDoc} */
 	@Override
-	public LocationTerm create(final Offender offender, final Location location,
-			final DateRange dateRange)
-					throws DuplicateEntityFoundException,
+	public LocationTerm create(
+			final Offender offender,
+			final Location location,
+			final DateRange dateRange,
+			final String notes)
+					throws LocationTermExistsException,
 						LocationTermConflictException, 
 						LocationTermExistsAfterException, 
 						OffenderNotUnderSupervisionException {
-		// Throws exception if duplicate location term exists
-		if (this.locationTermDao.find(offender, 
-				DateRange.getStartDate(dateRange),
-				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException("Location term exists");
-		}
 		
-		// Prevents dates from being equal unless both are null
+		// Stores start and end date
 		Date startDate = DateRange.getStartDate(dateRange);
 		Date endDate = DateRange.getEndDate(dateRange);
-		if (startDate != null && startDate.equals(endDate)) {
+		
+		// Throws exception if duplicate location term exists
+		if (this.locationTermDao.find(offender, startDate, endDate) != null) {
+			throw new LocationTermExistsException("Location term exists");
+		}
+		
+		// Prevents dates from being equal
+		if (startDate.equals(endDate)) {
 			throw new IllegalArgumentException(
 					"Start and end date cannot be equal");
 		}
 		
 		// Throw exception if the offender does not have a current placement for
 		// the specified date.
-		if (startDate != null) {
-			if(this.placementTermDelegate
-					.findForOffenderOnDate(offender, startDate) == null) {
+		if(this.placementTermDelegate
+			.findForOffenderOnDate(offender, startDate) == null) {
 				throw new OffenderNotUnderSupervisionException("Offender is not"
 						+ " under supervision on the specified date");
-			}
 		}
 		
 		LocationTerm startLocationTerm = this.locationTermDao
 				.findByOffenderOnDate(offender, startDate);
-		//Throws an exception if location terms exist after the start date and 
-		//the end date is null
-		if (endDate == null) {
+		LocationTerm endLocationTerm;
+		// Finds location term on end date when end date is not null
+		// Otherwise, Throws an exception if location terms exist after the
+		// start date and the end date is null
+		if (endDate != null) {
+			endLocationTerm = this.locationTermDao.findByOffenderOnDate(
+					offender, endDate);
+		} else {
 			long locationCount = this.locationTermDao.countAfterDateExcluding(
 					offender, startDate, startLocationTerm);
 			if (locationCount > 0) {
 				throw new LocationTermExistsAfterException(locationCount + 
 					" location term(s) exist after the specified date range.");
+			} else {
+				endLocationTerm = null;
 			}
 		}
 		if (startLocationTerm != null) {
@@ -225,13 +259,8 @@ public class LocationTermServiceImpl
 						+ "in conflict with existing location term.");
 			}
 			
-			//Get end location term when possible
-			LocationTerm endLocationTerm = null;
 			if (endDate != null) {
-				endLocationTerm = this.locationTermDao.findByOffenderOnDate(
-						offender, endDate);
-				ArrayList<LocationTerm> excludedLocationTerms 
-					= new ArrayList<LocationTerm>();
+				List<LocationTerm> excludedLocationTerms = new ArrayList<>();
 				excludedLocationTerms.add(startLocationTerm);
 				if (endLocationTerm != null) {
 					excludedLocationTerms.add(endLocationTerm);
@@ -240,7 +269,7 @@ public class LocationTermServiceImpl
 				// dates that can not be automatically adjusted
 				long existingCount = this.locationTermDao.countExcluding(
 						offender, startDate, endDate, 
-						excludedLocationTerms.toArray(new LocationTerm[0]));
+						excludedLocationTerms.toArray(new LocationTerm[] {}));
 				if (existingCount > 0) {
 					throw new LocationTermConflictException("Date span covers " 
 							+ existingCount + " existing location term(s) that "
@@ -256,38 +285,56 @@ public class LocationTermServiceImpl
 					this.auditComponentRetriever.retrieveUserAccount(),
 					this.auditComponentRetriever.retrieveDate()));
 			this.locationTermDao.makePersistent(startLocationTerm);
-			
-			//Update the existing end location term if it exists
-			if (endLocationTerm != null) {
-				endLocationTerm.setDateRange(new DateRange(endDate, 
-						DateRange.getEndDate(endLocationTerm.getDateRange())));
-				endLocationTerm.setUpdateSignature(new UpdateSignature(
-						this.auditComponentRetriever.retrieveUserAccount(),
-						this.auditComponentRetriever.retrieveDate()));
-			}
-			
 		}
 		
-		// Updates the existing location reason term if it exists
-		LocationReasonTerm activeLocationReasonTerm 
-		= this.locationReasonTermDelegate.findForOffenderOnDate(offender, 
+		//Update the existing end location term if it exists
+		if (endLocationTerm != null) {
+			endLocationTerm.setDateRange(new DateRange(endDate, 
+					DateRange.getEndDate(endLocationTerm.getDateRange())));
+			endLocationTerm.setUpdateSignature(new UpdateSignature(
+					this.auditComponentRetriever.retrieveUserAccount(),
+					this.auditComponentRetriever.retrieveDate()));
+		}
+		
+		// Updates the location reason term on start date if it exists
+		LocationReasonTerm locationReasonTermOnStartDate
+			= this.locationReasonTermDelegate.findForOffenderOnDate(offender, 
 				startDate);
-		if (activeLocationReasonTerm != null) {
-			this.locationReasonTermDelegate.update(activeLocationReasonTerm, 
-					new DateRange(DateRange.getStartDate(
-							activeLocationReasonTerm.getDateRange()), 
-							startDate), activeLocationReasonTerm.getReason());
+		if (locationReasonTermOnStartDate != null) {
+			try {
+				this.locationReasonTermDelegate.update(
+						locationReasonTermOnStartDate, 
+						new DateRange(DateRange.getStartDate(
+								locationReasonTermOnStartDate.getDateRange()), 
+								startDate),
+						locationReasonTermOnStartDate.getReason());
+			} catch (LocationReasonTermExistsException e) {
+				
+				// It should not be possible for two reason terms for the same
+				// location term to exist with the same start date
+				// This would be bad data and unrecoverable in the application
+				throw new AssertionError("Conflicting reason term exists", e);
+			}
 		}
 		
-		
-//		// Throws exception if conflicting location terms exist
-//		long conflictingCount = this.locationTermDao.count(offender,
-//				DateRange.getStartDate(dateRange),
-//				DateRange.getEndDate(dateRange));
-//		if (conflictingCount > 0) {
-//			throw new LocationTermConflictException(
-//					conflictingCount + " conflicting location term(s) exist");
-//		}
+		// Updates location reason term on end date if it exists
+		LocationReasonTerm locationReasonTermOnEndDate
+			= this.locationReasonTermDelegate.findForOffenderOnDate(offender,
+					endDate);
+		if (locationReasonTermOnEndDate != null) {
+			try {
+				this.locationReasonTermDelegate.update(
+						locationReasonTermOnEndDate,
+						new DateRange(endDate,
+							DateRange.getEndDate(
+								locationReasonTermOnEndDate.getDateRange())),
+						locationReasonTermOnEndDate.getReason());
+			} catch (LocationReasonTermExistsException e) {
+				
+				// As above when location reason term on start date is ended
+				throw new AssertionError("Conflicting reason term exists" ,e); 
+			}
+		}
 		
 		// Creates new location term
 		LocationTerm locationTerm = this.locationTermInstanceFactory
@@ -302,68 +349,50 @@ public class LocationTermServiceImpl
 		locationTerm.setLocation(location);
 		locationTerm.setDateRange(dateRange);
 		locationTerm.setLocked(false);
+		locationTerm.setNotes(notes);
 		return this.locationTermDao.makePersistent(locationTerm);
 	}
 
 	/** {@inheritDoc}  */
 	@Override
 	public LocationTerm update(final LocationTerm locationTerm,
-			final Location location, final DateRange dateRange)
-					throws DuplicateEntityFoundException,
-						LocationTermConflictException,
-						DateRangeOutOfBoundsException, 
+			final Location location, final DateRange dateRange,
+			final String notes)
+					throws LocationTermExistsException,
+						LocationTermConflictException, 
 						LocationTermExistsAfterException,
 						LocationTermLockedException, 
 						OffenderNotUnderSupervisionException {
+		
 		// Prevents update of locked location term
 		if (locationTerm.getLocked()) {
 			throw new LocationTermLockedException("Location term locked");
 		}
 		
-		// Prevents dates from being equal unless both are null
+		// Prevents dates from being equal
 		Date startDate = DateRange.getStartDate(dateRange);
 		Date endDate = DateRange.getEndDate(dateRange);
-		if (startDate != null && startDate.equals(endDate)) {
+		if (startDate.equals(endDate)) {
 			throw new IllegalArgumentException(
 					"Start and end date cannot be equal");
 		}
 		
 		// Throw exception if the offender does not have a current placement for
 		// the specified date.
-		if (startDate != null) {
-			if(this.placementTermDelegate.findForOffenderOnDate(
-					locationTerm.getOffender(), startDate) == null) {
-				throw new OffenderNotUnderSupervisionException("Offender is not"
-						+ " under supervision on the specified date");
-			}
+		if(this.placementTermDelegate.findForOffenderOnDate(
+				locationTerm.getOffender(), startDate) == null) {
+			throw new OffenderNotUnderSupervisionException("Offender is not"
+					+ " under supervision on the specified date");
 		}
 		
 		// Throws exception if duplicate location term exists
 		if (this.locationTermDao.findExcluding(locationTerm.getOffender(),
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange), locationTerm) != null) {
-			throw new DuplicateEntityFoundException("Location term exists");
+			throw new LocationTermExistsException("Location term exists");
 		}
 		
-		// Throws exception if conflicting location terms exist
-		long conflictingCount = this.locationTermDao.countExcluding(
-				locationTerm.getOffender(), DateRange.getStartDate(dateRange),
-				DateRange.getEndDate(dateRange), locationTerm);
-		if (conflictingCount > 0) {
-			throw new LocationTermConflictException(
-					conflictingCount + " conflicting location term(s) exist");
-		}
-		
-		// Throws exception if location reason terms exist for location term
-		// outside of new date range
-		long reasonTermsOutOfBoundsCount = this.locationReasonTermDelegate
-				.countForLocationTermOutOfDateBounds(locationTerm,
-						DateRange.getStartDate(dateRange),
-						DateRange.getEndDate(dateRange));
-		if (reasonTermsOutOfBoundsCount > 0) {
-			throw new DateRangeOutOfBoundsException(reasonTermsOutOfBoundsCount
-					+ " location reason term(s) exist outside of date range");
-		}
+		// Throws exception if location terms exist after
 		if (endDate == null) {
 			long existingTermsAfterDateCount = this.locationTermDao
 					.countAfterDateExcluding(locationTerm.getOffender(), 
@@ -375,22 +404,54 @@ public class LocationTermServiceImpl
 			}
 		}
 		
+		// Throws exception if conflicting location terms exist (exclude
+		// location terms that start on end date)
+		LocationTerm locationTermStartingOnEndDate
+			= this.locationTermDao.findWithStartDate(
+					locationTerm.getOffender(),
+					DateRange.getEndDate(dateRange));
+		long conflictingCount;
+		if (locationTermStartingOnEndDate != null) {
+			conflictingCount = this.locationTermDao.countExcluding(
+					locationTerm.getOffender(), DateRange.getStartDate(dateRange),
+					DateRange.getEndDate(dateRange), locationTerm,
+					locationTermStartingOnEndDate);
+		} else {
+			conflictingCount = this.locationTermDao.countExcluding(
+					locationTerm.getOffender(), DateRange.getStartDate(dateRange),
+					DateRange.getEndDate(dateRange), locationTerm);
+		}
+		if (conflictingCount > 0) {
+			throw new LocationTermConflictException(
+					conflictingCount + " conflicting location term(s) exist");
+		}
+		
 		// Updates existing location term
 		locationTerm.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(),
 				this.auditComponentRetriever.retrieveDate()));
 		locationTerm.setLocation(location);
 		locationTerm.setDateRange(dateRange);
+		locationTerm.setNotes(notes);
 		return this.locationTermDao.makePersistent(locationTerm);
 	}
 
-	/** {@inheritDoc} 
-	 * @throws DateRangeOutOfBoundsException */
+	/** {@inheritDoc} */
+	@Override
+	public LocationTermChangeActionAssociation associateChangeAction(
+				final LocationTerm locationTerm,
+				final LocationTermChangeAction changeAction)
+			throws LocationTermChangeActionAssociationExistsException {
+		return this.locationTermChangeActionAssociationDelegate
+				.create(locationTerm, changeAction);
+	}
+	
+	/** {@inheritDoc} */
 	@Override
 	public LocationReasonTerm createReasonTerm(
 			final LocationTerm locationTerm, final DateRange dateRange,
 			final LocationReason reason)
-				throws DuplicateEntityFoundException, 
+				throws LocationReasonTermExistsException, 
 				LocationReasonTermConflictException, 
 				DateRangeOutOfBoundsException,
 				LocationReasonTermExistsAfterException {
@@ -399,7 +460,7 @@ public class LocationTermServiceImpl
 				locationTerm.getOffender(), locationTerm,
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange)) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new LocationReasonTermExistsException(
 					"Location reason term exists");
 		}
 		
@@ -441,10 +502,12 @@ public class LocationTermServiceImpl
 	@Override
 	public LocationReasonTerm updateReasonTerm(
 			final LocationReasonTerm reasonTerm, final DateRange dateRange,
-			final LocationReason reason) throws DuplicateEntityFoundException, 
-				LocationReasonTermConflictException, 
-				DateRangeOutOfBoundsException, 
-				LocationReasonTermExistsAfterException {
+			final LocationReason reason)
+				throws LocationReasonTermExistsException, 
+					LocationReasonTermConflictException, 
+					DateRangeOutOfBoundsException, 
+					LocationReasonTermExistsAfterException {
+		
 		// Throws an exception if entity already exists
 		if (this.locationReasonTermDelegate.findExcluding(
 				reasonTerm.getOffender(),
@@ -452,7 +515,7 @@ public class LocationTermServiceImpl
 				DateRange.getStartDate(dateRange),
 				DateRange.getEndDate(dateRange),
 				reasonTerm) != null) {
-			throw new DuplicateEntityFoundException(
+			throw new LocationReasonTermExistsException(
 					"Location reason term exists");
 		}
 	
@@ -469,11 +532,25 @@ public class LocationTermServiceImpl
 			}
 		}
 		
-		// Throws exception if conflicts exist
+		// Throws exception if conflicts exist - exclude reason term with
+		// start date of end date
+		LocationReasonTerm reasonTermStartingOnEndDate
+			= this.locationReasonTermDelegate
+				.findWithStartDate(reasonTerm.getLocationTerm(),
+						DateRange.getEndDate(dateRange));
+		LocationReasonTerm[] excludedReasonTerms;
+		if (reasonTermStartingOnEndDate != null) {
+			excludedReasonTerms = new LocationReasonTerm[] {
+				reasonTerm, reasonTermStartingOnEndDate
+			};
+		} else {
+			excludedReasonTerms = new LocationReasonTerm[] { reasonTerm };
+		}
 		long countConflicting = this.locationReasonTermDelegate.countExcluding(
 				reasonTerm.getLocationTerm(), 
 				DateRange.getStartDate(dateRange),
-				DateRange.getEndDate(dateRange), reasonTerm);
+				DateRange.getEndDate(dateRange),
+				excludedReasonTerms);
 		if (countConflicting > 0) {
 			throw new LocationReasonTermConflictException(countConflicting
 					+ " conflicting location reason term(s) exist");
@@ -579,6 +656,15 @@ public class LocationTermServiceImpl
 	public List<LocationTermChangeAction> findChangeActions() {
 		return this.locationTermChangeActionDelegate.findAll();
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<LocationTermChangeAction>
+	findAllowedChangeActionsForCorrectionalStatus(
+			final CorrectionalStatus correctionalStatus) {
+		return this.locationTermChangeActionDelegate
+				.findAllowedForCorrectionalStatus(correctionalStatus);
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -608,6 +694,14 @@ public class LocationTermServiceImpl
 		return this.allowedLocationChangeReasonRuleDelegate
 				.findLocationReasonsForChangeAction(changeAction);
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<LocationReason> findReasonsAllowedForLocation(
+			final Location location) {
+		return this.allowedLocationChangeReasonRuleDelegate
+				.findLocationReasonsAllowedForLocation(location);
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -634,8 +728,8 @@ public class LocationTermServiceImpl
 				.findAllowedForPlacementInState(state);
 		if (organizations.size() > 0) {
 			return this.locationDelegate
-				.findByOrganizations(
-						organizations.toArray(
+				.findByOrganizationsInState(
+						state, organizations.toArray(
 								new SupervisoryOrganization[] { }));
 		} else{
 			return Collections.emptyList();

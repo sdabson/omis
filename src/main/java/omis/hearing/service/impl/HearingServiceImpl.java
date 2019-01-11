@@ -1,12 +1,35 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.hearing.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-
-import omis.communitysupervision.dao.CommunitySupervisionOfficeDao;
+import java.util.Set;
+import omis.asrc.domain.AssessmentSanctionRevocationCenter;
+import omis.asrc.service.delegate.AssessmentSanctionRevocationCenterDelegate;
 import omis.communitysupervision.domain.CommunitySupervisionOffice;
-import omis.exception.DuplicateEntityFoundException;
+import omis.communitysupervision.service.delegate.CommunitySupervisionOfficeDelegate;
+import omis.condition.domain.Condition;
+import omis.condition.service.delegate.ConditionDelegate;
+import omis.disciplinaryCode.domain.DisciplinaryCode;
+import omis.disciplinaryCode.service.delegate.DisciplinaryCodeDelegate;
 import omis.facility.domain.Facility;
 import omis.facility.service.delegate.FacilityDelegate;
 import omis.hearing.domain.Hearing;
@@ -16,27 +39,32 @@ import omis.hearing.domain.HearingStatus;
 import omis.hearing.domain.HearingStatusCategory;
 import omis.hearing.domain.ImposedSanction;
 import omis.hearing.domain.Infraction;
-import omis.hearing.domain.StaffAttendance;
+import omis.hearing.domain.InfractionPlea;
+import omis.hearing.domain.UserAttendance;
 import omis.hearing.domain.component.Resolution;
+import omis.hearing.exception.HearingExistsException;
+import omis.hearing.exception.HearingNoteExistsException;
+import omis.hearing.exception.HearingStatusExistsException;
+import omis.hearing.exception.InfractionExistsException;
+import omis.hearing.exception.UserAttendanceExistsException;
 import omis.hearing.service.HearingService;
 import omis.hearing.service.delegate.HearingDelegate;
 import omis.hearing.service.delegate.HearingNoteDelegate;
 import omis.hearing.service.delegate.HearingStatusDelegate;
 import omis.hearing.service.delegate.ImposedSanctionDelegate;
 import omis.hearing.service.delegate.InfractionDelegate;
-import omis.hearing.service.delegate.StaffAttendanceDelegate;
+import omis.hearing.service.delegate.UserAttendanceDelegate;
 import omis.jail.domain.Jail;
 import omis.jail.service.delegate.JailDelegate;
 import omis.location.domain.Location;
-import omis.location.service.delegate.LocationDelegate;
 import omis.offender.domain.Offender;
-import omis.prerelease.dao.PreReleaseCenterDao;
 import omis.prerelease.domain.PreReleaseCenter;
-import omis.staff.domain.StaffAssignment;
-import omis.supervision.dao.SupervisoryOrganizationDao;
+import omis.prerelease.service.delegate.PreReleaseCenterDelegate;
 import omis.supervision.domain.SupervisoryOrganization;
-import omis.treatment.dao.TreatmentCenterDao;
+import omis.supervision.service.delegate.SupervisoryOrganizationDelegate;
 import omis.treatment.domain.TreatmentCenter;
+import omis.treatment.service.delegate.TreatmentCenterDelegate;
+import omis.user.domain.UserAccount;
 import omis.violationevent.domain.ConditionViolation;
 import omis.violationevent.domain.DisciplinaryCodeViolation;
 import omis.violationevent.domain.ViolationEvent;
@@ -45,12 +73,12 @@ import omis.violationevent.service.delegate.DisciplinaryCodeViolationDelegate;
 import omis.violationevent.service.delegate.ViolationEventDelegate;
 
 /**
- * HearingServiceImpl.java
+ * Hearing Service Implementation.
  * 
- *@author Annie Jacques 
- *@version 0.1.1 (Apr 18, 2017)
- *@since OMIS 3.0
- *
+ * @author Annie Wahl 
+ * @author Josh Divine
+ * @version 0.1.5 (Jul 17, 2018)
+ * @since OMIS 3.0
  */
 public class HearingServiceImpl implements HearingService {
 	
@@ -58,7 +86,7 @@ public class HearingServiceImpl implements HearingService {
 	
 	private final HearingNoteDelegate hearingNoteDelegate;
 	
-	private final StaffAttendanceDelegate staffAttendanceDelegate;
+	private final UserAttendanceDelegate userAttendanceDelegate;
 	
 	private final HearingStatusDelegate hearingStatusDelegate;
 	
@@ -77,51 +105,72 @@ public class HearingServiceImpl implements HearingService {
 	
 	private final FacilityDelegate facilityDelegate;
 
-	private final LocationDelegate locationDelegate;
+	private final TreatmentCenterDelegate treatmentCenterDelegate;
 	
-	private final TreatmentCenterDao treatmentCenterDao;
+	private final PreReleaseCenterDelegate preReleaseCenterDelegate;
 	
-	private final PreReleaseCenterDao preReleaseCenterDao;
-	
-	private final CommunitySupervisionOfficeDao communitySupervisionOfficeDao;
+	private final CommunitySupervisionOfficeDelegate 
+			communitySupervisionOfficeDelegate;
 
-	private final SupervisoryOrganizationDao supervisoryOrganizationDao;
+	private final SupervisoryOrganizationDelegate 
+			supervisoryOrganizationDelegate;
 	
+	private final AssessmentSanctionRevocationCenterDelegate 
+			assessmentSanctionRevocationCenterDelegate;
+	
+	private final DisciplinaryCodeDelegate disciplinaryCodeDelegate;
+	
+	private final ConditionDelegate conditionDelegate;
 	
 	/**
-	 * @param hearingDelegate
-	 * @param hearingNoteDelegate
-	 * @param staffAttendanceDelegate
-	 * @param hearingStatusDelegate
-	 * @param infractionDelegate
-	 * @param violationEventDelegate
-	 * @param jailDelegate
-	 * @param facilityDelegate
-	 * @param treatmentCenterDao
-	 * @param preReleaseCenterDao
-	 * @param communitySupervisionOfficeDao
-	 * @param supervisoryOrganizationDao
+	 * @param hearingDelegate - hearing delegate
+	 * @param hearingNoteDelegate - hearing note delegate
+	 * @param userAttendanceDelegate user attendance delegate
+	 * @param hearingStatusDelegate - hearing status delegate
+	 * @param infractionDelegate - infraction delegate
+	 * @param imposedSanctionDelegate - imposed sanction delegate
+	 * @param violationEventDelegate - violation event delegate
+	 * @param conditionViolationDelegate - condition violation delegate
+	 * @param disciplinaryCodeViolationDelegate - disciplinary code violation
+	 * delegate
+	 * @param jailDelegate - jail delegate
+	 * @param facilityDelegate - facility delegate
+	 * @param treatmentCenterDelegate - treatment center delegate
+	 * @param preReleaseCenterDelegate - prerelease center delegate
+	 * @param communitySupervisionOfficeDelegate - community supervision
+	 * office delegate
+	 * @param supervisoryOrganizationDelegate - supervisory organization
+	 * delegate
+	 * @param assessmentSanctionRevocationCenterDelegate assessment sanction 
+	 * revocation center delegate
+	 * @param disciplinaryCodeDelegate disciplinary code delegate
+	 * @param conditionDelegate condition delegate
 	 */
 	public HearingServiceImpl(final HearingDelegate hearingDelegate,
 			final HearingNoteDelegate hearingNoteDelegate,
-			final StaffAttendanceDelegate staffAttendanceDelegate,
+			final UserAttendanceDelegate userAttendanceDelegate,
 			final HearingStatusDelegate hearingStatusDelegate,
 			final InfractionDelegate infractionDelegate,
 			final ImposedSanctionDelegate imposedSanctionDelegate,
 			final ViolationEventDelegate violationEventDelegate,
 			final ConditionViolationDelegate conditionViolationDelegate,
 			final DisciplinaryCodeViolationDelegate
-				disciplinaryCodeViolationDelegate,
+					disciplinaryCodeViolationDelegate,
 			final JailDelegate jailDelegate,
 			final FacilityDelegate facilityDelegate,
-			final LocationDelegate locationDelegate,
-			final TreatmentCenterDao treatmentCenterDao,
-			final PreReleaseCenterDao preReleaseCenterDao,
-			final CommunitySupervisionOfficeDao communitySupervisionOfficeDao,
-			final SupervisoryOrganizationDao supervisoryOrganizationDao) {
+			final TreatmentCenterDelegate treatmentCenterDelegate,
+			final PreReleaseCenterDelegate preReleaseCenterDelegate,
+			final CommunitySupervisionOfficeDelegate 
+					communitySupervisionOfficeDelegate,
+			final SupervisoryOrganizationDelegate 
+					supervisoryOrganizationDelegate,
+			final AssessmentSanctionRevocationCenterDelegate 
+					assessmentSanctionRevocationCenterDelegate,
+			final DisciplinaryCodeDelegate disciplinaryCodeDelegate,
+			final ConditionDelegate conditionDelegate) {
 		this.hearingDelegate = hearingDelegate;
 		this.hearingNoteDelegate = hearingNoteDelegate;
-		this.staffAttendanceDelegate = staffAttendanceDelegate;
+		this.userAttendanceDelegate = userAttendanceDelegate;
 		this.hearingStatusDelegate = hearingStatusDelegate;
 		this.infractionDelegate = infractionDelegate;
 		this.imposedSanctionDelegate = imposedSanctionDelegate;
@@ -131,19 +180,24 @@ public class HearingServiceImpl implements HearingService {
 				disciplinaryCodeViolationDelegate;
 		this.jailDelegate = jailDelegate;
 		this.facilityDelegate = facilityDelegate;
-		this.locationDelegate = locationDelegate;
-		this.treatmentCenterDao = treatmentCenterDao;
-		this.preReleaseCenterDao = preReleaseCenterDao;
-		this.communitySupervisionOfficeDao = communitySupervisionOfficeDao;
-		this.supervisoryOrganizationDao = supervisoryOrganizationDao;
+		this.treatmentCenterDelegate = treatmentCenterDelegate;
+		this.preReleaseCenterDelegate = preReleaseCenterDelegate;
+		this.communitySupervisionOfficeDelegate = 
+				communitySupervisionOfficeDelegate;
+		this.supervisoryOrganizationDelegate = supervisoryOrganizationDelegate;
+		this.assessmentSanctionRevocationCenterDelegate = 
+				assessmentSanctionRevocationCenterDelegate;
+		this.disciplinaryCodeDelegate = disciplinaryCodeDelegate;
+		this.conditionDelegate = conditionDelegate;
 	}
 
 	/**{@inheritDoc} */
 	@Override
 	public Hearing createHearing(final Location location,
-			final Offender offender, final Boolean inAttendance, final Date date,
-			final HearingCategory category, final StaffAssignment officer)
-			throws DuplicateEntityFoundException {
+			final Offender offender, final Boolean inAttendance,
+			final Date date, final HearingCategory category,
+			final UserAccount officer)
+					throws HearingExistsException {
 		return this.hearingDelegate.create(location, offender, inAttendance,
 				date, category, officer);
 	}
@@ -152,8 +206,8 @@ public class HearingServiceImpl implements HearingService {
 	@Override
 	public Hearing updateHearing(final Hearing hearing, final Location location,
 			final Boolean inAttendance, final Date date,
-			final HearingCategory category, final StaffAssignment officer)
-			throws DuplicateEntityFoundException {
+			final HearingCategory category, final UserAccount officer)
+					throws HearingExistsException {
 		return this.hearingDelegate.update(hearing, location, inAttendance,
 				date, category, officer);
 	}
@@ -168,7 +222,7 @@ public class HearingServiceImpl implements HearingService {
 	@Override
 	public HearingNote createHearingNote(final Hearing hearing,
 			final String description, final Date date)
-			throws DuplicateEntityFoundException {
+					throws HearingNoteExistsException {
 		return this.hearingNoteDelegate.create(hearing, description, date);
 	}
 
@@ -176,7 +230,7 @@ public class HearingServiceImpl implements HearingService {
 	@Override
 	public HearingNote updateHearingNote(final HearingNote hearingNote,
 			final String description, final Date date)
-			throws DuplicateEntityFoundException {
+					throws HearingNoteExistsException {
 		return this.hearingNoteDelegate.update(
 				hearingNote, description, date);
 	}
@@ -195,32 +249,32 @@ public class HearingServiceImpl implements HearingService {
 
 	/**{@inheritDoc} */
 	@Override
-	public StaffAttendance createStaffAttendance(final Hearing hearing,
-			final StaffAssignment staff)
-			throws DuplicateEntityFoundException {
-		return this.staffAttendanceDelegate.create(hearing, staff);
+	public UserAttendance createUserAttendance(final Hearing hearing,
+			final UserAccount userAccount)
+			throws UserAttendanceExistsException {
+		return this.userAttendanceDelegate.create(hearing, userAccount);
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public StaffAttendance updateStaffAttendance(
-			final StaffAttendance staffAttendance, final StaffAssignment staff)
-					throws DuplicateEntityFoundException {
-		return this.staffAttendanceDelegate.update(
-				staffAttendance, staff);
+	public UserAttendance updateUserAttendance(
+			final UserAttendance userAttendance, final UserAccount userAccount)
+					throws UserAttendanceExistsException {
+		return this.userAttendanceDelegate.update(userAttendance, 
+				userAttendance.getHearing(), userAccount);
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public void removeStaffAttendance(final StaffAttendance staffAttendance) {
-		this.staffAttendanceDelegate.remove(staffAttendance);
+	public void removeUserAttendance(final UserAttendance userAttendance) {
+		this.userAttendanceDelegate.remove(userAttendance);
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public List<StaffAttendance> findStaffAttendedByHearing(
+	public List<UserAttendance> findUserAttendedByHearing(
 			final Hearing hearing) {
-		return this.staffAttendanceDelegate.findAllByHearing(hearing);
+		return this.userAttendanceDelegate.findAllByHearing(hearing);
 	}
 
 	/**{@inheritDoc} */
@@ -228,7 +282,7 @@ public class HearingServiceImpl implements HearingService {
 	public List<Location> findFacilityLocations() {
 		List<Facility> facilities = this.facilityDelegate.findAll();
 		List<Location> locations = new ArrayList<Location>();
-		for(Facility facility : facilities){
+		for (Facility facility : facilities) {
 			locations.add(facility.getLocation());
 		}
 		return locations;
@@ -239,7 +293,7 @@ public class HearingServiceImpl implements HearingService {
 	public List<Location> findJailLocations() {
 		List<Jail> jails = this.jailDelegate.findAll();
 		List<Location> locations = new ArrayList<Location>();
-		for(Jail jail : jails){
+		for (Jail jail : jails) {
 			locations.add(jail.getLocation());
 		}
 		return locations;
@@ -250,7 +304,7 @@ public class HearingServiceImpl implements HearingService {
 	public HearingStatus createHearingStatus(final Hearing hearing,
 			final String description, final Date date,
 			final HearingStatusCategory category)
-					throws DuplicateEntityFoundException {
+					throws HearingStatusExistsException {
 		return this.hearingStatusDelegate.create(hearing, description, date,
 				category);
 	}
@@ -260,7 +314,7 @@ public class HearingServiceImpl implements HearingService {
 	public HearingStatus updateHearingStatus(final HearingStatus hearingStatus,
 			final String description, final Date date,
 			final HearingStatusCategory category)
-					throws DuplicateEntityFoundException {
+					throws HearingStatusExistsException {
 		return this.hearingStatusDelegate.update(hearingStatus, description,
 				date, category);
 	}
@@ -276,10 +330,10 @@ public class HearingServiceImpl implements HearingService {
 	public Infraction createInfraction(final Hearing hearing,
 			final ConditionViolation conditionViolation,
 			final DisciplinaryCodeViolation disciplinaryCodeViolation,
-			final Resolution resolution)
-					throws DuplicateEntityFoundException {
+			final Resolution resolution, final InfractionPlea plea)
+					throws InfractionExistsException {
 		return this.infractionDelegate.create(hearing, conditionViolation,
-				disciplinaryCodeViolation, resolution);
+				disciplinaryCodeViolation, resolution, plea);
 	}
 
 	/**{@inheritDoc} */
@@ -287,10 +341,10 @@ public class HearingServiceImpl implements HearingService {
 	public Infraction updateInfraction(final Infraction infraction,
 			final ConditionViolation conditionViolation,
 			final DisciplinaryCodeViolation disciplinaryCodeViolation,
-			final Resolution resolution)
-					throws DuplicateEntityFoundException {
+			final Resolution resolution, final InfractionPlea plea)
+					throws InfractionExistsException {
 		return this.infractionDelegate.update(infraction, conditionViolation,
-				disciplinaryCodeViolation, resolution);
+				disciplinaryCodeViolation, resolution, plea);
 	}
 
 	/**{@inheritDoc} */
@@ -323,22 +377,22 @@ public class HearingServiceImpl implements HearingService {
 	public List<Location> findTreatmentCenterLocations() {
 		List<Location> treatmentCenterLocations =
 				new ArrayList<Location>();
-		
+		Set<Location> uniqueLocations = new HashSet<>();
 		List<TreatmentCenter> treatmentCenters =
-				this.treatmentCenterDao.findAll();
-		List<Location> locations =
-				this.locationDelegate.findAll();
-		
-		for(Location location : locations){
-			for(TreatmentCenter treatmentCenter : treatmentCenters){
-				if(treatmentCenter.getLocation()
-						.equals(location)){
-					treatmentCenterLocations
-						.add(location);
-				}
-			}
+				this.treatmentCenterDelegate.findAll();
+		List<AssessmentSanctionRevocationCenter> 
+			assessmentSanctionRevocationCenters = this
+				.assessmentSanctionRevocationCenterDelegate.findAll();
+		for (TreatmentCenter treatmentCenter : treatmentCenters) {
+			uniqueLocations.add(treatmentCenter.getLocation());
 		}
-		
+		for (AssessmentSanctionRevocationCenter 
+				assessmentSanctionRevocationCenter
+				: assessmentSanctionRevocationCenters) {
+			uniqueLocations.add(assessmentSanctionRevocationCenter
+						.getLocation());
+		}
+		treatmentCenterLocations.addAll(uniqueLocations);
 		return treatmentCenterLocations;
 	}
 
@@ -347,22 +401,11 @@ public class HearingServiceImpl implements HearingService {
 	public List<Location> findPreReleaseCenterLocations() {
 		List<Location> preReleaseCenterLocations =
 				new ArrayList<Location>();
-		
-		List<PreReleaseCenter> preReleaseCenters =
-				this.preReleaseCenterDao.findAll();
-		List<Location> locations =
-				this.locationDelegate.findAll();
-		
-		for(Location location : locations){
-			for(PreReleaseCenter preReleaseCenter : preReleaseCenters){
-				if(preReleaseCenter.getLocation()
-						.equals(location)){
-					preReleaseCenterLocations
-						.add(location);
-				}
-			}
+		List<PreReleaseCenter> preReleaseCenters = this.preReleaseCenterDelegate
+				.findAll();
+		for (PreReleaseCenter preReleaseCenter : preReleaseCenters) {
+			preReleaseCenterLocations.add(preReleaseCenter.getLocation());
 		}
-		
 		return preReleaseCenterLocations;
 	}
 
@@ -371,30 +414,20 @@ public class HearingServiceImpl implements HearingService {
 	public List<Location> findCommunitySupervisionOfficeLocations() {
 		List<Location> communitySupervisionOfficeLocations =
 				new ArrayList<Location>();
-		
 		List<CommunitySupervisionOffice> communitySupervisionOffices =
-				this.communitySupervisionOfficeDao.findAll();
-		List<Location> locations =
-				this.locationDelegate.findAll();
-		
-		for(Location location : locations){
-			for(CommunitySupervisionOffice communitySupervisionOffice :
-					communitySupervisionOffices){
-				if(communitySupervisionOffice.getLocation()
-						.equals(location)){
-					communitySupervisionOfficeLocations
-						.add(location);
-				}
-			}
+				this.communitySupervisionOfficeDelegate.findAll();
+		for (CommunitySupervisionOffice communitySupervisionOffice
+				: communitySupervisionOffices) {
+			communitySupervisionOfficeLocations.add(
+						communitySupervisionOffice.getLocation());
 		}
-		
 		return communitySupervisionOfficeLocations;
 	}
 
 	/**{@inheritDoc} */
 	@Override
 	public List<SupervisoryOrganization> findSupervisoryOrganization() {
-		return this.supervisoryOrganizationDao.findAll();
+		return this.supervisoryOrganizationDelegate.findAll();
 	}
 
 	/**{@inheritDoc} */
@@ -430,7 +463,25 @@ public class HearingServiceImpl implements HearingService {
 
 	/**{@inheritDoc} */
 	@Override
-	public List<HearingStatus> findHearingStatusesByHearing(Hearing hearing) {
+	public List<HearingStatus> findHearingStatusesByHearing(
+			final Hearing hearing) {
 		return this.hearingStatusDelegate.findByHearing(hearing);
+	}
+
+	/**{@inheritDoc} */
+	@Override
+	public List<DisciplinaryCode>
+		findDisciplinaryCodesByJurisdictionAndEventDate(
+			final SupervisoryOrganization jurisdiction, final Date eventDate) {
+		return this.disciplinaryCodeDelegate
+				.findBySupervisoryOrganizationAndDate(jurisdiction, eventDate);
+	}
+
+	/**{@inheritDoc} */
+	@Override
+	public List<Condition> findConditionsByOffenderAndEffectiveDate(
+			final Offender offender, final Date eventDate) {
+		return this.conditionDelegate.findByOffenderAndEffectiveDate(
+				offender, eventDate);
 	}
 }

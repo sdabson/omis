@@ -45,6 +45,7 @@ import omis.paroleeligibility.domain.EligibilityStatusCategory;
 import omis.paroleeligibility.domain.EligibilityStatusReason;
 import omis.paroleeligibility.domain.ParoleEligibility;
 import omis.paroleeligibility.domain.ParoleEligibilityNote;
+import omis.paroleeligibility.report.ParoleEligibilityReportService;
 import omis.paroleeligibility.service.ParoleEligibilityService;
 import omis.paroleeligibility.web.form.ParoleEligibilityForm;
 import omis.paroleeligibility.web.form.ParoleEligibilityNoteItem;
@@ -55,7 +56,8 @@ import omis.paroleeligibility.web.validator.ParoleEligibilityFormValidator;
  * Controller for managing parole eligibilities.
  *
  * @author Trevor Isles
- * @version 0.1.0 (Dec 7, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (May 23, 2018)
  * @since OMIS 3.0
  */
 @Controller
@@ -76,6 +78,9 @@ public class ManageParoleEligibilityController {
 	private static final String
 		PAROLE_ELIGIBILITY_NOTE_ITEMS_ACTION_MENU_VIEW_NAME 
 		= "/paroleEligibility/includes/paroleEligibilityNoteItemsActionMenu";
+	
+	private static final String STATUS_REASON_OPTIONS_VIEW_NAME =
+			"/paroleEligibility/includes/statusReasonOptions";
 	
 	/* Redirects. */
 	
@@ -106,6 +111,8 @@ public class ManageParoleEligibilityController {
 	private static final String ELIGIBILITY_STATUSES_MODEL_KEY 
 		= "eligibilityStatuses";
 	
+	private static final String BOARD_HEARING_MODEL_KEY = "boardHearing";
+	
 	/* Message keys. */
 	
 	/* Services. */
@@ -113,6 +120,10 @@ public class ManageParoleEligibilityController {
 	@Autowired
 	@Qualifier("paroleEligibilityService")
 	private ParoleEligibilityService paroleEligibilityService;
+
+	@Autowired
+	@Qualifier("paroleEligibilityReportService")
+	private ParoleEligibilityReportService paroleEligibilityReportService;
 	
 	/* Helpers. */
 	
@@ -173,7 +184,9 @@ public class ManageParoleEligibilityController {
 	public ModelAndView create(
 			@RequestParam(value = "offender", required = true)
 			final Offender offender) {
-		return prepareEditMav(offender, new ParoleEligibilityForm());
+		ParoleEligibilityForm form = new ParoleEligibilityForm();
+		form.setParoleEligibilityStatusDate(new Date());
+		return prepareEditMav(offender, form);
 	}
 	
 	/**
@@ -216,6 +229,13 @@ public class ManageParoleEligibilityController {
 				paroleEligibilityForm.getEligibilityStatusCategory(), 
 				paroleEligibilityForm.getParoleEligibilityStatusDate(), 
 				statusReason, statusComment, reviewDate);
+		if(this.paroleEligibilityService
+				.findParoleEligibilitiesByOffenderAfterDate(offender,
+						paroleEligibilityForm.getHearingEligibilityDate())
+				.isEmpty() && reviewDate != null) {
+			this.paroleEligibilityService.create(offender, reviewDate,
+					null, null, null, null, null, null);
+		}
 		this.processParoleEligibilityNoteItems(paroleEligibilityForm
 				.getParoleEligibilityNoteItems(), eligibility);
 		return new ModelAndView(String.format(LIST_REDIRECT, offender.getId()));
@@ -314,6 +334,14 @@ public class ManageParoleEligibilityController {
 						paroleEligibilityForm.getEligibilityStatusCategory(),
 						paroleEligibilityForm.getParoleEligibilityStatusDate(),
 						statusReason, statusComment, reviewDate);
+		if(this.paroleEligibilityService
+				.findParoleEligibilitiesByOffenderAfterDate(
+						eligibility.getOffender(),
+						paroleEligibilityForm.getHearingEligibilityDate())
+				.isEmpty() && reviewDate != null) {
+			this.paroleEligibilityService.create(eligibility.getOffender(),
+					reviewDate, null, null, null, null, null, null);
+		}
 		this.processParoleEligibilityNoteItems(
 				paroleEligibilityForm.getParoleEligibilityNoteItems(),
 				paroleEligibility);
@@ -357,10 +385,18 @@ public class ManageParoleEligibilityController {
 			method = RequestMethod.GET)
 	public ModelAndView showParoleEligibilityActionMenu(
 			@RequestParam(value = "offender", required = true) 
-			final Offender offender) {
+			final Offender offender,
+			@RequestParam(value = "eligibility", required = false) 
+			final ParoleEligibility eligibility) {
 		ModelAndView mav = new ModelAndView(
 				PAROLE_ELIGIBILITY_ACTION_MENU_VIEW_NAME);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
+		if (eligibility != null) {
+			mav.addObject(PAROLE_ELIGIBILITY_MODEL_KEY, eligibility);
+			mav.addObject(BOARD_HEARING_MODEL_KEY, 
+					this.paroleEligibilityReportService
+					.findBoardHearingByParoleEligibility(eligibility));
+		}	
 		return mav;
 	}
 	
@@ -379,6 +415,26 @@ public class ManageParoleEligibilityController {
 				paroleEligibilityNoteIndex);
 		return new ModelAndView(
 				PAROLE_ELIGIBILITY_NOTE_ITEMS_ACTION_MENU_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Returns the model and view for displaying the Eligibility Status Reasons
+	 * options.
+	 * 
+	 * @param statusCategory - Eligibility Status Category
+	 * @return Model and view for displaying the Eligibility Status Reasons
+	 * options.
+	 */
+	@RequestMapping(value = "statusReasonOptions.html",
+			method = RequestMethod.GET)
+	public ModelAndView showStatusReasonOptions(
+			final EligibilityStatusCategory statusCategory) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(STATUS_REASONS_MODEL_KEY,
+				this.paroleEligibilityService
+				.findEligibilityStatusReasonsByEligibilityStatusCategory(
+						statusCategory));
+		return new ModelAndView(STATUS_REASON_OPTIONS_VIEW_NAME, map);
 	}
 	
 	/* Helper methods. */
@@ -441,7 +497,9 @@ public class ManageParoleEligibilityController {
 		mav.addObject(APPEARANCE_CATEGORIES_MODEL_KEY, 
 				this.paroleEligibilityService.findAppearanceCategories());
 		mav.addObject(STATUS_REASONS_MODEL_KEY, 
-				this.paroleEligibilityService.findEligibilityStatusReasons());
+				this.paroleEligibilityService
+				.findEligibilityStatusReasonsByEligibilityStatusCategory(
+						paroleEligibilityForm.getEligibilityStatusCategory()));
 		mav.addObject(PAROLE_ELIGIBILITY_FORM_MODEL_KEY, paroleEligibilityForm);
 		mav.addObject(ELIGIBILITY_STATUSES_MODEL_KEY, EligibilityStatusCategory
 				.values());

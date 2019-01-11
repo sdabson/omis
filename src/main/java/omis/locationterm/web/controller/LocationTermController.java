@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.locationterm.web.controller;
 
 import java.beans.PropertyEditor;
@@ -28,7 +45,6 @@ import omis.beans.factory.PropertyEditorFactory;
 import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.datatype.DateRange;
 import omis.exception.DateRangeOutOfBoundsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.domain.Location;
 import omis.locationterm.domain.LocationReason;
 import omis.locationterm.domain.LocationReasonTerm;
@@ -37,8 +53,10 @@ import omis.locationterm.domain.LocationTermChangeAction;
 import omis.locationterm.exception.LocationReasonTermConflictException;
 import omis.locationterm.exception.LocationReasonTermExistsAfterException;
 import omis.locationterm.exception.LocationReasonTermExistsException;
+import omis.locationterm.exception.LocationTermChangeActionAssociationExistsException;
 import omis.locationterm.exception.LocationTermConflictException;
 import omis.locationterm.exception.LocationTermExistsAfterException;
+import omis.locationterm.exception.LocationTermExistsException;
 import omis.locationterm.exception.LocationTermLockedException;
 import omis.locationterm.report.LocationTermReportService;
 import omis.locationterm.report.LocationTermSummary;
@@ -87,10 +105,20 @@ public class LocationTermController {
 	private static final String BOOLEAN_VALUE_VIEW_NAME
 		= "common/json/booleanValue";
 	
+	private static final String REASONS_VIEW_NAME
+		= "locationTerm/includes/locationReasons";
+	
+	private static final String CHANGE_ACTIONS_VIEW_NAME
+		= "locationTerm/includes/changeActions";
+	
 	/* Redirects. */
 	
 	private static final String LIST_REDIRECT
 		= "redirect:/locationTerm/list.html?offender=%d";
+	
+	private static final String CREATE_WITH_ACTION_REDIRECT
+		= "redirect:/locationTerm/create.html?offender=%d&changeAction=%d"
+				+ "&defaultStartDate=%s&defaultStartTime=%s";
 	
 	/* Action menus. */
 	
@@ -116,6 +144,8 @@ public class LocationTermController {
 	private static final String LOCATIONS_MODEL_KEY = "locations";
 	
 	private static final String REASONS_MODEL_KEY = "reasons";
+	
+	private static final String DEFAULT_REASON_MODEL_KEY = "defaultReason";
 
 	private static final String OFFENDER_MODEL_KEY = "offender";
 	
@@ -151,6 +181,9 @@ public class LocationTermController {
 	
 	private static final String CHANGE_ACTION_MODEL_KEY = "changeAction";
 	
+	private static final String DEFAULT_CHANGE_ACTION_MODEL_KEY
+		= "defaultChangeAction";
+	
 	private static final String BOOLEAN_VALUE_MODEL_KEY = "booleanValue";
 	
 	/* Message bundles. */
@@ -169,9 +202,6 @@ public class LocationTermController {
 	private static final String LOCATION_REASON_TERMS_OUT_OF_BOUNDS_MESSAGE_KEY
 		= "locationReasonTerm.dateRangeOutOfLocationTermDateRangeBounds";
 
-	private static final String DUPLICATE_ENTITY_FOUND_EXCEPTION_MESSAGE_KEY
-		= "locationTerm.exists";
-	
 	private static final String LOCATION_TERM_EXISTS_AFTER_EXCEPTION
 		= "locationTerm.existsAfter";
 	
@@ -187,6 +217,13 @@ public class LocationTermController {
 	private static final String OFFENDER_NOT_UNDER_SUPERVISION_MESSAGE_KEY
 		= "offender.notUnderSupervision";
 
+	private static final String LOCATION_TERM_EXISTS_MESSAGE_KEY
+		= "locationTerm.exists";
+	
+	private static final String
+	LOCATION_TERM_CHANGE_ACTION_ASSOCIATION_EXISTS_MESSAGE_KEY
+		= "locationTermChangeActionAssociation.exists";
+	
 	/* Report names. */
 	
 	private static final String LOCATION_TERM_LISTING_REPORT_NAME 
@@ -330,9 +367,11 @@ public class LocationTermController {
 		ModelAndView mav = new ModelAndView(LIST_VIEW_NAME);
 		mav.addObject(LOCATION_TERM_SUMMARIES_MODEL_KEY, locationTermSummaries);
 		if (placementTerm != null) {
-			mav.addObject(SUPERVISORY_ORGANIZATION_MODEL_KEY,
-					placementTerm.getSupervisoryOrganizationTerm()
-						.getSupervisoryOrganization());
+			if (placementTerm.getSupervisoryOrganizationTerm() != null) {
+				mav.addObject(SUPERVISORY_ORGANIZATION_MODEL_KEY,
+						placementTerm.getSupervisoryOrganizationTerm()
+							.getSupervisoryOrganization());
+			}
 			mav.addObject(CORRECTIONAL_STATUS_MODEL_KEY,
 					placementTerm.getCorrectionalStatusTerm()
 						.getCorrectionalStatus());
@@ -347,12 +386,15 @@ public class LocationTermController {
 	/**
 	 * Shows form to create new location term for offender.
 	 * 
+	 * <p>Change action is required until supervisory organization is supported.
+	 * 
 	 * @param offender offender
 	 * @param organization organization
 	 * @param defaultStartDate default start date
 	 * @param defaultStartTime default start time
 	 * @param toLocation location to which to send
-	 * @param changeAction change action
+	 * @param changeAction change action - required until supervisory
+	 * organization is supported
 	 * @return form to create new location term for offender
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.GET)
@@ -366,7 +408,7 @@ public class LocationTermController {
 				final String defaultStartTime,
 			@RequestParam(value = "toLocation", required = false)
 				final Location toLocation,
-			@RequestParam(value = "changeAction", required = false)
+			@RequestParam(value = "changeAction", required = true)
 				final LocationTermChangeAction changeAction) {
 		Date effectiveDate;
 		if (defaultStartDate != null) {
@@ -425,7 +467,8 @@ public class LocationTermController {
 			locationTermForm.setAllowLocation(true);
 			locationTermForm.setAllowState(true);
 			locationTermForm.setState(homeState);
-			if (placementTerm != null) {
+			if (placementTerm != null
+					&& placementTerm.getSupervisoryOrganizationTerm() != null) {
 				locationTermForm.setEndDate(
 						DateRange.getEndDate(placementTerm.getDateRange()));
 				locationTermForm.setEndTime(
@@ -445,8 +488,15 @@ public class LocationTermController {
 		if (changeAction != null) {
 			reasons = this.locationTermService
 					.findReasonsForChangeAction(changeAction);
+		} else if (toLocation != null) {
+			reasons = this.locationTermService
+					.findReasonsAllowedForLocation(toLocation);
+		} else if (locationTermForm.getLocation() != null) {
+			reasons = this.locationTermService
+					.findReasonsAllowedForLocation(
+							locationTermForm.getLocation());
 		} else {
-			reasons = this.locationTermService.findReasons();
+			reasons = Collections.emptyList();
 		}
 		ModelAndView mav = this.prepareEditMav(
 				offender, locationTermForm, locations, reasons);
@@ -488,9 +538,10 @@ public class LocationTermController {
 				.findLocationsAllowedForPlacementInState(state);
 		LocationTermForm locationTermForm = new LocationTermForm();
 		locationTermForm.setState(state);
-		locationTermForm.setAllowLocation(true);
-		locationTermForm.setAllowState(true);
+		locationTermForm.setAllowLocation(false);
+		locationTermForm.setAllowState(false);
 		locationTermForm.setLocation(locationTerm.getLocation());
+		locationTermForm.setNotes(locationTerm.getNotes());
 		if (locationTerm.getDateRange() != null) {
 			locationTermForm.setStartDate(
 					locationTerm.getDateRange().getStartDate());
@@ -505,15 +556,17 @@ public class LocationTermController {
 				if (defaultEndDate != null) {
 					locationTermForm.setEndDate(defaultEndDate);
 					locationTermForm.setEndTime(this.parseTimeText(defaultEndTime));
+					locationTermForm.setAllowNextChangeAction(true);
 				}
 			}
 		} else {
 			if (defaultEndDate != null) {
 				locationTermForm.setEndDate(defaultEndDate);
 				locationTermForm.setEndTime(this.parseTimeText(defaultEndTime));
+				locationTermForm.setAllowNextChangeAction(true);
 			}
 		}
-		locationTermForm.setAllowMultipleReasonTerms(true);
+		locationTermForm.setAllowMultipleReasonTerms(false);
 		List<LocationReasonTerm> reasonTerms = this.locationTermService
 				.findReasonTerms(locationTerm);
 		Collections.reverse(reasonTerms);
@@ -569,7 +622,8 @@ public class LocationTermController {
 			locationTermForm.setAssociateMultipleReasonTerms(false);
 			locationTermForm.setAllowSingleReasonTerm(true);
 		}
-		List<LocationReason> reasons = this.locationTermService.findReasons();
+		List<LocationReason> reasons = this.locationTermService
+				.findReasonsAllowedForLocation(locationTerm.getLocation());
 		ModelAndView mav = this.prepareEditMav(
 				locationTerm.getOffender(), locationTermForm,
 				locations, reasons);
@@ -587,7 +641,6 @@ public class LocationTermController {
 	 * @param result binding result
 	 * @param session HTTP session
 	 * @return redirect to list location terms
-	 * @throws DuplicateEntityFoundException if the location term exists
 	 * @throws LocationTermConflictException if conflicting location terms exist
 	 * @throws LocationTermExistsAfterException if location terms exist after 
 	 * the start date when an end date is not specified
@@ -598,6 +651,10 @@ public class LocationTermController {
 	 * and exists location reason terms exist after the start date
 	 * @throws OffenderNotUnderSupervisionException offender is not under 
 	 * supervision on the specified start date
+	 * @throws LocationTermExistsException if location term exists
+	 * @throws LocationReasonTermExistsException if reason term exists
+	 * @throws LocationTermChangeActionAssociationExistsException if association
+	 * between location term and change action exists
 	 */
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('LOCATION_TERM_CREATE') or hasRole('ADMIN')")
@@ -611,13 +668,15 @@ public class LocationTermController {
 			final LocationTermForm locationTermForm,
 			final BindingResult result,
 			final HttpSession session)
-					throws DuplicateEntityFoundException,
-						LocationTermConflictException, 
+					throws LocationTermConflictException, 
 						LocationTermExistsAfterException, 
 						LocationReasonTermConflictException, 
 						DateRangeOutOfBoundsException, 
 						LocationReasonTermExistsAfterException, 
-						OffenderNotUnderSupervisionException {
+						OffenderNotUnderSupervisionException,
+						LocationTermExistsException,
+						LocationReasonTermExistsException,
+						LocationTermChangeActionAssociationExistsException {
 		this.locationTermFormValidator.validate(locationTermForm, result);
 		if (result.hasErrors()) {
 			Date effectiveDate;
@@ -670,11 +729,18 @@ public class LocationTermController {
 				placementTerm = null;
 			}
 			List<LocationReason> reasons;
-			if (changeAction != null) {
+			if (locationTermForm.getLocation() != null) {
+				reasons = this.locationTermService
+					.findReasonsAllowedForLocation(
+							locationTermForm.getLocation());
+			} else if (changeAction != null) {
 				reasons = this.locationTermService
 						.findReasonsForChangeAction(changeAction);
+			} else if (toLocation != null) {
+				reasons = this.locationTermService
+						.findReasonsAllowedForLocation(toLocation);
 			} else {
-				reasons = this.locationTermService.findReasons();
+				reasons = Collections.emptyList();
 			}
 			ModelAndView mav = this.prepareRedisplayEditMav(
 					offender, locations, reasons, locationTermForm, result);
@@ -694,8 +760,14 @@ public class LocationTermController {
 				locationTermForm.getStartTime(),
 				locationTermForm.getEndDate(),
 				locationTermForm.getEndTime());
-		LocationTerm locationTerm = this.locationTermService.create(offender,
-				locationTermForm.getLocation(), dateRange);
+		Location location;
+		if (toLocation != null) {
+			location = toLocation;
+		} else {
+			location = locationTermForm.getLocation();
+		}
+		LocationTerm locationTerm = this.locationTermService.create(
+				offender, location, dateRange, locationTermForm.getNotes());
 		if (locationTermForm.getAllowMultipleReasonTerms() != null
 				&& locationTermForm.getAllowMultipleReasonTerms()
 				&& locationTermForm.getAssociateMultipleReasonTerms() != null
@@ -722,6 +794,10 @@ public class LocationTermController {
 			throw new UnsupportedOperationException(
 					"Must do something with reasons");
 		}
+		if (changeAction != null) {
+			this.locationTermService.associateChangeAction(
+					locationTerm, changeAction);
+		}
 		
 		// Checks for redirect URLs, if found, returns it
 		// Otherwise return to location term listing
@@ -743,7 +819,6 @@ public class LocationTermController {
 	 * @param locationTermForm form for location term
 	 * @param result binding result
 	 * @return redirect to list location terms
-	 * @throws DuplicateEntityFoundException if location term exists
 	 * @throws LocationTermConflictException if conflicting location terms exist
 	 * @throws DateRangeOutOfBoundsException if existing location reason terms
 	 * are out of the date range bounds of the location term
@@ -756,6 +831,8 @@ public class LocationTermController {
 	 * @throws LocationTermLockedException if location term is locked
 	 * @throws OffenderNotUnderSupervisionException offender is not under 
 	 * supervision on the specified start date
+	 * @throws LocationTermExistsException if location term exists
+	 * @throws LocationReasonTermExistsException if reason term exists 
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('LOCATION_TERM_EDIT') or hasRole('ADMIN')")
@@ -764,14 +841,15 @@ public class LocationTermController {
 				final LocationTerm locationTerm,
 			final LocationTermForm locationTermForm,
 			final BindingResult result)
-					throws DuplicateEntityFoundException,
-						LocationTermConflictException,
+					throws LocationTermConflictException,
 						DateRangeOutOfBoundsException, 
 						LocationTermExistsAfterException, 
 						LocationReasonTermConflictException, 
 						LocationReasonTermExistsAfterException,
 						LocationTermLockedException, 
-						OffenderNotUnderSupervisionException {
+						OffenderNotUnderSupervisionException,
+						LocationTermExistsException,
+						LocationReasonTermExistsException {
 		this.locationTermFormValidator.validate(locationTermForm, result);
 		if (result.hasErrors()) {
 			List<Location> locations;
@@ -784,7 +862,7 @@ public class LocationTermController {
 						.findLocationsAllowedForPlacement();
 			}
 			List<LocationReason> reasons = this.locationTermService
-					.findReasons();
+					.findReasonsAllowedForLocation(locationTerm.getLocation());
 			ModelAndView mav =  this.prepareRedisplayEditMav(
 					locationTerm.getOffender(), locations, reasons,
 					locationTermForm, result);
@@ -794,6 +872,10 @@ public class LocationTermController {
 		DateRange dateRange = this.createDateRange(
 			locationTermForm.getStartDate(), locationTermForm.getStartTime(),
 			locationTermForm.getEndDate(), locationTermForm.getEndTime());
+		LocationTerm updatedLocationTerm
+				= this.locationTermService.update(locationTerm,
+						locationTerm.getLocation(), dateRange,
+						locationTermForm.getNotes());
 		if (locationTermForm.getAllowMultipleReasonTerms() != null
 				&& locationTermForm.getAllowMultipleReasonTerms()
 				&& locationTermForm.getAssociateMultipleReasonTerms() != null
@@ -802,7 +884,8 @@ public class LocationTermController {
 					: locationTermForm.getReasonTermItems()) {
 				if (LocationReasonTermItemOperation.CREATE
 						.equals(reasonTermItem.getOperation())) {
-					this.locationTermService.createReasonTerm(locationTerm,
+					this.locationTermService.createReasonTerm(
+							updatedLocationTerm,
 							this.createDateRange(
 									reasonTermItem.getStartDate(),
 									reasonTermItem.getStartTime(),
@@ -831,11 +914,12 @@ public class LocationTermController {
 			}
 		} else {
 			List<LocationReasonTerm> reasonTerms = this.locationTermService
-					.findReasonTerms(locationTerm);
+					.findReasonTerms(updatedLocationTerm);
 			if (reasonTerms.size() == 0) {
 				if (locationTermForm.getReason() != null) {
 					this.locationTermService.createReasonTerm(
-						locationTerm, dateRange, locationTermForm.getReason());
+							updatedLocationTerm, dateRange,
+							locationTermForm.getReason());
 				}
 			} else if (reasonTerms.size() == 1) {
 				LocationReasonTerm reasonTerm = reasonTerms.get(0);
@@ -851,10 +935,18 @@ public class LocationTermController {
 				throw new IllegalStateException("Multiple reasons exist");
 			}
 		}
-		this.locationTermService.update(locationTerm,
-				locationTermForm.getLocation(), dateRange);
-		return new ModelAndView(String.format(LIST_REDIRECT,
-				locationTerm.getOffender().getId()));
+		if (locationTermForm.getAllowNextChangeAction() != null
+				&& locationTermForm.getAllowNextChangeAction()
+				&& locationTermForm.getNextChangeAction() != null) {
+			return new ModelAndView(String.format(CREATE_WITH_ACTION_REDIRECT,
+					updatedLocationTerm.getOffender().getId(),
+					locationTermForm.getNextChangeAction().getId(),
+					this.toDateString(locationTermForm.getEndDate()),
+					this.toTimeString(locationTermForm.getEndTime())));
+		} else {
+			return new ModelAndView(String.format(LIST_REDIRECT,
+					updatedLocationTerm.getOffender().getId()));
+		}
 	}
 
 	/**
@@ -888,12 +980,20 @@ public class LocationTermController {
 			value = "/createReasonTermRow.html", method = RequestMethod.GET)
 	public ModelAndView createReasonTermRow(
 			@RequestParam(value = "itemIndex", required = true)
-				final Integer itemIndex) {
+				final Integer itemIndex,
+			@RequestParam(value = "location", required = false)
+				final Location location) {
 		LocationReasonTermItem locationReasonTermItem
 			= new LocationReasonTermItem();
 		locationReasonTermItem.setOperation(
 				LocationReasonTermItemOperation.CREATE);
-		List<LocationReason> reasons = this.locationTermService.findReasons();
+		List<LocationReason> reasons;
+		if (location != null) {
+			reasons = this.locationTermService
+					.findReasonsAllowedForLocation(location);
+		} else {
+			reasons = this.locationTermService.findReasons();
+		}
 		ModelAndView mav = new ModelAndView(
 				REASON_TERM_EDIT_TABLE_ROW_VIEW_NAME);
 		mav.addObject(REASON_TERM_ITEM_MODEL_KEY, locationReasonTermItem);
@@ -990,6 +1090,27 @@ public class LocationTermController {
 	}
 	
 	/**
+	 * Returns reasons allowed for location.
+	 * 
+	 * @param location location
+	 * @return reasons allowed for location
+	 */
+	@RequestMapping(
+			value = "/findAllowedReasons.html", method = RequestMethod.GET)
+	public ModelAndView findAllowedReasons(
+			@RequestParam(value = "location", required = true)
+				final Location location,
+			@RequestParam(value = "defaultReason", required = false)
+				final LocationReason defaultReason) {
+		List<LocationReason> reasons = this.locationTermService
+				.findReasonsAllowedForLocation(location);
+		ModelAndView mav = new ModelAndView(REASONS_VIEW_NAME);
+		mav.addObject(REASONS_MODEL_KEY, reasons);
+		mav.addObject(DEFAULT_REASON_MODEL_KEY, defaultReason);
+		return mav;
+	}
+	
+	/**
 	 * Returns whether offender is placed on effective date (and time).
 	 * 
 	 * @param offender offender
@@ -1021,6 +1142,45 @@ public class LocationTermController {
 		return mav;
 	}
 	
+	/**
+	 * Returns allowed location term change actions for offender on effective
+	 * date.
+	 * 
+	 * @param offender offender
+	 * @param effectiveDate effective date
+	 * @param effectiveTime time of effective date
+	 * @return allowed location term change actions for offender on effective
+	 * date
+	 */
+	@RequestMapping(
+			value = "/findAllowedChangeActions.html",
+			method = RequestMethod.GET)
+	public ModelAndView findAllowedChangeActions(
+			@RequestParam(value = "offender", required = true)
+				final Offender offender,
+			@RequestParam(value = "effectiveDate", required = false)
+				final Date effectiveDate,
+			@RequestParam(value = "effectiveTime", required = false)
+				final String effectiveTime,
+			@RequestParam(value = "defaultChangeAction", required = false)
+				final LocationTermChangeAction defaultChangeAction) {
+		List<LocationTermChangeAction> changeActions;
+		if (effectiveDate != null && effectiveTime != null) {
+			Date effectiveDateTime = DateManipulator.getDateAtTimeOfDay(
+					effectiveDate, this.parseTimeText(effectiveTime));
+			changeActions = this.findAllowedChangeActionsImpl(
+					offender, effectiveDateTime);
+		} else {
+			changeActions = Collections.emptyList();
+		}
+		ModelAndView mav = new ModelAndView(CHANGE_ACTIONS_VIEW_NAME);
+		mav.addObject(CHANGE_ACTIONS_MODEL_KEY, changeActions);
+		if (defaultChangeAction != null) {
+			mav.addObject(DEFAULT_CHANGE_ACTION_MODEL_KEY, defaultChangeAction);
+		}
+		return mav;
+	}
+	
 	/* Business handlers. */
 	
 	/**
@@ -1036,6 +1196,20 @@ public class LocationTermController {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				LOCATION_REASON_EXISTS_MESSAGE_KEY,
 				ERROR_BUNDLE_NAME, locationReasonTermExistsException);
+	}
+	
+	/**
+	 * Handles {@code LocationTermExistsException}.
+	 * 
+	 * @param locationTermExistsException exception thrown
+	 * @return screen to handle {@code LocationTermExistsException}
+	 */
+	@ExceptionHandler(LocationTermExistsException.class)
+	public ModelAndView handleLocationTermExistsException(
+			final LocationTermExistsException locationTermExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				LOCATION_TERM_EXISTS_MESSAGE_KEY,
+				ERROR_BUNDLE_NAME, locationTermExistsException);
 	}
 	
 	/**
@@ -1096,20 +1270,6 @@ public class LocationTermController {
 	}
 	
 	/**
-	 * Handles {@code DuplicateEntityFoundException}.
-	 * 
-	 * @param duplicateEntityFoundException exception thrown
-	 * @return screen to handle {@code DuplicateEntityFoundException}
-	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException duplicateEntityFoundException) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				DUPLICATE_ENTITY_FOUND_EXCEPTION_MESSAGE_KEY,
-				ERROR_BUNDLE_NAME, duplicateEntityFoundException);
-	}
-	
-	/**
 	 * Handles {@code LocationTermExistsAfterException}.
 	 * @param locationTermExistsAfterException exception thrown
 	 * @return screen to handle {@code LocationTermExistsAfterException}
@@ -1152,6 +1312,25 @@ public class LocationTermController {
 				OFFENDER_NOT_UNDER_SUPERVISION_MESSAGE_KEY,
 				ERROR_BUNDLE_NAME,
 				offenderNotUnderSupervisionException);
+	}
+	
+	/**
+	 * Handles {@code LocationTermChangeActionAssociationExistsException}.
+	 * 
+	 * @param locationTermChangeActionAssociationExistsException exception
+	 * thrown
+	 * @return model and view to handle
+	 * {@code LocationTermChangeActionAssociationExistsException}
+	 */
+	@ExceptionHandler(LocationTermChangeActionAssociationExistsException.class)
+	public ModelAndView
+	handleLocationTermChangeActionAssociationExistsException(
+			final LocationTermChangeActionAssociationExistsException
+				locationTermChangeActionAssociationExistsException) {
+		return this.businessExceptionHandlerDelegate.prepareModelAndView(
+				LOCATION_TERM_CHANGE_ACTION_ASSOCIATION_EXISTS_MESSAGE_KEY,
+				ERROR_BUNDLE_NAME,
+				locationTermChangeActionAssociationExistsException);
 	}
 	
 	/* Action menus. */
@@ -1203,7 +1382,9 @@ public class LocationTermController {
 			mav.addObject(LOCATION_TERM_MODEL_KEY, locationTerm);
 		} else {
 			List<LocationTermChangeAction> changeActions
-				= this.locationTermService.findChangeActions();
+				= this.locationTermService
+					.findAllowedChangeActionsForCorrectionalStatus(
+							correctionalStatus);
 			mav.addObject(CHANGE_ACTIONS_MODEL_KEY, changeActions);
 		}
 		if (correctionalStatus != null
@@ -1311,6 +1492,21 @@ public class LocationTermController {
 			List<State> states = this.locationTermService.findHomeStates();
 			mav.addObject(STATES_MODEL_KEY, states);
 		}
+		if (locationTermForm.getAllowNextChangeAction() != null
+				&& locationTermForm.getAllowNextChangeAction()) {
+			List<LocationTermChangeAction> changeActions;
+			if (locationTermForm.getEndDate() != null
+					&& locationTermForm.getEndTime() != null) {
+				Date effectiveDate = DateManipulator.getDateAtTimeOfDay(
+						locationTermForm.getEndDate(),
+						locationTermForm.getEndTime());
+				changeActions = this.findAllowedChangeActionsImpl(
+						offender, effectiveDate);
+			} else {
+				changeActions = Collections.emptyList();
+			}
+			mav.addObject(CHANGE_ACTIONS_MODEL_KEY, changeActions);
+		}
 		addOffenderSummary(mav, offender);
 		return mav;
 	}
@@ -1374,6 +1570,38 @@ public class LocationTermController {
 		}
 	}
 	
+	// Returns date string
+	private String toDateString(final Date date) {
+		PropertyEditor propertyEditor = this.datePropertyEditorFactory
+				.createCustomDateOnlyEditor(true);
+		propertyEditor.setValue(date);
+		return propertyEditor.getAsText();
+	}
+	
+	// Returns time string
+	private String toTimeString(final Date time) {
+		PropertyEditor propertyEditor = this.datePropertyEditorFactory
+				.createCustomTimeOnlyEditor(true);
+		propertyEditor.setValue(time);
+		return propertyEditor.getAsText();
+	}
+	
+	// Returns allowed change actions for offender on date
+	private List<LocationTermChangeAction> findAllowedChangeActionsImpl(
+			final Offender offender, final Date effectiveDate) {
+		PlacementTerm placementTerm = this.locationTermService
+				.findPlacementTermForOffenderOnDate(
+						offender, effectiveDate);
+		if (placementTerm != null) {
+			return this.locationTermService
+					.findAllowedChangeActionsForCorrectionalStatus(
+							placementTerm.getCorrectionalStatusTerm()
+								.getCorrectionalStatus());
+		} else {
+			return Collections.emptyList();
+		}
+	}
+	
 	/* Init binder. */
 	
 	/**
@@ -1408,10 +1636,10 @@ public class LocationTermController {
 		binder.registerCustomEditor(State.class,
 				this.statePropertyEditorFactory
 					.createPropertyEditor());
-		binder.registerCustomEditor(Date.class, "startDate",
+		binder.registerCustomEditor(Date.class, "effectiveDate",
 				this.datePropertyEditorFactory
 					.createCustomDateOnlyEditor(true));
-		binder.registerCustomEditor(Date.class, "effectiveDate",
+		binder.registerCustomEditor(Date.class, "startDate",
 				this.datePropertyEditorFactory
 					.createCustomDateOnlyEditor(true));
 		binder.registerCustomEditor(Date.class, "startTime",

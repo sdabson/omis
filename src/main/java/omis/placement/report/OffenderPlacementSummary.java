@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.placement.report;
 
 import java.util.Date;
@@ -5,6 +22,7 @@ import java.util.Date;
 /** Summary for offender location. 
  * Note: Revisit this when we are ready to move location to production.
  * @author Ryan Johns
+ * @author Stephen Abson
  * @version 0.1.0 (Jul 28, 2016)
  * @since OMIS 3.0 */
 public interface OffenderPlacementSummary {
@@ -68,6 +86,27 @@ public interface OffenderPlacementSummary {
 	 * @return chimes id. */
 	String getChimesId();
 	
+	/**
+	 * Returns whether offender is placed.
+	 * 
+	 * @return whether offender is placed
+	 */
+	Boolean getPlaced();
+	
+	/**
+	 * Returns whether offender is located.
+	 * 
+	 * @return whether offender is located
+	 */
+	Boolean getLocated();
+	
+	/**
+	 * Returns whether offender has an assigned officer.
+	 * 
+	 * @return whether offender has an assigned officer
+	 */
+	Boolean getOfficerAssigned();
+	
 	/** Sets current location name.
 	 * @param currentLocationName - current location name. */
 	void setCurrentLocationName(String currentLocationName);
@@ -127,4 +166,25 @@ public interface OffenderPlacementSummary {
 	/** Sets chimes id.
 	 * @param chimesId - chimes id. */
 	void setChimesId(String chimesId);
+	
+	/**
+	 * Sets whether offender is placed.
+	 * 
+	 * @param placed whether offender is placed
+	 */
+	void setPlaced(Boolean placed);
+	
+	/**
+	 * Sets whether offender is located.
+	 * 
+	 * @param located set whether offender is located
+	 */
+	void setLocated(Boolean located);
+	
+	/**
+	 * Sets whether offender has an officer assignment.
+	 * 
+	 * @param officerAssigned whether offender has an officer assignment
+	 */
+	void setOfficerAssigned(Boolean officerAssigned);
 }

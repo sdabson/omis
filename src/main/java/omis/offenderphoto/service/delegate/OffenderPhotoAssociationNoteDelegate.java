@@ -121,6 +121,16 @@ public class OffenderPhotoAssociationNoteDelegate {
 		this.offenderPhotoAssociationNoteDao.makeTransient(note);
 	}
 	
+	/**
+	 * Removes all offender photo association notes for the specified
+	 * association.
+	 * 
+	 * @param association association
+	 */
+	public void removeByAssociation(final OffenderPhotoAssociation association) {
+		this.offenderPhotoAssociationNoteDao.removeByAssociation(association);
+	}
+	
 	/* Helper methods. */
 	
 	/*

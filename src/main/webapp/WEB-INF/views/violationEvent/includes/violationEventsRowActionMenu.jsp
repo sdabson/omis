@@ -17,9 +17,30 @@
 		<sec:authorize access="hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')">
 		<c:if test="${not empty violationEvent}">
 			<li>
-				<a href="${pageContext.request.contextPath}/violationEvent/violationEventDetailsReport.html?violationEvent=${violationEvent.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="violationEventDetailsReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/violationEvent/agreementWaiverRefusalReport.rtf?violationEvent=${violationEvent.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="agreementWaiverRefusalReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
+		<sec:authorize access="hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')">
+		<c:if test="${not empty violationEvent}">
+			<li>
+				<a href="${pageContext.request.contextPath}/violationEvent/disciplinaryInfractionNOHReport.rtf?violationEvent=${violationEvent.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="disciplinaryInfractionNOHReportLinkLabel"/></a>
 			</li>
 		</c:if>
 		</sec:authorize>
+		<sec:authorize access="hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')">
+		<c:if test="${not empty violationEvent}">
+			<li>
+				<a href="${pageContext.request.contextPath}/violationEvent/summaryActionCellSearchReport.rtf?violationEvent=${violationEvent.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="summaryActionCellSearchReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>
+		<sec:authorize access="hasRole('VIOLATION_EVENT_VIEW') or hasRole('ADMIN')">
+		<c:if test="${not empty violationEvent}">
+			<li>
+				<a href="${pageContext.request.contextPath}/violationEvent/violationEventDetailsReport.html?violationEvent=${violationEvent.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="violationEventDetailsReportLinkLabel"/></a>
+			</li>
+		</c:if>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

@@ -1,11 +1,28 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.organization.service.delegate;
 
 import java.util.List;
 
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.organization.dao.OrganizationDao;
 import omis.organization.domain.Organization;
+import omis.organization.exception.OrganizationExistsException;
 
 /**
  * Delegate for organizations.
@@ -48,12 +65,12 @@ public class OrganizationDelegate {
 	 * @param alias alias
 	 * @param parent parent
 	 * @return created organization
-	 * @throws DuplicateEntityFoundException if organization exists
+	 * @throws OrganizationExistsException if organization exists
 	 */
 	public Organization create(final String name, final String alias,
-			final Organization parent) throws DuplicateEntityFoundException {
+			final Organization parent) throws OrganizationExistsException {
 		if (this.organizationDao.find(name) != null) {
-			throw new DuplicateEntityFoundException("Organization exists");
+			throw new OrganizationExistsException("Organization exists");
 		}
 		Organization organization = this.organizationInstanceFactory
 				.createInstance();
@@ -69,13 +86,13 @@ public class OrganizationDelegate {
 	 * @param alias alias
 	 * @param parent parent
 	 * @return updated organization
-	 * @throws DuplicateEntityFoundException if organization exists
+	 * @throws OrganizationExistsException if organization exists
 	 */
 	public Organization update(final Organization organization,
 			final String name, final String alias, final Organization parent)
-				throws DuplicateEntityFoundException {
+				throws OrganizationExistsException {
 		if (this.organizationDao.findExcluding(name, organization) != null) {
-			throw new DuplicateEntityFoundException("Organization exists");
+			throw new OrganizationExistsException("Organization exists");
 		}
 		this.populateOrganization(organization, name, alias, parent);
 		return this.organizationDao.makePersistent(organization);

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.victim.report.impl.hibernate;
 
 import java.util.List;
@@ -17,7 +34,9 @@ import omis.victim.service.delegate.VictimNoteDelegate;
  * Hibernate implementation of victim report service.
  *
  * @author Stephen Abson
- * @version 0.0.1 (Jun 8, 2015)
+ * @author Josh Divine
+ * @author Sheronda Vaughn
+ * @version 0.0.2 (Feb 14, 2018)
  * @since OMIS 3.0
  */
 public class VictimAssociationReportServiceHibernateImpl
@@ -36,6 +55,14 @@ public class VictimAssociationReportServiceHibernateImpl
 	
 	private static final String FIND_DOCUMENT_BY_VICTIM_QUERY_NAME 
 		= "findDocumentAssociationSummariesByVictim";
+	
+	private static final String 
+		COUNT_VICTIM_ASSOCIATION_BY_OFFENDER_VICTIM_QUERY_NAME
+		= "countVictimAssociationByOffenderVictim";
+
+	private static final String 
+		FIND_VICTIM_ASSOCIATION_BY_OFFENDER_VICTIM_QUERY_NAME
+		= "findVictimAssociationByOffenderVictim";
 	
 	/* Parameter names */
 	
@@ -60,7 +87,8 @@ public class VictimAssociationReportServiceHibernateImpl
 	 * Instantiates Hibernate implementation of victim report service. 
 	 * 
 	 * @param sessionFactory session factory
-	 * @param delegate for victim notes
+	 * @param victimNoteDelegate delegate for victim notes
+	 * @param offenderDelegate offender delegate
 	 */
 	public VictimAssociationReportServiceHibernateImpl(
 			final SessionFactory sessionFactory,
@@ -80,7 +108,9 @@ public class VictimAssociationReportServiceHibernateImpl
 		@SuppressWarnings("unchecked")
 		List<VictimAssociationSummary> summaries = this.sessionFactory
 				.getCurrentSession().getNamedQuery(FIND_BY_OFFENDER_QUERY_NAME)
-				.setParameter(OFFENDER_PARAM_NAME, offender).list();
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setReadOnly(true)
+				.list();
 		return summaries;
 	}
 	
@@ -88,11 +118,13 @@ public class VictimAssociationReportServiceHibernateImpl
 	@Override
 	public VictimAssociationSummary summarizeVictimAssociation(
 			final VictimAssociation victimAssociation) {
-		VictimAssociationSummary summary =
-				(VictimAssociationSummary) this.sessionFactory
+		VictimAssociationSummary summary 
+			= (VictimAssociationSummary) this.sessionFactory
 				.getCurrentSession().getNamedQuery(
 						SUMMARIZE_QUERY_NAME)
-				.setParameter(VICTIM_ASSOCIATION_PARAM_NAME, victimAssociation).uniqueResult();
+				.setParameter(VICTIM_ASSOCIATION_PARAM_NAME, victimAssociation)
+				.setReadOnly(true)
+				.uniqueResult();
 		return summary;
 	}
 	
@@ -103,7 +135,9 @@ public class VictimAssociationReportServiceHibernateImpl
 		@SuppressWarnings("unchecked")
 		List<VictimAssociationSummary> summaries = this.sessionFactory
 				.getCurrentSession().getNamedQuery(FIND_BY_VICTIM_QUERY_NAME)
-				.setParameter(VICTIM_PARAM_NAME, victim).list();
+				.setParameter(VICTIM_PARAM_NAME, victim)
+				.setReadOnly(true)
+				.list();
 		return summaries;
 	}
 	
@@ -112,10 +146,13 @@ public class VictimAssociationReportServiceHibernateImpl
 	public List<VictimDocumentAssociationSummary> 
 		findDocumentAssociationSummariesByVictim(final Person victim) {
 		@SuppressWarnings("unchecked")
-		List<VictimDocumentAssociationSummary> documentSummaries = this.sessionFactory
+		List<VictimDocumentAssociationSummary> documentSummaries 
+			= this.sessionFactory
 				.getCurrentSession()
 				.getNamedQuery(FIND_DOCUMENT_BY_VICTIM_QUERY_NAME)
-				.setParameter(VICTIM_PARAM_NAME, victim).list();
+				.setParameter(VICTIM_PARAM_NAME, victim)
+				.setReadOnly(true)
+				.list();
 		return documentSummaries;
 	}
 
@@ -130,5 +167,32 @@ public class VictimAssociationReportServiceHibernateImpl
 	@Override
 	public boolean isOffender(final Person person) {
 		return this.offenderDelegate.isOffender(person);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Boolean victimAssociationExists(
+			final Offender offender, final Person victim) {
+		final Boolean query = (Boolean) this.sessionFactory.getCurrentSession()
+				.getNamedQuery(
+						COUNT_VICTIM_ASSOCIATION_BY_OFFENDER_VICTIM_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setParameter(VICTIM_PARAM_NAME, victim)
+				.uniqueResult();
+		return query;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public VictimAssociation findVictimAssociation(
+			final Offender offender, final Person victim) {
+		VictimAssociation association = (VictimAssociation) this.sessionFactory
+			.getCurrentSession()
+			.getNamedQuery(
+					FIND_VICTIM_ASSOCIATION_BY_OFFENDER_VICTIM_QUERY_NAME)
+			.setParameter(OFFENDER_PARAM_NAME, offender)
+			.setParameter(VICTIM_PARAM_NAME, victim)
+			.uniqueResult();
+		return association;
 	}
 }

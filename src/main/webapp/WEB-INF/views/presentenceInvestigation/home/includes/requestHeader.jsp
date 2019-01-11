@@ -10,7 +10,10 @@
 			<label class="fieldLabel detailsLabel">
 				<fmt:message key="courtCaseLabel"/>
 			</label>
-			<c:out value="${summary.docketValue}"/>
+			<c:forEach items="${summary.docketValues}" var="docket" varStatus="status">
+				<c:set var="docketValue" value="${status.first ? '' : docketValue}${status.first ? '' : ', '}${docket}" />
+			</c:forEach>
+			<c:out value="${docketValue}"/>
 		</span>
 		<span class="fieldGroup">
 			<label class="fieldLabel detailsLabel">
@@ -34,6 +37,12 @@
 			</label>
 			<c:out value="${summary.assignedUserLastName}, ${summary.assignedUserFirstName} (${summary.assignedUserUserName})"/>
 		</span>
+		<%-- <span class="fieldGroup">
+			<label class="fieldLabel detailsLabel">
+				<fmt:message key="submissionDateLabel"/>
+			</label>
+			<c:out value="${summary.submissionDate}"/>
+		</span> --%>
 	</fieldset>
 </div>
 </fmt:bundle>

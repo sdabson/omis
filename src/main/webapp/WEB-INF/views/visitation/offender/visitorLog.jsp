@@ -14,11 +14,9 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/links.css"/>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/toolbar.css"/>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/offender/style/offenderHeader.css"/>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/ServerConfig.js"> </script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/jquery.min.js"> </script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/3rdparty/JQuery/ui/jquery-ui-custom.min.js"> </script>
+<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
+<jsp:include page="/WEB-INF/views/common/includes/serverConfigResources.jsp"/>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/visitation/scripts/visitorLog.js"> </script>
 	<title>
 		<fmt:message key="offenderVisitationLogHeader">
@@ -29,6 +27,7 @@
 	<h1>
 		<fmt:message key="offenderVisitationLogHeader">
 		</fmt:message>
+		<c:out value="here"></c:out>
 	</h1>
 	<jsp:include page="/WEB-INF/views/offender/includes/offenderHeader.jsp"/>
 	<ul id="visitationToolbar" class="toolbar">
@@ -45,9 +44,10 @@
 			</c:otherwise>
 		</c:choose>
 	</ul>
-	<jsp:include page="../includes/changeVisitorLogDatesForm.jsp"/>
-	<h2><fmt:message key="visitationLogHeadingLabel"/></h2>
+	<jsp:include page="../includes/changeVisitorLogDatesForm.jsp"/>	
+	<h2>console.log("here3");<fmt:message key="visitationLogHeadingLabel"/></h2>
 	<jsp:include page="../includes/logListTable.jsp"/>
+	
 </body>
 </fmt:bundle>
 </html>

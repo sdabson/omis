@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<!-- Service -->
+		
+		<bean id="probationParoleDocumentService" class="omis.probationparole.service.impl.ProbationParoleDocumentServiceImpl">
+			<constructor-arg name="probationParoleDocumentAssociationDelegate" ref="probationParoleDocumentAssociationDelegate" />
+			<constructor-arg name="probationParoleDocumentCategoryDelegate" ref="probationParoleDocumentCategoryDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<!-- ProbationParoleDocumentAssociation Beans -->
+		
+		<bean id="probationParoleDocumentAssociationDao" class="omis.probationparole.dao.impl.hibernate.ProbationParoleDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.probationparole.domain.ProbationParoleDocumentAssociation" />
+		</bean>
+		
+		<bean id="probationParoleDocumentAssociationDelegate" class="omis.probationparole.service.delegate.ProbationParoleDocumentAssociationDelegate">
+			<constructor-arg name="probationParoleDocumentAssociationDao" ref="probationParoleDocumentAssociationDao" />
+			<constructor-arg name="probationParoleDocumentAssociationInstanceFactory" ref="probationParoleDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="probationParoleDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.probationparole.domain.ProbationParoleDocumentAssociation" />
+		</bean>
+		
+		<bean id="probationParoleDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="probationParoleDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.probationparole.domain.ProbationParoleDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- ProbationParoleDocumentCategory Beans -->
+		
+		<bean id="probationParoleDocumentCategoryDao" class="omis.probationparole.dao.impl.hibernate.ProbationParoleDocumentCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.probationparole.domain.ProbationParoleDocumentCategory" />
+		</bean>
+		
+		<bean id="probationParoleDocumentCategoryDelegate" class="omis.probationparole.service.delegate.ProbationParoleDocumentCategoryDelegate">
+			<constructor-arg name="probationParoleDocumentCategoryDao" ref="probationParoleDocumentCategoryDao" />
+			<constructor-arg name="probationParoleDocumentCategoryInstanceFactory" ref="probationParoleDocumentCategoryInstanceFactory" />
+		</bean>
+		
+		<bean id="probationParoleDocumentCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.probationparole.domain.ProbationParoleDocumentCategory" />
+		</bean>
+		
+		<bean id="probationParoleDocumentCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="probationParoleDocumentCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.probationparole.domain.ProbationParoleDocumentCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- Document Beans -->
+		
+		<bean id="probationParoleDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="probationParoleDocumentLocator"/>
+		</bean>
+
+		<bean id="probationParoleDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="probationParoleDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+
+		<bean id="probationParoleDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\ProbationParoleDocuments"/>
+		</bean>
+		
+		<bean id="probationParoleDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="probationParoleDocumentLocator"/>
+		</bean>
+		
+</beans>

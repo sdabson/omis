@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.program.service.testng;
 
 import java.util.Date;
@@ -55,7 +72,8 @@ import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
 /**
  * Tests program placement service.
  *
- * @author Josh Divine 
+ * @author Josh Divine
+ * @author Stephen Abson
  * @version 0.0.1
  * @since OMIS 3.0
  */
@@ -207,7 +225,7 @@ public class ProgramPlacementServiceCreateTests
 		Location location = this.locationDelegate.create(
 				supervisoryOrganization, dateRange, address);
 		LocationTerm locationTerm = this.locationTermDelegate.create(offender, 
-				location, startDate, endDate, false);
+				location, startDate, endDate, false, null);
 		Program program = this.programDelegate.create("Program");
 		// Action
 		ProgramPlacement programPlacement = this.programPlacementService.create(
@@ -269,7 +287,7 @@ public class ProgramPlacementServiceCreateTests
 		Location location = this.locationDelegate.create(
 				supervisoryOrganization, dateRange, address);
 		LocationTerm locationTerm = this.locationTermDelegate.create(offender, 
-				location, startDate, endDate, false);
+				location, startDate, endDate, false, null);
 		Program program = this.programDelegate.create("Program");
 		
 		this.programPlacementDelegate.create(offender, dateRange, 
@@ -330,7 +348,7 @@ public class ProgramPlacementServiceCreateTests
 		Location location = this.locationDelegate.create(
 				supervisoryOrganization, dateRange, address);
 		LocationTerm locationTerm = this.locationTermDelegate.create(offender, 
-				location, startDate, endDate, false);
+				location, startDate, endDate, false, null);
 		Program program = this.programDelegate.create("Program");
 		
 		Date programStartDate = startDate;
@@ -405,7 +423,7 @@ public class ProgramPlacementServiceCreateTests
 		Location location = this.locationDelegate.create(
 				supervisoryOrganization, dateRange, address);
 		LocationTerm locationTerm = this.locationTermDelegate.create(offender, 
-				location, startDate, endDate, false);
+				location, startDate, endDate, false, null);
 		Program program = this.programDelegate.create("Program");
 		
 		Date programStartDate = this.parseDateText("01/15/2002");

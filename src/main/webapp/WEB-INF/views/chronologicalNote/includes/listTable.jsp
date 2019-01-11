@@ -19,18 +19,22 @@
 <%--
  - Table of listed chronological notes 
  - Author: Yidong Li
+ - Author: Sheronda Vaughn
  - Version: 0.1.1 (Feb 1, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:bundle basename="omis.trackeddocument.msgs.trackedDocument">
+<fmt:bundle basename="omis.chronologicalnote.msgs.chronologicalNote">
 	<table id="chronologicalnote" class="listTable">
 		<thead>
 			<tr>
 				<th class = "operations"> </th>
-				<th><fmt:message key="docketLabel"/></th>
-				<th><fmt:message key="totalDocumentLabel"/></th>
+				<th class="date"><fmt:message key="titleLabel"/></th>
+				<th><fmt:message key="startDateLabel"/></th>
+				<th><fmt:message key="categoriesLabel"/></th>
+				<th><fmt:message key="narrativeLabel"/></th>
+				<th><fmt:message key="updatedByLabel"/></th>
 			</tr>
 		</thead>
 		<tbody>

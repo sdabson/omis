@@ -1,21 +1,26 @@
 package omis.violationevent.web.form;
 
+import java.io.Serializable;
 import omis.disciplinaryCode.domain.DisciplinaryCode;
 import omis.violationevent.domain.DisciplinaryCodeViolation;
 
 /**
- * DisciplinaryCodeViolationItem.java
+ * Disciplinary Code Violation Item.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Jan 19, 2017)
+ *@author Annie Wahl 
+ *@version 0.1.1 (Jul 26, 2018)
  *@since OMIS 3.0
  *
  */
-public class DisciplinaryCodeViolationItem {
+public class DisciplinaryCodeViolationItem implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private DisciplinaryCodeViolation disciplinaryCodeViolation;
 	
 	private DisciplinaryCode disciplinaryCode;
+	
+	private String details;
 	
 	private ViolationEventItemOperation itemOperation;
 	
@@ -26,7 +31,7 @@ public class DisciplinaryCodeViolationItem {
 	}
 	
 	/**
-	 * Returns the disciplinaryCodeViolation
+	 * Returns the disciplinaryCodeViolation.
 	 * @return disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public DisciplinaryCodeViolation getDisciplinaryCodeViolation() {
@@ -36,7 +41,7 @@ public class DisciplinaryCodeViolationItem {
 
 
 	/**
-	 * Sets the disciplinaryCodeViolation
+	 * Sets the disciplinaryCodeViolation.
 	 * @param disciplinaryCodeViolation - DisciplinaryCodeViolation
 	 */
 	public void setDisciplinaryCodeViolation(
@@ -45,7 +50,7 @@ public class DisciplinaryCodeViolationItem {
 	}
 
 	/**
-	 * Returns the disciplinaryCode
+	 * Returns the disciplinaryCode.
 	 * @return disciplinaryCode - DisciplinaryCode
 	 */
 	public DisciplinaryCode getDisciplinaryCode() {
@@ -53,15 +58,31 @@ public class DisciplinaryCodeViolationItem {
 	}
 
 	/**
-	 * Sets the disciplinaryCode
+	 * Sets the disciplinaryCode.
 	 * @param disciplinaryCode - DisciplinaryCode
 	 */
 	public void setDisciplinaryCode(final DisciplinaryCode disciplinaryCode) {
 		this.disciplinaryCode = disciplinaryCode;
 	}
+	
+	/**
+	 * Returns the details.
+	 * @return details - details
+	 */
+	public String getDetails() {
+		return this.details;
+	}
 
 	/**
-	 * Returns the itemOperation
+	 * Sets the details.
+	 * @param details the details to set
+	 */
+	public void setDetails(final String details) {
+		this.details = details;
+	}
+
+	/**
+	 * Returns the itemOperation.
 	 * @return itemOperation - ViolationEventItemOperation
 	 */
 	public ViolationEventItemOperation getItemOperation() {
@@ -69,15 +90,11 @@ public class DisciplinaryCodeViolationItem {
 	}
 
 	/**
-	 * Sets the itemOperation
+	 * Sets the itemOperation.
 	 * @param itemOperation - ViolationEventItemOperation
 	 */
 	public void setItemOperation(
 			final ViolationEventItemOperation itemOperation) {
 		this.itemOperation = itemOperation;
 	}
-	
-	
-	
-	
 }

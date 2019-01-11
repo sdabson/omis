@@ -1,8 +1,26 @@
+<%--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ --%>
 <%-- 
  - Author: Stephen Abson
  - Author: Ryan Johns
  - Author: Sheronda Vaughn
- - Version: 0.1.1 (Nov 18, 2015)
+ - Author: Josh Divine
+ - Version: 0.1.2 (Apr 17, 2018)
  - Since: OMIS 3.0
  --%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
@@ -10,14 +28,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <fmt:setBundle basename="omis.offender.msgs.offender" var="offenderBundle"/>
 <fmt:bundle basename="omis.msgs.homeLinks">
-		<h1 class="accentRegular">
+		<h1 class="homeLinksHeader">
 			<a class="actionMenuItem" id="searchActionMenu" href="${pageContext.request.contextPath}/searchActionMenu.html"></a>
 			<span class="contentHeading"><fmt:message key="searchHeader"/></span>
 		</h1>
-		<ul class="content">		
+		<ul class="content homeLinksListContainer">		
 			<li>
 				<a href="${pageContext.request.contextPath}/offender/advancedOffenderSearch.html">
-					<span class="banner hoverable">
+					<span class="banner">
 						<img src="${pageContext.request.contextPath}/resources/common/images/offenderSearch.png" height="90" width="90"/>
 						<span class="label"><fmt:message key="offenderSearchLabel"/></span>
 					</span>
@@ -31,6 +49,16 @@
 					</span>										
 				</a>				
 			</li>
+			<sec:authorize access="hasRole('ADMIN') or hasRole('OFFENDER_RELATIONSHIP_LIST')">
+			<li>
+				<a href="${pageContext.request.contextPath}/offenderRelationship/search.html">
+					<span class="banner">
+						<img style="display: none" src="${pageContext.request.contextPath}/resources/common/images/offenderRelationsSearch.png" height="90" width="90"/>
+						<span class="label"><fmt:message key="offenderRelationsSearchLabel"/></span>
+					</span>										
+				</a>				
+			</li>
+			</sec:authorize>
 			<sec:authorize access="(hasRole('ADMIN') and hasRole('APP_DEV'))">
 			<li>
 				<a href="${pageContext.request.contextPath}/employer/employerSearch.html">
@@ -62,14 +90,14 @@
 			</li>
 			</sec:authorize>			
 		</ul>
-		<h1 class="accentRegular">
+		<h1 class="homeLinksHeader">
 			<a class="actionMenuItem" id="caseLoadActionMenu" href="${pageContext.request.contextPath}/caseLoadActionMenu.html"></a>
 			<span class="contentHeading"><fmt:message key="caseLoadHeader"/></span>
 		</h1>
-		<ul class="content">
-			<sec:authorize access="(hasRole('ADMIN') and hasRole('APP_DEV'))">
+		<ul class="content homeLinksListContainer">
+			<sec:authorize access="hasRole('ADMIN') or hasRole('OFFICER_CASE_ASSIGNMENT_LIST')">
 			<li>
-				<a href="${pageContext.request.contextPath}/caseload/list.html">								
+				<a href="${pageContext.request.contextPath}/caseload/officerCaseAssignment/list.html">								
 					<span class="banner">
 						<img src="${pageContext.request.contextPath}/resources/common/images/myCaseloads.png" height="90" width="90"/>
 						<span class="label"><fmt:message key="myCaseloadsLabel"/></span>
@@ -118,11 +146,11 @@
 			</li>
 			</sec:authorize> --%>
 		</ul>
-		<h1 class="accentRegular">
+		<h1 class="homeLinksHeader">
 			<a class="actionMenuItem" id="workCentersActionMenu" href="${pageContext.request.contextPath}/workCentersActionMenu.html"></a>
 			<span class="contentHeading"><fmt:message key="workCentersHeader"/></span>
 		</h1>
-		<ul class="content">
+		<ul class="content homeLinksListContainer">
 			<li>
 				<a href="${pageContext.request.contextPath}/health/referral/referralCenter.html">
 					<span class="banner">
@@ -131,14 +159,16 @@
 					</span>
 				</a>
 			</li>
+			<sec:authorize access="(hasRole('ADMIN') and hasRole('APP_DEV'))">
 			<li>
-				<a href="${pageContext.request.contextPath}/paroleBoardItinerary/list.html">
+				<a href="${pageContext.request.contextPath}/bopp/home.html">
 					<span class="banner">
 						<!-- <img src="${pageContext.request.contextPath}/resources/common/images/??.png" height="90" width="90"/> -->
 						<span class="label"><fmt:message key="boardOfPardonsAndParole"/></span>
 					</span>
 				</a>
 			</li>
+			</sec:authorize>
 			<li>
 				<a href="${pageContext.request.contextPath}/presentenceInvestigation/request/list.html">
 					<span class="banner">

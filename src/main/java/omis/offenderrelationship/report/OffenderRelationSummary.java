@@ -20,9 +20,11 @@ import omis.visitation.domain.VisitationAssociation;
 
 /**
  * Offender relation summary.
+ * 
  * @author Yidong Li
  * @author Joel Norris
- * @version 0.1.0 (June 7, 2015)
+ * @author Stephen Abson
+ * @version 0.1.1 (Dec 6, 2018)
  * @since OMIS 3.0
  */
 public class OffenderRelationSummary
@@ -41,7 +43,9 @@ public class OffenderRelationSummary
 	private final String suffix;
 	
 	private final Boolean offender;
-	 
+	
+	private final Integer offenderNumber;
+	
 	private final String offenderLastName;
 	 
 	private final String offenderFirstName;
@@ -50,7 +54,7 @@ public class OffenderRelationSummary
 	
 	private final String offenderSuffix;
 	
-	private final Integer offenderNumber;
+	private final Integer offenderOffenderNumber;
 	
 	private final Boolean victim;
 	
@@ -81,7 +85,7 @@ public class OffenderRelationSummary
 	 * @param visitationAssociation visitation association
 	 * @param secondPerson second person
 	 * @param relationship relationship
-	 * @param associate asociate
+	 * @param associate associate
 	 */
 	public OffenderRelationSummary(
 		final Person firstPerson,
@@ -110,6 +114,8 @@ public class OffenderRelationSummary
 		this.offenderFirstName = firstPerson.getName().getFirstName();
 		this.offenderMiddleName = firstPerson.getName().getMiddleName();
 		this.offenderSuffix = firstPerson.getName().getSuffix();
+		this.offenderOffenderNumber
+			= ((Offender) firstPerson).getOffenderNumber();
 		
 		if (associate != null) {
 			this.offender = true;
@@ -204,6 +210,18 @@ public class OffenderRelationSummary
 		return this.offender;
 	}
 
+	// Consider renaming "offenderNumber" to "relationOffenderNumber" to make
+	// it clearer to whom the number belongs - SA
+	
+	/**
+	 * Returns offender number of relation.
+	 * 
+	 * @return offender number of relation
+	 */
+	public Integer getOffenderNumber() {
+		return this.offenderNumber;
+	}
+	
 	/**
 	 * Returns offender last name.
 	 * 
@@ -240,13 +258,16 @@ public class OffenderRelationSummary
 		return this.offenderSuffix;
 	}
 	
+	// Consider renaming "offenderOffenderNumber" to "offenderNumber" to
+	// eliminate the recursion in the naming - SA
+	
 	/**
-	 * Returns offender number.
+	 * Returns offender number of offender.
 	 * 
-	 * @return offender number
+	 * @return offender number of offender
 	 */
-	public Integer getOffenderNumber() {
-		return this.offenderNumber;
+	public Integer getOffenderOffenderNumber() {
+		return this.offenderOffenderNumber;
 	}
 	
 	/**

@@ -7,7 +7,7 @@
  - These queries, and the report services that use them, should be updated to
  - return facility summaries rather than facilities.
  -
- - Author: Stephen Abson
+ - Author: Stephen Abson, Yidong Li
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"

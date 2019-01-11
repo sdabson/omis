@@ -4,10 +4,10 @@ import omis.audit.domain.Creatable;
 import omis.audit.domain.Updatable;
 
 /**
- * QuestionnaireSection.java
+ * Questionnaire Section.
  * 
- *@author Annie Jacques 
- *@version 0.1.0 (Sep 7, 2016)
+ *@author Annie Wahl
+ *@version 0.1.1 (Oct 4, 2018)
  *@since OMIS 3.0
  *
  */
@@ -15,83 +15,83 @@ public interface QuestionnaireSection extends Creatable, Updatable {
 
 	/** Gets id.
 	 * @return id. */
-	public Long getId();
+	Long getId();
 	
 	/** Sets id.
 	 * @param id - id. */
-	public void setId(Long id);
+	void setId(Long id);
 	
 	/**
-	 * Returns the title
+	 * Returns the title.
 	 * @return title - String
 	 */
-	public String getTitle();
+	String getTitle();
 	
 	/**
-	 * Sets the title
+	 * Sets the title.
 	 * @param title - String
 	 */
-	public void setTitle(String title);
+	void setTitle(String title);
 	
 	/**
-	 * Returns the sort order
+	 * Returns the sort order.
 	 * @return sortOrder - Short
 	 */
-	public Short getSortOrder();
+	Short getSortOrder();
 	
 	/**
-	 * Sets the sort order 
+	 * Sets the sort order.
 	 * @param sortOrder - Short
 	 */
-	public void setSortOrder(Short sortOrder);
+	void setSortOrder(Short sortOrder);
 	
 	/**
-	 * Returns questionnaire type
+	 * Returns questionnaire type.
 	 * @return questionnaireType
 	 */
-	public QuestionnaireType getQuestionnaireType();
+	QuestionnaireType getQuestionnaireType();
 	
 	/**
-	 * Sets the questionnaire type
-	 * @param questionnaireType
+	 * Sets the questionnaire type.
+	 * @param questionnaireType - Questionnaire Type
 	 */
-	public void setQuestionnaireType(QuestionnaireType questionnaireType);
+	void setQuestionnaireType(QuestionnaireType questionnaireType);
 	
 	/**
-	 * Returns the section type
-	 * @return sectionType
+	 * Returns the section type.
+	 * @return sectionType - Section Type
 	 */
-	public SectionType getSectionType();
+	SectionType getSectionType();
 	
 	/**
-	 * Sets the section type
-	 * @param sectionType
+	 * Sets the section type.
+	 * @param sectionType - Section Type
 	 */
-	public void setSectionType(SectionType sectionType);
+	void setSectionType(SectionType sectionType);
 	
 	/**
-	 * Returns the section number
-	 * @return section number - Integer
+	 * Returns the section number.
+	 * @return section number - String
 	 */
-	public Integer getSectionNumber();
+	String getSectionNumber();
 	
 	/**
-	 * Sets the section number
-	 * @param sectionNumber - Integer
+	 * Sets the section number.
+	 * @param sectionNumber - String
 	 */
-	public void setSectionNumber(Integer sectionNumber);
+	void setSectionNumber(String sectionNumber);
 	
 	/**
-	 * Returns the section help
+	 * Returns the section help.
 	 * @return sectionHelp - String
 	 */
-	public String getSectionHelp();
+	String getSectionHelp();
 	
 	/**
-	 * Sets the section help
+	 * Sets the section help.
 	 * @param sectionHelp - String
 	 */
-	public void setSectionHelp(String sectionHelp);
+	void setSectionHelp(String sectionHelp);
 	
 	/** Compares {@code this} and {@code obj} for equality.
 	 * <p>

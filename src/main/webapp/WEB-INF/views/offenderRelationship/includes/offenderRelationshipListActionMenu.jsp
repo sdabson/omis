@@ -5,14 +5,18 @@
 <fmt:bundle basename="omis.offenderrelationship.msgs.offenderRelationship">
 	<ul>
 		<sec:authorize access="hasRole('OFFENDER_RELATIONSHIP_CREATE') or hasRole('ADMIN')">
-			<li>
-				<a class="createLink" href="${pageContext.request.contextPath}/offenderRelationship/search.html?offender=${offender.id}&amp;redirectTarget=${redirectTarget.name}&amp;option=NEW_RELATION"><span class="visibleLinkLabel"><fmt:message key="createRelationLabel"/></span></a>
-			</li>
+			<c:if test="${not empty offender}">
+				<li>
+					<a class="createLink" href="${pageContext.request.contextPath}/offenderRelationship/search.html?offender=${offender.id}&amp;redirectTarget=${redirectTarget.name}&amp;option=NEW_RELATION"><span class="visibleLinkLabel"><fmt:message key="createRelationLabel"/></span></a>
+				</li>
+			</c:if>
 		</sec:authorize>
 		<sec:authorize access="hasRole('OFFENDER_RELATIONSHIP_LIST') or hasRole('ADMIN')">
-			<li>
-				<a href="${pageContext.request.contextPath}/offenderRelationship/relationshipListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab reportLink"><fmt:message key="printListReportLinkLabel"/></a>
-			</li>
+			<c:if test="${not empty offender}">
+				<li>
+					<a href="${pageContext.request.contextPath}/offenderRelationship/relationshipListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="printListReportLinkLabel"/></a>
+				</li>
+			</c:if>
 		</sec:authorize>
 	</ul>
 </fmt:bundle>

@@ -50,15 +50,29 @@
     
     <!-- Report services -->
 	
-	<bean id="placementReportService"
-	      class="omis.placement.report.impl.hibernate.PlacementReportServiceHibernateImpl">
-	   	<constructor-arg name="locationTermSummaryDelegate" ref="locationTermSummaryDelegate"/>
-		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-	</bean>
-	
 	<bean id="placementProfileItemReportService"
 		  class="omis.placement.report.impl.hibernate.PlacementProfileItemReportServiceHibernateImpl">
 		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
 	</bean>
+	
+	<!-- Profile specific report service configurations -->
+	
+	<beans profile="standalone,test">
+		<bean id="placementReportService"
+	      class="omis.placement.report.impl.hibernate.PlacementReportServiceHibernateImpl">
+	   		<constructor-arg name="locationTermSummaryDelegate" ref="locationTermSummaryDelegate"/>
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+			<constructor-arg name="useIdiomaticOffenderPlacementSummaryQuery" value="true"/>
+		</bean>
+	</beans>
+	
+	<beans profile="prod,preprod,dev">
+		<bean id="placementReportService"
+	      class="omis.placement.report.impl.hibernate.PlacementReportServiceHibernateImpl">
+	   		<constructor-arg name="locationTermSummaryDelegate" ref="locationTermSummaryDelegate"/>
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+			<constructor-arg name="useIdiomaticOffenderPlacementSummaryQuery" value="false"/>
+		</bean>
+	</beans>
 	
 </beans>

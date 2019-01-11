@@ -69,4 +69,10 @@
 	     and pira.providerAssignment = :providerAssignment
 	     and ir not in (:exclude)
 	]]></query>
+	<query name="findExistingInternalReferralByOffenderAppointmentAssociation"><![CDATA[
+	  select ir
+		from omis.health.domain.ProviderInternalReferralAssociation pira
+		right outer join pira.internalReferral ir
+	   where ir.offenderAppointmentAssociation = :offenderAppointmentAssociation
+	]]></query>
 </hibernate-mapping>

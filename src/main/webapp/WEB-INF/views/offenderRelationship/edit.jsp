@@ -32,7 +32,6 @@
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/colors.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/fonts.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/form.css"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/jquery/ui/jquery-ui.custom.css"/>
 	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/caseload/style/form.css"/>
 	<jsp:include page="/WEB-INF/views/common/includes/jQueryResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
@@ -46,6 +45,7 @@
 		var offender = ${offender.id};
 		var offenderRelationshipTelephoneNumberIndex= ${offenderRelationshipTelephoneNumberIndex};
 		var offenderRelationshipOnlineAccountIndex= ${offenderRelationshipOnlineAccountIndex};
+		var offenderRelationshipNoteItemIndex = ${offenderRelationshipNoteItemIndex};
 	</script>
 </head>
 <body>

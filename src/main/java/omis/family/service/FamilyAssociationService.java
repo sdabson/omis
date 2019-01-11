@@ -21,11 +21,10 @@ import java.util.Date;
 import java.util.List;
 
 import omis.address.domain.Address;
-import omis.address.domain.AddressUnitDesignator;
 import omis.address.domain.BuildingCategory;
-import omis.address.domain.StreetSuffix;
 import omis.address.domain.ZipCode;
 import omis.address.exception.AddressExistsException;
+import omis.address.exception.ZipCodeExistsException;
 import omis.audit.domain.VerificationSignature;
 import omis.contact.domain.Contact;
 import omis.contact.domain.OnlineAccount;
@@ -33,29 +32,32 @@ import omis.contact.domain.OnlineAccountHost;
 import omis.contact.domain.TelephoneNumber;
 import omis.contact.domain.TelephoneNumberCategory;
 import omis.contact.domain.component.PoBox;
+import omis.contact.exception.ContactExistsException;
 import omis.contact.exception.OnlineAccountExistsException;
 import omis.contact.exception.TelephoneNumberExistsException;
 import omis.country.domain.Country;
 import omis.datatype.DateRange;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
 import omis.family.domain.FamilyAssociation;
 import omis.family.domain.FamilyAssociationCategory;
-import omis.family.domain.FamilyAssociationNote;
 import omis.family.domain.component.FamilyAssociationFlags;
 import omis.family.exception.FamilyAssociationConflictException;
 import omis.family.exception.FamilyAssociationExistsException;
-import omis.family.exception.FamilyAssociationNoteExistsException;
 import omis.offender.domain.Offender;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.exception.CityExistsException;
+import omis.relationship.domain.Relationship;
+import omis.relationship.domain.RelationshipNote;
+import omis.relationship.domain.RelationshipNoteCategory;
 import omis.relationship.exception.ReflexiveRelationshipException;
+import omis.relationship.exception.RelationshipNoteExistsException;
 import omis.residence.domain.ResidenceTerm;
 import omis.residence.exception.PrimaryResidenceExistsException;
 import omis.residence.exception.ResidenceStatusConflictException;
+import omis.residence.exception.ResidenceTermExistsException;
 
 /**
  * Service for family association.
@@ -163,7 +165,8 @@ public interface FamilyAssociationService {
 	 * @param buiildingCategory building category
 	 * @param zipCode zip code
 	 * @return address
-	 * @throws FamilyAssociationExistsException family association exists exception
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 * @throws AddressExistsException 
 	 */
 	Address createAddress(String value, String designator, 
@@ -175,18 +178,24 @@ public interface FamilyAssociationService {
 	 * @param person person
 	 * @param address address
 	 * @param verificationSignature verification signature	 
-	 * @throws FamilyAssociationExistsException family association exists exception
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
 	 * @throws PrimaryResidenceExistsException 
 	 * primary residence exists exception
 	 * @throws ResidenceStatusConflictException 
 	 * residence status conflict exception
 	 * @return residence term
-	 * @throws DuplicateEntityFoundException 
+	 * @throws ResidenceTermExistsException, residence term exists exception 
+	 * @throws ResidenceStatusConflictException, residence status conflict
+	 * exception
+	 * @throws PrimaryResidenceExistsException  primary residence exists
+	 * exception
+	 * @throws ResidenceTermExistsException residence term exists exception
 	 */
 	ResidenceTerm createResidenceTerm(Person person, Address address, 
 		VerificationSignature verificationSignature)
 		throws PrimaryResidenceExistsException, 
-		ResidenceStatusConflictException, DuplicateEntityFoundException;
+		ResidenceStatusConflictException, ResidenceTermExistsException;
 	
 	/**
 	 * Add contact.
@@ -194,11 +203,12 @@ public interface FamilyAssociationService {
 	 * @param mailingAddress mailing address
 	 * @param poBox P.O. box
 	 * @return contact
-	 * @throws FamilyAssociationExistsException faamily association exists exception
-	 * @throws DuplicateEntityFoundException 
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
+	 * @throws ContactExistsException contact exists exception 
 	 */
 	Contact addContact(Person person, Address mailingAddress, PoBox poBox)
-		throws DuplicateEntityFoundException;
+		throws ContactExistsException;
 
 	/**
 	 * Find a contact by person.
@@ -228,11 +238,12 @@ public interface FamilyAssociationService {
 	 * @param mailingAddress mailing address
 	 * @param poBox P.O. box
 	 * @return contact
-	 * @throws FamilyAssociationExistsException family association exists exception
-	 * @throws DuplicateEntityFoundException 
+	 * @throws FamilyAssociationExistsException family association exists
+	 * exception
+	 * @throws ContactExistsException contact exists exception
 	 */
 	Contact updateContact(Contact contact, Address mailingAddress, PoBox poBox)
-			throws DuplicateEntityFoundException;
+			throws ContactExistsException;
 	
 	/**
 	 * Add telephone number.
@@ -314,42 +325,11 @@ public interface FamilyAssociationService {
 	List<OnlineAccountHost> findOnlineAccountHosts();
 	
 	/**
-	 * Add note.
-	 * @param association family association
-	 * @param date date
-	 * @param value text
-	 * @return family association note
-	 * @throws FamilyAssociationNoteExistsException family association
-	 * exists exception
-	 */
-	FamilyAssociationNote addNote(FamilyAssociation association, Date date, 
-		String value) throws FamilyAssociationNoteExistsException;
-	
-	/**
-	 * Update note.
-	 * @param note family association note
-	 * @param date date
-	 * @param value text
-	 * @return family association note
-	 * @throws FamilyAssociationNoteExistsException family association
-	 * exists exception
-	 */
-	FamilyAssociationNote updateNote(FamilyAssociationNote note, Date date, 
-		String value) throws FamilyAssociationNoteExistsException;
-	
-	/**
-	 * Find notes by association.
-	 * @param association family association
+	 * Find notes by relationship.
+	 * @param relationship relationship
 	 * @return a list of family association notes
 	 */
-	List<FamilyAssociationNote> findNotesByAssociation(
-			FamilyAssociation association);
-	
-	/**
-	 * Remove note.
-	 * @param note family association note
-	 */
-	void removeNote(FamilyAssociationNote note);
+	List<RelationshipNote> findNotesByRelationship(Relationship relationship);
 	
 	/**
 	 * Find contact.
@@ -392,11 +372,11 @@ public interface FamilyAssociationService {
 	 * @param extension zip code extension
 	 * @param city city
 	 * @return zip code
-	 * @throws FamilyAssociationExistsException family association exists exception
-	 * @throws DuplicateEntityFoundException 
+	 * @throws ZipCodeExistsException zip code exists exception
+	 * exception
 	 */
 	ZipCode createZipCode(String value, String extension, City city) 
-		throws DuplicateEntityFoundException;
+		throws ZipCodeExistsException;
 	
 	/**
 	 * Find states by country.
@@ -418,18 +398,6 @@ public interface FamilyAssociationService {
 	 * @return yes or no
 	 */
 	Boolean hasStates(Country country);
-	
-	/**
-	 * Find all address unit designators.
-	 * @return a list of address unit designators
-	 */
-	List<AddressUnitDesignator> findAddressUnitDesignators();
-	
-	/**
-	 * Find all street suffixes.
-	 * @return a list of street suffixes
-	 */
-	List<StreetSuffix> findStreetSuffixes();
 	
 	/**
 	 * Create city.
@@ -469,4 +437,53 @@ public interface FamilyAssociationService {
 	 * @return a list of cities
 	 */
 	List<City> findCitiesByCountryWithoutState(Country country);
+	
+	/**
+	 * Add a relationship note to family association.
+	 * @param familyAssociation family association
+	 * @param category relationship note category
+	 * @param date date
+	 * @param value value
+	 * @exception RelationshipNoteExistsException thrown when relationship note
+	 * already exists
+	 * @return relationship note
+	 */
+	RelationshipNote addRelationshipNote(FamilyAssociation familyAssociation,
+		RelationshipNoteCategory category, Date date, String value)
+		throws RelationshipNoteExistsException;
+	
+	/**
+	 * Update an existing  relationship note.
+	 * @param relationshipNote relationship note
+	 * @param category relationship note category
+	 * @param date date
+	 * @param value value
+	 * @exception RelationshipNoteExistsException thrown when relationship note
+	 * already exists
+	 * @return relationship note
+	 */
+	RelationshipNote updateRelationshipNote(RelationshipNote relationshipNote,
+		RelationshipNoteCategory category, Date date, String value)
+		throws RelationshipNoteExistsException;
+	
+	/**
+	 * Remove an existing  relationship note.
+	 * @param relationshipNote relationship note
+	 */
+	void removeRelationshipNote(RelationshipNote relationshipNote);
+	
+	/**
+	 * Find all existing  relationship note categories.
+	 * @return a list of relationship note categories
+	 */
+	List<RelationshipNoteCategory> findDesignatedRelationshipNoteCategories();
+	
+	/**
+	 * Find all relationship notes associated with a family association.
+	 * @param familyAssociation family association
+	 * @return a list of relationship notes
+	 */
+	@Deprecated
+	List<RelationshipNote> findRelationshipNotes(FamilyAssociation
+		familyAssociation);
 }

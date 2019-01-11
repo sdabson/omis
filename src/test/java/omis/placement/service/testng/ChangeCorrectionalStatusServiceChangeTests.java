@@ -21,11 +21,17 @@ import omis.supervision.domain.PlacementTermChangeAction;
 import omis.supervision.domain.PlacementTermChangeReason;
 import omis.supervision.domain.SupervisoryOrganization;
 import omis.supervision.domain.SupervisoryOrganizationTerm;
+import omis.supervision.exception.AllowedCorrectionalStatusChangeExistsException;
+import omis.supervision.exception.AllowedCorrectionalStatusChangeReasonRuleExistsException;
+import omis.supervision.exception.CorrectionalStatusExistsException;
 import omis.supervision.exception.EndedPlacementTermException;
 import omis.supervision.exception.IllegalCorrectionalStatusChangeException;
 import omis.supervision.exception.OffenderNotUnderSupervisionException;
+import omis.supervision.exception.PlacementTermChangeActionExistsException;
+import omis.supervision.exception.PlacementTermChangeReasonExistsException;
 import omis.supervision.exception.PlacementTermChangeReasonNotAllowedException;
 import omis.supervision.exception.PlacementTermConflictException;
+import omis.supervision.exception.SupervisoryOrganizationExistsException;
 import omis.supervision.service.delegate.AllowedCorrectionalStatusChangeDelegate;
 import omis.supervision.service.delegate.AllowedCorrectionalStatusChangeReasonRuleDelegate;
 import omis.supervision.service.delegate.CorrectionalStatusDelegate;
@@ -44,7 +50,7 @@ import omis.testng.AbstractHibernateTransactionalTestNGSpringContextTests;
  * @version 0.0.1 (Jun 20, 2016)
  * @since OMIS 3.0
  */
-@Test(groups = {"placement"})
+@Test(groups = {"placement", "service"})
 public class ChangeCorrectionalStatusServiceChangeTests
 		extends AbstractHibernateTransactionalTestNGSpringContextTests {
 	
@@ -152,7 +158,7 @@ public class ChangeCorrectionalStatusServiceChangeTests
 		}
 		final Offender offender
 			= this.offenderDelegate.createWithoutIdentity(
-					"Blofeld", "Ernst", "Stavro", null);
+					"Grant", "Ernst", "Stavro", null);
 		Date effectiveDate = this.parseDateText("09/23/2012");
 		PlacementTermChangeAction changeAction;
 		try {
@@ -175,7 +181,8 @@ public class ChangeCorrectionalStatusServiceChangeTests
 	}
 	
 	/**
-	 * Tests changing of plcament term.
+	 * Tests changing of placement term with different status but same
+	 * supervisory organization.
 	 * 
 	 * @throws IllegalCorrectionalStatusChangeException if correctional
 	 * status change is not allowed
@@ -187,15 +194,14 @@ public class ChangeCorrectionalStatusServiceChangeTests
 	 * is not allowed
 	 * @throws EndedPlacementTermException if placement is ended
 	 */
-	@Test
-	public void testChangeWhileUnderSupervision()
+	public void testChangeWhileUnderSupervisionSameSupervisoryOrganization()
 			throws IllegalCorrectionalStatusChangeException,
 				OffenderNotUnderSupervisionException,
 				PlacementTermConflictException,
 				PlacementTermChangeReasonNotAllowedException,
 				EndedPlacementTermException {
 		Offender offender = this.offenderDelegate
-				.createWithoutIdentity("Blofeld", "Ernst", "Stavro", null);
+				.createWithoutIdentity("Grant", "Ernst", "Stavro", null);
 		CorrectionalStatus altSecure;
 		try {
 			altSecure = this.correctionalStatusDelegate
@@ -266,6 +272,373 @@ public class ChangeCorrectionalStatusServiceChangeTests
 				new DateRange(probationStartDate, null));
 	}
 	
+	/**
+	 * Tests changing of placement term with different status and supervisory
+	 * organization.
+	 * 
+	 * @throws CorrectionalStatusExistsException if correctional status
+	 * exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws IllegalCorrectionalStatusChangeException if correctional
+	 * status change is not allowed
+	 * @throws OffenderNotUnderSupervisionException if offender is not
+	 * under supervision
+	 * @throws PlacementTermConflictException if change cases a placement
+	 * conflict
+	 * @throws PlacementTermChangeReasonNotAllowedException if change reason
+	 * is not allowed
+	 * @throws EndedPlacementTermException if placement is ended
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 * @throws AllowedCorrectionalStatusChangeReasonRuleExistsException if
+	 * correctional status change reason rule exists 
+	 */
+	public void
+	testChangeWhileUnderSupervisionDifferentSupervisoryOrganization()
+			throws CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				PlacementTermChangeActionExistsException,
+				AllowedCorrectionalStatusChangeExistsException,
+				IllegalCorrectionalStatusChangeException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermChangeReasonNotAllowedException,
+				EndedPlacementTermException,
+				PlacementTermChangeReasonExistsException,
+				AllowedCorrectionalStatusChangeReasonRuleExistsException {
+		
+		// Arranges offender securely
+		Offender offender = this.offenderDelegate
+				.createWithoutIdentity("Grant", "Ernst", null, null);
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("State Prison", "STATEP", null);
+		DateRange secureRange = new DateRange(
+				this.parseDateText("12/12/2010"), null);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, false);
+		this.createPlacementTerm(offender, secure, prison, newSentenceReason,
+				null, secureRange);
+		
+		// Action - paroles offender
+		CorrectionalStatus parole = this.correctionalStatusDelegate
+				.create("Parole", "PAR", false, (short) 1, true);
+		PlacementTermChangeAction paroleAction
+			= this.placementTermChangeActionDelegate
+				.create("Place on Parole");
+		this.allowedCorrectionalStatusChangeDelegate.create(
+				paroleAction, secure, parole);
+		SupervisoryOrganization pnpOffice = this.supervisoryOrganizationDelegate
+				.create("City PnP Office", "CPNP", null);
+		Date effectiveDate = this.parseDateText("12/12/2012");
+		PlacementTermChangeReason boppDecision
+			= this.placementTermChangeReasonDelegate
+				.create("BOPP decision", (short) 1, true, false);
+		this.allowedCorrectionalStatusChangeReasonRuleDelegate
+				.create(secure, parole, boppDecision);
+		PlacementTerm changedTerm = this.changeCorrectionalStatusService
+				.change(offender, parole, pnpOffice, boppDecision,
+						effectiveDate, null);
+		
+		// Asserts changed term uses different supervisory organization
+		this.assertValues(changedTerm, parole, pnpOffice, boppDecision, null,
+				new DateRange(effectiveDate, null));
+		
+		// Asserts placement term on original date has original supervisory
+		// organization
+		PlacementTerm originalTerm = this.placementTermDelegate
+				.findForOffenderOnDate(offender, secureRange.getStartDate());
+		this.assertValues(originalTerm, secure, prison, newSentenceReason,
+				boppDecision, new DateRange(
+						secureRange.getStartDate(), effectiveDate));
+	}
+	
+	/**
+	 * Tests that {@code EndedPlacementTermException} is thrown when existing
+	 * placement term is already ended.
+	 * 
+	 * @throws EndedPlacementTermException if existing placement term is
+	 * ended - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists 
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws PlacementTermChangeReasonNotAllowedException if change reason is
+	 * not allowed
+	 * @throws PlacementTermConflictException if conflicting placement term
+	 * exists
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision 
+	 * @throws IllegalCorrectionalStatusChangeException if correctional status
+	 * change is illegal 
+	 * @throws PlacementTermChangeReasonExistsException if placement term change
+	 * reason exists
+	 */
+	@Test(expectedExceptions = {EndedPlacementTermException.class})
+	public void testChangeWithEndedExistingPlacementTerm()
+			throws EndedPlacementTermException,
+				CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				IllegalCorrectionalStatusChangeException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermConflictException,
+				PlacementTermChangeReasonNotAllowedException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arrangements - places offender securely with ended terms
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison Number 1", "PRSN1", null);
+		Offender offender = this.offenderDelegate
+				.createWithoutIdentity("Blofeld", "Donald", null, null);
+		DateRange dateRange = new DateRange(
+				this.parseDateText("12/12/2012"),
+				this.parseDateText("12/12/2013"));
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, true);
+		this.createPlacementTerm(offender, secure, prison, newSentenceReason,
+				null, dateRange);
+		
+		// Action - attempts to change placement to probation during secure
+		// placement
+		CorrectionalStatus probation = this.correctionalStatusDelegate
+				.create("Probation", "PROB", false, (short) 1, true);
+		SupervisoryOrganization pnpOffice = this.supervisoryOrganizationDelegate
+				.create("P&P Office Number 5", "PNP5", null);
+		Date effectiveDate = this.parseDateText("06/06/2013");
+		PlacementTermChangeReason boardDecision
+			= this.placementTermChangeReasonDelegate
+				.create("Board Decision", (short) 1, true, true);
+		this.changeCorrectionalStatusService.change(
+				offender, probation, pnpOffice, boardDecision, effectiveDate,
+				null);
+	}
+	
+	/**
+	 * Tests that {@code IllegalCorrectionalStatusChangeException} is thrown
+	 * when the correctional status is {@code null} (changes do not allow
+	 * releases).
+	 * 
+	 * @throws IllegalCorrectionalStatusChangeException if correctional status
+	 * is {@code null} - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws EndedPlacementTermException if placement term is ended
+	 * @throws PlacementTermChangeReasonNotAllowedException if placement term
+	 * change reason is not allowed
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision 
+	 * @throws PlacementTermChangeReasonExistsException if placement term change
+	 * reason exists
+	 */
+	@Test(expectedExceptions = {IllegalCorrectionalStatusChangeException.class})
+	public void
+	testIllegalCorrectionalStatusChangeExceptionWhenCorrectionalStatusIsNull()
+			throws IllegalCorrectionalStatusChangeException,
+				CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermChangeReasonNotAllowedException,
+				EndedPlacementTermException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arrangements - places offender securely
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison 1", "PRSN1", null);
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"Blofeld", "Donald", null, null);
+		DateRange dateRange = new DateRange(
+				this.parseDateText("12/12/2010"), null);
+		PlacementTermChangeReason newSentenceReason
+			= this.placementTermChangeReasonDelegate
+				.create("New Sentence", (short) 1, true, true);
+		this.createPlacementTerm(offender, secure, prison, newSentenceReason,
+				null, dateRange);
+		
+		// Action - attempts to release offender as a correctional status
+		// change
+		Date releaseDate = this.parseDateText("12/12/2013");
+		this.changeCorrectionalStatusService
+			.change(offender, null, null, null, releaseDate, null);
+	}
+	
+	/**
+	 * Tests that {@code IllegalCorrectionalStatusChangeException} is thrown
+	 * when the correctional status is the same as on the effective date.
+	 * 
+	 * @throws IllegalCorrectionalStatusChangeException if correctional status
+	 * is same as on effective date - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws EndedPlacementTermException if placement term is ended
+	 * @throws PlacementTermChangeReasonNotAllowedException if placement term
+	 * change reason is not allowed
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision 
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists
+	 */
+	@Test(expectedExceptions = {IllegalCorrectionalStatusChangeException.class})
+	public void
+	testIllegalCorrectionalStatusChangeExceptionWhenCorrectionalStatusAreSame()
+			throws IllegalCorrectionalStatusChangeException,
+				CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermChangeReasonNotAllowedException,
+				EndedPlacementTermException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arrangements - places offender securely
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison 1", "PRSN1", null);
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"Blofeld", "Donald", null, null);
+		DateRange dateRange = new DateRange(
+				this.parseDateText("12/12/2010"), null);
+		PlacementTermChangeReason newSentenceReason
+			= this.placementTermChangeReasonDelegate
+				.create("New Sentence", (short) 1, true, true);
+		this.createPlacementTerm(offender, secure, prison, newSentenceReason,
+				null, dateRange);
+		
+		// Action - attempts place offender securely on effective date
+		Date effectiveDate = this.parseDateText("12/12/2013");
+		this.changeCorrectionalStatusService
+			.change(offender, secure, null, newSentenceReason, effectiveDate,
+					null);
+	}
+	
+	/**
+	 * Tests that {@code IllegalCorrectionalStatusChangeException} is thrown
+	 * when the correctional status change is not allowed.
+	 * 
+	 * @throws IllegalCorrectionalStatusChangeException if correctional change
+	 * is not allowed - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws EndedPlacementTermException if placement term is ended
+	 * @throws PlacementTermChangeReasonNotAllowedException if placement term
+	 * change reason is not allowed
+	 * @throws OffenderNotUnderSupervisionException if offender is not under
+	 * supervision 
+	 * @throws PlacementTermChangeReasonExistsException if placement term change
+	 * reason exists
+	 */
+	@Test(expectedExceptions = {IllegalCorrectionalStatusChangeException.class})
+	public void
+	testIllegalCorrectionalStatusChangeExceptionWhenCorrectionalStatusIsNotAllowed()
+			throws IllegalCorrectionalStatusChangeException,
+				CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				OffenderNotUnderSupervisionException,
+				PlacementTermChangeReasonNotAllowedException,
+				EndedPlacementTermException,
+				PlacementTermChangeReasonExistsException {
+		
+		// Arrangements - places offender securely
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison 1", "PRSN1", null);
+		Offender offender = this.offenderDelegate.createWithoutIdentity(
+				"Blofeld", "Donald", "James", null);
+		DateRange dateRange = new DateRange(
+				this.parseDateText("12/12/2010"), null);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, true);
+		this.createPlacementTerm(offender, secure, prison, newSentenceReason,
+				null, dateRange);
+		
+		// Action - attempts to place offender on pre-adjudication
+		Date releaseDate = this.parseDateText("12/12/2013");
+		CorrectionalStatus preadjudication = this.correctionalStatusDelegate
+				.create("Pre-adjudication", "PRE", false, (short) 1, true);
+		this.changeCorrectionalStatusService
+			.change(offender, preadjudication, null, null, releaseDate, null);
+	}
+
+	/**
+	 * Tests that reasons not allowed are prevented with
+	 * {@code PlacementTermChangeReasonNotAllowedException}.
+	 * 
+	 * @throws PlacementTermChangeReasonNotAllowedException if reason is not
+	 * allowed - asserted
+	 * @throws CorrectionalStatusExistsException if correctional status exists
+	 * @throws SupervisoryOrganizationExistsException if supervisory
+	 * organization exists
+	 * @throws PlacementTermChangeReasonExistsException if placement term
+	 * change reason exists 
+	 * @throws EndedPlacementTermException if placement term is ended 
+	 * @throws OffenderNotUnderSupervisionException if offender is not
+	 * under supervision
+	 * @throws IllegalCorrectionalStatusChangeException if correctional status
+	 * change is not allowed 
+	 * @throws PlacementTermChangeActionExistsException if placement term
+	 * change action exists
+	 * @throws AllowedCorrectionalStatusChangeExistsException if correctional
+	 * status change is allowed 
+	 */
+	@Test(expectedExceptions
+		= {PlacementTermChangeReasonNotAllowedException.class})
+	public void
+	testPlacementTermChangeReasonNotAllowedExceptionWhenNotAllowed()
+			throws PlacementTermChangeReasonNotAllowedException,
+				CorrectionalStatusExistsException,
+				SupervisoryOrganizationExistsException,
+				PlacementTermChangeReasonExistsException,
+				IllegalCorrectionalStatusChangeException,
+				OffenderNotUnderSupervisionException,
+				EndedPlacementTermException,
+				PlacementTermChangeActionExistsException,
+				AllowedCorrectionalStatusChangeExistsException {
+		
+		// Arranges offender securely at prison
+		Offender offender = this.offenderDelegate
+				.createWithoutIdentity("Grant", "Donald", null, null);
+		CorrectionalStatus secure = this.correctionalStatusDelegate
+				.create("Secure", "SEC", true, (short) 1, true);
+		SupervisoryOrganization prison = this.supervisoryOrganizationDelegate
+				.create("Prison", "PRSN", null);
+		DateRange dateRange = new DateRange(
+				this.parseDateText("12/12/2012"), null);
+		PlacementTermChangeReason newSentenceReason
+				= this.placementTermChangeReasonDelegate
+					.create("New Sentence", (short) 1, true, true);
+		this.createPlacementTerm(
+				offender, secure, prison, newSentenceReason, null, dateRange);
+		
+		// Action - attempts to place offender on probation but with a
+		// change reason that is not allowed
+		CorrectionalStatus probation = this.correctionalStatusDelegate
+				.create("Probation", "PRO", true, (short) 1, true);
+		SupervisoryOrganization pnpOffice = this.supervisoryOrganizationDelegate
+				.create("PnP Office", "PNP", null);
+		PlacementTermChangeAction releaseToProbation
+			= this.placementTermChangeActionDelegate
+				.create("Release to Probation");
+		this.allowedCorrectionalStatusChangeDelegate
+			.create(releaseToProbation, secure, probation);
+		PlacementTermChangeReason revocation
+			= this.placementTermChangeReasonDelegate
+				.create("Revocation", (short) 1, true, true);
+		Date effectiveDate = this.parseDateText("12/12/2013");
+		this.changeCorrectionalStatusService
+			.change(offender, probation, pnpOffice, revocation, effectiveDate,
+					null);
+	}
+	
 	// Creates placement term - business violations are not checked for
 	private PlacementTerm createPlacementTerm(final Offender offender,
 			final CorrectionalStatus correctionalStatus,
@@ -295,7 +668,7 @@ public class ChangeCorrectionalStatusServiceChangeTests
 			throw new RuntimeException("Placement term exists", e);
 		}
 	}
-
+	
 	// Allows correctional status change, does nothing if already allowed
 	private void allowCorrectionalStatusChange(
 			final PlacementTermChangeAction action,

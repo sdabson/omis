@@ -22,11 +22,11 @@ import omis.organization.service.delegate.OrganizationDelegate;
 import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
-import omis.paroleboarditinerary.domain.ParoleBoardLocation;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
 import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
 import omis.paroleboarditinerary.service.delegate.ParoleBoardItineraryDelegate;
-import omis.paroleboarditinerary.service.delegate.ParoleBoardLocationDelegate;
+import omis.paroleboardlocation.domain.ParoleBoardLocation;
+import omis.paroleboardlocation.service.delegate.ParoleBoardLocationDelegate;
 import omis.paroleboardmember.domain.ParoleBoardMember;
 import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
 import omis.person.domain.Person;
@@ -46,7 +46,7 @@ import omis.util.PropertyValueAsserter;
  * Tests method to create board attendees.
  *
  * @author Josh Divine
- * @version 0.0.1
+ * @version 0.1.1 (Apr 18, 2018)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryServiceCreateAttendeeTests
@@ -144,7 +144,7 @@ public class ParoleBoardItineraryServiceCreateAttendeeTests
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
+				.create(paroleBoardLocation, true, startDate, endDate);
 		Date memberStartDate = this.parseDateText("01/01/2017");
 		Date memberEndDate = null;
 		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
@@ -201,7 +201,7 @@ public class ParoleBoardItineraryServiceCreateAttendeeTests
 		Date startDate = this.parseDateText("01/01/2017");
 		Date endDate = this.parseDateText("12/31/2017");
 		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, startDate, endDate);
+				.create(paroleBoardLocation, true, startDate, endDate);
 		Date memberStartDate = this.parseDateText("01/01/2017");
 		Date memberEndDate = null;
 		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
