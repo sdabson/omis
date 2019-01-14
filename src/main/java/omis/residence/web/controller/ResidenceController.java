@@ -334,15 +334,6 @@ public class ResidenceController {
 	private static final String NON_RESIDENCE_DETAILS_ID_REPORT_PARAM_NAME 
 		= "NON_RESD_ID";
 	
-	/* Module name. */
-	
-	private static final String MODULE_NAME = "residence";
-	
-	/* Toggle keys. */
-	
-	private static final String ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY
-		= "allowMailingAddressAtResidence";
-	
 	/* Report runners. */
 	
 	@Autowired
@@ -590,9 +581,10 @@ public class ResidenceController {
 									residenceForm.getVerificationDate(),
 									residenceForm.getVerified(),
 									residenceForm.getVerificationMethod()));
-			if (this.getAllowMailingAddressAtResidence()) {
-				if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
-						residenceForm.getStatusOption())) {
+			if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
+					residenceForm.getStatusOption())) {
+				if (residenceForm.getMailingAddressAtResidence() != null
+						&& residenceForm.getMailingAddressAtResidence()) {
 					this.residenceService.changeMailingAddress(
 							offender, createNewAddress);
 				}
@@ -718,17 +710,15 @@ public class ResidenceController {
 					"Residence term status not supported: " 
 							+ residenceTerm.getStatus());
 		}
-		if (this.getAllowMailingAddressAtResidence()) {
-			if (ResidenceStatus.RESIDENT.equals(
-						residenceTerm.getStatus())
-					&& ResidenceCategory.PRIMARY.equals(
-						residenceTerm.getCategory())) {
-				if (residenceTerm.getAddress().equals(
-						this.residenceService.findMailingAddress(person))) {
-					residenceForm.setMailingAddressAtResidence(true);
-				} else {
-					residenceForm.setMailingAddressAtResidence(false);
-				}
+		if (ResidenceStatus.RESIDENT.equals(
+					residenceTerm.getStatus())
+				&& ResidenceCategory.PRIMARY.equals(
+					residenceTerm.getCategory())) {
+			if (residenceTerm.getAddress().equals(
+					this.residenceService.findMailingAddress(person))) {
+				residenceForm.setMailingAddressAtResidence(true);
+			} else {
+				residenceForm.setMailingAddressAtResidence(false);
 			}
 		}
 		ModelAndView mav = this.prepareMav(residenceForm, 
@@ -849,8 +839,6 @@ public class ResidenceController {
 							residenceForm.getState(), status));
 			}
 		}
-		mav.addObject(ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY,
-				this.getAllowMailingAddressAtResidence());
 		mav.addObject(VERIFICATION_METHODS_MODEL_KEY, 
 				this.residenceService.findAllVerificationMethods());	
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
@@ -895,12 +883,6 @@ public class ResidenceController {
 			mav.addObject(NON_RESIDENCE_TERM_MODEL_KEY, nonResidenceTerm);
 		}
 		return mav;
-	}
-
-	// Returns whether residence can be used as mailing address
-	private boolean getAllowMailingAddressAtResidence() {
-		return this.featureToggles.get(
-				MODULE_NAME, ALLOW_MAILING_ADDRESS_AT_RESIDENCE_TOGGLE_KEY);
 	}
 	
 	/**
@@ -1029,9 +1011,10 @@ public class ResidenceController {
 									residenceForm.getVerificationDate(),
 									residenceForm.getVerified(),
 									residenceForm.getVerificationMethod()));
-			if (this.getAllowMailingAddressAtResidence()) {
-				if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
-						residenceForm.getStatusOption())) {
+			if (ResidenceStatusOption.PRIMARY_RESIDENCE.equals(
+					residenceForm.getStatusOption())) {
+				if (residenceForm.getMailingAddressAtResidence() != null
+						&& residenceForm.getMailingAddressAtResidence()) {
 					this.residenceService.changeMailingAddress(
 							residenceTerm.getPerson(), updatedAddress);
 				}

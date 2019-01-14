@@ -158,11 +158,6 @@ public class OffenderContactController {
 		= "mailingAddressFields";
 	
 	private static final String PO_BOX_FIELDS_NAME = "poBoxFields";
-
-	/* Toggle keys. */
-	
-	private static final String ALLOW_RESIDENCE_AT_MAILING_ADDRESS_TOGGLE_KEY
-		= "allowResidenceAtMailingAddress";
 	
 	/* Services. */
 
@@ -312,21 +307,19 @@ public class OffenderContactController {
 			}
 			offenderContactForm.setExistingMailingAddress(mailingAddress);
 			offenderContactForm.setExistingMailingAddressQuery(addressString);
-			if (this.getAllowResidenceAtMailingAddress()) {
-				Date effectiveDate = new Date();
-				ResidenceTerm primaryResidenceTerm
-					= this.offenderContactService.findPrimaryResidence(
-						offender, effectiveDate);
-				if (primaryResidenceTerm != null) {
-					if (primaryResidenceTerm.getAddress()
-							.equals(mailingAddress)) {
-						offenderContactForm.setResidentAtMailingAddress(true);
-						offenderContactForm
-							.setResidentAtMailingAddressEffectiveDate(
-									DateRange.getStartDate(
-											primaryResidenceTerm
-											.getDateRange()));
-					}
+			Date effectiveDate = new Date();
+			ResidenceTerm primaryResidenceTerm
+				= this.offenderContactService.findPrimaryResidence(
+					offender, effectiveDate);
+			if (primaryResidenceTerm != null) {
+				if (primaryResidenceTerm.getAddress()
+						.equals(mailingAddress)) {
+					offenderContactForm.setResidentAtMailingAddress(true);
+					offenderContactForm
+						.setResidentAtMailingAddressEffectiveDate(
+								DateRange.getStartDate(
+										primaryResidenceTerm
+										.getDateRange()));
 				}
 			}
 		}
@@ -479,14 +472,12 @@ public class OffenderContactController {
 						"Unsupported mailing address operation: %s",
 						offenderContactForm.getMailingAddressOperation()));
 			}
-			if (this.getAllowResidenceAtMailingAddress()) {
-				if (offenderContactForm.getResidentAtMailingAddress() != null
-						&& offenderContactForm.getResidentAtMailingAddress()) {
-					this.offenderContactService.changePrimaryResidence(
-							offender, mailingAddress,
-							offenderContactForm
-								.getResidentAtMailingAddressEffectiveDate());
-				}
+			if (offenderContactForm.getResidentAtMailingAddress() != null
+					&& offenderContactForm.getResidentAtMailingAddress()) {
+				this.offenderContactService.changePrimaryResidence(
+						offender, mailingAddress,
+						offenderContactForm
+							.getResidentAtMailingAddressEffectiveDate());
 			}
 		} else {
 			mailingAddress = null;
@@ -878,9 +869,6 @@ public class OffenderContactController {
 		this.addressFieldsControllerDelegate.prepareEditAddressFields(
 			mav.getModelMap(), countries, mailingStates, mailingCities, 
 			mailingZipCodes, MAILING_ADDRESS_FIELDS_NAME);
-		mav.addObject(
-				ALLOW_RESIDENCE_AT_MAILING_ADDRESS_TOGGLE_KEY,
-				this.getAllowResidenceAtMailingAddress());
 		List<State> poBoxStates;
 		List<City> poBoxCities;
 		List<ZipCode> poBoxZipCodes;
@@ -1010,14 +998,6 @@ public class OffenderContactController {
 		} else {
 			return false;
 		}
-	}
-	
-	/* Feature toggle lookup helpers. */
-	
-	// Returns whether residences at mailing address are allowed
-	private boolean getAllowResidenceAtMailingAddress() {
-		return this.featureToggles.get(
-						"offendercontact", "allowResidenceAtMailingAddress");
 	}
 	
 	/* Reports. */

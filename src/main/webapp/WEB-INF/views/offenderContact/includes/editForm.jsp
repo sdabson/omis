@@ -55,18 +55,16 @@
 				<c:set var="addressFields" value="${offenderContactForm.mailingAddressFields}" scope="request"/>
 				<jsp:include page="/WEB-INF/views/address/includes/addressFields.jsp"></jsp:include>
 			</div>
-			<c:if test="${allowResidenceAtMailingAddress}">
-				<span class="fieldGroup">
-					<form:label path="residentAtMailingAddress" class="fieldLabel"><fmt:message key="residentAtMailingAddressLabel" bundle="${offenderContactBundle}"/></form:label>
-					<form:checkbox id="residentAtMailingAddress" path="residentAtMailingAddress"/>
-					<form:errors path="residentAtMailingAddress" cssClass="error"/>
-				</span>
-				<span class="fieldGroup">
-					<form:label path="residentAtMailingAddressEffectiveDate" class="fieldLabel"><fmt:message key="residentAtMailingAddressEffectiveDateLabel" bundle="${offenderContactBundle}"/></form:label>
-					<form:input id="residentAtMailingAddressEffectiveDate" path="residentAtMailingAddressEffectiveDate" class="date" disabled="${not offenderContactForm.residentAtMailingAddress}"/>
-					<form:errors path="residentAtMailingAddressEffectiveDate" cssClass="error"/>
-				</span>
-			</c:if>
+			<span class="fieldGroup">
+				<form:label path="residentAtMailingAddress" class="fieldLabel"><fmt:message key="residentAtMailingAddressLabel" bundle="${offenderContactBundle}"/></form:label>
+				<form:checkbox id="residentAtMailingAddress" path="residentAtMailingAddress"/>
+				<form:errors path="residentAtMailingAddress" cssClass="error"/>
+			</span>
+			<span class="fieldGroup">
+				<form:label path="residentAtMailingAddressEffectiveDate" class="fieldLabel"><fmt:message key="residentAtMailingAddressEffectiveDateLabel" bundle="${offenderContactBundle}"/></form:label>
+				<form:input id="residentAtMailingAddressEffectiveDate" path="residentAtMailingAddressEffectiveDate" class="date" disabled="${not offenderContactForm.residentAtMailingAddress}"/>
+				<form:errors path="residentAtMailingAddressEffectiveDate" cssClass="error"/>
+			</span>
 		</div>
 	</fieldset>
 	</c:if>

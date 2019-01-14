@@ -130,15 +130,12 @@ window.onload = function() {
 		var findAddressesByQueryUrl = config.ServerConfig.getContextPath() + "/offenderContact/findAddressesByQuery.json";
 		applyValueLabelAutoComplete(existingMailingAddressQuery, existingMailingAddress, findAddressesByQueryUrl); 
 		applyAddressFieldsOnClick("mailingAddressFields", "mailingAddressFields/findStates.html", "mailingAddressFields/findCities.html", "mailingAddressFields/findZipCodes.html");
-		var allowResidenceAtMailingAddress = config.FeatureToggles.get("offendercontact", "allowResidenceAtMailingAddress");
-		if (allowResidenceAtMailingAddress == true) {
-			var residentAtMailingAddress = document.getElementById("residentAtMailingAddress");
-			residentAtMailingAddress.onclick = function(event) {
-				var residentAtMailingAddressEffectiveDate = document.getElementById("residentAtMailingAddressEffectiveDate");
-				residentAtMailingAddressEffectiveDate.disabled = !event.target.checked;
-			};
-			applyDatePicker(document.getElementById("residentAtMailingAddressEffectiveDate"));
-		}
+		var residentAtMailingAddress = document.getElementById("residentAtMailingAddress");
+		residentAtMailingAddress.onclick = function(event) {
+			var residentAtMailingAddressEffectiveDate = document.getElementById("residentAtMailingAddressEffectiveDate");
+			residentAtMailingAddressEffectiveDate.disabled = !event.target.checked;
+		};
+		applyDatePicker(document.getElementById("residentAtMailingAddressEffectiveDate"));
 	}
 	
 	// Apply ZIP code behavior

@@ -196,14 +196,12 @@
 	<form:checkbox path="confirmed"/>
 	<form:errors path="confirmed"/>
 </span>
-<c:if test="${allowMailingAddressAtResidence}">
-	<c:if test="${residenceForm.statusOption.name eq 'PRIMARY_RESIDENCE'}">
-		<span class="fieldGroup">
-			<form:label path="mailingAddressAtResidence" class="fieldLabel"><fmt:message key="mailingAddressAtResidenceLabel"/></form:label>
-			<form:checkbox path="mailingAddressAtResidence"/>
-			<form:errors path="mailingAddressAtResidence" cssClass="error"/>
-		</span>
-	</c:if>
+<c:if test="${residenceForm.statusOption.name eq 'PRIMARY_RESIDENCE'}">
+	<span class="fieldGroup">
+		<form:label path="mailingAddressAtResidence" class="fieldLabel"><fmt:message key="mailingAddressAtResidenceLabel"/></form:label>
+		<form:checkbox path="mailingAddressAtResidence"/>
+		<form:errors path="mailingAddressAtResidence" cssClass="error"/>
+	</span>
 </c:if>
 </fieldset>
 <c:if test="${not empty existingResidenceSummary}">

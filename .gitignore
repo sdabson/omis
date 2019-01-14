@@ -39,7 +39,14 @@ derby.log
 
 # Excludes potentially proprietary content
 # TODO - Replace proprietary content, remove this
-src/main/webapp/resources/common/images/
+src/main/webapp/resources/common/images/adobeFile.png
+src/main/webapp/resources/common/images/frogPrint.png
+src/main/webapp/resources/common/images/msWordFile.png
+src/main/webapp/resources/common/images/myCaseloads.png
+src/main/webapp/resources/common/images/personalDetails.png
+src/main/webapp/resources/common/images/serviceProviderSearch.png
+src/main/webapp/resources/common/images/supervisoryCaseloads.png
+src/main/webapp/resources/common/images/view-list-text.png
 src/main/webapp/resources/3rdparty/
 src/main/webapp/resources/alert/images/
 src/main/webapp/resources/visitation/images/
