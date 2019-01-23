@@ -55,6 +55,7 @@
   <bean id="createOffenderService"
   	class="omis.offender.service.impl.CreateOffenderServiceImpl">
   	<constructor-arg name="offenderDelegate" ref="offenderDelegate"/>
+  	<constructor-arg name="personIdentityDelegate" ref="personIdentityDelegate"/>
   	<constructor-arg name="personDemographicsDelegate" ref="personDemographicsDelegate"/>
   	<constructor-arg name="religiousPreferenceDelegate" ref="religiousPreferenceDelegate"/>
   	<constructor-arg name="citizenshipDelegate" ref="citizenshipDelegate"/>

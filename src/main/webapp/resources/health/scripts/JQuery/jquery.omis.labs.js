@@ -65,6 +65,7 @@ function addLabWorkItem() {
 	}
 	assignDatePicker($("#defaultSampleDate"));
 	var defaultOrderDate = $("#defaultOrderDate");
+	$("#defaultOrderDate").attr("autocomplete", "off");
 	$("#defaultOrderDate").datepicker({
 		changeMonth: true,
 		changeYear: true,
@@ -94,6 +95,7 @@ function addLabWorkItem() {
  * @param inputControl input control to assign a jQuery Date Picker
  */
 function assignDatePicker(inputControl) {
+	$(inputControl).attr("autocomplete", "off");
 	$(inputControl).datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -124,6 +126,7 @@ function applyLabWorkRowBehavior(labWorkIndex) {
 		return false;
 	});
 	var orderDate = $("#labWorkOrderDate" + labWorkIndex);
+	$("#labWorkOrderDate" + labWorkIndex).attr("autocomplete", "off");
 	$("#labWorkOrderDate" + labWorkIndex).datepicker({
 		changeMonth: true,
 		changeYear: true,

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.person.dao;
 
 import java.util.Date;
@@ -70,4 +87,24 @@ public interface PersonIdentityDao
 	 * @return a person identity
 	 */
 	PersonIdentity findByPerson(Person person);
+	
+	/**
+	 * Returns person identities with State ID number.
+	 * 
+	 * @param stateIdNumber State ID number by which to return person identities
+	 * @return person identities by State ID number
+	 */
+	List<PersonIdentity> findByStateIdNumber(String stateIdNumber);
+	
+	/**
+	 * Returns person identities with State ID number excluding supplied
+	 * person identities.
+	 * 
+	 * @param stateIdNumber State ID number by which to return person identities
+	 * @param excludedIdentities person identities to exclude
+	 * @return person identities with State ID number excluding supplied person
+	 * identities
+	 */
+	List<PersonIdentity> findByStateIdNumberExcluding(
+			String stateIdNumber, PersonIdentity... excludedIdentities);
 }

@@ -165,6 +165,8 @@
 	<fieldset>
 		<legend><fmt:message key="presentenceInvestigationDocketsTitle"/></legend>
 		<span class="fieldGroup">
+		
+			<form:errors path="presentenceInvestigationDocketAssociationItems" cssClass="error"/>
 			<c:set var="dockets" value="${dockets}" scope="request" />
 			<c:set var="courts" value="${courts}" scope="request" />
 			<c:set var="presentenceInvestigationDocketAssociationItems" value="${presentenceInvestigationRequestForm.presentenceInvestigationDocketAssociationItems}" scope="request"/>

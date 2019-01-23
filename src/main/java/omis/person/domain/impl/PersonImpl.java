@@ -120,15 +120,15 @@ public class PersonImpl implements Person {
 			}
 			if (this.getIdentity().getBirthDate() != null) {
 				if (!this.getIdentity().getBirthDate().equals(
-					that.getIdentity().getBirthDate())) {
+						that.getIdentity().getBirthDate())) {
 					return false;
 				}
 			} else if (that.getIdentity().getBirthDate() != null) {
 				return false;
 			}
 			if (this.getIdentity().getBirthCountry() != null) {
-				if (!this.getIdentity().getBirthCountry().equals(that
-					.getIdentity().getBirthCountry())) {
+				if (!this.getIdentity().getBirthCountry().equals(
+						that.getIdentity().getBirthCountry())) {
 					return false;
 				}
 			} else if (that.getIdentity().getBirthCountry() != null) {
@@ -136,30 +136,29 @@ public class PersonImpl implements Person {
 			}
 			if (this.getIdentity().getBirthPlace() != null) {
 				if (!this.getIdentity().getBirthPlace().equals(
-					that.getIdentity().getBirthPlace())) {
+						that.getIdentity().getBirthPlace())) {
 					return false;
 				}
 			} else if (that.getIdentity().getBirthPlace() != null) {
 				return false;
 			}
-			if (this.getIdentity().getSex()!=null&&that.getIdentity().getSex()
-				!=null) {
-				if (!this.getIdentity().getSex().equals(that.getIdentity()
-					.getSex())) {
+			if (this.getIdentity().getSex() != null
+					&& that.getIdentity().getSex() != null ) {
+				if (!this.getIdentity().getSex().equals(
+						that.getIdentity().getSex())) {
 					return false;
 				}
-			} else if ((this.getIdentity().getSex()!=null && 
-				that.getIdentity().getSex()==null) 
-				|| (this.getIdentity().getSex()==null && that.getIdentity()
-				.getSex()!=null)){
+			} else if ((this.getIdentity().getSex() != null
+							&& that.getIdentity().getSex() == null) 
+						|| (this.getIdentity().getSex() == null
+							&& that.getIdentity().getSex() != null)) {
 				return false;
 			}
-		} else if (that.getIdentity() != null && this.getIdentity()==null) {
+		} else if (that.getIdentity() != null && this.getIdentity() == null) {
 			return false;
-		} else if (that.getIdentity() == null && this.getIdentity()!=null) {
+		} else if (that.getIdentity() == null && this.getIdentity() != null) {
 			return false;
 		}
-				
 		return true;
 	}
 	
@@ -174,7 +173,8 @@ public class PersonImpl implements Person {
 		if (this.getIdentity() != null) {
 			if (this.getIdentity().getSocialSecurityNumber() != null) {
 				hashCode = 29 * hashCode
-						+ this.getIdentity().getSocialSecurityNumber().hashCode();
+						+ this.getIdentity().getSocialSecurityNumber()
+							.hashCode();
 			}
 			if (this.getIdentity().getBirthDate() != null) {
 				hashCode = 29 * hashCode + this.getIdentity().getBirthDate()
@@ -189,9 +189,40 @@ public class PersonImpl implements Person {
 				.hashCode();
 			}
 			if (this.getIdentity().getSex() != null) {
-				hashCode = 29 * hashCode + this.getIdentity().getSex().hashCode();
+				hashCode = 29 * hashCode
+						+ this.getIdentity().getSex().hashCode();
 			}
 		}
 		return hashCode;
+	}
+	
+	/**
+	 * Returns string representation of {@code this} including name and identity
+	 * details.
+	 * 
+	 * @return string representation of {@coe this} including name and identity
+	 * details.
+	 */
+	@Override
+	public String toString() {
+		String personName;
+		if (this.getName() != null) {
+			personName = String.format("%s, %s", this.getName().getLastName(),
+					this.getName().getFirstName());
+		} else {
+			personName = "no name";
+		}
+		String personIdentity;
+		if (this.getIdentity() != null) {
+			personIdentity = String.format("%s %d %s %s",
+					this.getIdentity().getSex(),
+					this.getIdentity().getSocialSecurityNumber(),
+					this.getIdentity().getStateIdNumber(),
+					this.getIdentity().getBirthDate());
+		} else {
+			personIdentity = "no identity";
+		}
+		return String.format("%d: [%s] [%s]", this.getId(),
+				personName, personIdentity);
 	}
 }

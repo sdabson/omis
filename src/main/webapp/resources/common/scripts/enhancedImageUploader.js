@@ -16,13 +16,13 @@
  * @param resultCallback callback function to use the resulting data
  */
 function enhancedImageEditingModalOnClickSetup(clickableElt, imgSrc, desiredW, desiredH, resultCallback) {
-	//console.log("enhancedImageEditingModalOnClickSetup invoked");
+	
 	if(!clickableElt.id) {
-		//console.log("Clickable element has no ID");
+		console.log("Clickable element has no ID");
 	} else {
 		clickableElt.addEventListener("click", clickableEltOnclick);
 		function clickableEltOnclick() {
-//			console.log("clickableEltOnClick invoked");
+			
 			if(clickableElt.id) {
 				let modalContainer;
 				if(document.getElementById(clickableElt.id + "ModalEnhancedImageEditorContainer") instanceof Element) {
@@ -30,10 +30,22 @@ function enhancedImageEditingModalOnClickSetup(clickableElt, imgSrc, desiredW, d
 				} else {
 					modalContainer = createModalContainer(clickableElt.id + "ModalEnhancedImageEditorContainer");
 				}
-				//Being applied multiple times?!?!?!
-//				console.log("before apply image editor");
-				applyImageEditor(null, modalContainer, imgSrc, desiredW, desiredH, resultCallback)
-				modalContainer.innerHTML = "<a class=\"modalClose\" id=\""+clickableElt.id+"ModalClose\"href=\"#\"/>";
+				//initial modal inner creation, maybe change to element appends and change name of wrapper
+				modalContainer.innerHTML = "<span class=\"modalCloseWrapper\"><a class=\"modalClose\" id=\""+clickableElt.id+"ModalClose\"href=\"#\"/></span>";
+				//Modal image wrapper
+				let modalEditingWrapper = document.createElement("span");
+				modalEditingWrapper.id = modalContainer.id + "ModalEditingWrapper";
+				modalEditingWrapper.classList.add("modalEditingWrapper");
+				modalEditingWrapper.classList.add("modalRow");
+				modalContainer.appendChild(modalEditingWrapper);
+				//Apply image editor functionality within the modal editing wrapper
+				applyImageEditor(null, modalEditingWrapper, imgSrc, desiredW, desiredH, resultCallback);
+				//modal interaction wrapper
+				let modalInteractionWrapper = document.createElement("span");
+				modalInteractionWrapper.classList.add("modalInteractionWrapper");
+				modalInteractionWrapper.classList.add("modalRow");
+				modalContainer.appendChild(modalInteractionWrapper);
+				
 				modalContainer.classList.remove("hidden");
 				let modalClose = document.getElementById(clickableElt.id+"ModalClose");
 				modalClose.onclick = function() {
@@ -44,10 +56,11 @@ function enhancedImageEditingModalOnClickSetup(clickableElt, imgSrc, desiredW, d
 				modalAccept.id = clickableElt.id + "ModalAccept";
 				modalAccept.classList.add("imageEditAccept");
 				modalAccept.href= "#";
-				modalContainer.appendChild(modalAccept);
+				modalInteractionWrapper.appendChild(modalAccept);
 				
 				modalAccept.onclick = function() {
-					let data = document.getElementById(clickableElt.id+"ModalEnhancedImageEditorContainerAnchorPreviewCanvas").toDataURL('image/jpeg', 0.5);
+					let data = document.getElementById(modalContainer.id+"ModalEditingWrapperAnchorPreviewCanvas").toDataURL('image/jpeg', 0.5);
+					
 					modalContainer.parentNode.removeChild(modalContainer);
 					clickableElt.removeEventListener("click", clickableEltOnclick);
 					clickableElt.parentNode.replaceChild(document.getElementById(clickableElt.id), clickableElt);
@@ -71,7 +84,6 @@ function applyImageEditor(anchorElt, container, imgSrc, desiredW, desiredH, resu
 	srcImage = new Image();
 	//Create Image and wait for it to load. Because applying the source to an image object does not
 	//immediately give it natural height/width nor allows it to be used for data applicable to an HTML5 canvas.
-//	console.log("before onload in apply image editor");
 	srcImage.onload = function() {
 		//Declare function specific variables.
 		let wrapper;
@@ -86,18 +98,14 @@ function applyImageEditor(anchorElt, container, imgSrc, desiredW, desiredH, resu
 					if (!anchorElt.id) {
 						anchorElt.id = "enhancedImageUploaderAnchor";
 					}
-					let anchorId = anchorElt.id;
-//					console.log("reached");
+					anchorId = anchorElt.id;
 					wrapper = interactiveImageWrap(anchorElt);
-					//wrapper = document.createElement('div');
 					wrapper.id = anchorId + "EnhancedImageUploaderWrapper";
 					wrapper.classList.add("interactiveImageWrapper");
 					wrapper.classList.add("enhancedImageUploaderWrapper");
-					//wrapElement(anchorElt, wrapper);
 				} else {
-
-//					console.log("already there");
 					wrapper = document.getElementById(anchorId + "EnhancedImageUploaderWrapper");
+					anchorId = wrapper.id+"Anchor"
 				}
 			} else {
 				alert("NO CONTAINER OR ANCHOR ELEMENT");
@@ -107,14 +115,11 @@ function applyImageEditor(anchorElt, container, imgSrc, desiredW, desiredH, resu
 			wrapper=container;
 			anchorId=container.id+"Anchor";
 		}
-		
 		//manual styling assignments, get rid of anything that can be referenced via CSS
 		canvas = document.createElement('canvas');
 		canvas.id = anchorId + "ResizingCanvas";
 		canvas.classList.add("enhancedImageUploaderResizingCanvas");
 		canvas.classList.add("enhancedImageUploaderCanvas");
-		//canvas.style.border="1px solid black";
-		canvas.style.background="lime";
 		canvas.width = srcImage.naturalWidth;
 		canvas.height = srcImage.naturalHeight;
 		canvas.style.width = srcImage.naturalWidth;
@@ -127,7 +132,6 @@ function applyImageEditor(anchorElt, container, imgSrc, desiredW, desiredH, resu
 			wrapElement(canvas, canvasWrapper);
 		} else {
 			document.getElementById(anchorId + "CanvasWrapper").replaceChild(canvas, document.getElementById(anchorId + "ResizingCanvas"));
-			//wrapper.replaceChild(canvas, document.getElementById(anchorId + "ResizingCanvas"));
 		}
 		let c = canvas.getContext("2d");
 		getImageScale();
@@ -217,7 +221,6 @@ function applyImageEditor(anchorElt, container, imgSrc, desiredW, desiredH, resu
 				mouseX = (e.clientX - rect.left);
 				mouseY = (e.clientY - rect.top);
 			}
-			//In case no loop is running
 			if(mousePressed) {
 				editableRec.update();
 			}

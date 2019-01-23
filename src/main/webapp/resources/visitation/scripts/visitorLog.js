@@ -36,6 +36,7 @@ function oneTimeAssignmentFunctions() {
 		refreshVisitorLog(form);
 		return false;
 	});
+	$(".chooseDate").attr("autocomplete", "off");
 	$(".chooseDate").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -56,6 +57,7 @@ function oneTimeAssignmentFunctions() {
 			},
 			success: function(data){
 				$("#dateFieldArea").html(data);
+				$(".chooseDate").attr("autocomplete", "off");
 				$(".chooseDate").datepicker({
 					changeMonth: true,
 					changeYear: true

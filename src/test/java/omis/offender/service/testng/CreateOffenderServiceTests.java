@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 
 import omis.citizenship.domain.Citizenship;
 import omis.country.domain.Country;
+import omis.country.exception.CountryExistsException;
 import omis.country.service.delegate.CountryDelegate;
 import omis.demographics.domain.DominantSide;
 import omis.demographics.domain.Height;
@@ -49,9 +50,12 @@ import omis.offenderflag.domain.OffenderFlagCategory;
 import omis.offenderflag.service.delegate.OffenderFlagCategoryDelegate;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
 import omis.person.domain.Person;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.person.service.delegate.PersonDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
+import omis.region.exception.StateExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.religion.domain.Religion;
@@ -70,7 +74,7 @@ import omis.util.PropertyValueAsserter;
  * @version 0.0.1 (Jun 16, 2016)
  * @since OMIS 3.0
  */
-@Test(groups = "offender")
+@Test(groups = {"offender", "service"})
 public class CreateOffenderServiceTests
 		extends AbstractHibernateTransactionalTestNGSpringContextTests {
 	
@@ -113,11 +117,19 @@ public class CreateOffenderServiceTests
 	/**
 	 * Tests creation of offender.
 	 * 
-	 * @throws DuplicateEntityFoundException if offender exists
+	 * @throws OffenderExistsException if offender exists
 	 * @throws ParseException if birth date cannot be parsed 
+	 * @throws CountryExistsException if country exists
+	 * @throws StateExistsException if State exists
+	 * @throws CityExistsException if city exists
 	 */
 	public void testOffenderCreation()
-			throws DuplicateEntityFoundException, ParseException {
+			throws OffenderExistsException,
+				ParseException,
+				StateIdNumberExistsException,
+				CountryExistsException,
+				StateExistsException,
+				CityExistsException {
 		//Arrangements	
 		final String lastName = "Blofeldt";
 		final String firstName = "Ernst";
@@ -417,15 +429,13 @@ public class CreateOffenderServiceTests
 	/**
 	 * Tests offender exists.
 	 *
-	 *
-	 * @throws DuplicateEntityFoundException duplciate entity found
 	 * @throws ParseException parse
 	 * @throws OffenderExistsException offender exists
 	 */
 	@Test(expectedExceptions = {OffenderExistsException.class})
 	public void testOffenderExistsException() 
-			throws DuplicateEntityFoundException, ParseException, 
-			OffenderExistsException {
+			throws ParseException, 
+				OffenderExistsException {
 		final String lastName = "Blofeldt";
 		final String firstName = "Ernst";
 		final String middleName = "Stavro";
@@ -443,10 +453,14 @@ public class CreateOffenderServiceTests
 	//person or offender because old OMIS2 has duplicated date and still needs
 	//to be converted for use into OMIS3
 	//No unique key to test against. sv
-	@Test(expectedExceptions = {DuplicateEntityFoundException.class}, 
+	@Test(expectedExceptions = {OffenderExistsException.class}, 
 			enabled = false)
 	public void testDuplicateEntityFoundException() 
-			throws DuplicateEntityFoundException, ParseException {
+			throws OffenderExistsException,
+				StateIdNumberExistsException,
+				CountryExistsException,
+				StateExistsException,
+				CityExistsException {
 		//Arrangements	
 		final String lastName = "Blofeldt";
 		final String firstName = "Ernst";
@@ -472,6 +486,62 @@ public class CreateOffenderServiceTests
 				middleName, suffix, socialSecurityNumber, 
 				stateIdNumber, birthDate, birthCountry, birthPlace, 
 				sex);
+	}
+	
+	/**
+	 * Tests that {@code StateIdNumberExistsException} is thrown to prevent
+	 * two people sharing a State ID number.
+	 * 
+	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * - asserted
+	 */
+	@Test(expectedExceptions = {StateIdNumberExistsException.class})
+	public void testStateIdNumberExistsException()
+			throws OffenderExistsException,
+				StateIdNumberExistsException {
+		
+		// Arranges existing person with State ID number
+		String stateIdNumber = "MT123456789";
+		this.personDelegate.createWithIdentity("Blofeld", "Franz", null, null,
+				null, null, null, null, null, null, stateIdNumber, null, null);
+		
+		// Action - attempts to create offender with same State ID number
+		this.createOffenderService
+			.create("Oberhauser", "Auric", null, "IV", null, stateIdNumber,
+					null, null, null, null);
+	}
+	
+	/**
+	 * Tests that {@code StateIdNumberExistsException} is thrown to prevent
+	 * two people sharing a State ID number when more than one person already
+	 * has the State ID number.
+	 * 
+	 * <p>The arrangements should not be allowed - once it can be guaranteed
+	 * that no two people can exists with the same State ID number, this
+	 * unit test will fail and should then be removed.
+	 * 
+	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * - asserted
+	 */
+	@Test(expectedExceptions = {StateIdNumberExistsException.class})
+	public void testStateIdNumberExistsExceptionWithMultiples()
+			throws OffenderExistsException, StateIdNumberExistsException {
+		
+		// Arranges two people with State ID number
+		String stateIdNumber = "MT123456789";
+		this.personDelegate.createWithIdentity("Blofeld", "Franz", null, null,
+				null, null, null, null, null, null, stateIdNumber, null,
+				null);
+		this.personDelegate.createWithIdentity("Oberhauser", "Ernst", null,
+				null, null, null, null, null, null, null, stateIdNumber, null,
+				null);
+		
+		// Action - attempts to create offender with same State ID number
+		this.createOffenderService
+			.create("Le Chiffre", "Auric", null, "IV", null, stateIdNumber,
+					null, null, null, null);
 	}
 	
 	/* Helper methods */

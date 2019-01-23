@@ -48,8 +48,8 @@
   			creationSignature.userAccount.user.name.suffix)
 		from 
 			omis.travelpermit.domain.TravelPermit permit
-			inner join permit.transportation transportation
-			inner join transportation.method method
+			left outer join permit.transportation transportation
+			left outer join transportation.method method
 			inner join permit.offender offender
 			inner join offender.name name
 			left outer join permit.otherTravellers otherTravelers

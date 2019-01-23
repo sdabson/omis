@@ -34,21 +34,26 @@ import omis.demographics.domain.Sex;
 import omis.demographics.domain.Tribe;
 import omis.demographics.domain.component.PersonAppearance;
 import omis.demographics.domain.component.PersonPhysique;
+import omis.demographics.exception.PersonDemographicsExistsException;
 import omis.exception.DateConflictException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.exception.OperationNotAuthorizedException;
 import omis.immigration.domain.AlienResidence;
 import omis.offender.domain.Offender;
 import omis.offender.exception.OffenderExistsException;
 import omis.offenderflag.domain.OffenderFlag;
 import omis.offenderflag.domain.OffenderFlagCategory;
+import omis.offenderflag.exception.OffenderFlagExistsException;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
+import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.religion.domain.Religion;
 import omis.religion.domain.ReligiousPreference;
+import omis.religion.exception.ReligiousPreferenceExistsException;
 
 /**
  * Create offender service.
@@ -74,13 +79,15 @@ public interface CreateOffenderService {
 	 * @param birthPlace birth city
 	 * @param sex sex
 	 * @return newly created offender
-	 * @throws DuplicateEntityFoundException thrown when an offender is found
+	 * @throws OffenderExistsException thrown when an offender is found
 	 * with the same unique properties that were provided.
+	 * @throws StateIdNumberExistsException if State ID number is used
 	 */
 	Offender create(String lastName, String firstName, String middleName, 
 			String suffix, Integer socialSecurityNumber, String stateIdNumber, 
 			Date birthDate, Country birthCountry, City birthPlace, Sex sex) 
-			throws DuplicateEntityFoundException;
+					throws OffenderExistsException,
+						StateIdNumberExistsException;
 	
 	/**
 	 * Converts person into offender.
@@ -118,14 +125,14 @@ public interface CreateOffenderService {
 	 * @param tribe tribe
 	 * @param maritalStatus marital status
 	 * @return person demographics
-	 * @throws DuplicateEntityFoundException thrown when person demographics are
-	 * found with the same unique information for the same offender
+	 * @throws PersonDemographicsExistsException thrown when person demographics
+	 * are found with the same unique information for the same offender
 	 */
 	PersonDemographics addDemographics(Offender offender, 
 			PersonPhysique physique, PersonAppearance appearance, 
 			DominantSide dominantSide, Race race, Boolean hispanicEthnicity,
 			Tribe tribe, MaritalStatus maritalStatus)
-					throws DuplicateEntityFoundException;
+					throws PersonDemographicsExistsException;
 	
 	/**
 	 * Creates a new religious preference for the specified offender with the
@@ -134,14 +141,18 @@ public interface CreateOffenderService {
 	 * @param offender offender
 	 * @param religion religion
 	 * @return religious preference
-	 * @throws OperationNotAuthorizedException 
-	 * @throws DateConflictException 
-	 * @throws DuplicateEntityFoundException 
+	 * @throws OperationNotAuthorizedException if accommodation is not
+	 * authorized
+	 * @throws DateConflictException if existing religious preference conflicts
+	 * with date 
+	 * @throws ReligiousPreferenceExistsException if religious preference
+	 * exists
 	 */
 	ReligiousPreference addReligiousPreference(Offender offender, 
 			Religion religion)
-					throws DuplicateEntityFoundException,
-					DateConflictException, OperationNotAuthorizedException;
+					throws ReligiousPreferenceExistsException,
+						DateConflictException,
+						OperationNotAuthorizedException;
 	
 	/**
 	 * Sets the country of citizenship for the specified offender to the 
@@ -170,10 +181,10 @@ public interface CreateOffenderService {
 	 * @param category offender flag category
 	 * @param value the value of this particular flag
 	 * @return offender flag
-	 * @throws DuplicateEntityFoundException 
+	 * @throws OffenderFlagExistsException if offender flag exists 
 	 */
 	OffenderFlag setFlag(Offender offender, OffenderFlagCategory category, 
-			Boolean value) throws DuplicateEntityFoundException;
+			Boolean value) throws OffenderFlagExistsException;
 	
 	/**
 	 * Associates the specified photo's filename with the specified offender
@@ -183,11 +194,12 @@ public interface CreateOffenderService {
 	 * @param filename file name
 	 * @param photoDate photo date
 	 * @return offender photo association
-	 * @throws DuplicateEntityFoundException 
+	 * @throws OffenderPhotoAssociationExistsException if offender photo
+	 * association exists 
 	 */
 	OffenderPhotoAssociation associateProfilePhoto(Offender offender, 
 			String filename, Date photoDate)
-					throws DuplicateEntityFoundException;
+					throws OffenderPhotoAssociationExistsException;
 	
 	/**
 	 * Returns countries.
@@ -235,10 +247,10 @@ public interface CreateOffenderService {
 	 * @param state State
 	 * @param country country
 	 * @return created city
-	 * @throws DuplicateEntityFoundException if city exists
+	 * @throws CityExistsException if city exists
 	 */
 	City createCity(String name, State state, Country country)
-		throws DuplicateEntityFoundException;
+		throws CityExistsException;
 	
 	/**
 	 * Returns builds.

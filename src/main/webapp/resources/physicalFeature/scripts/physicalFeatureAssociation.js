@@ -1,4 +1,5 @@
 function assignPhysicalFeatureAssociationOnClick() {
+	$("#originationDate").attr("autocomplete", "off");
 	$("#originationDate").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -45,6 +46,7 @@ function featureClassificationEvent(featureClassification) {
  */
 function applyPhysicalFeaturePhotoTableRowLinkBehavior(index) {
 	var physicalFeaturePhotoTableRow = $("#physicalFeaturePhotoRow" + index);
+	$(".dateSelect").attr("autocomplete", "off");
 	$(".dateSelect").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -168,6 +170,7 @@ function applyPhysicalFeatureAssociationNoteItemsActionMenuOnClick() {
  * @param index physical feature association note item index
  */
 function physicalFeatureAssociationNoteItemRowOnClick(index) {
+	$("#physicalFeatureAssociationNoteItemDate" + index).attr("autocomplete", "off");
 	$("#physicalFeatureAssociationNoteItemDate" + index).datepicker({
 		changeMonth: true,
 		changeYear: true

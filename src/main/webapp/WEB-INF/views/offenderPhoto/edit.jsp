@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <%--
  - Author: Stephen Abson
- - Version: 0.1.0 (Feb 26, 2014)
+ - Author: Joel Norris
+ - Version: 0.1.1 (January 10, 2019)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>

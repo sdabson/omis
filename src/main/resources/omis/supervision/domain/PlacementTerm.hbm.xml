@@ -129,9 +129,32 @@
 			and placementTerm.offender = :offender
 	]]></query>
 	
+	<!-- Finds placement terms between dates for offender. -->
+	<query name="findPlacementTermsBetweenDatesForOffender"><![CDATA[
+		select placementTerm
+		from omis.supervision.domain.PlacementTerm placementTerm
+		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null
+				or placementTerm.dateRange.startDate is null)
+			and (placementTerm.dateRange.endDate > :startDate or :startDate is null
+				or placementTerm.dateRange.endDate is null)
+			and placementTerm.offender = :offender
+	]]></query>
+	
 	<!-- Counts placement terms between dates for offender (exclusive). -->
 	<query name="countPlacementTermsBetweenDatesForOffenderExcluding"><![CDATA[
 		select count (placementTerm)
+		from omis.supervision.domain.PlacementTerm placementTerm
+		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null
+				or placementTerm.dateRange.startDate is null)
+			and (placementTerm.dateRange.endDate > :startDate or :startDate is null
+				or placementTerm.dateRange.endDate is null)
+			and placementTerm.offender = :offender
+			and placementTerm not in (:excludePlacementTerms)
+	]]></query>
+	
+	<!-- Finds placement terms between dates for offender (exclusive). -->
+	<query name="findPlacementTermsBetweenDatesForOffenderExcluding"><![CDATA[
+		select placementTerm
 		from omis.supervision.domain.PlacementTerm placementTerm
 		where (placementTerm.dateRange.startDate <= :endDate or :endDate is null
 				or placementTerm.dateRange.startDate is null)

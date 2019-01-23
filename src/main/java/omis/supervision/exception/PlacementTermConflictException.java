@@ -17,7 +17,10 @@
  */
 package omis.supervision.exception;
 
+import java.util.List;
+
 import omis.exception.BusinessException;
+import omis.supervision.domain.PlacementTerm;
 
 /**
  * Thrown to indicate that two or more placement terms conflict.
@@ -30,9 +33,11 @@ public class PlacementTermConflictException extends BusinessException {
 
 	private static final long serialVersionUID = 1L;
 	
+	private final List<PlacementTerm> conflicts;
+	
 	/** Default constructor. */
 	public PlacementTermConflictException() {
-		// Do nothing
+		this.conflicts = null;
 	}
 	
 	/**
@@ -40,10 +45,13 @@ public class PlacementTermConflictException extends BusinessException {
 	 * 
 	 * @param message business exception message
 	 * @param cause business exception cause
+	 * @param conflicts conflicting placement terms
 	 */
 	public PlacementTermConflictException(
-			final String message, final Throwable cause) {
+			final String message, final Throwable cause,
+			final List<PlacementTerm> conflicts) {
 		super(message, cause);
+		this.conflicts = conflicts;
 	}
 	
 	/**
@@ -53,6 +61,7 @@ public class PlacementTermConflictException extends BusinessException {
 	 */
 	public PlacementTermConflictException(final String message) {
 		super(message);
+		this.conflicts = null;
 	}
 	
 	/**
@@ -62,5 +71,24 @@ public class PlacementTermConflictException extends BusinessException {
 	 */
 	public PlacementTermConflictException(final Throwable cause) {
 		super(cause);
+		this.conflicts = null;
+	}
+	
+	/**
+	 * Instantiates with conflicting placement terms.
+	 * 
+	 * @param conflicts conflicting placement terms
+	 */
+	public PlacementTermConflictException(final List<PlacementTerm> conflicts) {
+		this.conflicts = conflicts;
+	}
+	
+	/**
+	 * Returns conflicting placement terms.
+	 * 
+	 * @return conflicting placement terms
+	 */
+	public List<PlacementTerm> getConflicts() {
+		return this.conflicts;
 	}
 }

@@ -50,6 +50,7 @@ $(document).ready(function() {
 		}
 	}
 	
+	$("#effectiveDate").attr("autocomplete", "off");
 	$("#effectiveDate").datepicker({
 		changeMonth: true,
 		changeYear: true

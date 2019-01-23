@@ -103,8 +103,19 @@ public interface PlacementTermDao
 			Offender offender, Date startDate, Date endDate);
 	
 	/**
+	 * Returns placement terms for offender between dates.
+	 * 
+	 * @param offender offender
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @return placement terms for offender between dates
+	 */
+	List<PlacementTerm> findForOffenderBetweenDates(
+			Offender offender, Date startDate, Date endDate);
+	
+	/**
 	 * Returns number of placement terms for offender between dates excluding
-	 * selected placement terms.
+	 * supplied placement terms.
 	 * 
 	 * @param offender offender
 	 * @param startDate start date
@@ -113,6 +124,20 @@ public interface PlacementTermDao
 	 * @return number of placement terms for offender between dates
 	 */
 	long countForOffenderBetweenDatesExcluding(
+			Offender offender, Date startDate, Date endDate,
+			PlacementTerm... excludedPlacementTerms);
+	
+	/**
+	 * Returns placement terms for offender between dates excluding supplied
+	 * placement terms.
+	 * 
+	 * @param offender offender
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @param excludedPlacementTerms placement terms to exclude
+	 * @return number of placement terms for offender between dates
+	 */
+	List<PlacementTerm> findForOffenderBetweenDatesExcluding(
 			Offender offender, Date startDate, Date endDate,
 			PlacementTerm... excludedPlacementTerms);
 	

@@ -94,6 +94,7 @@ function applyLabWorkReferralOnClick(labWorkSampleItemIndex, facilityId, sampleD
  * @param inputIdToAssign input ID to assign
  */
 function applyDatePicker(inputIdToAssign) {
+	$('#'+inputIdToAssign).attr("autocomplete", "off");
 	$("#" + inputIdToAssign).datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -136,6 +137,7 @@ function applyLabWorkSampleItemOnClick(labWorkSampleItemIndex, facilityId) {
 	});
 	var sampleItemSampleDateID = $("#labWorkSampleItemSampleDate" + labWorkSampleItemIndex).attr("id");
 	applyDatePicker(sampleItemSampleDateID);
+	$("#labWorkSampleItemOrderDate" + labWorkSampleItemIndex).attr("autocomplete", "off");
 	$("#labWorkSampleItemOrderDate" + labWorkSampleItemIndex).datepicker({
 		onClose: function() {
 			$.ajax({

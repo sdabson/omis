@@ -46,6 +46,7 @@ function taskAssignmentItemRowOnClick(taskFieldsPropertyName, taskAssignmentItem
 };
 
 function assignDatePicker(elementId) {
+	$('#'+elementId).attr("autocomplete", "off");
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -53,5 +54,6 @@ function assignDatePicker(elementId) {
 };
 
 function assignTimePicker(elementId) {
+	$(document.getElementById(elementId)).attr("autocomplete", "off");
 	$(document.getElementById(elementId)).ptTimeSelect();
 };

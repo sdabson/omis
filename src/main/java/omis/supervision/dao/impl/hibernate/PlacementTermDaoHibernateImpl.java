@@ -57,9 +57,16 @@ public class PlacementTermDaoHibernateImpl
 	private static final String COUNT_BETWEEN_DATES_FOR_OFFENDER_QUERY_NAME
 			= "countPlacementTermsBetweenDatesForOffender";
 	
+	private static final String FIND_BETWEEN_DATES_FOR_OFFENDER_QUERY_NAME
+			= "findPlacementTermsBetweenDatesForOffender";
+	
 	private static final String
 	COUNT_BETWEEN_DATES_FOR_OFFENDER_EXCLUDING_QUERY_NAME
 			= "countPlacementTermsBetweenDatesForOffenderExcluding";
+	
+	private static final
+	String FIND_BETWEEN_DATES_FOR_OFFENDER_EXCLUDING_QUERY_NAME
+			= "findPlacementTermsBetweenDatesForOffenderExcluding";
 	
 	private static final String FIND_BY_CORRECTIONAL_STATUS_TERM_QUERY_NAME
 			= "findPlacementTermsByCorrectionalStatusTerm";
@@ -185,8 +192,8 @@ public class PlacementTermDaoHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public long countForOffenderBetweenDates(final Offender offender,
-			final Date startDate, final Date endDate) {
+	public long countForOffenderBetweenDates(
+			final Offender offender, final Date startDate, final Date endDate) {
 		long count = (Long) this.getSessionFactory().getCurrentSession()
 				.getNamedQuery(COUNT_BETWEEN_DATES_FOR_OFFENDER_QUERY_NAME)
 				.setParameter(START_DATE_PARAM_NAME, startDate)
@@ -194,6 +201,21 @@ public class PlacementTermDaoHibernateImpl
 				.setParameter(OFFENDER_PARAM_NAME, offender)
 				.uniqueResult();
 		return count;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<PlacementTerm> findForOffenderBetweenDates(
+			final Offender offender, final Date startDate, final Date endDate) {
+		@SuppressWarnings("unchecked")
+		List<PlacementTerm> placementTerms = this.getSessionFactory()
+				.getCurrentSession().getNamedQuery(
+						FIND_BETWEEN_DATES_FOR_OFFENDER_QUERY_NAME)
+				.setParameter(START_DATE_PARAM_NAME, startDate)
+				.setParameter(END_DATE_PARAM_NAME, endDate)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.list();
+		return placementTerms;
 	}
 
 	/** {@inheritDoc} */
@@ -211,6 +233,24 @@ public class PlacementTermDaoHibernateImpl
 						excludedPlacementTerms)
 				.uniqueResult();
 		return count;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<PlacementTerm> findForOffenderBetweenDatesExcluding(
+			final Offender offender, final Date startDate, final Date endDate,
+			final PlacementTerm... excludedPlacementTerms) {
+		@SuppressWarnings("unchecked")
+		List<PlacementTerm> placementTerms = this.getSessionFactory()
+				.getCurrentSession().getNamedQuery(
+						FIND_BETWEEN_DATES_FOR_OFFENDER_EXCLUDING_QUERY_NAME)
+				.setParameter(START_DATE_PARAM_NAME, startDate)
+				.setParameter(END_DATE_PARAM_NAME, endDate)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setParameterList(EXCLUDE_PLACEMENT_TERMS_PARAM_NAME,
+						excludedPlacementTerms)
+				.list();
+		return placementTerms;
 	}
 	
 	/** {@inheritDoc} */

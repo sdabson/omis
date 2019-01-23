@@ -25,6 +25,7 @@ function assignViewableImageInteractions() {
 	}
 }
 
+
 /**
  * Creates a wrapper of the specified type around the specified element.
  * 
@@ -44,13 +45,14 @@ function wrap(el, wrapper) {
  * @param el element to wrap
  * 
  * @param wrapper potential wrapper element
- * @returns
+ * @returns wrapper element
  */
 function interactiveImageWrap(el) {
 	if(el.parentNode.classList.contains("interactiveImageWrapper")) {
 		wrapper = el.parentNode;
 		wrapper.innerHTML = '';
-		return wrap(el,wrapper);
+		wrapper.appendChild(el);
+		return wrapper;
 	} else {
 		newWrapper = document.createElement('div');
 		newWrapper.classList.add("interactiveImageWrapper");
@@ -100,7 +102,7 @@ function applyInteractiveImagePreview(imgElt, modalContainer) {
 				modalContainer.innerHTML = "<img style=\"max-height: " 
 					+ maxImageHeight+ "px; max-width: "+ maxImageWidth 
 					+ "px;\" class=\"modalImage modalContent\" src=\"" 
-					+ imgElt.src + "\"/> <a class=\"modalClose\" id=\"modalClose\"href=\"#\"/>"
+					+ imgElt.src + "\"/> <span class=\"modalCloseWrapper\"><a class=\"modalClose\" id=\"modalClose\"href=\"#\"/></span>"
 				modalContainer.classList.remove("hidden");
 				var modalClose = document.getElementById("modalClose");
 				modalClose.onclick = function() {

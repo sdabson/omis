@@ -4,6 +4,7 @@
  * @param id id
  */
 function applyDatePicker(id) {
+	$('#'+id).attr("autocomplete", "off");
 	$("#" + id).datepicker({
 		changeMonth: true,
 		changeYear: true

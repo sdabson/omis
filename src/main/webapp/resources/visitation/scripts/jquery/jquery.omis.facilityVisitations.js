@@ -13,6 +13,7 @@
  */
 function assignDatePicker(inputControl) {
 	if ( $(inputControl).prop('type') != 'date' ) {
+		$(inputControl).attr("autocomplete", "off");
 		$(inputControl).datepicker({
 			changeMonth: true,
 			changeYear: true

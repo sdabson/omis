@@ -6,6 +6,7 @@
  * @since OMIS 3.0
  */
 $(document).ready(function() {
+	$(".date").attr("autocomplete", "off");
 	$(".date").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -34,10 +35,12 @@ $(document).ready(function() {
 					},
 					success: function(data) {
 						$("#calculation").html(data);
+						$("#prisonDischargeDate").attr("autocomplete", "off");
 						$("#prisonDischargeDate").datepicker({
 							changeMonth: true,
 							changeYear: true
 						});
+						$("#probationDischargeDate").attr("autocomplete", "off");
 						$("#probationDischargeDate").datepicker({
 							changeMonth: true,
 							changeYear: true

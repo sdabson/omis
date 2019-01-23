@@ -1,9 +1,11 @@
 $(document).ready(function(feeRequirementIndex) {
 	applyActionMenu(document.getElementById("actionMenuLink"));	
+	$("#startDate").attr("autocomplete", "off");
 	$("#startDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#endDate").attr("autocomplete", "off");
 	$("#endDate").datepicker({
 		changeMonth: true,
 		changeYear: true

@@ -12,6 +12,7 @@
 function assignFormOnClick() {
 	applyActionMenu(document.getElementById("actionMenuLink"));
 	applyActionMenu(document.getElementById("substanceTestResultsActionMenuLink"), addSubstanceTestResultEvent);
+	$("#resultDate").attr("autocomplete", "off");
 	$("#resultDate").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -20,10 +21,12 @@ function assignFormOnClick() {
 		applySubstanceTestResultLinkBehavior(substanceTestResultIndex);
 	}
 	if ($("#labInvolved").is(':checked')) {
+		$("#labResultDate").attr("autocomplete", "off");
 		$("#labResultDate").datepicker({
 			changeMonth: true,
 			changeYear: true
 		});
+		$("#labRequestDate").attr("autocomplete", "off");
 		$("#labRequestDate").datepicker({
 			changeMonth: true,
 			changeYear: true
@@ -49,10 +52,12 @@ function assignFormOnClick() {
 					success: function(data) {
 						$("#labResultContainer").html(data);
 						$("#labResultContainer").show();
+						$("#labResultDate").attr("autocomplete", "off");
 						$("#labResultDate").datepicker({
 							changeMonth: true,
 							changeYear: true
 						});
+						$("#labRequestDate").attr("autocomplete", "off");
 						$("#labRequestDate").datepicker({
 							changeMonth: true,
 							changeYear: true

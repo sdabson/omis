@@ -358,7 +358,7 @@
 			status.category in ('APPEARING')
 		and
 			(((eligibility.hearingEligibilityDate >= :startDate or :startDate is null)
-			and (eligibility.hearingEligibilityDate < :endDate or :endDate is null))
+			and (eligibility.hearingEligibilityDate <= :endDate or :endDate is null))
 			or eligibility.hearingEligibilityDate is null)
 		order by eligibility.hearingEligibilityDate asc
 	]]></query>

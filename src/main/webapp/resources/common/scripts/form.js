@@ -150,6 +150,7 @@ function applyDatePicker(elt, options) {
 		changeMonth: true,
 		changeYear: true
 	},options));
+	$(elt).attr("autocomplete", "off");
 }
 
 /**
@@ -160,6 +161,7 @@ function applyDatePicker(elt, options) {
  */
 function applyTimePicker(elt, options) {
 	$(elt).ptTimeSelect();
+	$(elt).attr("autocomplete", "off");
 }
 
 /**

@@ -71,3 +71,11 @@ span.linkContainer {
 	box-shadow: ${boxShadowValue};
 	border-radius: ${borderRadius}px;
 }
+
+<%--Home Screen--%>
+#homeLinksPanelContainer>ul.content {
+	box-shadow: ${boxShadowValue};
+	border-radius: ${borderRadius}px;
+}
+
+

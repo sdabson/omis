@@ -72,6 +72,7 @@ function applyVisitLogFormOnClick() {
  */
 function assignDatePicker(elementId) {
 	if ( $("#" + elementId).prop('type') != 'date' ) {
+		$('#'+elementId).attr("autocomplete", "off");
 		$("#" + elementId).datepicker({
 			changeMonth: true,
 			changeYear: true

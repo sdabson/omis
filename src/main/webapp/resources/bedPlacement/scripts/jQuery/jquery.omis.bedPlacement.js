@@ -321,6 +321,7 @@ function removeSelectOptions(element){
  * @param elementId dom element id
  */
 function assignDatePicker(elementId) {
+	$('#'+elementId).attr("autocomplete", "off");
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -333,5 +334,6 @@ function assignDatePicker(elementId) {
  * @param elementId DOM element id
  */
 function assignTimePicker(elementId) {
+	$("#" + elementId).attr("autocomplete", "off");
 	$("#" + elementId).ptTimeSelect();
 };

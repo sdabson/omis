@@ -18,6 +18,7 @@
 package omis.person.exception;
 
 import omis.exception.DuplicateEntityFoundException;
+import omis.person.domain.Person;
 
 /**
  * Thrown when person exists.
@@ -31,37 +32,61 @@ public class PersonExistsException
 
 	private static final long serialVersionUID = 1L;
 	
+	private final Person person;
+	
 	/** Instantiates exception thrown when person exists. */
 	public PersonExistsException() {
-		// Default instantiation
+		this.person = null;
 	}
 	
 	/**
-	 * Instantiates exception thrown when person exists with message and cause.
+	 * Instantiates exception thrown when person exists.
 	 * 
 	 * @param message message
 	 * @param cause cause
+	 * @param person existing person
 	 */
 	public PersonExistsException(
-			final String message, final Throwable cause) {
+			final String message, final Throwable cause, final Person person) {
 		super(message, cause);
+		this.person = person;
 	}
 	
 	/**
-	 * Instantiates exception thrown when person exists with message.
+	 * Instantiates exception thrown when person exists.
 	 * 
 	 * @param message message
 	 */
 	public PersonExistsException(final String message) {
 		super(message);
+		this.person = null;
 	}
 	
 	/**
-	 * Instantiates exception thrown when person exists with cause.
+	 * Instantiates exception thrown when person exists.
 	 * 
 	 * @param cause cause
 	 */
 	public PersonExistsException(final Throwable cause) {
 		super(cause);
+		this.person = null;
+	}
+	
+	/**
+	 * Instantiates exception thrown when person exists.
+	 * 
+	 * @param person person
+	 */
+	public PersonExistsException(final Person person) {
+		this.person = person;
+	}
+	
+	/**
+	 * Returns person.
+	 * 
+	 * @return person
+	 */
+	public Person getPerson() {
+		return this.person;
 	}
 }

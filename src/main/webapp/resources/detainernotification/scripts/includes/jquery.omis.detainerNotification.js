@@ -174,6 +174,7 @@ function categoryChangeFunction(interstateDetainerActivityItemIndex){
 
 
 function assignDatePicker(elementId) {
+	$('#'+elementId).attr("autocomplete", "off");
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true

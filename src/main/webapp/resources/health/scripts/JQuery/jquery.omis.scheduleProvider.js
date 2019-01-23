@@ -70,6 +70,7 @@ function dayDiff(start, end) {
  
 function applyTimePickers(className) {
 	$("."+className).each(function() {
+		$(this).attr("autocomplete", "off");
 		$(this).ptTimeSelect();
 	});
 }

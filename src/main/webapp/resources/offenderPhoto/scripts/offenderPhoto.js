@@ -9,13 +9,26 @@
 window.onload = function() {
 	applyDatePicker(document.getElementById("photoDate"));
 	if(document.getElementById("photoFile")) {
-		applyOnImageFileChange(document.getElementById("photoPreviewFieldGroup"), document.getElementById("photoPreview"), document.getElementById("photoFile"), document.getElementById("photoData"), refreshOffenderPhoto, function() { if(allowEnhancedImageEditor) {enhancedImageEditingModalOnClickSetup(document.getElementById("photoPreview"), document.getElementById("photoPreview").src, 960, 1080, refreshOffenderPhoto);}}, 1920, 1080);
+		applyOnImageFileChange(
+				document.getElementById("photoPreviewFieldGroup"), document.getElementById("photoPreview"),
+				document.getElementById("photoFile"), document.getElementById("photoData"),
+				refreshOffenderPhoto, function() { 
+					if(allowEnhancedImageEditor) {
+						assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
+					}
+				},
+				640, 480);
 	}
 	if(document.getElementById("photoPreview").classList.contains("enhancedImageUploadResultImage")) {
 		if(allowEnhancedImageEditor) {
 			document.getElementById("photoPreview").onload = function() {
-				enhancedImageEditingModalOnClickSetup(document.getElementById("photoPreview"), document.getElementById("photoPreview").src, 960, 1080, refreshOffenderPhoto);
+				assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
 			};
+		}
+	}
+	if(allowEnhancedImageEditor) {
+		if(document.getElementById("photoData") && document.getElementById("photoData").value != "") {
+			assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
 		}
 	}
 	applyFormUpdateChecker(document.getElementById("offenderPhotoForm"));

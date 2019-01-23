@@ -12,6 +12,7 @@
  * @param inputControl input control to assign a jQuery Date Picker
  */
 function assignDatePicker(inputControl) {
+	$(inputControl).attr("autocomplete", "off");
 	$(inputControl).datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -23,6 +24,7 @@ function assignLabWorkOnClick() {
 	assignDatePicker("#resultsDate");
 	var orderDate = $("#orderDate");
 	var facilityId = $("#facilityId");
+	$("#orderDate").attr("autocomplete", "off");
 	$("#orderDate").datepicker({
 		changeMonth: true,
 		changeYear: true,

@@ -341,7 +341,7 @@ public class PrisonTermController {
 				form.getVerificationDate(),
 				null);
 		
-		if (form.getData() != null) {
+		if (form.getData() != null && form.getData().length > 0) {
 			final String fileExtension = form.getFileExtension();
 			this.documentFilenameGenerator
 					.setExtension(fileExtension);

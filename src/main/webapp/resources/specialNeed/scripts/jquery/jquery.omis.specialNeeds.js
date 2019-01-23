@@ -8,6 +8,7 @@ function applySpecialNeedsOnClick() {
 }
 
 function assignSpecialNeedNoteOnClick(noteIndex){
+	$("#specialNeedNote" + noteIndex + "Date").attr("autocomplete", "off");
 	$("#specialNeedNote" + noteIndex + "Date").datepicker({
 		changeMonth: true,
 		changeYear: true	

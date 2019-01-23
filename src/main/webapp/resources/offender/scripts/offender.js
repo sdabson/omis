@@ -10,10 +10,12 @@
  * @since OMIS 3.0
  */
 $(document).ready(function() {
+	$("#birthDate").attr("autocomplete", "off");
 	$("#birthDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#photoDate").attr("autocomplete", "off");
 	$("#photoDate").datepicker({
 		changeMonth: true,
 		changeYear: true

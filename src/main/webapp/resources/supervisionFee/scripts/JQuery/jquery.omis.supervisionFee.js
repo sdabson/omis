@@ -1,8 +1,10 @@
 function applyFeeRequirementLinkBehavior(feeRequirementIndex) {
+	$("#feeRequirement" + feeRequirementIndex + "StartDate").attr("autocomplete", "off");
 	$("#feeRequirement" + feeRequirementIndex + "StartDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#feeRequirement" + feeRequirementIndex + "EndDate").attr("autocomplete", "off");
 	$("#feeRequirement" + feeRequirementIndex + "EndDate").datepicker({
 		changeMonth: true,
 		changeYear: true

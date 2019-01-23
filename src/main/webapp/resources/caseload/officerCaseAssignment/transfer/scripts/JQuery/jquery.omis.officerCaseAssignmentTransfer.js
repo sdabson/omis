@@ -21,6 +21,7 @@
  * @param inputIdToAssign input ID to assign
  */
 function applyDatePicker(inputIdToAssign) {
+	$('#'+inputIdToAssign).attr("autocomplete", "off");
 	$("#" + inputIdToAssign).datepicker({
 		changeMonth: true,
 		changeYear: true

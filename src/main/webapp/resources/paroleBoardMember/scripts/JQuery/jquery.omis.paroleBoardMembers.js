@@ -12,6 +12,7 @@
  * @param elt field
  */
 function applyDatePicker(elt) {
+	$('#'+elt).attr("autocomplete", "off");
 	$("#" + elt).datepicker({
 		changeMonth: true,
 		changeYear: true

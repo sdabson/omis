@@ -19,10 +19,10 @@ window.onload = function() {
 		applyPhotoItemOnClick(i);
 		//only one of each left/right input should be checked on load (if any)
 		if(document.getElementById("leftImage" + i).checked) {
-			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea0"), document.getElementById("photoItemThumbnail"+i).src, 960, 1080, updateLeftSide);
+			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea0"), document.getElementById("photoItemThumbnail"+i).src, 320, 480, updateLeftSide);
 		}
 		if(document.getElementById("rightImage" + i).checked) {
-			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea1"), document.getElementById("photoItemThumbnail"+i).src, 960, 1080, updateRightSide);
+			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea1"), document.getElementById("photoItemThumbnail"+i).src, 320, 480, updateRightSide);
 		}
 	}
 	for(i = 0; i < currentOffenderPhotoAssociationNoteItemIndex; i++) {
@@ -53,7 +53,7 @@ function applyPhotoItemOnClick(index) {
 	leftImageRadio.onclick = function() {
 		if(leftImageRadio.checked) {
 			updateLeftSide(document.getElementById("photoItemThumbnail"+index).src);
-			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea0"), document.getElementById("photoItemThumbnail"+index).src, 960, 1080, updateLeftSide);
+			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea0"), document.getElementById("photoItemThumbnail"+index).src, 320, 480, updateLeftSide);
 			assignPhotoPreviewMouseOver(document.getElementById("photoPreview"), document.getElementsByClassName("photoJoinPreviewHoverArea"));
 		}
 	}
@@ -61,18 +61,18 @@ function applyPhotoItemOnClick(index) {
 	rightImageRadio.onclick = function() {
 		if(rightImageRadio.checked) {
 			updateRightSide(document.getElementById("photoItemThumbnail"+index).src);
-			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea1"), document.getElementById("photoItemThumbnail"+index).src, 960, 1080, updateRightSide);
+			enhancedImageEditingModalOnClickSetup(document.getElementById("clickableImageArea1"), document.getElementById("photoItemThumbnail"+index).src, 320, 480, updateRightSide);
 			assignPhotoPreviewMouseOver(document.getElementById("photoPreview"), document.getElementsByClassName("photoJoinPreviewHoverArea"));
 		}
 	}
 }
 
 function updateLeftSide(data) {
-	updatePreviewSection(data, document.getElementById("photoPreview"), 0, 960, 1920, 1080, refreshOffenderPhoto);
+	updatePreviewSection(data, document.getElementById("photoPreview"), 0, 320, 640, 480, refreshOffenderPhoto);
 }
 
 function updateRightSide(data) {
-	updatePreviewSection(data, document.getElementById("photoPreview"), 1, 960, 1920, 1080, refreshOffenderPhoto);
+	updatePreviewSection(data, document.getElementById("photoPreview"), 1, 320, 640, 480, refreshOffenderPhoto);
 }
 
 /*

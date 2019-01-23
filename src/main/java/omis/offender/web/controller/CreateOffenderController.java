@@ -50,12 +50,14 @@ import omis.demographics.domain.Tribe;
 import omis.demographics.domain.Weight;
 import omis.demographics.domain.component.PersonAppearance;
 import omis.demographics.domain.component.PersonPhysique;
-import omis.exception.BusinessException;
-import omis.exception.DuplicateEntityFoundException;
+import omis.demographics.exception.PersonDemographicsExistsException;
+import omis.exception.DateConflictException;
+import omis.exception.OperationNotAuthorizedException;
 import omis.io.FilenameGenerator;
 import omis.media.io.PhotoPersister;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
+import omis.offender.exception.OffenderExistsException;
 import omis.offender.service.CreateOffenderService;
 import omis.offender.web.form.AlienResidenceLegality;
 import omis.offender.web.form.CreateOffenderFlagItem;
@@ -63,11 +65,16 @@ import omis.offender.web.form.CreateOffenderFlagItemValue;
 import omis.offender.web.form.CreateOffenderForm;
 import omis.offender.web.validator.CreateOffenderFormValidator;
 import omis.offenderflag.domain.OffenderFlagCategory;
+import omis.offenderflag.exception.OffenderFlagExistsException;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
+import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.person.domain.Person;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.religion.domain.Religion;
+import omis.religion.exception.ReligiousPreferenceExistsException;
 import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
 
 /**
@@ -137,16 +144,22 @@ public class CreateOffenderController {
 	
 	private static final String HOME_COUNTRY_CITIZEN_MODEL_KEY
 		= "homeCountryCitizen";
-
+	
 	/* Errors messages. */
 	
-	private static final String DUPLICATE_ENTITY_FOUND_MESSAGE_KEY
-		= "birthCity.exists";
+	private static final String OFFENDER_EXISTS_MESSAGE_KEY
+		= "offender.exists";
+	
+	private static final String STATE_ID_NUMBER_EXISTS_MESSAGE_KEY
+		= "stateIdNumber.exists";
 
 	/* Bundles. */
 	
 	private static final String ERROR_BUNDLE_NAME
 		= "omis.offender.msgs.form";
+	
+	private static final String PERSON_ERROR_BUNDLE_NAME
+		= "omis.person.msgs.form";
 	
 	/* Services. */
 	
@@ -309,7 +322,19 @@ public class CreateOffenderController {
 	 * @param createOffenderForm form capturing offender information
 	 * @param result binding result
 	 * @return redirect to profile screen
-	 * @throws BusinessException if a business rule is violated
+	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number exists
+	 * @throws PersonDemographicsExistsException if person demographics record
+	 * exists
+	 * @throws OperationNotAuthorizedException if religious preference
+	 * accommodation is not authorized 
+	 * @throws DateConflictException if conflicting religious preferences exist
+	 * in date range 
+	 * @throws ReligiousPreferenceExistsException if religious preference
+	 * exists 
+	 * @throws OffenderFlagExistsException if flag exists for offender
+	 * @throws OffenderPhotoAssociationExistsException if offender photo
+	 * association exists
 	 */
 	@PreAuthorize("hasRole('OFFENDER_CREATE') or hasRole('ADMIN')")
 	@RequestMapping(value = "/create.html", method = RequestMethod.POST)
@@ -318,7 +343,14 @@ public class CreateOffenderController {
 				final Person person,
 			final CreateOffenderForm createOffenderForm,
 			final BindingResult result)
-				throws BusinessException {
+					throws OffenderExistsException,
+						StateIdNumberExistsException,
+						PersonDemographicsExistsException,
+						ReligiousPreferenceExistsException,
+						DateConflictException,
+						OperationNotAuthorizedException,
+						OffenderFlagExistsException,
+						OffenderPhotoAssociationExistsException {
 		this.createOffenderFormValidator.validate(createOffenderForm, result);
 		if (result.hasErrors()) {
 			return this.prepareRedisplayMav(createOffenderForm, result);
@@ -334,10 +366,14 @@ public class CreateOffenderController {
 		City birthPlace;
 		if (createOffenderForm.getCreateNewBirthPlace() != null
 				&& createOffenderForm.getCreateNewBirthPlace()) {
-			birthPlace = this.createOffenderService.createCity(
+			try {
+				birthPlace = this.createOffenderService.createCity(
 					createOffenderForm.getBirthPlaceName(),
 					createOffenderForm.getBirthState(),
 					createOffenderForm.getBirthCountry());
+			} catch (CityExistsException e) {
+				birthPlace = e.getCity();
+			}
 		} else {
 			birthPlace = createOffenderForm.getBirthPlace();
 		}
@@ -432,7 +468,7 @@ public class CreateOffenderController {
 		}
 		if (this.createOffenderService.findRequiredCategories().size() > 0) {
 			if (!this.createOffenderService.hasRequiredFlags(offender)) {
-				throw new BusinessException("Required flags missing");
+				throw new RuntimeException("Required flags missing");
 			}
 		}
 		if (createOffenderForm.getPhotoData() != null
@@ -447,7 +483,7 @@ public class CreateOffenderController {
 		} else if ((createOffenderForm.getPhotoData() != null
 					&& createOffenderForm.getPhotoData().length > 0)
 				|| createOffenderForm.getPhotoDate() != null) {
-			throw new BusinessException("Both photo and date required");
+			throw new RuntimeException("Both photo and date required");
 		}
 		return new ModelAndView(String.format(PROFILE_REDIRECT,
 				offender.getId()));
@@ -538,20 +574,44 @@ public class CreateOffenderController {
 		return mav;
 	}
 	
-	/* Exception handlers. */
+	/*
+	 * Exception handlers.
+	 * 
+	 * Handles only duplicate offenders and none-unique State ID number. All
+	 * other duplicate entity found exceptions thrown by save(...) are logically
+	 * impossible and therefore should be reported as runtime exceptions.
+	 */
 	
 	/**
-	 * Handles {@code DuplicateEntityFoundException}.
+	 * Handles {@code OffenderExistsException}.
 	 * 
-	 * @param duplicateEntityFoundException exception
-	 * @return screen to handle {@code DuplicateEntityFoundException}
+	 * @param offenderExistsException exception
+	 * @return screen to handle {@code OffenderExistsException}
 	 */
-	@ExceptionHandler(DuplicateEntityFoundException.class)
-	public ModelAndView handleDuplicateEntityFoundException(
-			final DuplicateEntityFoundException duplicateEntityFoundException) {
+	@ExceptionHandler(OffenderExistsException.class)
+	public ModelAndView handleOffenderExistsException(
+			final OffenderExistsException offenderExistsException) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				DUPLICATE_ENTITY_FOUND_MESSAGE_KEY, ERROR_BUNDLE_NAME,
-				duplicateEntityFoundException);
+				OFFENDER_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
+				offenderExistsException);
+	}
+	
+	/**
+	 * Handles {@code StateIdNumberExistsException}.
+	 * 
+	 * @param stateIdNumberExistsException exception to handle
+	 * @return screen to handle {@code StateIdNumberExistsException}
+	 */
+	@ExceptionHandler(StateIdNumberExistsException.class)
+	public ModelAndView handleStateIdNumberExistsException(
+			final StateIdNumberExistsException stateIdNumberExistsException) {
+		stateIdNumberExistsException.getPerson().getName();
+		return this.businessExceptionHandlerDelegate
+				.prepareModelAndView(
+					STATE_ID_NUMBER_EXISTS_MESSAGE_KEY,
+					PERSON_ERROR_BUNDLE_NAME,
+					stateIdNumberExistsException);
+		
 	}
 	
 	/* Helper methods. */

@@ -259,8 +259,16 @@ public class PlacementTermServiceImpl
 					offender, startDate, endDate, startPlacementTerm);
 		}
 		if (placementTermCountBetweenDates > 0) {
-			throw new PlacementTermConflictException(
-					"Conflict with existing placement term");
+			List<PlacementTerm> conflictingPlacementTerms;
+			if (startPlacementTerm == null) {
+				conflictingPlacementTerms = this.placementTermDao
+					.findForOffenderBetweenDates(offender, startDate, endDate);
+			} else {
+				conflictingPlacementTerms = this.placementTermDao
+						.findForOffenderBetweenDatesExcluding(
+							offender, startDate, endDate, startPlacementTerm);
+			}
+			throw new PlacementTermConflictException(conflictingPlacementTerms);
 		}
 
 		// Determines correctional status term. Use existing if the correctional

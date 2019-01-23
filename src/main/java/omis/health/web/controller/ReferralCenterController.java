@@ -365,9 +365,10 @@ public class ReferralCenterController {
 		    			new HealthAppointmentStatus[] { null },
 		    			currentDate);
 		    	resolvedReferrals = this.referralSummaryReportService
-		    		.findByFacility(facility, filterByStartDate,
-		    			filterByEndDate, reportReferralTypes, resolvedStatuses,
-		    			currentDate);
+		    		.findByOffender(filterByOffender, filterByStartDate,
+					filterByEndDate, reportReferralTypes,
+					resolvedStatuses, currentDate);
+		    		
 		    	map.put("resolvedReferrals", resolvedReferrals);
 		    	map.put("scheduledReferrals", scheduledReferrals);
 		    }

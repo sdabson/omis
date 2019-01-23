@@ -1,4 +1,5 @@
 function assignAccommodationNoteOnClick(noteIndex){
+	$("#accommodationNote" + noteIndex + "Date").attr("autocomplete", "off");
 	$("#accommodationNote" + noteIndex + "Date").datepicker({
 		changeMonth: true,
 		changeYear: true	

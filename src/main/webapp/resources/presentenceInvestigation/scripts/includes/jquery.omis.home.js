@@ -47,6 +47,7 @@ function presentenceInvestigationRequestNoteItemRowOnClick(presentenceInvestigat
 };
 
 function assignDatePicker(elementId) {
+	$('#'+elementId).attr("autocomplete", "off");
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true

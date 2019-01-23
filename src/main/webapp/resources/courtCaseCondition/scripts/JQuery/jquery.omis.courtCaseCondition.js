@@ -84,6 +84,7 @@ function documentTagItemRowOnClick(agreementAssociableDocumentItemIndex, documen
 
 
 function assignDatePicker(elementId) {
+	$('#'+elementId).attr("autocomplete", "off");
 	$("#" + elementId).datepicker({
 		changeMonth: true,
 		changeYear: true

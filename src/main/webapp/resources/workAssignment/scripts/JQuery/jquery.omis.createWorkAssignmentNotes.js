@@ -35,6 +35,7 @@ function addWorkAssignmentNoteItem(){
  * @param inputControl input control to assign a jQuery Date Picker
  */
 function assignDatePicker(inputControl) {
+	$(inputControl).attr("autocomplete", "off");
 	$(inputControl).datepicker({
 		changeMonth: true,
 		changeYear: true

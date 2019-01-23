@@ -17,14 +17,19 @@
 		<c:choose>
 			<c:when test="${not empty summary.disciplinaryCodeDescription}">
 				<c:choose>
-					<c:when test="${not empty summary.modifiedDisciplinaryCode}">
+					<c:when test="${not empty summary.modifiedDisciplinaryCodeDescription}">
 						<fmt:message key="modifiedViolationDetailsLabel">
-							<fmt:param value="${summary.modifiedDisciplinaryCode}"/>
+							<fmt:param value="${summary.modifiedDisciplinaryCodeValue}"/>
+							<fmt:param value="${summary.modifiedDisciplinaryCodeDescription}"/>
+							<fmt:param value="${summary.disciplinaryCodeValue}"/>
 							<fmt:param value="${summary.disciplinaryCodeDescription}"/>
 						</fmt:message>
 					</c:when>
 					<c:otherwise>
-						<c:out value="${summary.disciplinaryCodeDescription}"/>
+						<fmt:message key="violationDetailsDescriptionLabel">
+							<fmt:param value="${summary.disciplinaryCodeValue}"/>
+							<fmt:param value="${summary.disciplinaryCodeDescription}"/>
+						</fmt:message>
 					</c:otherwise>
 				</c:choose>
 			</c:when>
@@ -32,12 +37,17 @@
 				<c:choose>
 					<c:when test="${not empty summary.modifiedConditionClause}">
 						<fmt:message key="modifiedViolationDetailsLabel">
+							<fmt:param value="${summary.modifiedConditionTitle}"/>
 							<fmt:param value="${summary.modifiedConditionClause}"/>
 							<fmt:param value="${summary.conditionTitle}"/>
+							<fmt:param value="${summary.conditionClause}"/>
 						</fmt:message>
 					</c:when>
 					<c:otherwise>
-						<c:out value="${summary.conditionTitle}"/>
+						<fmt:message key="violationDetailsDescriptionLabel">
+							<fmt:param value="${summary.conditionTitle}"/>
+							<fmt:param value="${summary.conditionClause}"/>
+						</fmt:message>
 					</c:otherwise>
 				</c:choose>
 			</c:when>

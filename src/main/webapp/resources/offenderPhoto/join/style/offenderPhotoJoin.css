@@ -42,8 +42,8 @@ img.photoItemThumbnail {
 }
 
 img.joinedPhotoPreview {
-	width: 480px;
-	height: 270px;
+	width: 320px;
+	height: 240px;
 }
 
 div.photoItem div.photoItemThumbnailContainer {

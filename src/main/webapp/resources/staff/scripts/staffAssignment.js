@@ -24,37 +24,6 @@
  */
 window.onload = function() {
 	
-	// Refreshes photo
-//	function refreshPhoto(previewElt, inputElt, data) {
-//		previewElt.setAttribute("src", data);
-//		inputElt.value = data.replace("data:image/jpeg;base64,", "");
-//	}
-	
-	// Applies image file change behavior - eventually move to common library
-//	function applyOnImageFileChange(fieldGroupElt, previewElt, fileInputElt, inputElt, refreshPhotoCallback) {
-//		if (previewElt.getAttribute("src") == null || previewElt.getAttribute("src") == "") {
-//			if (!ui.hasClass(fieldGroupElt, "hidden")) {
-//				ui.addClass(fieldGroupElt, "hidden");
-//			}
-//		}
-//		if (window.FileReader) {
-//			fileInputElt.onchange = function(event) {
-//				var reader = new FileReader();
-//				reader.onload = function(innerEvent) {
-//					if (ui.hasClass(fieldGroupElt, "hidden")) {
-//						ui.removeClass(fieldGroupElt, "hidden");
-//					}
-//					var data = innerEvent.target.result;
-//					refreshPhotoCallback(previewElt, inputElt, data);
-//					fileInputElt.value = null;
-//				};
-//				if (event.target.files[0] != null) {
-//					reader.readAsDataURL(event.target.files[0]);
-//				}
-//			};
-//		}
-//	}
-	
 	// Updates locations and divisions
 	function onchangeSupervisoryOrganization(supervisoryOrganization) {
 		
@@ -98,42 +67,32 @@ window.onload = function() {
 	if (birthDate != null) {
 		applyDatePicker(document.getElementById("birthDate"));
 	}
-//	applyOnImageFileChange(document.getElementById("photoPreviewFieldGroup"),
-//			document.getElementById("photoPreview"),
-//			document.getElementById("photoFile"),
-//			document.getElementById("photoData"),
-//			refreshPhoto,
-//			function() { //if(allowEnhancedImageEditor) {
-//						if(true) {
-//							console.log("reached");
-//				enhancedImageEditingModalOnClickSetup(
-//						document.getElementById("photoPreview"),
-//						document.getElementById("photoPreview").src,
-//						960, 1080, refreshOffenderPhoto);
-//				console.log("assigned");}}, 1920, 1080);
-
-	//Apply the image uploader functionality
-	if(document.getElementById("photoPreview").classList.contains("hoverableUploadImage")) {
-		if(allowEnhancedImageEditor) {
-			if(document.getElementById("photoPreview").complete) {
-				enhancedImageEditingModalOnClickSetup(document.getElementById("photoPreview"), document.getElementById("photoPreview").src, 960, 1080, refreshPhoto);
-			} else {
-				document.getElementById("photoPreview").onload = function() {
-					enhancedImageEditingModalOnClickSetup(document.getElementById("photoPreview"), document.getElementById("photoPreview").src, 960, 1080, refreshPhoto);
-				};
-			}
+	
+	//If new photo flag is true, assign image editing
+	if(allowEnhancedImageEditor) {
+		if(document.getElementById("newPhoto").value) {
+			assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 640, 480);
 		}
 	}
-	applyOnImageFileChange(document.getElementById("photoPreviewFieldGroup"),
-			document.getElementById("photoPreview"),
-			document.getElementById("photoFile"),
-			document.getElementById("photoData"),
-			refreshPhoto,
-			function() { if(allowEnhancedImageEditor) {enhancedImageEditingModalOnClickSetup(document.getElementById("photoPreview"), document.getElementById("photoPreview").src, 960, 1080, refreshPhoto);}}, 1920, 1080);
 	
+	//Show preview area on edit, and 
+	applyOnImageFileChange(
+		document.getElementById("photoPreviewFieldGroup"), document.getElementById("photoPreview"),
+		document.getElementById("photoFile"), document.getElementById("photoData"),
+		refreshPhoto, function() { 
+			if(allowEnhancedImageEditor) {
+				assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 640, 480);
+			}
+			document.getElementById("newPhoto").value = true;
+		},
+		640, 480);
+	
+	//apply date pickers
 	applyDatePicker(document.getElementById("photoDate"));
 	applyDatePicker(document.getElementById("startDate"));
 	applyDatePicker(document.getElementById("endDate"));
+	
+	
 	var supervisoryOrganization = document.getElementById("supervisoryOrganization");
 	supervisoryOrganization.onchange = function() {
 		var supervisoryOrganization;

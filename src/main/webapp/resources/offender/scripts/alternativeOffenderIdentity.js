@@ -6,18 +6,22 @@
  * @since OMIS 3.0
  */
 $(document).ready(function() {
+	$("#birthDate").attr("autocomplete", "off");
 	$("#birthDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#deathDate").attr("autocomplete", "off");
 	$("#deathDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#startDate").attr("autocomplete", "off");
 	$("#startDate").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#endDate").attr("autocomplete", "off");
 	$("#endDate").datepicker({
 		changeMonth: true,
 		changeYear: true

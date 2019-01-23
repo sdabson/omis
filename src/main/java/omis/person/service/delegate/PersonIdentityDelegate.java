@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.person.service.delegate;
 
 import java.util.Date;
@@ -21,22 +38,23 @@ import omis.region.domain.State;
  * 
  * @author Joel Norris
  * @author Yidong Li
- * @version 0.1.0 (Jun 1, 2015)
+ * @author Stephen Abson
+ * @version 0.1.1 (Jan 17, 2019)
  * @since OMIS 3.0
  */
 public class PersonIdentityDelegate {
 
 	/* Data access objects. */
 	
-	private PersonIdentityDao personIdentityDao;
+	private final PersonIdentityDao personIdentityDao;
 	
 	/* Instance factories. */
 	
-	private InstanceFactory<PersonIdentity> personIdentityInstanceFactory;
+	private final InstanceFactory<PersonIdentity> personIdentityInstanceFactory;
 	
 	/* Component retrievers. */
 	
-	private AuditComponentRetriever auditComponentRetriever;
+	private final AuditComponentRetriever auditComponentRetriever;
 	
 	/* Constructors. */
 	
@@ -189,6 +207,62 @@ public class PersonIdentityDelegate {
 		return this.personIdentityDao.findByPerson(person);
 	}
 	
+	/**
+	 * Counts person identities by State ID number.
+	 *  
+	 * @param stateIdNumber State ID number by which to count person identities
+	 * @param excludedIdentities person identities to optionally exclude
+	 * @return count of person identities by State ID number
+	 */
+	public long countByStateIdNumber(
+			final String stateIdNumber,
+			final PersonIdentity... excludedIdentities) {
+		
+		// This method will most likely be deprecated and replaced by one that
+		// returns whether an identity with the State ID number exists. When
+		// that is the case, replace the invocations of DAO "find" methods with
+		// uses of "count" methods and return "count...(args) > 0". This work
+		// should be done along with that described in the comments in
+		// findByStateIdNumber below when it can be guaranteed that only a
+		// single person identity with a duplicate State ID number to the one
+		// passed can exist (in other words, when unique State ID numbers are
+		// enforced and there are no violations).
+		//    --- SA (Jan 17, 2019)
+		
+		// Performs count
+		if (excludedIdentities.length > 0) {
+			return this.personIdentityDao.findByStateIdNumberExcluding(
+					stateIdNumber, excludedIdentities).size();
+		} else {
+			return this.personIdentityDao.findByStateIdNumber(stateIdNumber)
+					.size();
+		}
+	}
+	
+	/**
+	 * Returns person identities by State ID number.
+	 * 
+	 * @param stateIdNumber State ID number by which to return person identities
+	 * @param excludedIdentities person identities to optionally exclude
+	 * @return person identities by State ID number
+	 */
+	public List<PersonIdentity> findByStateIdNumber(
+			final String stateIdNumber,
+			final PersonIdentity... excludedIdentities) {
+		
+		// This method will most likely be replaced by one that returns a
+		// single identity with a duplicate State ID number. See the comments
+		// in countByStateIdNumber for more details - SA
+		
+		// Returns identities
+		if (excludedIdentities.length > 0) {
+			return this.personIdentityDao.findByStateIdNumberExcluding(
+					stateIdNumber, excludedIdentities);
+		} else {
+			return this.personIdentityDao.findByStateIdNumber(stateIdNumber);
+		}
+	}
+	
 	/* Helper methods. */
 	
 	private PersonIdentity populatePersonIdentity(
@@ -211,6 +285,4 @@ public class PersonIdentityDelegate {
 		personIdentity.setBirthCountry(birthCountry);
 		return personIdentity;
 	}
-	
-	
 }

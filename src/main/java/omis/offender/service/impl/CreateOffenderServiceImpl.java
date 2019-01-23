@@ -36,6 +36,7 @@ import omis.demographics.domain.Sex;
 import omis.demographics.domain.Tribe;
 import omis.demographics.domain.component.PersonAppearance;
 import omis.demographics.domain.component.PersonPhysique;
+import omis.demographics.exception.PersonDemographicsExistsException;
 import omis.demographics.service.delegate.BuildDelegate;
 import omis.demographics.service.delegate.ComplexionDelegate;
 import omis.demographics.service.delegate.EyeColorDelegate;
@@ -56,19 +57,25 @@ import omis.offender.service.CreateOffenderService;
 import omis.offender.service.delegate.OffenderDelegate;
 import omis.offenderflag.domain.OffenderFlag;
 import omis.offenderflag.domain.OffenderFlagCategory;
+import omis.offenderflag.exception.OffenderFlagExistsException;
 import omis.offenderflag.service.delegate.OffenderFlagCategoryDelegate;
 import omis.offenderflag.service.delegate.OffenderFlagDelegate;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
+import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.offenderphoto.service.delegate.OffenderPhotoAssociationDelegate;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.StateIdNumberExistsException;
+import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.person.service.delegate.SuffixDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
+import omis.region.exception.CityExistsException;
 import omis.region.service.delegate.CityDelegate;
 import omis.region.service.delegate.StateDelegate;
 import omis.religion.domain.Religion;
 import omis.religion.domain.ReligiousPreference;
+import omis.religion.exception.ReligiousPreferenceExistsException;
 import omis.religion.service.delegate.ReligionDelegate;
 import omis.religion.service.delegate.ReligiousPreferenceDelegate;
 
@@ -88,43 +95,46 @@ public class CreateOffenderServiceImpl
 	
 	private final OffenderDelegate offenderDelegate;
 	
-	private PersonDemographicsDelegate personDemographicsDelegate;
+	private final PersonIdentityDelegate personIdentityDelegate;
 	
-	private ReligiousPreferenceDelegate religiousPreferenceDelegate;
+	private final PersonDemographicsDelegate personDemographicsDelegate;
 	
-	private CitizenshipDelegate citizenshipDelegate;
+	private final ReligiousPreferenceDelegate religiousPreferenceDelegate;
 	
-	private AlienResidenceDelegate alienResidenceDelegate;
+	private final CitizenshipDelegate citizenshipDelegate;
 	
-	private OffenderFlagDelegate offenderFlagDelegate;
+	private final AlienResidenceDelegate alienResidenceDelegate;
 	
-	private OffenderPhotoAssociationDelegate offenderPhotoAssociationDelegate;
+	private final OffenderFlagDelegate offenderFlagDelegate;
 	
-	private CountryDelegate countryDelegate;
+	private final OffenderPhotoAssociationDelegate
+	offenderPhotoAssociationDelegate;
 	
-	private StateDelegate stateDelegate;
+	private final CountryDelegate countryDelegate;
 	
-	private CityDelegate cityDelegate;
+	private final StateDelegate stateDelegate;
 	
-	private BuildDelegate buildDelegate;
+	private final CityDelegate cityDelegate;
 	
-	private ComplexionDelegate complexionDelegate;
+	private final BuildDelegate buildDelegate;
 	
-	private EyeColorDelegate eyeColorDelegate;
+	private final ComplexionDelegate complexionDelegate;
 	
-	private HairColorDelegate hairColorDelegate;
+	private final EyeColorDelegate eyeColorDelegate;
 	
-	private MaritalStatusDelegate maritalStatusDelegate;
+	private final HairColorDelegate hairColorDelegate;
 	
-	private RaceDelegate raceDelegate;
+	private final MaritalStatusDelegate maritalStatusDelegate;
 	
-	private TribeDelegate tribeDelegate;
+	private final RaceDelegate raceDelegate;
 	
-	private SuffixDelegate suffixDelegate;
+	private final TribeDelegate tribeDelegate;
 	
-	private ReligionDelegate religionDelegate;
+	private final SuffixDelegate suffixDelegate;
 	
-	private OffenderFlagCategoryDelegate offenderFlagCategoryDelegate;
+	private final ReligionDelegate religionDelegate;
+	
+	private final OffenderFlagCategoryDelegate offenderFlagCategoryDelegate;
 	
 	
 	
@@ -133,6 +143,7 @@ public class CreateOffenderServiceImpl
 	 * Instantiates an instance of create offender service.
 	 * 
 	 * @param offenderDelegate offender delegate
+	 * @param personIdentityDelegate person identity delegate
 	 * @param personDemographicsDelegate person demographics delegate
 	 * @param religiousPreferenceDelegate religious preference delegate
 	 * @param citizenshipDelegate citizenship delegate
@@ -156,6 +167,7 @@ public class CreateOffenderServiceImpl
 	 */
 	public CreateOffenderServiceImpl(
 			final OffenderDelegate offenderDelegate,
+			final PersonIdentityDelegate personIdentityDelegate,
 			final PersonDemographicsDelegate personDemographicsDelegate,
 			final ReligiousPreferenceDelegate religiousPreferenceDelegate,
 			final CitizenshipDelegate citizenshipDelegate,
@@ -177,6 +189,7 @@ public class CreateOffenderServiceImpl
 			final ReligionDelegate religionDelegate, 
 			final OffenderFlagCategoryDelegate offenderFlagCategoryDelegate) {
 		this.offenderDelegate = offenderDelegate;
+		this.personIdentityDelegate = personIdentityDelegate;
 		this.personDemographicsDelegate = personDemographicsDelegate;
 		this.religiousPreferenceDelegate = religiousPreferenceDelegate;
 		this.citizenshipDelegate = citizenshipDelegate;
@@ -205,7 +218,21 @@ public class CreateOffenderServiceImpl
 			final Integer socialSecurityNumber, final String stateIdNumber, 
 			final Date birthDate, final Country birthCountry, 
 			final City birthPlace, final Sex sex) 
-		throws DuplicateEntityFoundException {
+					throws OffenderExistsException,
+						StateIdNumberExistsException {
+		long stateIdNumberCount = this.personIdentityDelegate
+				.countByStateIdNumber(stateIdNumber);
+		if (stateIdNumberCount > 0) {
+			if (stateIdNumberCount == 1) {
+				throw new StateIdNumberExistsException(
+						stateIdNumber,
+						this.personIdentityDelegate
+							.findByStateIdNumber(stateIdNumber).get(0)
+								.getPerson());
+			} else {
+				throw new StateIdNumberExistsException(stateIdNumber);
+			}
+		}
 		State birthState;
 		if (birthPlace != null) {
 			birthState = birthPlace.getState();
@@ -247,23 +274,26 @@ public class CreateOffenderServiceImpl
 			final DominantSide dominantSide, final Race race,
 			final Boolean hispanicEthnicity, final Tribe tribe,
 			final MaritalStatus maritalStatus) 
-		throws DuplicateEntityFoundException {
-		
+					throws PersonDemographicsExistsException {
 		return this.personDemographicsDelegate.create(offender, appearance,
 				race, hispanicEthnicity, physique, dominantSide, maritalStatus,
 				tribe);
 	}
 
-	/** {@inheritDoc} 
-	 * @throws OperationNotAuthorizedException 
-	 * @throws DateConflictException 
-	 * @throws DuplicateEntityFoundException */
+	/** {@inheritDoc} */
 	@Override
 	public ReligiousPreference addReligiousPreference(final Offender offender,
-			final Religion religion) throws DuplicateEntityFoundException,
-				DateConflictException, OperationNotAuthorizedException {
-		return this.religiousPreferenceDelegate
+			final Religion religion)
+					throws ReligiousPreferenceExistsException,
+						DateConflictException, OperationNotAuthorizedException {
+		
+		// TODO Refactor delegate to use ReligiousPreferenceExistsException - SA
+		try {
+			return this.religiousPreferenceDelegate
 				.save(offender, religion, null, null, null);
+		} catch (DuplicateEntityFoundException e) {
+			throw new ReligiousPreferenceExistsException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -281,25 +311,32 @@ public class CreateOffenderServiceImpl
 				.create(offender, null, null, legal, null);
 	}
 
-	/** {@inheritDoc} 
-	 * @throws DuplicateEntityFoundException */
+	/** {@inheritDoc} */
 	@Override
 	public OffenderFlag setFlag(final Offender offender,
 			final OffenderFlagCategory category, final Boolean value)
-					throws DuplicateEntityFoundException {
-		return this.offenderFlagDelegate.create(offender, category, value);
+					throws OffenderFlagExistsException {
+		try {
+			return this.offenderFlagDelegate.create(offender, category, value);
+		} catch (DuplicateEntityFoundException e) {
+			throw new OffenderFlagExistsException(e);
+		}
 	}
 
-	/** {@inheritDoc} 
-	 * @throws DuplicateEntityFoundException */
+	/** {@inheritDoc} */
 	@Override
 	public OffenderPhotoAssociation associateProfilePhoto(
-			final Offender offender, final String filename, 
-			final Date photoDate) throws DuplicateEntityFoundException {
+			final Offender offender, final String filename,
+			final Date photoDate)
+					throws OffenderPhotoAssociationExistsException {
 		Photo photo = this.offenderPhotoAssociationDelegate
 				.createPhoto(offender, filename, photoDate);
-		return this.offenderPhotoAssociationDelegate
-				.create(offender, photo, true);
+		try {
+			return this.offenderPhotoAssociationDelegate
+					.create(offender, photo, true);
+		} catch (DuplicateEntityFoundException e) {
+			throw new OffenderPhotoAssociationExistsException(e);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -324,7 +361,7 @@ public class CreateOffenderServiceImpl
 	@Override
 	public City createCity(
 			final String name, final State state, final Country country)
-				throws DuplicateEntityFoundException {
+				throws CityExistsException {
 		return this.cityDelegate.create(name, true, state, country);
 	}
 

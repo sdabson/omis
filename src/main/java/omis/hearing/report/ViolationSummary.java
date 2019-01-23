@@ -10,7 +10,7 @@ import omis.violationevent.domain.ViolationEventCategory;
  * Violation Summary.
  * 
  *@author Annie Wahl
- *@version 0.1.2 (Jul 27, 2018)
+ *@version 0.1.3 (Jan 22, 2019)
  *@since OMIS 3.0
  *
  */
@@ -38,7 +38,11 @@ public class ViolationSummary implements Serializable {
 	
 	private final String conditionTitle;
 	
-	private final String modifiedDisciplinaryCode;
+	private final String modifiedDisciplinaryCodeValue;
+	
+	private final String modifiedDisciplinaryCodeDescription;
+
+	private final String modifiedConditionTitle;
 	
 	private final String modifiedConditionClause;
 	
@@ -65,7 +69,9 @@ public class ViolationSummary implements Serializable {
 	 * @param disciplinaryCodeValue - String
 	 * @param conditionClause - String
 	 * @param conditionTitle - String
-	 * @param modifiedDisciplinaryCode - String
+	 * @param modifiedDisciplinaryCodeValue - String
+	 * @param modifiedDisciplinaryCodeDescription - String
+	 * @param modifiedConditionTitle - String
 	 * @param modifiedConditionClause - String
 	 * @param violationEventDetails - String
 	 * @param violationEventDate - Date
@@ -84,7 +90,9 @@ public class ViolationSummary implements Serializable {
 			final String disciplinaryCodeValue,
 			final String conditionClause,
 			final String conditionTitle,
-			final String modifiedDisciplinaryCode,
+			final String modifiedDisciplinaryCodeValue,
+			final String modifiedDisciplinaryCodeDescription,
+			final String modifiedConditionTitle,
 			final String modifiedConditionClause,
 			final String violationEventDetails,
 			final Date violationEventDate,
@@ -112,7 +120,10 @@ public class ViolationSummary implements Serializable {
 		this.infractionId = null;
 		this.violationDetails = violationDetails;
 		this.modifiedConditionClause = modifiedConditionClause;
-		this.modifiedDisciplinaryCode = modifiedDisciplinaryCode;
+		this.modifiedConditionTitle = modifiedConditionTitle;
+		this.modifiedDisciplinaryCodeValue = modifiedDisciplinaryCodeValue;
+		this.modifiedDisciplinaryCodeDescription =
+				modifiedDisciplinaryCodeDescription;
 	}
 	
 	/**
@@ -123,7 +134,8 @@ public class ViolationSummary implements Serializable {
 	 * @param violationEventCategory - Violation Event Category
 	 * @param disciplinaryCodeDescription - String
 	 * @param disciplinaryCodeValue - String
-	 * @param modifiedDisciplinaryCode - String
+	 * @param modifiedDisciplinaryCodeValue - String
+	 * @param modifiedDisciplinaryCodeDescription - String
 	 * @param violationEventDetails - String
 	 * @param violationEventDate - Date
 	 * @param decisionReason - String
@@ -140,7 +152,8 @@ public class ViolationSummary implements Serializable {
 			final ViolationEventCategory violationEventCategory,
 			final String disciplinaryCodeDescription,
 			final String disciplinaryCodeValue,
-			final String modifiedDisciplinaryCode,
+			final String modifiedDisciplinaryCodeValue,
+			final String modifiedDisciplinaryCodeDescription,
 			final String violationEventDetails,
 			final Date violationEventDate, final String decisionReason,
 			final String decision, final String dispositionCategory,
@@ -157,7 +170,10 @@ public class ViolationSummary implements Serializable {
 		this.violationEventDate = violationEventDate;
 		this.violationEventDetails = violationEventDetails;
 		this.modifiedConditionClause = null;
-		this.modifiedDisciplinaryCode = modifiedDisciplinaryCode;
+		this.modifiedConditionTitle = null;
+		this.modifiedDisciplinaryCodeValue = modifiedDisciplinaryCodeValue;
+		this.modifiedDisciplinaryCodeDescription =
+				modifiedDisciplinaryCodeDescription;
 		this.conditionClause = null;
 		this.conditionTitle = null;
 		this.decisionReason = decisionReason;
@@ -177,6 +193,7 @@ public class ViolationSummary implements Serializable {
 	 * @param conditionViolationId - Long
 	 * @param conditionClause - String
 	 * @param conditionTitle - String
+	 * @param modifiedConditionTitle - String
 	 * @param modifiedConditionClause - String
 	 * @param violationEventDetails - String
 	 * @param violationEventDate - Date
@@ -194,6 +211,7 @@ public class ViolationSummary implements Serializable {
 			final Long conditionViolationId,
 			final String conditionClause,
 			final String conditionTitle,
+			final String modifiedConditionTitle,
 			final String modifiedConditionClause,
 			final String violationEventDetails, final Date violationEventDate,
 			final String decisionReason,
@@ -220,7 +238,9 @@ public class ViolationSummary implements Serializable {
 		this.resolutionCategory = resolutionCategory;
 		this.violationDetails = violationDetails;
 		this.modifiedConditionClause = modifiedConditionClause;
-		this.modifiedDisciplinaryCode = null;
+		this.modifiedConditionTitle = modifiedConditionTitle;
+		this.modifiedDisciplinaryCodeValue = null;
+		this.modifiedDisciplinaryCodeDescription = null;
 	}
 	
 	/**
@@ -247,10 +267,12 @@ public class ViolationSummary implements Serializable {
 		this.violationEventCategory = violationEventCategory;
 		this.disciplinaryCodeDescription = disciplinaryCodeDescription;
 		this.disciplinaryCodeValue = disciplinaryCodeValue;
-		this.modifiedDisciplinaryCode = null;
+		this.modifiedDisciplinaryCodeDescription = null;
+		this.modifiedDisciplinaryCodeValue = null;
 		this.violationEventDetails = violationEventDetails;
 		this.violationEventDate = violationEventDate;
 		this.modifiedConditionClause = null;
+		this.modifiedConditionTitle = null;
 		this.conditionClause = null;
 		this.conditionTitle = null;
 		this.decisionReason = null;
@@ -290,7 +312,9 @@ public class ViolationSummary implements Serializable {
 		this.conditionClause = conditionClause;
 		this.conditionTitle = conditionTitle;
 		this.modifiedConditionClause = null;
-		this.modifiedDisciplinaryCode = null;
+		this.modifiedConditionTitle = null;
+		this.modifiedDisciplinaryCodeValue = null;
+		this.modifiedDisciplinaryCodeDescription = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
@@ -333,7 +357,9 @@ public class ViolationSummary implements Serializable {
 		this.conditionClause = conditionClause;
 		this.conditionTitle = conditionTitle;
 		this.modifiedConditionClause = null;
-		this.modifiedDisciplinaryCode = null;
+		this.modifiedConditionTitle = null;
+		this.modifiedDisciplinaryCodeValue = null;
+		this.modifiedDisciplinaryCodeDescription = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
@@ -377,7 +403,9 @@ public class ViolationSummary implements Serializable {
 		this.conditionClause = conditionClause;
 		this.conditionTitle = conditionTitle;
 		this.modifiedConditionClause = null;
-		this.modifiedDisciplinaryCode = null;
+		this.modifiedConditionTitle = null;
+		this.modifiedDisciplinaryCodeValue = null;
+		this.modifiedDisciplinaryCodeDescription = null;
 		this.decisionReason = null;
 		this.decision = null;
 		this.dispositionCategory = null;
@@ -527,8 +555,8 @@ public class ViolationSummary implements Serializable {
 	 * Returns this modified disciplinary code.
 	 * @return modifiedDisciplinaryCode - modified disciplinary code
 	 */
-	public String getModifiedDisciplinaryCode() {
-		return this.modifiedDisciplinaryCode;
+	public String getModifiedDisciplinaryCodeDescription() {
+		return this.modifiedDisciplinaryCodeDescription;
 	}
 
 	/**
@@ -538,6 +566,23 @@ public class ViolationSummary implements Serializable {
 	public String getModifiedConditionClause() {
 		return this.modifiedConditionClause;
 	}
-	
-	
+
+	/**
+	 * Returns the Modified Disciplinary Code Value.
+	 *
+	 * @return modifiedDisciplinaryCodeValue
+	 */
+	public String getModifiedDisciplinaryCodeValue() {
+		return this.modifiedDisciplinaryCodeValue;
+	}
+
+	/**
+	 * Returns the Modified Condition Title.
+	 *
+	 * @return modifiedConditionTitle
+	 */
+	public String getModifiedConditionTitle() {
+		return this.modifiedConditionTitle;
+	}
+
 }

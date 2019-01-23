@@ -1073,12 +1073,14 @@ public class TravelPermitController {
 			form.setStartDate(
 				permit.getDateRange().getStartDate());
 			form.setIssueDate(permit.getIssuance().getDate());
-			form.setTravelMethod(permit.getTransportation()
-				.getMethod());
+			if (permit.getTransportation() != null) {
+				form.setTravelMethod(permit.getTransportation()
+					.getMethod());
 			form.setPlateNumber(permit.getTransportation()
 				.getNumber());
 			form.setVehicleInfo(permit.getTransportation()
 				.getDescription());
+			}
 			List<TravelPermitNoteItem> noteItems
 			= new ArrayList<TravelPermitNoteItem>();
 			List<TravelPermitNote> notes = this.travelPermitService.findNotes(

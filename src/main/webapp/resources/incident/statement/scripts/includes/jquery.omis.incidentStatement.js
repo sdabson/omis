@@ -525,6 +525,7 @@ function applyInformationSourceCategoryOnClick() {
  * @param elementId DOM element id
  */
 function assignTimePicker(elementId) {
+	$("#" + elementId).attr("autocomplete", "off");
 	$("#" + elementId).ptTimeSelect();
 }
 

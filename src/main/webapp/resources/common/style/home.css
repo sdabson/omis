@@ -3,6 +3,7 @@
  *
  * Author: Stephen Abson
  * Author: Ryan Johns
+ * Author: Annie Wahl
  */
 
 span.contentHeading {
@@ -14,32 +15,64 @@ span.contentHeading {
     width: 100%;
 }
 
+#homeLinksPanelContainer {
+	display: flex;
+	position: absolute;
+	bottom: 0;
+	top: 50px;
+	width: 100%;
+	height: 90%;
+}
+
+#homeLinksHeaderContainer {
+	display: flex;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	
+}
+
+#homeLinksHeaderContainer > .homeLinksHeader {
+	position: relative;
+	width: 100%;
+	margin: 11px;
+	padding-left: 20px;
+}
+
 ul.content {
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-    list-style-type: none;
-    min-height: 211px;
-    width: 98%;
-    text-align: center;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
+	margin: 11px;
+	padding: 20px;
+	list-style-type: none;
+	min-height: 350px;
+	width: 100%;
+	position: relative;
+	border-width: 2px;
+	border-style: solid;
+}
+
+ul.content > li > a >img{
+	height: 20px;
+	width: 20px;
+	vertical-align: middle;
 }
 
 ul.content > li {
 	padding: 5px;
 	margin: 4px;
-	display:inline-block;
+	display: block;
 	margin-bottom: 22px;
-}
-
-ul.content > li {
 	list-style: none;
 }
 
-ul.content li.last {
-	/*border-bottom: none;*/
+ul.content li > a {
+	text-decoration: none;
+	color: inherit;
+}
+
+ul.content li > a:hover {
+	box-shadow: inset 0 0 15px 15px hsla(0, 100%, 100%, .33), 0 0 3px 3px hsla(0, 100%, 100%, .33);
+	transition: box-shadow 150ms ease-in-out;
+	opacity: .7;
 }
 
 ul.content #caseLoadItem {

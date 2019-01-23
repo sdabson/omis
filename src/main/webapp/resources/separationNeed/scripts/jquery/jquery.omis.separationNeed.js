@@ -7,10 +7,12 @@
  */
 
 function assignOnClick() {
+	$("#date").attr("autocomplete", "off");
 	$("#date").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#removalDate").attr("autocomplete", "off");
 	$("#removalDate").datepicker({
 		changeMonth: true,
 		changeYear: true
@@ -56,6 +58,7 @@ function separationNeedNoteItemsActionMenuOnClick() {
  * @param separationNeedNoteItemIndex separation need note item index
  */
 function separationNeedNoteItemRowOnClick(separationNeedNoteItemIndex) {
+	$("#noteDate" + separationNeedNoteItemIndex).attr("autocomplete", "off");
 	$("#noteDate" + separationNeedNoteItemIndex).datepicker({
 		changeMonth: true,
 		changeYear: true

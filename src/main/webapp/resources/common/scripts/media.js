@@ -30,6 +30,7 @@ function applyOnImageFileChange(fieldGroupElt, previewElt, fileInputElt, inputEl
 					if(maxWidth && maxHeight) {
 						convertImage(innerEvent.target.result, 'image/jpeg', 0.5, maxWidth, maxHeight, refreshPhotoCallback);
 					} else {
+						console.log("just convert");
 						convertDataURLMimeType(innerEvent.target.result, 'image/jpeg', 0.5, refreshPhotoCallback);
 					}
 					previewElt.onload = function() {
@@ -225,12 +226,26 @@ function applyImageJoin(numberOfImages, photoPreviewEle, photoData) {
 	for(i=0;i<numberOfImages;i++) {
 		clickableAreas[i] = createClickableImageArea(i, photoPreviewEle.width/numberOfImages);
 		wrapper.appendChild(clickableAreas[i]);
-		
 	}
 	if(photoData.value != "") {
 		assignPhotoPreviewMouseOver(photoPreview, clickableAreas);
 	}
 	assignPhotoPreviewMouseOut(clickableAreas);
+}
+
+function assignSingleImageEdit(photoPreview, callback, width, height) {
+	let wrapper = interactiveImageWrap(photoPreview);
+	clickableArea = createClickableImageArea(0, photoPreview.width);
+	wrapper.appendChild(clickableArea);
+	if(photoPreview.src != "") {
+		photoPreview.onmouseover = function(event) {
+			clickableArea.classList.add("show");
+		};
+	}
+	clickableArea.onmouseout = function() {
+		this.classList.remove("show");
+	}
+	enhancedImageEditingModalOnClickSetup(clickableArea, photoPreview.src, width, height, callback);
 }
 
 /*

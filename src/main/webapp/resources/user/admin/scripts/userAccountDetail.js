@@ -27,6 +27,7 @@ $(document).ready(function() {
 		});
 	}
 	if ($("#passwordExpirationDate") != null) {
+		$("#passwordExpirationDate").attr("autocomplete", "off");
 		$("#passwordExpirationDate").datepicker({
 			changeMonth: true,
 			changeYear: true

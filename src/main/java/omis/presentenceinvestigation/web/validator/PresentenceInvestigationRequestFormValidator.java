@@ -33,7 +33,7 @@ import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestFor
  * @author Ryan Johns
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.4 (Aug 15, 2018)
+ * @version 0.1.5 (Jan 17, 2019)
  * @since OMIS 3.0
  */
 public class PresentenceInvestigationRequestFormValidator
@@ -75,6 +75,9 @@ public class PresentenceInvestigationRequestFormValidator
 	private static final String DOCKET_REQUIRED_MSG_KEY =
 			"request.existingDocket.empty";
 	
+	private static final String ONE_DOCKET_REQUIRED_MSG_KEY =
+			"request.docket.empty";
+	
 	/** {@inheritDoc} */	
 	@Override
 	public boolean supports(final Class<?> clazz) {
@@ -102,6 +105,7 @@ public class PresentenceInvestigationRequestFormValidator
 				ASSIGNED_USER_REQUIRED_MSG_KEY);
 		ValidationUtils.rejectIfEmpty(errors, "category", 
 				CATEGORY_REQUIRED_MSG_KEY);
+		Boolean hasOne = false;
 		for (int i = 0; i < 
 				form.getPresentenceInvestigationDocketAssociationItems().size();
 				i++) {
@@ -127,7 +131,17 @@ public class PresentenceInvestigationRequestFormValidator
 							+ i + "].court", COURT_REQUIRED_MSG_KEY);
 				}
 			}
+			if (EnumSet.of(PresentenceInvestigationItemOperation.CREATE,
+					PresentenceInvestigationItemOperation.UPDATE).contains(
+					item.getItemOperation())){
+				hasOne = true;
+			}
 		}
+		if (!hasOne) {
+			errors.rejectValue("presentenceInvestigationDocketAssociationItems",
+					ONE_DOCKET_REQUIRED_MSG_KEY);
+		}
+		
 		for(int i = 0; i <
 				form.getPresentenceInvestigationRequestNoteItems().size(); i++){
 			if(EnumSet.of(PresentenceInvestigationItemOperation.CREATE,

@@ -74,13 +74,3 @@ div.editableImageWrapper:hover .editableImageAfter {
     cursor: pointer;
     padding: none;
 }
-
-div.modalContainer a.imageEditAccept:before {
-	content: url('../images/imageEditAccept.png');
-	position: absolute;
-	left: 50%;
-  	top: 75%;
-  	transform: translate(-50%, -50%);
-	/* display: inline-block; */
-	cursor: pointer;
-}

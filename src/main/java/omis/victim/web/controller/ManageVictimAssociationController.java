@@ -199,12 +199,6 @@ public class ManageVictimAssociationController {
 	private static final String REFLEXIVE_RELATIONSHIP_MESSAGE_KEY
 		= "victimAssociation.reflexiveRelationship";
 	
-	private static final String CITY_EXISTS_MESSAGE_KEY
-		= "city.exists";
-	
-	private static final String ZIP_CODE_EXISTS_MESSAGE_KEY
-		= "zipCode.exists";
-	
 	private static final String ADDRESS_EXISTS_MESSAGE_KEY
 		= "address.exists";
 	
@@ -217,12 +211,12 @@ public class ManageVictimAssociationController {
 	/* Message bundles. */
 	
 	private static final String ERROR_BUNDLE_NAME = "omis.victim.msgs.form";
+	
 	private static final String CONTACT_ERROR_BUNDLE_NAME 
 		= "omis.contact.msgs.form";
+	
 	private static final String ADDRESS_ERROR_BUNDLE_NAME 
 		= "omis.address.msgs.form";
-	private static final String REGION_ERROR_BUNDLE_NAME
-		= "omis.region.msgs.form";
 	
 	/* Services. */
 
@@ -452,8 +446,6 @@ public class ManageVictimAssociationController {
 	 * @throws ReflexiveRelationshipException if offender is victim
 	 * @throws VictimExistsException if victim association already
 	 * exists
-	 * @throws CityExistsException if city exists
-	 * @throws ZipCodeExistsException if zip code exits
 	 * @throws AddressExistsException if address exists
 	 * @throws TelephoneNumberExistsException if telephone number exists
 	 * @throws OnlineAccountExistsException if online account exists
@@ -470,8 +462,7 @@ public class ManageVictimAssociationController {
 			final VictimAssociationForm victimAssociationForm,
 			final BindingResult result)
 					throws VictimExistsException,
-						ReflexiveRelationshipException, 
-						CityExistsException, ZipCodeExistsException, 
+						ReflexiveRelationshipException,
 						AddressExistsException, TelephoneNumberExistsException, 
 						OnlineAccountExistsException, 
 						VictimNoteExistsException {
@@ -497,9 +488,7 @@ public class ManageVictimAssociationController {
 								victimAssociationForm.getPersonFields()
 									.getBirthCountry());
 				} catch (CityExistsException e) {
-					
-					// Front end should ensure that city does not exist - SA
-					throw new AssertionError("City exists", e);
+					birthCity = e.getCity();
 				}
 			} else {
 				birthCity = victimAssociationForm.getPersonFields()
@@ -578,16 +567,20 @@ public class ManageVictimAssociationController {
 									.getCountry())) {
 						mailingCity = birthCity;
 					} else {
-						mailingCity = this.victimAssociationService
-								.createCity(victimAssociationForm
-												.getMailingAddressFields()
-												.getCityName(),
-											victimAssociationForm
-												.getMailingAddressFields()
-												.getState(),
-											victimAssociationForm
-												.getMailingAddressFields()
-												.getCountry());
+						try {
+							mailingCity = this.victimAssociationService
+									.createCity(victimAssociationForm
+													.getMailingAddressFields()
+													.getCityName(),
+												victimAssociationForm
+													.getMailingAddressFields()
+													.getState(),
+												victimAssociationForm
+													.getMailingAddressFields()
+													.getCountry());
+						} catch (CityExistsException e) {
+							mailingCity = e.getCity();
+						}
 					}
 				} else {
 					mailingCity = victimAssociationForm
@@ -597,14 +590,18 @@ public class ManageVictimAssociationController {
 						.getNewZipCode() != null
 						&& victimAssociationForm.getMailingAddressFields()
 							.getNewZipCode()) {
-					mailingZipCode = this.victimAssociationService
-							.createZipCode(victimAssociationForm
-										.getMailingAddressFields()
-											.getZipCodeValue(),
-									victimAssociationForm
-										.getMailingAddressFields()
-											.getZipCodeExtension(),
-									mailingCity);
+					try {
+						mailingZipCode = this.victimAssociationService
+								.createZipCode(victimAssociationForm
+											.getMailingAddressFields()
+												.getZipCodeValue(),
+										victimAssociationForm
+											.getMailingAddressFields()
+												.getZipCodeExtension(),
+										mailingCity);
+					} catch (ZipCodeExistsException e) {
+						mailingZipCode = e.getZipCode();
+					}
 				} else {
 					mailingZipCode
 						= victimAssociationForm.getMailingAddressFields()
@@ -671,14 +668,18 @@ public class ManageVictimAssociationController {
 									.getCountry())) {
 					poBoxCity = mailingCity;
 				} else {
-					poBoxCity = this.victimAssociationService
-							.createCity(
-									victimAssociationForm.getPoBoxFields()
-										.getCityName(),
-									victimAssociationForm.getPoBoxFields()
-										.getState(),
-									victimAssociationForm.getPoBoxFields()
-										.getCountry());
+					try {
+						poBoxCity = this.victimAssociationService
+								.createCity(
+										victimAssociationForm.getPoBoxFields()
+											.getCityName(),
+										victimAssociationForm.getPoBoxFields()
+											.getState(),
+										victimAssociationForm.getPoBoxFields()
+											.getCountry());
+					} catch (CityExistsException e) {
+						poBoxCity = e.getCity();
+					}
 				}
 			} else {
 				poBoxCity = victimAssociationForm.getPoBoxFields()
@@ -692,19 +693,24 @@ public class ManageVictimAssociationController {
 						&& mailingZipCode.getValue().equals(
 								victimAssociationForm.getPoBoxFields()
 									.getZipCodeValue())
-						&& mailingZipCode.getExtension().equals(
-								victimAssociationForm.getPoBoxFields()
-									.getZipCodeExtension())
+						&& (mailingZipCode.getExtension() != null
+								&& mailingZipCode.getExtension().equals(
+										victimAssociationForm.getPoBoxFields()
+											.getZipCodeExtension()))
 						&& mailingZipCode.getCity().equals(poBoxCity)) {
 					poBoxZipCode = mailingZipCode;
 				} else {
-					poBoxZipCode = this.victimAssociationService
-							.createZipCode(
-								victimAssociationForm
-									.getPoBoxFields().getZipCodeValue(),
-								victimAssociationForm
-									.getPoBoxFields().getZipCodeExtension(),
-								poBoxCity);
+					try {
+						poBoxZipCode = this.victimAssociationService
+								.createZipCode(
+									victimAssociationForm
+										.getPoBoxFields().getZipCodeValue(),
+									victimAssociationForm
+										.getPoBoxFields().getZipCodeExtension(),
+									poBoxCity);
+					} catch (ZipCodeExistsException e) {
+						poBoxZipCode = e.getZipCode();
+					}
 				}
 			} else {
 				poBoxZipCode = victimAssociationForm.getPoBoxFields()
@@ -1242,34 +1248,6 @@ public class ManageVictimAssociationController {
 			final ReflexiveRelationshipException exception) {
 		return this.businessExceptionHandlerDelegate.prepareModelAndView(
 				REFLEXIVE_RELATIONSHIP_MESSAGE_KEY, ERROR_BUNDLE_NAME,
-				exception);
-	}
-		
-	/**
-	 * Handles {@code CityExistsException}.
-	 * 
-	 * @param exception exception thrown
-	 * @return model and view to handle {@code CityExistsException}
-	 */
-	@ExceptionHandler(CityExistsException.class)
-	public ModelAndView handleCityExistsException(
-			final CityExistsException exception) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				CITY_EXISTS_MESSAGE_KEY, REGION_ERROR_BUNDLE_NAME,
-				exception);
-	}
-	
-	/**
-	 * Handles {@code ZipCodeExistsException}.
-	 * 
-	 * @param exception exception thrown
-	 * @return model and view to handle {@code ZipCodeExistsException}
-	 */
-	@ExceptionHandler(ZipCodeExistsException.class)
-	public ModelAndView handleZipCodeExistsException(
-			final ZipCodeExistsException exception) {
-		return this.businessExceptionHandlerDelegate.prepareModelAndView(
-				ZIP_CODE_EXISTS_MESSAGE_KEY, ADDRESS_ERROR_BUNDLE_NAME,
 				exception);
 	}
 	

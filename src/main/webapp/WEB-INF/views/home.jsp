@@ -21,12 +21,12 @@
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/eventRunnerResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/scrollContainerResources.jsp"/>
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/home.css?VERSION=2"/>
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/common/style/home.css?VERSION=3"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/health/style/health.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/victim/style/victim.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/investigation/style/investigation.css"/>
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/user/admin/style/userAdmin.css"/>
-		<script src="${pageContext.request.contextPath}/resources/index/scripts/home.js" type="text/javascript"></script>
+		<script src="${pageContext.request.contextPath}/resources/index/scripts/home.js?VERSION=1" type="text/javascript"></script>
   </head>
   <body>
 	<jsp:include page="includes/homeLinks.jsp"/>

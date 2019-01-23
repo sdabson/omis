@@ -25,7 +25,9 @@ var contents = document.getElementsByClassName("content");
 }
 
 window.onload = function() {
-	applyActionMenu(document.getElementById("searchActionMenu"));
+	//Currently not using action menus on home screen.
+	//Keeping them commented out to make it easy in case they're added back again later.
+/*	applyActionMenu(document.getElementById("searchActionMenu"));
 	applyActionMenu(document.getElementById("caseLoadActionMenu"));
-	applyActionMenu(document.getElementById("workCentersActionMenu"));
+	applyActionMenu(document.getElementById("workCentersActionMenu"));*/
 }

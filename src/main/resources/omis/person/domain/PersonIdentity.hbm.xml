@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+
+<!--
  - Mapping and queries for person identity.
  -
  - Author: Stephen Abson
@@ -50,6 +68,8 @@
 		<property name="deceased" column="`DECEASED`" type="yes_no" not-null="false"/>
 		<property name="deathDate" column="`DEATH_DATE`" type="java.util.Date" not-null="false"/>
 	</class>
+	
+	<!-- Finds person identity. -->
 	<query name="findPersonIdentity"><![CDATA[
 		select identity
 		from
@@ -72,6 +92,8 @@
 		and 
 			(identity.sex = :sex or (identity.sex is null and :sex is null))
 	]]></query>
+	
+	<!-- Finds person identity excluding supplied instance. -->
 	<query name="findPersonIdentityExcluding"><![CDATA[
 		select identity
 		from
@@ -96,6 +118,8 @@
 		and
 			identity <> :personIdentity
 	]]></query>
+	
+	<!-- Finds alternative person identities. -->
 	<query name="findAlternativePersonIdentities"><![CDATA[
 		select identity
 		from
@@ -103,11 +127,41 @@
 		where
 			identity.person = :person
 	]]></query>
+	
+	<!--
+	  - Finds person identities for person.
+	  -
+	  - Should this be limited to identities that are person.identities? [SA]
+	  -->
 	<query name="findPersonIdentityByPerson"><![CDATA[
 		select identity
 		from
 			omis.person.domain.PersonIdentity identity
 		where
 			identity.person = :person
+	]]></query>
+	
+	<!--
+	  - Finds person identities with State ID number. Only actual identities
+	  - of person are included (person.identity - not alternatives).
+	  -->
+	<query name="findPersonIdentitiesByStateIdNumber"><![CDATA[
+		select personIdentity
+		from omis.person.domain.Person person
+			inner join person.identity personIdentity
+		where personIdentity.stateIdNumber = :stateIdNumber
+	]]></query>
+	
+	<!-- 
+	  - Finds person identities with State ID number excluding supplied
+	  - identities. Only actual identities of person are included
+	  - (person.identity - not alternatives).
+	  -->
+	<query name="findPersonIdentitiesByStateIdNumberExcluding"><![CDATA[
+		select personIdentity
+		from omis.person.domain.Person person
+			inner join person.identity personIdentity
+		where personIdentity.stateIdNumber = :stateIdNumber
+			and personIdentity not in (:excludedIdentities)
 	]]></query>
 </hibernate-mapping>

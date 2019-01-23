@@ -1,9 +1,12 @@
 function assignVisitFormOnClick() {
+	$("#date").attr("autocomplete", "off");
 	$("#date").datepicker({
 		changeMonth: true,
 		changeYear: true
 	});
+	$("#startTime").attr("autocomplete", "off");
 	$("#startTime").ptTimeSelect();
+	$("#endTime").attr("autocomplete", "off");
 	$("#endTime").ptTimeSelect();
 	$("#date").change(function () {
 		$.ajax({
