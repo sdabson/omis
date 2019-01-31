@@ -1,6 +1,7 @@
 package omis.paroleboarditinerary.web.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -228,14 +229,17 @@ public class ReportParoleBoardItineraryController {
 			@RequestParam(value = "paroleBoardItinerary", required = true)
 				final ParoleBoardItinerary paroleBoardItinerary) {
 		ModelAndView mav = new ModelAndView(HEARINGS_VIEW_NAME);
+		Calendar pastCal = new Calendar.Builder().setInstant(
+				DateRange.getStartDate(paroleBoardItinerary.getDateRange()))
+				.build();
+		pastCal.add(Calendar.MONTH, -3);
 		mav.addObject(SCHEDULED_HEARINGS_MODEL_KEY, 
 				this.paroleEligibilityReportService.findByItinerary(
 						paroleBoardItinerary));
 		mav.addObject(UNSCHEDULED_ELIGIBILITY_SUMMARIES_MODEL_KEY, 
 				this.paroleEligibilityReportService
 				.findUnscheduledEligibilitySummariesByDateRange(
-						DateRange.getStartDate(
-								paroleBoardItinerary.getDateRange()), 
+						new Date(pastCal.getTimeInMillis()),
 						DateRange.getEndDate(
 								paroleBoardItinerary.getDateRange())));
 		mav.addObject(PAROLE_BOARD_ITINERARY_SUMMARY_MODEL_KEY, 

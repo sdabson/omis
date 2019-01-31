@@ -50,6 +50,7 @@ import omis.offenderflag.domain.OffenderFlagCategory;
 import omis.offenderflag.service.delegate.OffenderFlagCategoryDelegate;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
 import omis.person.domain.Person;
+import omis.person.exception.SocialSecurityNumberExistsException;
 import omis.person.exception.StateIdNumberExistsException;
 import omis.person.service.delegate.PersonDelegate;
 import omis.region.domain.City;
@@ -118,6 +119,9 @@ public class CreateOffenderServiceTests
 	 * Tests creation of offender.
 	 * 
 	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * is used
 	 * @throws ParseException if birth date cannot be parsed 
 	 * @throws CountryExistsException if country exists
 	 * @throws StateExistsException if State exists
@@ -127,6 +131,7 @@ public class CreateOffenderServiceTests
 			throws OffenderExistsException,
 				ParseException,
 				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException,
 				CountryExistsException,
 				StateExistsException,
 				CityExistsException {
@@ -458,6 +463,7 @@ public class CreateOffenderServiceTests
 	public void testDuplicateEntityFoundException() 
 			throws OffenderExistsException,
 				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException,
 				CountryExistsException,
 				StateExistsException,
 				CityExistsException {
@@ -495,11 +501,14 @@ public class CreateOffenderServiceTests
 	 * @throws OffenderExistsException if offender exists
 	 * @throws StateIdNumberExistsException if State ID number is used
 	 * - asserted
+	 * @throws SocialSecurityNumberExistsException if social security number is
+	 * used
 	 */
 	@Test(expectedExceptions = {StateIdNumberExistsException.class})
 	public void testStateIdNumberExistsException()
 			throws OffenderExistsException,
-				StateIdNumberExistsException {
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
 		
 		// Arranges existing person with State ID number
 		String stateIdNumber = "MT123456789";
@@ -518,16 +527,20 @@ public class CreateOffenderServiceTests
 	 * has the State ID number.
 	 * 
 	 * <p>The arrangements should not be allowed - once it can be guaranteed
-	 * that no two people can exists with the same State ID number, this
+	 * that no two people can exist with the same actual State ID number, this
 	 * unit test will fail and should then be removed.
 	 * 
 	 * @throws OffenderExistsException if offender exists
 	 * @throws StateIdNumberExistsException if State ID number is used
 	 * - asserted
+	 * @throws SocialSecurityNumberExistsException if social security number is
+	 * used
 	 */
 	@Test(expectedExceptions = {StateIdNumberExistsException.class})
 	public void testStateIdNumberExistsExceptionWithMultiples()
-			throws OffenderExistsException, StateIdNumberExistsException {
+			throws OffenderExistsException,
+				SocialSecurityNumberExistsException,
+				StateIdNumberExistsException {
 		
 		// Arranges two people with State ID number
 		String stateIdNumber = "MT123456789";
@@ -544,6 +557,67 @@ public class CreateOffenderServiceTests
 					null, null, null, null);
 	}
 	
+	/**
+	 * Tests that {@code SocialSecurityNumberExistsException} is thrown to
+	 * prevent two people sharing a social security number
+	 * 
+	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number exists
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists - asserted
+	 */
+	@Test(expectedExceptions = {SocialSecurityNumberExistsException.class})
+	public void testSocialSecurityNumberExistsException()
+			throws OffenderExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
+		// Arranges existing person with social security number
+		Integer socialSecurityNumber = 321654987;
+		this.personDelegate.createWithIdentity("Blofeld", "Emilio", null, null,
+				null, null, null, null, null, socialSecurityNumber, null, null,
+				null);
+		
+		// Actions - attempts to create offender with same social security
+		// number
+		this.createOffenderService.create("Oberhauser", "Ernst", null, null,
+				socialSecurityNumber, null, null, null, null, null);
+	}
+	
+	/**
+	 * Tests that {@code SocialSecurityNumberException} is thrown to prevent
+	 * two people sharing a social security number when more than one person
+	 * already has the social security number.
+	 * 
+	 * <p>The arrangements should not be allowed - once it can be guaranteed
+	 * that no two people can exist with the same actual social security
+	 * number, this unit test will fail and should then be removed.
+	 * 
+	 * @throws OffenderExistsException if offender exists
+	 * @throws StateIdNumberExistsException if State ID number exists
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists - asserted
+	 */
+	@Test(expectedExceptions = {SocialSecurityNumberExistsException.class})
+	public void testSocialSecurityNumberExistsExceptionWithMultiples()
+			throws OffenderExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
+		// Arranges two people with same social security number
+		Integer socialSecurityNumber = 321654987;
+		this.personDelegate.createWithIdentity("Blofeld", "Franz", null, null,
+				null, null, null, null, null, socialSecurityNumber, null, null,
+				null);
+		this.personDelegate.createWithIdentity("Oberhauser", "Fransisco", null,
+				null, null, null, null, null, null, socialSecurityNumber, null,
+				null, null);
+		
+		// Action - attempts to create offender with same social security
+		// number
+		this.createOffenderService.create("Largo", "Julius", null, null,
+				socialSecurityNumber, null, null, null, null, null);
+	}
 	/* Helper methods */
 	
 	// Parses date text

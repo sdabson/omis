@@ -1,5 +1,23 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.presentenceinvestigation.web.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +39,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.ModelAndView;
 
 import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -27,6 +47,7 @@ import omis.person.domain.Person;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummaryReportService;
 import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
+import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestSearchForm;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
@@ -39,7 +60,7 @@ import omis.user.domain.UserAccount;
  * @author Annie Wahl
  * @author Josh Divine
  * @author Sierra Haynes
- * @version 0.1.4 (May 15, 2018)
+ * @version 0.1.5 (Jan 28, 2019)
  * @since OMIS 3.0
  */
 @Controller
@@ -64,34 +85,34 @@ public class ReportPresentenceInvestigationRequestController {
 	/* Report names. */
 	
 	private static final String INVESTIGATION_REQUEST_DETAIL_REPORT_NAME 
-		="/Legal/PSI/Pre_Sentence_Investigation";	
+		= "/Legal/PSI/Pre_Sentence_Investigation";	
 	
 	private static final String AFFIDAVIT_OF_PECUNIARY_LOSS_REPORT_NAME 
-		="/Legal/PSI/Affidavit_of_Victims_Pecuniary_Loss";	
+		= "/Legal/PSI/Affidavit_of_Victims_Pecuniary_Loss";	
 	
 	private static final String PSI_QUESTIONNAIRE_REPORT_NAME 
-		="/Legal/PSI/PSI_Questionnaire";
+		= "/Legal/PSI/PSI_Questionnaire";
 	
 	private static final String INVESTIGATION_ASSIGNMENT_REPORT_NAME 
-		="/Legal/PSI/PSI_Assignments_Report";
+		= "/Legal/PSI/PSI_Assignments_Report";
 	
 	private static final String INVESTIGATION_PROGRESS_REPORT_NAME 
-		="/Legal/PSI/PSI_Progress_Summary_Report";
+		= "/Legal/PSI/PSI_Progress_Summary_Report";
 	
 	private static final String INVESTIGATION_TASK_REPORT_NAME 
-		="/Legal/PSI/PSI_Task_Assignments";	
+		= "/Legal/PSI/PSI_Task_Assignments";	
 	
 	private static final String VICTIM_IMPACT_REPORT_NAME 
-		="/Relationships/Victims/Victim_Impact_Statement";
+		= "/Relationships/Victims/Victim_Impact_Statement";
 	
 	private static final String VICTIM_IMPACT_KID_REPORT_NAME 
-		="/Relationships/Victims/Victim_Impact_for_Kids";
+		= "/Relationships/Victims/Victim_Impact_for_Kids";
 	
 	private static final String PSI_REQUEST_DETAILS_REPORT_NAME 
-		="/Legal/PSI/PSI_Request_Details_OC";	
+		= "/Legal/PSI/PSI_Request_Details_OC";	
 	
 	private static final String PSI_REQUEST_LISTING_REPORT_NAME 
-		="/Legal/PSI/PSI_Request_Listing_OC";	
+		= "/Legal/PSI/PSI_Request_Listing_OC";	
 	
 	/* Report Parameter names. */
 	
@@ -135,7 +156,11 @@ public class ReportPresentenceInvestigationRequestController {
 	private static final String SUBMITTED_SUMMARIES_MODEL_KEY = 
 			"submittedSummaries";
 	
+	private static final String FORM_MODEL_KEY =
+			"presentenceInvestigationRequestSearchForm";
+	
 	/* Services. */
+	
 	@Autowired
 	@Qualifier("reportRunner")
 	private ReportRunner reportRunner;
@@ -158,20 +183,25 @@ public class ReportPresentenceInvestigationRequestController {
 	
 	@Autowired
 	@Qualifier("presentenceInvestigationRequestPropertyEditorFactory")
-	PropertyEditorFactory presentenceInvestigationRequestPropertyEditorFactory;
+	private PropertyEditorFactory
+				presentenceInvestigationRequestPropertyEditorFactory;
 	
 	@Autowired
 	@Qualifier("userAccountPropertyEditorFactory")
-	PropertyEditorFactory userAccountPropertyEditorFactory;
+	private PropertyEditorFactory userAccountPropertyEditorFactory;
 	
 
 	@Autowired
 	@Qualifier("personPropertyEditorFactory")
-	PropertyEditorFactory personPropertyEditorFactory;
+	private PropertyEditorFactory personPropertyEditorFactory;
 	
 	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
-	OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("datePropertyEditorFactory")
+	private CustomDateEditorFactory customDateEditorFactory;
 	
 	@Autowired
 	@Qualifier("offenderSummaryModelDelegate")
@@ -204,20 +234,23 @@ public class ReportPresentenceInvestigationRequestController {
 			@RequestParam(value = "offender", required = false)
 				final Person offender) {
 		ModelMap map = new ModelMap();
-		if(offender == null && assignedUser != null){
+		if (offender == null && assignedUser != null) {
+			map.addAttribute(FORM_MODEL_KEY,
+					new PresentenceInvestigationRequestSearchForm());
 			map.addAttribute(ASSIGNED_USER_MODEL_KEY, assignedUser);
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
-					.presentenceInvestigationRequestReportService
-					.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-							assignedUser));
+				.presentenceInvestigationRequestReportService
+				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+							assignedUser, null, null));
 			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
-					.presentenceInvestigationRequestReportService
-					.findSubmittedPresentenceInvestigationRequestSummariesByUser(
-							assignedUser));
-		}
-		else if(offender != null){
-			if(this.presentenceInvestigationRequestService.isOffender(offender)){
-				this.offenderSummaryModelDelegate.add(map,(Offender) offender);
+				.presentenceInvestigationRequestReportService
+				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+							assignedUser, null, null));
+		} else if (offender != null) {
+			if (this.presentenceInvestigationRequestService
+					.isOffender(offender)) {
+				this.offenderSummaryModelDelegate.add(map,
+						(Offender) offender);
 			}
 			map.addAttribute(OFFENDER_MODEL_KEY, offender);
 			map.addAttribute(SUMMARIES_MODEL_KEY, this
@@ -225,19 +258,65 @@ public class ReportPresentenceInvestigationRequestController {
 					.findPresentenceInvestigationRequestSummariesByOffender(
 							offender));
 			
-		}
-		else if(offender == null && assignedUser == null){
+		} else if (offender == null && assignedUser == null) {
+			map.addAttribute(FORM_MODEL_KEY,
+					new PresentenceInvestigationRequestSearchForm());
 			UserAccount user = this.retrieveUserAccount();
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
-					.presentenceInvestigationRequestReportService
-					.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-							user));
+				.presentenceInvestigationRequestReportService
+				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+							user, null, null));
 			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
-					.presentenceInvestigationRequestReportService
-					.findSubmittedPresentenceInvestigationRequestSummariesByUser(
-							user));
+				.presentenceInvestigationRequestReportService
+				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+							user, null, null));
 			map.addAttribute(ASSIGNED_USER_MODEL_KEY, user);
 		}
+		
+		return new ModelAndView(LIST_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Displays a filtered list of Presentence Investigation Requests.
+	 * 
+	 * @param form - Presentence Investigation Request Form
+	 * @param bindingResult - Binding Result
+	 * @return Model and View for the filtered list of Presentence Investigation
+	 * Requests.
+	 */
+	@RequestMapping(value = "list.html",
+			method = RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN') or "
+			+ "hasRole('PRESENTENCE_INVESTIGATION_REQUEST_LIST')")
+	public ModelAndView updateList(
+			final PresentenceInvestigationRequestSearchForm form,
+			final BindingResult bindingResult) {
+		ModelMap map = new ModelMap();
+		if (form.getUserAccount() == null) {
+			UserAccount user = this.retrieveUserAccount();
+			map.addAttribute(ASSIGNED_USER_MODEL_KEY, user);
+			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
+				.presentenceInvestigationRequestReportService
+				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+						user, form.getStartDate(), form.getEndDate()));
+			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
+				.presentenceInvestigationRequestReportService
+				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+						user, form.getStartDate(), form.getEndDate()));
+		} else {
+			map.addAttribute(ASSIGNED_USER_MODEL_KEY, form.getUserAccount());
+			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
+				.presentenceInvestigationRequestReportService
+				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
+							form.getUserAccount(), form.getStartDate(),
+							form.getEndDate()));
+			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
+				.presentenceInvestigationRequestReportService
+				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
+							form.getUserAccount(), form.getStartDate(),
+							form.getEndDate()));
+		}
+		map.addAttribute(FORM_MODEL_KEY, form);
 		
 		return new ModelAndView(LIST_VIEW_NAME, map);
 	}
@@ -250,8 +329,8 @@ public class ReportPresentenceInvestigationRequestController {
 	 * @param onReturn - String, used to evaluate which list screen to return to
 	 * @return model and view for presentence investigation requests action menu
 	 */
-	@RequestMapping(value="/presentenceInvestigationRequestsActionMenu.html",
-			method=RequestMethod.GET)
+	@RequestMapping(value = "/presentenceInvestigationRequestsActionMenu.html",
+			method = RequestMethod.GET)
 	public ModelAndView displayInvestigationRequestsActionMenu(
 			@RequestParam(value = "assignedUser", required = false)
 				final UserAccount assignedUser, 
@@ -550,5 +629,8 @@ public class ReportPresentenceInvestigationRequestController {
 		binder.registerCustomEditor(PresentenceInvestigationRequest.class, 
 				this.presentenceInvestigationRequestPropertyEditorFactory.
 					createPropertyEditor());
+		binder.registerCustomEditor(Date.class,
+				this.customDateEditorFactory
+				.createCustomDateOnlyEditor(true));
 	}
 }

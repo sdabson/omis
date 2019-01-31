@@ -34,17 +34,23 @@
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/headerListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
+	<jsp:include page="/WEB-INF/views/common/includes/formResources.jsp"/>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/user/scripts/searchUserAccount.js?VERSION=1"> </script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"> </script>
 	<title>
 		<fmt:message key="presentenceInvestigationRequestListHeader"/>
 		<c:if test="${not empty offender}">
 			<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
 		</c:if>
 	</title>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/presentenceInvestigationRequests.js?VERSION=1"> </script>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/presentenceInvestigation/style/presentenceInvestigation.css?VERSION=3"/>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/presentenceInvestigationRequests.js?VERSION=2"> </script>
 </head>
  <body>
  	<c:choose>
 	<c:when test="${empty offender}">
+		<jsp:include page="includes/presentenceInvestigationRequestSearchForm.jsp"/>
 		<c:set var="onReturn" value="byUser" />
 		<h1>
 			<a class="actionMenuItem" id="unsubmittedActionMenuLink" href="${pageContext.request.contextPath}/presentenceInvestigation/request/presentenceInvestigationRequestsActionMenu.html?assignedUser=${assignedUser.id}&offender=${offender.id}&onReturn=${onReturn}"></a>

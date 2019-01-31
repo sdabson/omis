@@ -11,7 +11,10 @@ $(document).ready(function() {
 	applyActionMenu(document.getElementById("actionMenuLink"));
 	var bedPlacementRowActionMenus = document.getElementsByClassName("bedPlacementRowActionMenuItem");
 	for (i = 0; i < bedPlacementRowActionMenus.length; i++) {
-		applyActionMenu(document.getElementById("bedPlacementRowActionMenuLink" + i));
+		applyActionMenu(document.getElementById("bedPlacementRowActionMenuLink" + i),
+				function() {
+					applyRemoveLinkConfirmation();
+				});
 	}
 	applyRemoveLinkConfirmation();
 });

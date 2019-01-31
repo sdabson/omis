@@ -107,4 +107,25 @@ public interface PersonIdentityDao
 	 */
 	List<PersonIdentity> findByStateIdNumberExcluding(
 			String stateIdNumber, PersonIdentity... excludedIdentities);
+	
+	/**
+	 * Returns person identities with social security number.
+	 * 
+	 * @param socialSecurityNumber social security number by which to return
+	 * person identities
+	 * @return person identities with social security number
+	 */
+	List<PersonIdentity> findBySocialSecurityNumber(
+			Integer socialSecurityNumber);
+	
+	/**
+	 * Returns person identities with social security number excluding supplied
+	 * person identities.
+	 * 
+	 * @param socialSecurityNumber social security number
+	 * @param excludedIdentities person identities to exclude
+	 * @return person identities excluding supplied person identities
+	 */
+	List<PersonIdentity> findBySocialSecurityNumberExcluding(
+			Integer socialSecurityNumber, PersonIdentity... excludedIdentities);
 }

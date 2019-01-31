@@ -65,6 +65,7 @@ import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.offenderphoto.service.delegate.OffenderPhotoAssociationDelegate;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.SocialSecurityNumberExistsException;
 import omis.person.exception.StateIdNumberExistsException;
 import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.person.service.delegate.SuffixDelegate;
@@ -219,7 +220,8 @@ public class CreateOffenderServiceImpl
 			final Date birthDate, final Country birthCountry, 
 			final City birthPlace, final Sex sex) 
 					throws OffenderExistsException,
-						StateIdNumberExistsException {
+						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException {
 		long stateIdNumberCount = this.personIdentityDelegate
 				.countByStateIdNumber(stateIdNumber);
 		if (stateIdNumberCount > 0) {
@@ -230,7 +232,20 @@ public class CreateOffenderServiceImpl
 							.findByStateIdNumber(stateIdNumber).get(0)
 								.getPerson());
 			} else {
-				throw new StateIdNumberExistsException(stateIdNumber);
+				throw new StateIdNumberExistsException();
+			}
+		}
+		long socialSecurityNumberCount = this.personIdentityDelegate
+				.countBySocialSecurityNumber(socialSecurityNumber);
+		if (socialSecurityNumberCount > 0) {
+			if (socialSecurityNumberCount == 1) {
+				throw new SocialSecurityNumberExistsException(
+						socialSecurityNumber,
+						this.personIdentityDelegate.findBySocialSecurityNumber(
+								socialSecurityNumber).get(0)
+									.getPerson());
+			} else {
+				throw new SocialSecurityNumberExistsException();
 			}
 		}
 		State birthState;

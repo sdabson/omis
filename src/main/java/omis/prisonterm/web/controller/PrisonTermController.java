@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -64,7 +66,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * @author Trevor Isles
  * @author Josh Divine
  * @author Annie Wahl
- * @version 0.1.2 (Dec 20, 2017)
+ * @version 0.1.3 (Jan 30, 2019)
  * @since OMIS 3.0
  */
 
@@ -248,13 +250,22 @@ public class PrisonTermController {
 			messageBundle = "omis.prisonterm.msgs.prisonTerm",
 			screenType = RequestContentType.LISTING_SCREEN)
 	@RequestMapping(value = "/list.html", method = RequestMethod.GET)
-	@PreAuthorize("hasRole('PRISON_TERM_LIST') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('PRISON_TERM_LIST') or hasRole('ADMIN')"
+			+ " or hasRole('PRISON_TERM_VERIFY')")
 	public ModelAndView list(
 			@RequestParam(value = "offender", required = true)
 			final Offender offender) {
 		ModelAndView mav = new ModelAndView(LIST_VIEW_NAME);
-		List<PrisonTermSummary> prisonTerms = this.prisonTermReportService
-				.summarizeByOffender(offender);
+		List<PrisonTermSummary> prisonTerms;
+		if (this.hasRole("PRISON_TERM_VERIFY") || this.hasRole("ADMIN")) {
+			prisonTerms = this.prisonTermReportService
+						.summarizeByOffender(offender);
+		} else {
+			prisonTerms = this.prisonTermReportService
+					.findActiveVerifiedTermsByOffender(offender);
+		}
+		
+		
 		mav.addObject(PRISON_TERMS_MODEL_KEY, prisonTerms);
 		mav.addObject(OFFENDER_MODEL_KEY, offender);
 		this.offenderSummaryModelDelegate.add(mav.getModelMap(), offender);
@@ -275,7 +286,8 @@ public class PrisonTermController {
 			screenType = RequestContentType.DETAIL_SCREEN)
 	@RequestMapping(value = "/create.html", 
 			method = RequestMethod.GET)
-	@PreAuthorize("hasRole('PRISON_TERM_CREATE') or hasRole('ADMIN')")
+	@PreAuthorize("(hasRole('PRISON_TERM_CREATE')"
+			+ " and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')")
 	public ModelAndView create(
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
@@ -308,7 +320,8 @@ public class PrisonTermController {
 			screenType = RequestContentType.FORM_SUBMIT)
 	@RequestMapping(value = "/create.html",
 			method = RequestMethod.POST)
-	@PreAuthorize("hasRole('PRISON_TERM_CREATE') or hasRole('ADMIN')")
+	@PreAuthorize("(hasRole('PRISON_TERM_CREATE')"
+			+ " and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')")
 	public ModelAndView save(
 			@RequestParam(value = "offender", required = true)
 				final Offender offender,
@@ -458,7 +471,8 @@ public class PrisonTermController {
 	 * exists.
 	 */
 	@RequestMapping(value = "/edit.html", method = RequestMethod.POST)
-	@PreAuthorize("hasRole('PRISON_TERM_EDIT') or hasRole('ADMIN')")
+	@PreAuthorize("(hasRole('PRISON_TERM_EDIT')"
+			+ " and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')")
 	public ModelAndView update(
 			@RequestParam(value = "prisonTerm", required = true)
 				final PrisonTerm prisonTerm,
@@ -593,7 +607,8 @@ public class PrisonTermController {
 			messageBundle = "omis.prisonterm.msgs.prisonTerm",
 			screenType = RequestContentType.FORM_SUBMIT)
 	@RequestMapping(value = "/remove.html")
-	@PreAuthorize("hasRole('PRISON_TERM_REMOVE') or hasRole('ADMIN')")
+	@PreAuthorize("(hasRole('PRISON_TERM_REMOVE')"
+			+ " and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')")
 	public ModelAndView remove(
 			@RequestParam(value = "prisonTerm", required = true)
 				final PrisonTerm prisonTerm,
@@ -791,6 +806,18 @@ public class PrisonTermController {
 				}
 			}
 		}
+	}
+	
+	// Returns whether the current user has the specified role
+	private boolean hasRole(final String role) {
+		for (GrantedAuthority authority :
+				SecurityContextHolder.getContext().getAuthentication()
+					.getAuthorities()) {
+			if (role.equals(authority.getAuthority())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

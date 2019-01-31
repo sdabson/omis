@@ -12,7 +12,7 @@
 	</title>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/presentenceInvestigation/style/presentenceInvestigation.css?VERSION=2" />
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/presentenceInvestigation/style/presentenceInvestigation.css?VERSION=3" />
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/includes/jquery.omis.home.js?VERSION=1" ></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/home.js?VERSION=1" ></script>
 	<script type="text/javascript">

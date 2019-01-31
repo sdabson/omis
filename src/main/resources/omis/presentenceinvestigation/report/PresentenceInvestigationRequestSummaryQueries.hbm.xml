@@ -22,7 +22,7 @@
   - Author: Ryan Johns
   - Author: Annie Wahl
   - Author: Josh Divine
-  - Version: 0.1.9 (May 2, 2018)
+  - Version: 0.1.10 (Jan 25, 2019)
   -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -60,7 +60,10 @@
 			left outer join user.name personName
 			left outer join offender.name offenderName
 			where userAccount = :assignedUser
-		 	and psir.submissionDate is not null
+			and psir.submissionDate is not null
+			and
+				((psir.requestDate >= :startDate or :startDate is null)
+				and (psir.requestDate <= :endDate or :endDate is null))
 	]]></query>
 	<query name="findPresentenceInvestigationRequestSummariesByOffender"><![CDATA[
 		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
@@ -159,7 +162,10 @@
 			left outer join user.name personName
 			left outer join offender.name offenderName
 			where userAccount = :assignedUser
-		 	and psir.submissionDate is null
+			and psir.submissionDate is null
+			and
+				((psir.requestDate >= :startDate or :startDate is null)
+				and (psir.requestDate <= :endDate or :endDate is null))
 	]]></query>
 	<query name="findDocketValuesByPresentenceInvestigationRequest"><![CDATA[
 		select docket.value

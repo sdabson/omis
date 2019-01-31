@@ -30,7 +30,8 @@ import omis.prisonterm.report.PrisonTermSummary;
  * 
  * @author Trevor Isles
  * @author Josh Divine
- * @version 0.1.1 (Feb 14, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Jan 30, 2019)
  * @since OMIS 3.0
  */
 public class PrisonTermReportServiceHibernateImpl
@@ -39,25 +40,44 @@ public class PrisonTermReportServiceHibernateImpl
 	private static final String FIND_PRISON_TERM_SUMMARY_BY_OFFENDER_QUERY_NAME 
 		= "findPrisonTermSummaryByOffender";
 	
+	private static final String
+			FIND_ACTIVE_VERIFIED_BY_OFFENDER_AND_DATE_QUERY_NAME =
+			"findActiveVerifiedPrisonTermSummariesByOffender";
+	
 	private static final String OFFENDER_PARAM_NAME = "offender";
 	
 	private final SessionFactory sessionFactory;
 
-	/** Constructor
+	/** Constructor for PrisonTermReportServiceHibernateImpl.
 	 * @param sessionFactory - session factory.
 	 */
-	public PrisonTermReportServiceHibernateImpl (
+	public PrisonTermReportServiceHibernateImpl(
 			final SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<PrisonTermSummary> summarizeByOffender(Offender offender) {
+	public List<PrisonTermSummary> summarizeByOffender(
+			final Offender offender) {
 		@SuppressWarnings("unchecked")
 		List<PrisonTermSummary> summaries = this.sessionFactory
 			.getCurrentSession().getNamedQuery(
 					FIND_PRISON_TERM_SUMMARY_BY_OFFENDER_QUERY_NAME)
+			.setParameter(OFFENDER_PARAM_NAME, offender)
+			.setReadOnly(true)
+			.list();
+		return summaries;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<PrisonTermSummary> findActiveVerifiedTermsByOffender(
+			final Offender offender) {
+		@SuppressWarnings("unchecked")
+		List<PrisonTermSummary> summaries = this.sessionFactory
+			.getCurrentSession().getNamedQuery(
+					FIND_ACTIVE_VERIFIED_BY_OFFENDER_AND_DATE_QUERY_NAME)
 			.setParameter(OFFENDER_PARAM_NAME, offender)
 			.setReadOnly(true)
 			.list();

@@ -93,4 +93,54 @@
 		and
 			prisonTerm.status is 'ACTIVE'
 	]]></query>
+	<query name="findActiveVerifiedPrisonTermSummariesByOffender"><![CDATA[
+		select new omis.prisonterm.report.PrisonTermSummary(
+				prisonTerm.id,
+				offender.id,
+				offenderName.lastName,
+				offenderName.firstName,
+				offenderName.middleName,
+				offenderName.suffix,
+				offender.offenderNumber,
+				prisonTerm.actionDate,
+				prisonTerm.preSentenceCredits,
+				prisonTerm.sentenceDate,
+				prisonTerm.sentenceTermYears,
+				prisonTerm.sentenceTermDays,
+				prisonTerm.paroleEligibilityDate,
+				prisonTerm.projectedDischargeDate,
+				prisonTerm.maximumDischargeDate,
+				prisonTerm.sentenceToFollow,
+				prisonTerm.comments,
+				prisonTerm.status,
+				verificationName.lastName,
+				verificationName.firstName,
+				verificationName.middleName,
+				verificationUser.username,
+				prisonTerm.verificationDate,
+				sentenceCalculation.id
+			)
+		from
+			omis.prisonterm.domain.PrisonTerm prisonTerm
+		left outer join
+			prisonTerm.sentenceCalculation sentenceCalculation
+		inner join
+			prisonTerm.offender offender
+		inner join 
+			offender.name as offenderName
+		left join 
+			prisonTerm.verificationUser as verificationUser
+		left join 
+			verificationUser.user as user
+		left join 
+			user.name as verificationName
+		where
+			prisonTerm.offender = :offender
+		and
+			(prisonTerm.verificationUser is not null
+			and
+			prisonTerm.verificationDate is not null)
+		and
+			prisonTerm.status is 'ACTIVE'
+	]]></query>
 </hibernate-mapping>

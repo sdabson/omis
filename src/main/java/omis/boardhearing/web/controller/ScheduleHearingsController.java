@@ -18,6 +18,7 @@
 package omis.boardhearing.web.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import omis.boardhearing.web.form.BoardHearingItem;
 import omis.boardhearing.web.form.BoardHearingItemOperation;
 import omis.boardhearing.web.form.ScheduleHearingsForm;
 import omis.boardhearing.web.validator.ScheduleHearingsFormValidator;
+import omis.datatype.DateRange;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.report.ParoleBoardItinerarySummaryReportService;
@@ -189,6 +191,13 @@ public class ScheduleHearingsController {
 			+ "or hasRole('ADMIN')")
 	public ModelAndView edit(@RequestParam(value = "paroleBoardItinerary")
 			final ParoleBoardItinerary itinerary) {
+		
+		Calendar pastCal = new Calendar.Builder().setInstant(
+				DateRange.getStartDate(itinerary.getDateRange()))
+				.build();
+		pastCal.add(Calendar.MONTH, -3);
+		itinerary.getDateRange().setStartDate(new Date(pastCal.getTimeInMillis()));
+		//Date newDate = new Date(pastCal.getTimeInMillis());
 		return this.prepareEditMav(itinerary, this.prepareForm(itinerary));
 	}
 	

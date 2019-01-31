@@ -17,20 +17,22 @@
  */
 package omis.web.controller.delegate;
 
-import omis.exception.BusinessException;
-
 import org.springframework.web.servlet.ModelAndView;
+
+import omis.exception.BusinessException;
 
 /**
  * Delegate to handle business exceptions. 
  *
  * @author Stephen Abson
- * @version 0.0.1 (Dec 10, 2014)
+ * @version 0.0.2 (Jan 24, 2019)
  * @since OMIS 3.0
  */
 public class BusinessExceptionHandlerDelegate {
 
 	private static final String VIEW_NAME = "web/businessExceptionHandler";
+	
+	private static final String CUSTOM_VIEW_NAME_MODEL_KEY = "customViewName";
 	
 	private static final String MESSAGE_KEY_MODEL_KEY = "messageKey";
 	
@@ -58,6 +60,27 @@ public class BusinessExceptionHandlerDelegate {
 			final String messageKey, final String messageBundle,
 			final BusinessException businessException) {
 		ModelAndView mav = new ModelAndView(VIEW_NAME);
+		mav.addObject(MESSAGE_KEY_MODEL_KEY, messageKey);
+		mav.addObject(MESSAGE_BUNDLE_MODEL_KEY, messageBundle);
+		mav.addObject(BUSINESS_EXCEPTION_MODEL_KEY, businessException);
+		return mav;
+	}
+
+	/**
+	 * Prepares and returns model and view with option of custom view.
+	 * 
+	 * @param customViewName name of custom view
+	 * @param messageKey message key
+	 * @param messageBundle message bundle
+	 * @param businessException business exception
+	 * @return modal and view with custom view
+	 */
+	public ModelAndView prepareCustomizedModelAndView(
+			final String customViewName, final String messageKey,
+			final String messageBundle,
+			final BusinessException businessException) {
+		ModelAndView mav = new ModelAndView(VIEW_NAME);
+		mav.addObject(CUSTOM_VIEW_NAME_MODEL_KEY, customViewName);
 		mav.addObject(MESSAGE_KEY_MODEL_KEY, messageKey);
 		mav.addObject(MESSAGE_BUNDLE_MODEL_KEY, messageBundle);
 		mav.addObject(BUSINESS_EXCEPTION_MODEL_KEY, businessException);

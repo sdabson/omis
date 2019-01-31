@@ -17,8 +17,8 @@
  */
 package omis.presentenceinvestigation.report;
 
+import java.util.Date;
 import java.util.List;
-
 import omis.person.domain.Person;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.user.domain.UserAccount;
@@ -29,7 +29,7 @@ import omis.user.domain.UserAccount;
  * @author Ryan Johns
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.3 (May 15, 2018)
+ * @version 0.1.4 (Jan 25, 2019)
  * @since OMIS 3.0
  */
 public interface PresentenceInvestigationRequestSummaryReportService {
@@ -39,14 +39,18 @@ public interface PresentenceInvestigationRequestSummaryReportService {
 	 * member that have been submitted.
 	 * 
 	 * @param user user
+	 * @param startDate start date
+	 * @param endDate end date
 	 * @return list of presentence investigation summaries. 
 	 */
 	List<PresentenceInvestigationRequestSummary> 
 		findSubmittedPresentenceInvestigationRequestSummariesByUser(
-				UserAccount user);
+				UserAccount user, Date startDate, Date endDate);
 	
 	/**
-	 * Returns a list of presentence investigation request summaries by offender
+	 * Returns a list of presentence investigation request summaries by
+	 * offender.
+	 * 
 	 * @param offender - Person
 	 * @return list of presentence investigation request summaries by offender
 	 */
@@ -56,7 +60,8 @@ public interface PresentenceInvestigationRequestSummaryReportService {
 	
 	/**
 	 * Returns a presentence investigation request summary by specified
-	 * presentence investigation request
+	 * presentence investigation request.
+	 * 
 	 * @param presentenceInvestigationRequest - presentence investigation 
 	 * request
 	 * @return presentence investigation request summary by specified
@@ -70,9 +75,11 @@ public interface PresentenceInvestigationRequestSummaryReportService {
 	 * member that have not yet been submitted.
 	 * 
 	 * @param user user
+	 * @param startDate start date
+	 * @param endDate end date
 	 * @return list of presentence investigation request summaries
 	 */
 	List<PresentenceInvestigationRequestSummary> 
 			findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-					UserAccount user);
+					UserAccount user, Date startDate, Date endDate);
 }

@@ -17,10 +17,9 @@
  */
 package omis.presentenceinvestigation.report.impl.hibernate;
 
+import java.util.Date;
 import java.util.List;
-
 import org.hibernate.SessionFactory;
-
 import omis.person.domain.Person;
 import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary;
@@ -33,7 +32,7 @@ import omis.user.domain.UserAccount;
  * 
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.4 (Oct 25, 2018)
+ * @version 0.1.5 (Jan 25, 2019)
  * @since OMIS 3.0
  */
 public class 
@@ -69,6 +68,10 @@ public class
 	private static final String REQUEST_ID_PARAM_NAME = 
 			"presentenceInvestigationRequestId";
 	
+	private static final String START_DATE_PARAM_NAME = "startDate";
+	
+	private static final String END_DATE_PARAM_NAME = "endDate";
+	
 	private final SessionFactory sessionFactory;
 	
 	/** Constructor. 
@@ -83,11 +86,13 @@ public class
 	@Override
 	public List<PresentenceInvestigationRequestSummary> 
 		findSubmittedPresentenceInvestigationRequestSummariesByUser(
-			final UserAccount user) {
+			final UserAccount user, final Date startDate, final Date endDate) {
 		List<PresentenceInvestigationRequestSummary> summaries = this
 				.sessionFactory.getCurrentSession()
 				.getNamedQuery(FIND_BY_USER_QUERY_NAME)
 				.setParameter(USER_PARAM_NAME, user)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.setReadOnly(true)
 				.list();
 		for (PresentenceInvestigationRequestSummary summary : summaries) {
@@ -119,7 +124,8 @@ public class
 	/**{@inheritDoc} */
 	@Override
 	public PresentenceInvestigationRequestSummary summarize(
-			PresentenceInvestigationRequest presentenceInvestigationRequest) {
+			final PresentenceInvestigationRequest
+					presentenceInvestigationRequest) {
 		PresentenceInvestigationRequestSummary summary = 
 				(PresentenceInvestigationRequestSummary) this.sessionFactory
 				.getCurrentSession()
@@ -137,12 +143,15 @@ public class
 	@Override
 	public List<PresentenceInvestigationRequestSummary> 
 			findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-					final UserAccount user) {
+					final UserAccount user, final Date startDate,
+					final Date endDate) {
 		@SuppressWarnings("unchecked")
 		List<PresentenceInvestigationRequestSummary> summaries = this
 				.sessionFactory.getCurrentSession()
 				.getNamedQuery(FIND_UNSUBMITTED_BY_USER_QUERY_NAME)
 				.setParameter(USER_PARAM_NAME, user)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.setTimestamp(END_DATE_PARAM_NAME, endDate)
 				.setReadOnly(true)
 				.list();
 		for (PresentenceInvestigationRequestSummary summary : summaries) {

@@ -18,12 +18,16 @@
 		(select concat(bp.bed.room.facility.name, ' ', bp.bed.room.unit.name) from omis.bedplacement.domain.BedPlacement bp
 			where
 				bp.offender = secondPerson
-			and 
+			and
+				bp.confirmed = true
+			and
 				(bp.dateRange.startDate < :date and (bp.dateRange.endDate is null or bp.dateRange.endDate > :date))),
 		(select concat(bp.bed.room.facility.name, ' ', bp.bed.room.unit.name) from omis.bedplacement.domain.BedPlacement bp
 			where
 				bp.offender = firstPerson
-			and 
+			and
+				bp.confirmed = true
+			and
 				(bp.dateRange.startDate < :date and (bp.dateRange.endDate is null or bp.dateRange.endDate > :date))),
   	secondPersonName.firstName,
     secondPersonName.lastName,

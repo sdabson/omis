@@ -164,4 +164,28 @@
 		where personIdentity.stateIdNumber = :stateIdNumber
 			and personIdentity not in (:excludedIdentities)
 	]]></query>
+	
+	<!-- 
+	  - Finds person identities with social security number. Only actual
+	  - identities of person are included (person.identity - not alternatives).
+	  -->
+	<query name="findPersonIdentitiesBySocialSecurityNumber"><![CDATA[
+		select personIdentity
+		from omis.person.domain.Person person
+			inner join person.identity personIdentity
+		where personIdentity.socialSecurityNumber = :socialSecurityNumber
+	]]></query>
+	
+	<!-- 
+	  - Finds person identities with social security number excluding supplied
+	  - identities. Only actual identities of person are included
+	  - (person.identity - not alternatives).
+	  -->
+	<query name="findPersonIdentitiesBySocialSecurityNumberExcluding"><![CDATA[
+		select personIdentity
+		from omis.person.domain.Person person
+			inner join person.identity personIdentity
+		where personIdentity.socialSecurityNumber = :socialSecurityNumber
+			and personIdentity not in (:excludedIdentities)
+	]]></query>
 </hibernate-mapping>

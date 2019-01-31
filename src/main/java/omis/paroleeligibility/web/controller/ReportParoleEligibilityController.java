@@ -89,7 +89,7 @@ public class ReportParoleEligibilityController {
 	
 	private static final String
 		UNSCHEDULED_ELIGIBILITIES_ROW_ACTION_MENU_VIEW_NAME =
-			"paroleEligibility/includes/unresolvedEligibilitiesRowActionMenu";
+			"paroleEligibility/includes/unscheduledEligibilitiesRowActionMenu";
 
 	private static final String
 		UNSCHEDULED_ELIGIBILITIES_ACTION_MENU_VIEW_NAME =
@@ -456,12 +456,6 @@ public class ReportParoleEligibilityController {
 		ModelAndView mav = new ModelAndView(
 				UNRESOLVED_ELIGIBILITIES_ROW_ACTION_MENU_VIEW_NAME);
 		mav.addObject(ELIGIBILITY_MODEL_KEY, eligibility);
-		mav.addObject(HEARING_ANALYSIS_MODEL_KEY, this
-				.paroleEligibilityReportService
-				.findHearingAnalysisByParoleEligibility(eligibility));
-		mav.addObject(BOARD_HEARING_MODEL_KEY, this
-				.paroleEligibilityReportService
-				.findBoardHearingByParoleEligibility(eligibility));
 		return mav;
 	}
 	

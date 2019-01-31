@@ -21,7 +21,7 @@
  * Author: Joel Norris
  * Author: Annie Wahl
  * Author: Josh Divine
- * Version: 0.1.2 (May 15, 2018)
+ * Version: 0.1.3 (Jan 29, 2019)
  * Since: OMIS 3.0
  */
 window.onload = function() {
@@ -40,5 +40,16 @@ window.onload = function() {
 			applyRemoveLinkConfirmation();
 		});
 		
+	}
+	
+	if (document.getElementById("userAccountInput")) {
+		applySearchUserAccountsAutocomplete(
+				document.getElementById("userAccountInput"),
+				document.getElementById("userAccountDisplay"),
+				document.getElementById("userAccount"),
+				document.getElementById("clearUserAccount"),
+				document.getElementById("currentUserAccount"));
+		applyDatePicker(document.getElementById("startDate"));
+		applyDatePicker(document.getElementById("endDate"));
 	}
 }

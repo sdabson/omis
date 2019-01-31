@@ -7,7 +7,7 @@
  <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
  <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  <fmt:bundle basename="omis.health.msgs.health">
-<ul>
+<ul class="foreground">
 	<c:forEach var="facility" items="${facilities}">
 		<li>
 			<a href="${pageContext.request.contextPath}/health/referral/referralCenter.html?facility=${facility.id}&filterByReferralType=${referralType.name}&amp;filterByStartDate=<fmt:formatDate value='${filterByStartDate}' pattern='MM/dd/yyyy'/>">

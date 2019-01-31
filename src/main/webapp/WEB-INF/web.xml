@@ -73,6 +73,6 @@
   </context-param>
   <context-param>
   	<param-name>presentationResourceVersion</param-name>
-  	<param-value>1.0</param-value>
+  	<param-value>1.1</param-value>
   </context-param>
 </web-app>

@@ -30,6 +30,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,10 +62,10 @@ import omis.health.report.ReferralSummary;
 import omis.health.report.ReferralSummaryReportService;
 import omis.health.service.HealthReportService;
 import omis.health.service.ReferralCenterService;
+import omis.health.validator.ReferralCenterFilterFormValidator;
 import omis.health.web.form.ReferralCenterFilterForm;
 import omis.health.web.form.ReferralType;
 import omis.health.web.form.ScheduleInternalReferralForm;
-import omis.health.web.form.SearchResultType;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.report.ReportFormat;
@@ -85,87 +86,68 @@ import omis.web.http.SpringHeadersFactory;
 public class ReferralCenterController {
 	/* Global vari */
 	private static final long COUNT_LIMIT = 30;
+	private static final long DAY_LENGTH = 24 * 60 * 60 * 1000;
 	   
 	/* View names. */
 	private static final String FACILITY_REFERRAL_CENTER_VIEW =
 		"/health/referral/referralCenter";
-	
 	private static final String FACILITY_SELECT_VIEW =
 		"/health/referral/selectFacility";
-	
 	private static final String FACILITY_ACTION_MENU_VIEW =
 		"/health/referral/includes/facilityActionMenu";
-	
 	private static final String FACILITY_REFERRAL_CENTER_ACTION_MENU_VIEW =
 		"/health/referral/includes/actionMenu";
-	
 	private static final String FACILITY_SELECT_LIST_VIEW =
 		"/health/referral/includes/facilityList";
-	
 	private static final String PENDING_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/pendingActionMenu";
-	
 	private static final String OPEN_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/openReferralActionMenu";
-	
 	private static final String SCHEDULE_REFERRAL_VIEW =
 		"/health/referral/internal/schedule";
-	  
 	private static final String RESOLVED_INTERNAL_REFERRALS_ACTION_MENU_VIEW =
 		"/health/referral/internal/includes/resolvedActionMenu";
-	
 	private static final String RESOLVED_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/resolvedActionMenu";
-	  
 	private static final String SCHEDULED_INTERNAL_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/internal/includes/scheduledActionMenu";
-	
 	private static final String SCHEDULED_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/scheduledActionMenu";
-	
 	private static final String AUTHORIZED_REFERRALS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/authorizedActionMenu";
-	
 	private static final String PENDING_AUTHORIZATIONS_ACTION_MENU_VIEW =
 	    "/health/referral/includes/pendingAuthorizationsActionMenu";
-	
 	private static final String INTERNAL_SCHEDULED_ROW_ACTION_MENU_VIEW =
 	    "/health/referral/includes/internalScheduledRowActionMenu";
-	
 	private static final String EXTERNAL_SCHEDULED_ROW_ACTION_MENU_VIEW =
 	    "/health/referral/includes/externalScheduledRowActionMenu";
-	
 	private static final String PENDING_REFERRAL_ROW_ACTION_MENU_VIEW =
 	    "/health/request/includes/pendingRowActionMenu";
-	
 	private static final String EXTERNAL_RESOLVED_ROW_ACTION_MENU_VIEW =
 	    "/health/referral/includes/externalResolvedRowActionMenu";
-	
 	private static final String INTERNAL_RESOLVED_ROW_ACTION_MENU_VIEW =
 	    "/health/referral/includes/internalResolvedRowActionMenu";
-	
 	private static final String EXTERNAL_AUTHORIZED_ROW_ACTION_MENU_VIEW = 
 	    "/health/referral/includes/externalAuthorizedRowActionMenu";
 	
 	/* Model keys. */
 	
 	private static final String FACILITY_MODEL_KEY = "facility";
-	
 	private static final String REFERRAL_TYPE_MODEL_KEY = "referralType";
-	
 	private static final String OFFENDER_MODEL_KEY = "offender";
-	
-	private static final String FILTER_BY_START_DATE_MODEL_KEY
-		= "filterByStartDate";
-	
-	private static final String FILTER_BY_END_DATE_MODEL_KEY
-		= "filterByEndDate";
-	
-	private static final String COUNT_LIMIT_MODEL_KEY
-		= "countLimit";
-	
-	private static final String REQUEST_MODEL_KEY
-		= "request";
+	private static final String FILTER_BY_START_DATE_MODEL_KEY = "filterByStartDate";
+	private static final String FILTER_BY_END_DATE_MODEL_KEY = "filterByEndDate";
+	private static final String FILTER_BY_OFFENDER_MODEL_KEY = "filterByOffender";
+	private static final String FILTER_BY_APPOINTMENT_STATUS = "filterByAppointmentStatus";
+	private static final String COUNT_LIMIT_MODEL_KEY = "countLimit";
+	private static final String PENDING_REQUEST_SUMMARIES_MODEL_KEY = "pendingRequestSummaries";
+	private static final String RESOLVED_REFERRALS_MODEL_KEY = "resolvedReferrals";
+	private static final String SCHEDULED_REFERRALS_MODEL_KEY = "scheduledReferrals";
+	private static final String AUTHORIZED_REFERRALS_MODEL_KEY = "authorizedReferrals";
+	private static final String PENDING_AUTHORIZATIONS_MODEL_KEY = "pendingAuthorizations";
+	private static final String REFERRAL_TYPES_MODEL_KEY = "referralTypes";
+	private static final String APPOINTMENT_STATUSES_MODEL_KEY = "appointmentStatuses";
+	private static final String REFERRAL_CENTER_FILTER_FORM_MODEL_KEY = "filterForm";
 	
 	/* Property editor factories. */
 	
@@ -232,10 +214,15 @@ public class ReferralCenterController {
 	
 	@Autowired
 	private ReferralCenterService referralCenterService;
+	
+	/* Validators. */
+	@Autowired
+	@Qualifier("referralCenterFilterFormValidator")
+	private ReferralCenterFilterFormValidator referralCenterFilterFormValidator;
 
 	/** Home for referral center.
 	 * @param selectedFacility facility.
-	 * @param referralCenterFilterForm form to filter referrals
+	 * @param form form to filter referrals
 	 * @return referral center. */
 	@RequestContentMapping(nameKey = "referralCenterScreenName",
 		descriptionKey = "referralCenterScreenDescription",
@@ -247,13 +234,13 @@ public class ReferralCenterController {
 	public ModelAndView referralCenterHome(
 		    @RequestParam(value = "facility", required = false)
 		    final Facility selectedFacility,
-		    final ReferralCenterFilterForm referralCenterFilterForm) {
-		SearchResultType exceededSearchResultType = null;
-		Facility facility = selectedFacility;
+		    final ReferralCenterFilterForm form) {
 		final ModelMap map = new ModelMap();
-		ReferralType filterByReferralType = referralCenterFilterForm
+		
+		Facility facility = selectedFacility;
+		ReferralType filterByReferralType = form
 		    .getFilterByReferralType();
-		Date filterByStartDate = referralCenterFilterForm.getFilterByStartDate();
+		Date filterByStartDate = new Date();
 		if (facility == null) {
 			final List<Facility> facilities =
 				this.healthFacilityReportService.findHealthFacilitiesForStaff(
@@ -268,36 +255,42 @@ public class ReferralCenterController {
 		    }
 		  }
 		}
-		Date filterByEndDate = referralCenterFilterForm
-			.getFilterByEndDate();
-		Offender filterByOffender = referralCenterFilterForm
-		    .getFilterByOffender();
-		HealthAppointmentStatus filterByAppointmentStatus
-		    = referralCenterFilterForm.getFilterByAppointmentStatus();
-		if (filterByReferralType != null || filterByStartDate != null
-			|| filterByEndDate != null || filterByOffender != null
-		    || filterByAppointmentStatus != null) {
-			final HealthAppointmentStatus[] resolvedStatuses;
-			if (filterByAppointmentStatus != null) {
-				resolvedStatuses = new HealthAppointmentStatus[] {
-		        filterByAppointmentStatus
-		    };
+		Date filterByEndDate = new Date(filterByStartDate.getTime() + (30*DAY_LENGTH));
+		this.populateReferralCenter(map, null, null, facility,
+				ReferralType.ALL, filterByStartDate, filterByEndDate);
+		form.setFilterByReferralType(ReferralType.ALL);
+		form.setFilterByStartDate(filterByStartDate);
+		form.setFilterByEndDate(filterByEndDate);
+		
+		return this.prepareReferralCenterMav(map, form, facility);
+	}
+	
+	/*
+	 * Populates model keys for a referral center view depending on the specified filter values,
+	 * and facility supplied.
+	 * 
+	 * @param map model map
+	 * @param filterByAppointmentStatus filter by appointment status
+	 * @param filterByOffender filter by offender
+	 * @param facility facility
+	 * @param filterByReferralType filter by referral type
+	 * @param filterByStartDate filter by start date
+	 * @param filterByEndDate filter by end date
+	 * @return model map to populate referral center view
+	 */
+	private ModelMap populateReferralCenter(ModelMap map, HealthAppointmentStatus filterByAppointmentStatus,
+			Offender filterByOffender, Facility facility, ReferralType filterByReferralType,
+			Date filterByStartDate, Date filterByEndDate) {
+		final HealthAppointmentStatus[] resolvedStatuses;
+		if (filterByAppointmentStatus != null) {
+			resolvedStatuses = new HealthAppointmentStatus[] {
+					filterByAppointmentStatus
+			};
 		} else {
 			resolvedStatuses = HealthAppointmentStatus.values();
 		}
+			
 		final Date currentDate = new Date();
-		final List<HealthRequestSummary> pendingRequestSummaries;
-		if (filterByOffender != null) {
-			pendingRequestSummaries
-		    	= this.healthRequestReportService.findOpenByOffender(
-		    	filterByOffender, currentDate);
-		    map.put("pendingRequestSummaries", pendingRequestSummaries);
-		} else {
-		    pendingRequestSummaries
-		    	= this.healthRequestReportService.findOpen(facility, currentDate);
-		    map.put("pendingRequestSummaries", pendingRequestSummaries);
-		}
-		  
 		final List<ReferralSummary> scheduledReferrals;
 		final List<ReferralSummary> resolvedReferrals;
 		final omis.health.report.ReferralType[] reportReferralTypes;
@@ -322,215 +315,87 @@ public class ReferralCenterController {
 		}
 		
 		if (filterByOffender != null) {
-			if (this.featureToggles.get("health", "enableSearchResultCountLimit")) {
-				long count = this.referralSummaryReportService  
-					.countByOffender(filterByOffender, filterByStartDate,
+			//How to return results without limiting results 
+			scheduledReferrals = this.referralSummaryReportService
+				.findByOffender(filterByOffender, filterByStartDate,
 					filterByEndDate, reportReferralTypes,
-					new HealthAppointmentStatus[] { null });
-				if (count > COUNT_LIMIT) {
-					if (exceededSearchResultType == null) {
-						exceededSearchResultType = SearchResultType.REFERRAL_REQUEST;
-					}
-				} else {
-					if (exceededSearchResultType == null) {
-						scheduledReferrals = this.referralSummaryReportService
-							.findByOffender(filterByOffender, filterByStartDate,
-							filterByEndDate, reportReferralTypes,
-							new HealthAppointmentStatus[] { null },
-							currentDate);
-						map.put("scheduledReferrals", scheduledReferrals);
-					}
-				}
-		
-				count = this.referralSummaryReportService 
-					.countByOffender(filterByOffender, filterByStartDate,
-						filterByEndDate, reportReferralTypes, resolvedStatuses);
-				if (count > COUNT_LIMIT) {
-					if (exceededSearchResultType == null) {
-						exceededSearchResultType = SearchResultType.REFERRAL_REQUEST;
-					}
-				} else {
-					if (exceededSearchResultType == null) {
-						resolvedReferrals = this.referralSummaryReportService
-							.findByOffender(filterByOffender, filterByStartDate,
-							filterByEndDate, reportReferralTypes,
-							resolvedStatuses, currentDate);
-						map.put("resolvedReferrals", resolvedReferrals);
-					}
-				}
-		    } else { 
-		    	scheduledReferrals = this.referralSummaryReportService
-		    		.findByOffender(filterByOffender, filterByStartDate,
-		    			filterByEndDate, reportReferralTypes,
-		    			new HealthAppointmentStatus[] { null },
-		    			currentDate);
-		    	resolvedReferrals = this.referralSummaryReportService
-		    		.findByOffender(filterByOffender, filterByStartDate,
-					filterByEndDate, reportReferralTypes,
-					resolvedStatuses, currentDate);
-		    		
-		    	map.put("resolvedReferrals", resolvedReferrals);
-		    	map.put("scheduledReferrals", scheduledReferrals);
-		    }
-		  } else {
-			  	if (this.featureToggles.get("health",
-			  		"enableSearchResultCountLimit")) {
-				long count = this.referralSummaryReportService
-					.countByFacility(facility, filterByStartDate,
-						filterByEndDate, reportReferralTypes,
-						new HealthAppointmentStatus[] { null });
-				if (count > COUNT_LIMIT) {
-					if (exceededSearchResultType == null) {
-						exceededSearchResultType 
-							= SearchResultType.REFERRAL_REQUEST;
-					}
-				} else {
-					if (exceededSearchResultType == null) {
-						scheduledReferrals = this.referralSummaryReportService
-							.findByFacility(facility, filterByStartDate,
-							filterByEndDate, reportReferralTypes,
-							new HealthAppointmentStatus[] { null }, currentDate);
-						map.put("scheduledReferrals", scheduledReferrals);
-					}
-				}
-		
-				count = this.referralSummaryReportService 
-					.countByFacility(facility, filterByStartDate, filterByEndDate,
-					reportReferralTypes, resolvedStatuses);
-				if (count > COUNT_LIMIT) {
-					if (exceededSearchResultType == null) {
-						exceededSearchResultType = SearchResultType.REFERRAL_REQUEST;
-					}
-				} else {
-					if (exceededSearchResultType != null) {
-						resolvedReferrals = this.referralSummaryReportService
-							.findByFacility(facility, filterByStartDate,
-							filterByEndDate, reportReferralTypes, resolvedStatuses,
-							currentDate);
-						map.put("resolvedReferrals", resolvedReferrals);
-					}
-				}
-			 } else {
-				 scheduledReferrals =
-					this.referralSummaryReportService.findByFacility(facility,
-						filterByStartDate, filterByEndDate, reportReferralTypes,
-							new HealthAppointmentStatus[] { null }, currentDate);
-				 resolvedReferrals = this.referralSummaryReportService
-					.findByFacility(facility, filterByStartDate,
-					filterByEndDate, reportReferralTypes, resolvedStatuses,
+					new HealthAppointmentStatus[] { null },
 					currentDate);
-				 map.put("resolvedReferrals", resolvedReferrals);
-				 map.put("scheduledReferrals", scheduledReferrals);
-			 }
-		  }
+			resolvedReferrals = this.referralSummaryReportService
+				.findByOffender(filterByOffender, filterByStartDate,
+				filterByEndDate, reportReferralTypes,
+				resolvedStatuses, currentDate);
+		} else {
+			 scheduledReferrals =
+				this.referralSummaryReportService.findByFacility(facility,
+					filterByStartDate, filterByEndDate, reportReferralTypes,
+						new HealthAppointmentStatus[] { null }, currentDate);
+			 resolvedReferrals = this.referralSummaryReportService
+				.findByFacility(facility, filterByStartDate,
+				filterByEndDate, reportReferralTypes, resolvedStatuses,
+				currentDate);
 		}
-		map.put("facility", facility);
-		map.put("referralType", filterByReferralType);
-		
 		if (ReferralType.ALL.equals(filterByReferralType)
 			|| ReferralType.EXTERNAL_MEDICAL.equals(filterByReferralType)) {
 			List<AuthorizedReferralSummary> authorizedReferrals;
 			List<PendingReferralAuthorizationSummary> pendingAuthorizations;
 			if (filterByOffender != null) {
-				if (this.featureToggles.get("health", "enableSearchResultCountLimit")) {
-					long count = this.authorizedReferralSummaryReportService
-						.countUnscheduledByOffender(filterByOffender); 
-					if (count > COUNT_LIMIT) {
-						if (exceededSearchResultType == null) {
-							exceededSearchResultType
-								= SearchResultType.AUTHORIZED_REFERRAL_REQUEST;
-						}
-					} else {
-						if (exceededSearchResultType == null) {
-							authorizedReferrals
-								= this.authorizedReferralSummaryReportService
-								.findUnscheduledByOffender(filterByOffender);
-							map.put("authorizedReferrals", authorizedReferrals);
-						} 
-					}
-		
-					count = this.pendingReferralAuthorizationSummaryReportService
-						.countByOffender(filterByOffender);
-					if (count > COUNT_LIMIT) {
-						if (exceededSearchResultType == null) {
-							exceededSearchResultType 
-								= SearchResultType.PENDING_REFERRAL_AUTHORIZATION_REQUEST;
-						}
-					} else {
-						if (exceededSearchResultType == null) {
-							pendingAuthorizations
-								= this.pendingReferralAuthorizationSummaryReportService
-								.findByOffender(filterByOffender);
-							map.put("pendingAuthorizations", pendingAuthorizations);
-						}
-					}
-				} else {
 					authorizedReferrals
 						= this.authorizedReferralSummaryReportService
 						.findUnscheduledByOffender(filterByOffender);
-					map.put("authorizedReferrals", authorizedReferrals);
 					pendingAuthorizations
 						= this.pendingReferralAuthorizationSummaryReportService
 						.findByOffender(filterByOffender);
-					map.put("pendingAuthorizations", pendingAuthorizations);
-				}
 			} else {
-				if (this.featureToggles.get("health", "enableSearchResultCountLimit")) {
-					long count = this.authorizedReferralSummaryReportService
-						.countUnscheduledByFacility(facility); 
-					if (count > COUNT_LIMIT) {
-						if (exceededSearchResultType == null) {
-							exceededSearchResultType 
-								= SearchResultType.AUTHORIZED_REFERRAL_REQUEST;
-						}
-					} else {
-						if (exceededSearchResultType == null) {
-							authorizedReferrals
-								= this.authorizedReferralSummaryReportService
-							.findUnscheduledByFacility(facility);
-							map.put("authorizedReferrals", authorizedReferrals);
-						}
-					}
-					count = this.pendingReferralAuthorizationSummaryReportService
-						.countByFacility(facility);
-					if (count > COUNT_LIMIT) {
-						if (exceededSearchResultType == null) {
-							exceededSearchResultType 
-								= SearchResultType.PENDING_REFERRAL_AUTHORIZATION_REQUEST;
-						}
-					} else {
-						if (exceededSearchResultType == null) {
-							pendingAuthorizations
-								= this.pendingReferralAuthorizationSummaryReportService
-								.findByFacility(facility);
-							map.put("pendingAuthorizations",  pendingAuthorizations);
-						}
-					}
-				} else { 
 					authorizedReferrals
 						= this.authorizedReferralSummaryReportService
 						.findUnscheduledByFacility(facility);
-					map.put("authorizedReferrals", authorizedReferrals);
 					pendingAuthorizations
 						= this.pendingReferralAuthorizationSummaryReportService
 						.findByFacility(facility);
-					map.put("pendingAuthorizations", pendingAuthorizations);
-				}
 			}
+			map.addAttribute(AUTHORIZED_REFERRALS_MODEL_KEY, authorizedReferrals);
+			map.addAttribute(PENDING_AUTHORIZATIONS_MODEL_KEY, pendingAuthorizations);
 		}  
-		
-		map.put("referralTypes", ReferralType.supportedValues());
-		map.put("appointmentStatuses", HealthAppointmentStatus.values());
-		map.put("filterByStartDate", filterByStartDate);
-		map.put("filterByEndDate", filterByEndDate);
-		map.put("filterByOffender", filterByOffender);
-		map.put("filterByAppointmentStatus", filterByAppointmentStatus);
-		map.put("enableSearchResultCountLimit", this.getEnableSearchResultLimit());
-		map.put("exceededSearchResultType", exceededSearchResultType);
-		map.put(COUNT_LIMIT_MODEL_KEY, COUNT_LIMIT);
-		map.put(REQUEST_MODEL_KEY, exceededSearchResultType);
-		return new ModelAndView(FACILITY_REFERRAL_CENTER_VIEW, map);
+		map.addAttribute(RESOLVED_REFERRALS_MODEL_KEY, resolvedReferrals);
+		map.addAttribute(SCHEDULED_REFERRALS_MODEL_KEY, scheduledReferrals);
+		map.addAttribute(FACILITY_MODEL_KEY, facility);
+		return map;
 	}
+	
+	/**
+	 * Returns model and view for the health referral center with information
+	 * related to the specified referral center filter forms supplied values.
+	 * 
+	 * @param facility facility
+	 * @param form referral center filter form
+	 * @param result binding result
+	 * @return model and view for health referral center
+	 */
+	@RequestMapping(value = "filterReferralCenter.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMIN') or hasRole('HEALTH_ADMIN')"
+		+ " or hasRole('REFERRAL_CENTER')")
+	public ModelAndView filterReferralCenterHome(
+			@RequestParam(value = "facility", required = false)
+		    final Facility facility,
+		    final ReferralCenterFilterForm form,
+		    final BindingResult result) {
+		ModelMap map = new ModelMap();
+		//Validate form input
+		this.referralCenterFilterFormValidator.validate(form, result);
+		//Prevent any search, and return model and view immediately if validation of form fails
+		if(result.hasErrors()) {
+			map.addAttribute(BindingResult.MODEL_KEY_PREFIX
+					+ REFERRAL_CENTER_FILTER_FORM_MODEL_KEY, result);
+			return this.prepareReferralCenterMav(map, form, facility);
+		}
+		this.populateReferralCenter(map, form.getFilterByAppointmentStatus(),
+				form.getFilterByOffender(), facility,
+				form.getFilterByReferralType(), form.getFilterByStartDate(),
+				form.getFilterByEndDate());
+		return this.prepareReferralCenterMav(map, form, facility);
+	}
+	
 	
 	/** Schedule request.
 	 * @param healthRequest health request.
@@ -1017,7 +882,7 @@ public class ReferralCenterController {
 	
 	/* Helper methods. */
 	
-	/** Gets the current logged in user account.
+	/* Gets the current logged in user account.
 	 * @return userAccount. */
 	private UserAccount getUserAccount() {
 		return this.referralCenterService.findUserAccountByUsername(
@@ -1025,6 +890,14 @@ public class ReferralCenterController {
 			.getName());
 	}
 	
+	/*
+	 * Returns model and view to select a facility for referral center interaction.
+	 * 
+	 * @param facilities facilities
+	 * @param referralType referral type
+	 * @param filterByStartDate filter by start date
+	 * @return model and view for selecting facility
+	 */
 	private ModelAndView selectFacility(final List<Facility> facilities,
 			final ReferralType referralType, final Date filterByStartDate) {
 		final ModelMap map = new ModelMap();
@@ -1040,10 +913,37 @@ public class ReferralCenterController {
 		return new ModelAndView(FACILITY_SELECT_VIEW, map);
 	}
 	
-	// Returns whether search result count limit enabled. 
-	private boolean getEnableSearchResultLimit() {
-		return this.featureToggles.get("health",
-		"enableSearchResultCountLimit");
+	/*
+	 * Returns a model and view for the health referral center.
+	 * 
+	 * @param map model map
+	 * @param form referral center filter form
+	 * @param facility facility
+	 * @return model and view for health referral center
+	 */
+	private ModelAndView prepareReferralCenterMav(final ModelMap map,
+			final ReferralCenterFilterForm form, final Facility facility) {
+		final List<HealthRequestSummary> pendingRequestSummaries;
+		if (form.getFilterByOffender() != null) {
+			pendingRequestSummaries
+		    	= this.healthRequestReportService.findOpenByOffender(
+		    			form.getFilterByOffender(), new Date());
+		} else {
+		    pendingRequestSummaries
+		    	= this.healthRequestReportService.findOpen(facility, new Date());
+		}
+		map.addAttribute(PENDING_REQUEST_SUMMARIES_MODEL_KEY, pendingRequestSummaries);
+		map.addAttribute(REFERRAL_CENTER_FILTER_FORM_MODEL_KEY, form);
+		map.addAttribute(FILTER_BY_START_DATE_MODEL_KEY, form.getFilterByStartDate());
+		map.addAttribute(FILTER_BY_END_DATE_MODEL_KEY, form.getFilterByEndDate());
+		map.addAttribute(FILTER_BY_OFFENDER_MODEL_KEY, form.getFilterByOffender());
+		map.addAttribute(FILTER_BY_APPOINTMENT_STATUS, form.getFilterByAppointmentStatus());
+		map.addAttribute(REFERRAL_TYPE_MODEL_KEY, form.getFilterByReferralType());
+		map.addAttribute(REFERRAL_TYPES_MODEL_KEY, ReferralType.supportedValues());
+		map.addAttribute(APPOINTMENT_STATUSES_MODEL_KEY, HealthAppointmentStatus.values());
+		map.addAttribute(COUNT_LIMIT_MODEL_KEY, COUNT_LIMIT);
+		map.addAttribute(FACILITY_MODEL_KEY, facility);
+		return new ModelAndView(FACILITY_REFERRAL_CENTER_VIEW, map);
 	}
 	
 	/* Init binder. */

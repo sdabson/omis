@@ -35,7 +35,7 @@
 		<join table="`PERSON_TO_NAME`" optional="true">
 			<key column="`PERSON_ID`" unique="true"/>
 			<many-to-one name="name" entity-name="omis.person.domain.PersonName"
-		    	         column="`NAME_ID`" cascade="all" unique="true" not-null="true"/>
+		    	         column="`NAME_ID`" cascade="all" unique="true" not-null="true" fetch="join"/>
 		</join>
 	</class>
 </hibernate-mapping>

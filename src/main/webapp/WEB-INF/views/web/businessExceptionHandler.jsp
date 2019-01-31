@@ -40,6 +40,9 @@
 	<div id="businessViolationMessage">
 		<p class="businessViolationTitle">Business Violation</p>
 		<p class="businessMessageKey"><fmt:message key="${messageKey}" bundle="${bundle}"/></p>
+		<c:if test="${not empty customViewName}">
+			<jsp:include page="/WEB-INF/views/${customViewName}.jsp"/>
+		</c:if>
 		<button type="button" onclick="window.history.back()"><fmt:message key="backLabel" bundle="${commonBundle}"/></button>
 	</div>
 	<sec:authorize access="hasRole('APP_DEV')">

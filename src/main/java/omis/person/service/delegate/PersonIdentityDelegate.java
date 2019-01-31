@@ -263,6 +263,61 @@ public class PersonIdentityDelegate {
 		}
 	}
 	
+	/**
+	 * Counts person identities by social security number.
+	 * 
+	 * @param socialSecurityNumber social security number
+	 * @param excludedIdentities person identities to optionally exclude
+	 * @return count of person identities with social security number
+	 */
+	public long countBySocialSecurityNumber(
+			final Integer socialSecurityNumber,
+			final PersonIdentity... excludedIdentities) {
+		
+		// As with its State ID number counterpart, this method will most likely
+		// be replaced by one that returns whether an identity with the social
+		// security number exists. Invocations of DAO "find" methods will be
+		// replaced by uses of "count" methods and will return
+		// "count...(args) > 0". Corresponding changes should be made in
+		// findBySocialSecurityNumber when it can be guaranteed that only
+		// one person has a social security number in the actual identity
+		//    --- SA (Jan 23, 2019)
+		
+		// Performs count
+		if (excludedIdentities.length > 0) {
+			return this.personIdentityDao.findBySocialSecurityNumberExcluding(
+					socialSecurityNumber, excludedIdentities).size();
+		} else {
+			return this.personIdentityDao.findBySocialSecurityNumber(
+					socialSecurityNumber).size();
+		}
+	}
+	
+	/**
+	 * Returns person identities by social security number.
+	 * 
+	 * @param socialSecurityNumber social security number
+	 * @param excludedIdentities person identities to optionally exclude
+	 * @return person identities by social security number
+	 */
+	public List<PersonIdentity> findBySocialSecurityNumber(
+			final Integer socialSecurityNumber,
+			final PersonIdentity... excludedIdentities) {
+		
+		// This method will most likely be replaced by one that returns a
+		// single identity with the social security number supplied. See
+		// comments in countBySocialSecurityNumber for more details - SA
+		
+		// Returns identities
+		if (excludedIdentities.length > 0) {
+			return this.personIdentityDao.findBySocialSecurityNumberExcluding(
+					socialSecurityNumber, excludedIdentities);
+		} else {
+			return this.personIdentityDao.findBySocialSecurityNumber(
+					socialSecurityNumber);
+		}
+	}
+	
 	/* Helper methods. */
 	
 	private PersonIdentity populatePersonIdentity(

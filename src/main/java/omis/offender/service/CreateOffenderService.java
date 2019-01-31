@@ -47,6 +47,7 @@ import omis.offenderphoto.domain.OffenderPhotoAssociation;
 import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.person.domain.Person;
 import omis.person.domain.Suffix;
+import omis.person.exception.SocialSecurityNumberExistsException;
 import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -82,12 +83,15 @@ public interface CreateOffenderService {
 	 * @throws OffenderExistsException thrown when an offender is found
 	 * with the same unique properties that were provided.
 	 * @throws StateIdNumberExistsException if State ID number is used
+	 * @throws SocialSecurityNumberExissException if social security number
+	 * is used
 	 */
 	Offender create(String lastName, String firstName, String middleName, 
 			String suffix, Integer socialSecurityNumber, String stateIdNumber, 
 			Date birthDate, Country birthCountry, City birthPlace, Sex sex) 
 					throws OffenderExistsException,
-						StateIdNumberExistsException;
+						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException;
 	
 	/**
 	 * Converts person into offender.

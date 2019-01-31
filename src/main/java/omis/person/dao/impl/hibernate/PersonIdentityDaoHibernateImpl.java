@@ -62,6 +62,13 @@ public class PersonIdentityDaoHibernateImpl
 	private static final String FIND_BY_STATE_ID_NUMBER_EXCLUDING_QUERY_NAME
 		= "findPersonIdentitiesByStateIdNumberExcluding";
 	
+	private static final String FIND_BY_SOCIAL_SECURITY_NUMBER_QUERY_NAME
+		= "findPersonIdentitiesBySocialSecurityNumber";
+	
+	private static final String
+	FIND_BY_SOCIAL_SECURITY_NUMBER_EXCLUDING_QUERY_NAME
+		= "findPersonIdentitiesBySocialSecurityNumberExcluding";
+	
 	/* Parameter names. */
 	
 	private static final String PERSON_PARAM_NAME = "person";
@@ -185,6 +192,37 @@ public class PersonIdentityDaoHibernateImpl
 			.getCurrentSession().getNamedQuery(
 					FIND_BY_STATE_ID_NUMBER_EXCLUDING_QUERY_NAME)
 			.setParameter(STATE_ID_NUMBER_PARAM_NAME, stateIdNumber)
+			.setParameterList(EXCLUDED_IDENTITIES_PARAM_NAME,
+					excludedIdentities)
+			.list();
+		return identities;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<PersonIdentity> findBySocialSecurityNumber(
+			final Integer socialSecurityNumber) {
+		@SuppressWarnings("unchecked")
+		List<PersonIdentity> identities = this.getSessionFactory()
+			.getCurrentSession().getNamedQuery(
+					FIND_BY_SOCIAL_SECURITY_NUMBER_QUERY_NAME)
+			.setParameter(SOCIAL_SECURITY_NUMBER_PARAM_NAME,
+					socialSecurityNumber)
+			.list();
+		return identities;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<PersonIdentity> findBySocialSecurityNumberExcluding(
+			final Integer socialSecurityNumber,
+			final PersonIdentity... excludedIdentities) {
+		@SuppressWarnings("unchecked")
+		List<PersonIdentity> identities = this.getSessionFactory()
+			.getCurrentSession().getNamedQuery(
+					FIND_BY_SOCIAL_SECURITY_NUMBER_EXCLUDING_QUERY_NAME)
+			.setParameter(SOCIAL_SECURITY_NUMBER_PARAM_NAME,
+					socialSecurityNumber)
 			.setParameterList(EXCLUDED_IDENTITIES_PARAM_NAME,
 					excludedIdentities)
 			.list();

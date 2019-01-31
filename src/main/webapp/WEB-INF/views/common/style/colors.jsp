@@ -373,7 +373,7 @@ form.editForm.select:read-only,
 
 
 /* Form errors. */
-form.editForm span.error, form.editForm span.groupError, form.searchForm span.error {
+form.editForm span.error, form.editForm span.groupError, form.searchForm span.error, form.filterForm span.error {
   color: #D8000C;
 }
 

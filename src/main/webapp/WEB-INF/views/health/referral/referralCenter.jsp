@@ -41,23 +41,23 @@
 		</div>
 	</div>
 	<c:set var="offender" value="${filterByOffender}" scope="request"/>
-	<div id="facilityReferralCenterFilter">
+	<div id="facilityReferralCenterFilter" class="foreground">
 		<jsp:include page="includes/filterForm.jsp"/>
 	</div>
 	<div id="facilityReferralCenterFilterMin" >
 		<span><fmt:message key="filterToolsTitle"/></span>
 	</div>
 	<div id="referrals">
-	<c:choose>
-		<c:when test="${referralType.name eq 'ALL' or referralType.name eq 'INTERNAL_MEDICAL' or referralType.name eq 'EXTERNAL_MEDICAL' or referralType.name eq 'LAB' or empty referralType}">
-			<jsp:include page="includes/referrals.jsp"/>
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="unsupportedReferralTypeMessage">
-				<fmt:param>${referralType.name}</fmt:param>
-			</fmt:message>
-		</c:otherwise>
-	</c:choose>
+		<c:choose>
+			<c:when test="${referralType.name eq 'ALL' or referralType.name eq 'INTERNAL_MEDICAL' or referralType.name eq 'EXTERNAL_MEDICAL' or referralType.name eq 'LAB' or empty referralType}">
+				<jsp:include page="includes/referrals.jsp"/>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="unsupportedReferralTypeMessage">
+					<fmt:param>${referralType.name}</fmt:param>
+				</fmt:message>
+			</c:otherwise>
+		</c:choose>
 	</div>
 </body>
 </fmt:bundle>

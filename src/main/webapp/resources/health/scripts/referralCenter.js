@@ -13,7 +13,11 @@ $(document).ready(function($) {
 		}
 	}
 	
-	
+
+	document.getElementById("clearOffenderLink").onclick = function() {
+		document.getElementById("filterByOffenderSearchText").value = "";
+		document.getElementById("filterByOffender").value = "";
+	};
 	var requestLabel = messageResolver.getMessage("healthRequestLabel"); 
 	
 	applyCancelLinkConfirmation("cancelRequestLink", requestLabel);

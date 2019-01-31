@@ -9,82 +9,85 @@
  
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
 <fmt:setBundle basename="omis.health.msgs.health" var="healthBundle"/>
-<form id="filterForm" method="GET" action="${pageContext.request.contextPath}/health/referral/referralCenter.html">
+ 
+<form:form commandName="filterForm" id="filterForm" class="filterForm" method="GET" action="${pageContext.request.contextPath}/health/referral/filterReferralCenter.html?facility=${facility.id}">
 	<input type="hidden" name="facility" value="${facility.id}"/>
 	<div id="filterControlContainer" class="filterControlContainer">
-	<span class="titleHeader"><fmt:message key="filterToolsTitle" bundle="${healthBundle}"/></span>
-	<span class="seperator"><fmt:message key="offenderLabel" bundle="${healthBundle}"/></span>
-	<span class="fieldGroup">
-		<label for="filterByOffenderSearchText"><fmt:message key="offenderLabel" bundle="${healthBundle}"/></label>
-		<input id="filterByOffenderSearchText" name="filterByOffenderSearchText" type="text" value="<c:if test='${not empty offender}'>${offender.name.lastName}, ${offender.name.firstName} ${offender.name.middleName} (${offender.offenderNumber})</c:if>"/>
-		<a class="clearLink" href="${pageContext.request.contextPath}/health/referral/referralCenter.html?facility=${facility.id}&amp;filterByReferralType=${referralType.name}&amp;filterByStartDate=<fmt:formatDate value='${startDate}' pattern='MM/dd/yyyy'/>&amp;filterByEndDate=<fmt:formatDate value='${endDate}' pattern='MM/dd/yyyy'/>&amp;filterByAppointmentStatus=${appointmentStatus.name}&searchType=OFFENDER"><span class="linkLabel"><fmt:message key="clearLink" bundle="${commonBundle}"/></span></a>
-		<input id="filterByOffender" type="hidden" name="filterByOffender" value="${offender.id}"/>
-	</span>
-	<p class="buttons">
-		<button type="submit" name="searchType" value="OFFENDER"><fmt:message key="searchLabel" bundle="${commonBundle}"/></button>
-	</p>
-	<span class="seperator"><fmt:message key="referralsTitle" bundle="${healthBundle}"/></span>
-	<span class="fieldGroup">
-		<label for="filterByReferralType"><fmt:message key="referralTypeLabel" bundle="${healthBundle}"/></label> 
-		<select name="filterByReferralType">
-			<option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></option>
-			<c:choose>
-				<c:when test="${'ALL' eq referralType.name}">
-					<option value="ALL" selected="selected"><fmt:message key="referralTypeLabel.ALL" bundle="${healthBundle}"/></option>
-				</c:when>
-				<c:otherwise>
-					<option value="ALL"><fmt:message key="referralTypeLabel.ALL" bundle="${healthBundle}"/></option>
-				</c:otherwise>
-			</c:choose>
-			<c:forEach var="referralTypeItr" items="${referralTypes}">
+		<span class="titleHeader"><fmt:message key="filterToolsTitle" bundle="${healthBundle}"/></span>
+		<span class="seperator"><fmt:message key="offenderLabel" bundle="${healthBundle}"/></span>
+		<span class="fieldGroup">
+			<label for="filterByOffenderSearchText"><fmt:message key="offenderLabel" bundle="${healthBundle}"/></label>
+			<input id="filterByOffenderSearchText" name="filterByOffenderSearchText" type="text" value="<c:if test='${not empty offender}'>${offender.name.lastName}, ${offender.name.firstName} ${offender.name.middleName} (${offender.offenderNumber})</c:if>"/>
+			<a class="clearLink" id="clearOffenderLink" href="#"><span class="linkLabel"><fmt:message key="clearLink" bundle="${commonBundle}"/></span></a>
+			<input id="filterByOffender" type="hidden" name="filterByOffender" value="${offender.id}"/>
+		</span>
+		<p class="buttons">
+			<button type="submit" name="searchType" value="OFFENDER"><fmt:message key="searchLabel" bundle="${commonBundle}"/></button>
+		</p>
+		<span class="seperator"><fmt:message key="referralsTitle" bundle="${healthBundle}"/></span>
+		<span class="fieldGroup">
+			<label for="filterByReferralType"><fmt:message key="referralTypeLabel" bundle="${healthBundle}"/></label> 
+			<select name="filterByReferralType">
+				<option value=""><fmt:message key="nullLabel" bundle="${commonBundle}"/></option>
 				<c:choose>
-					<c:when test="${referralType eq referralTypeItr}">
-						<option value="${referralTypeItr.name}" selected="selected"><fmt:message key="referralTypeLabel.${referralTypeItr.name}" bundle="${healthBundle}"/></option>
+					<c:when test="${'ALL' eq referralType.name}">
+						<option value="ALL" selected="selected"><fmt:message key="referralTypeLabel.ALL" bundle="${healthBundle}"/></option>
 					</c:when>
 					<c:otherwise>
-						<option value="${referralTypeItr.name}"><fmt:message key="referralTypeLabel.${referralTypeItr.name}" bundle="${healthBundle}"/></option>
+						<option value="ALL"><fmt:message key="referralTypeLabel.ALL" bundle="${healthBundle}"/></option>
 					</c:otherwise>
 				</c:choose>
-			</c:forEach>
-		</select>			
-	</span>
-	<span class="fieldGroup">
-		<label for="filterByStartDate"><fmt:message key="startDateLabel" bundle="${commonBundle}"/></label>
-		<input id="filterByStartDate" name="filterByStartDate" type="text" class="date" value="<fmt:formatDate value='${filterByStartDate}' pattern='MM/dd/yyyy'/>"/>
-	</span>
-	<span class="fieldGroup">
-		<label for="filterByEndDate"><fmt:message key="endDateLabel" bundle="${commonBundle}"/></label>
-		<input id="filterByEndDate" name="filterByEndDate" type="text" class="date" value="<fmt:formatDate value='${filterByEndDate}' pattern='MM/dd/yyyy'/>"/>			
-	</span>
-	<span class="fieldGroup">
-		<label for="filterByAppointmentStatus"><fmt:message key="appointmentStatusLabel" bundle="${healthBundle}"/></label> 
-		<select name="filterByAppointmentStatus">
-			<c:choose>
-				<c:when test="${empty filterByAppointmentStatus}">
-					<option value="" selected="selected"><fmt:message key="allHealthAppointmentStatusesLabel" bundle="${healthBundle}"/></option>
-				</c:when>
-				<c:otherwise>
-					<option value=""><fmt:message key="allHealthAppointmentStatusesLabel" bundle="${healthBundle}"/></option>
-				</c:otherwise>
-			</c:choose>
-			<c:forEach var="appointmentStatus" items="${appointmentStatuses}">
+				<c:forEach var="referralTypeItr" items="${referralTypes}">
+					<c:choose>
+						<c:when test="${referralType eq referralTypeItr}">
+							<option value="${referralTypeItr.name}" selected="selected"><fmt:message key="referralTypeLabel.${referralTypeItr.name}" bundle="${healthBundle}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${referralTypeItr.name}"><fmt:message key="referralTypeLabel.${referralTypeItr.name}" bundle="${healthBundle}"/></option>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</select>			
+		</span>
+		<span class="fieldGroup">
+			<label for="filterByStartDate"><fmt:message key="startDateLabel" bundle="${commonBundle}"/></label>
+			<input id="filterByStartDate" name="filterByStartDate" type="text" class="date" value="<fmt:formatDate value='${filterByStartDate}' pattern='MM/dd/yyyy'/>"/>
+		</span>
+		<span class="fieldGroup">
+			<label for="filterByEndDate"><fmt:message key="endDateLabel" bundle="${commonBundle}"/></label>
+			<input id="filterByEndDate" name="filterByEndDate" type="text" class="date" value="<fmt:formatDate value='${filterByEndDate}' pattern='MM/dd/yyyy'/>"/>			
+		</span>
+		<span class="fieldGroup">
+			<label for="filterByAppointmentStatus"><fmt:message key="appointmentStatusLabel" bundle="${healthBundle}"/></label> 
+			<select name="filterByAppointmentStatus">
 				<c:choose>
-					<c:when test="${filterByAppointmentStatus eq appointmentStatus}">
-						<option value="${appointmentStatus.name}" selected="selected"><fmt:message key="healthAppointmentStatusLabel.${appointmentStatus.name}" bundle="${healthBundle}"/></option>
+					<c:when test="${empty filterByAppointmentStatus}">
+						<option value="" selected="selected"><fmt:message key="allHealthAppointmentStatusesLabel" bundle="${healthBundle}"/></option>
 					</c:when>
 					<c:otherwise>
-						<option value="${appointmentStatus.name}"><fmt:message key="healthAppointmentStatusLabel.${appointmentStatus.name}" bundle="${healthBundle}"/></option>
+						<option value=""><fmt:message key="allHealthAppointmentStatusesLabel" bundle="${healthBundle}"/></option>
 					</c:otherwise>
 				</c:choose>
-			</c:forEach>
-		</select>
-	</span>
-	<p class="buttons">
-		<button type="submit" name="searchType" value="REFERRAL"><fmt:message key="searchLabel" bundle="${commonBundle}"/></button>
-	</p>
-</div>
+				<c:forEach var="appointmentStatus" items="${appointmentStatuses}">
+					<c:choose>
+						<c:when test="${filterByAppointmentStatus eq appointmentStatus}">
+							<option value="${appointmentStatus.name}" selected="selected"><fmt:message key="healthAppointmentStatusLabel.${appointmentStatus.name}" bundle="${healthBundle}"/></option>
+						</c:when>
+						<c:otherwise>
+							<option value="${appointmentStatus.name}"><fmt:message key="healthAppointmentStatusLabel.${appointmentStatus.name}" bundle="${healthBundle}"/></option>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</select>
+		</span>
+		<p class="buttons">
+			<button type="submit" name="searchType" value="REFERRAL"><fmt:message key="searchLabel" bundle="${commonBundle}"/></button>
+		</p>
+		<form:errors path="*" cssClass="error" />
+	</div>
 <br>
 <br>
 <br>
@@ -124,4 +127,4 @@
 		</c:choose>
 	</c:if>
 </div>
-</form>
+</form:form>

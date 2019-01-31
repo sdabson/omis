@@ -69,6 +69,7 @@ import omis.offenderflag.exception.OffenderFlagExistsException;
 import omis.offenderphoto.domain.OffenderPhotoAssociation;
 import omis.offenderphoto.exception.OffenderPhotoAssociationExistsException;
 import omis.person.domain.Person;
+import omis.person.exception.SocialSecurityNumberExistsException;
 import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -93,6 +94,12 @@ public class CreateOffenderController {
 	/* View names. */
 	
 	private static final String EDIT_VIEW_NAME = "offender/edit";
+	
+	private static final String STATE_ID_NUMBER_EXISTS_CUSTOM_VIEW_NAME
+		= "person/includes/stateIdNumberExists";
+	
+	private static final String SOCIAL_SECURITY_NUMBER_EXISTS_CUSTOM_VIEW_NAME
+		= "person/includes/socialSecurityNumberExists";
 
 	private static final String STATE_OPTIONS_VIEW_NAME
 		= "region/includes/stateOptions";
@@ -153,6 +160,9 @@ public class CreateOffenderController {
 	private static final String STATE_ID_NUMBER_EXISTS_MESSAGE_KEY
 		= "stateIdNumber.exists";
 
+	private static final String SOCIAL_SECURITY_NUMBER_EXISTS_MESSAGE_KEY
+		= "socialSecurityNumber.exists";
+	
 	/* Bundles. */
 	
 	private static final String ERROR_BUNDLE_NAME
@@ -323,7 +333,9 @@ public class CreateOffenderController {
 	 * @param result binding result
 	 * @return redirect to profile screen
 	 * @throws OffenderExistsException if offender exists
-	 * @throws StateIdNumberExistsException if State ID number exists
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * is used
 	 * @throws PersonDemographicsExistsException if person demographics record
 	 * exists
 	 * @throws OperationNotAuthorizedException if religious preference
@@ -345,6 +357,7 @@ public class CreateOffenderController {
 			final BindingResult result)
 					throws OffenderExistsException,
 						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException,
 						PersonDemographicsExistsException,
 						ReligiousPreferenceExistsException,
 						DateConflictException,
@@ -605,13 +618,30 @@ public class CreateOffenderController {
 	@ExceptionHandler(StateIdNumberExistsException.class)
 	public ModelAndView handleStateIdNumberExistsException(
 			final StateIdNumberExistsException stateIdNumberExistsException) {
-		stateIdNumberExistsException.getPerson().getName();
 		return this.businessExceptionHandlerDelegate
-				.prepareModelAndView(
+				.prepareCustomizedModelAndView(
+					STATE_ID_NUMBER_EXISTS_CUSTOM_VIEW_NAME,
 					STATE_ID_NUMBER_EXISTS_MESSAGE_KEY,
 					PERSON_ERROR_BUNDLE_NAME,
 					stateIdNumberExistsException);
-		
+	}
+	
+	/**
+	 * Handles {@code SocialSecurityNumberExistsException}.
+	 * 
+	 * @param socialSecurityNumberExistsException exception to handle
+	 * @return screen to handler {@code SocialSecurityNumberExistsException}
+	 */
+	@ExceptionHandler(SocialSecurityNumberExistsException.class)
+	public ModelAndView handleSocialSecurityNumberExistsException(
+			final SocialSecurityNumberExistsException
+				socialSecurityNumberExistsException) {
+		return this.businessExceptionHandlerDelegate
+				.prepareCustomizedModelAndView(
+						SOCIAL_SECURITY_NUMBER_EXISTS_CUSTOM_VIEW_NAME,
+						SOCIAL_SECURITY_NUMBER_EXISTS_MESSAGE_KEY,
+						PERSON_ERROR_BUNDLE_NAME,
+						socialSecurityNumberExistsException);
 	}
 	
 	/* Helper methods. */

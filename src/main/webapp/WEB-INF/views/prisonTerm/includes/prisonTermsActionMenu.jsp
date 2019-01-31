@@ -1,6 +1,7 @@
 <!-- 
  - Author: Trevor Isles
- - Version: 0.1.0 (April 20, 2017)
+ - Author: Annie Wahl
+ - Version: 0.1.1 (Jan 31, 2019)
  - Since: OMIS 3.0
  -->
  <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -9,7 +10,7 @@
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle" />
 <fmt:bundle basename="omis.prisonterm.msgs.prisonTerm">
 	<ul>
-		<sec:authorize access="hasRole('PRISON_TERM_CREATE') or hasRole('ADMIN')">
+		<sec:authorize access="(hasRole('PRISON_TERM_CREATE') and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')">
 			<c:if test="${not empty offender and empty prisonTerm}">
 			<li>
 			<a class="createLink" href="${pageContext.request.contextPath}/prisonTerm/create.html?offender=${offender.id}">
@@ -37,7 +38,7 @@
 			</li>
 			</c:if>
 		</sec:authorize>
-		<sec:authorize access="hasRole('PRISON_TERM_REMOVE') or hasRole('ADMIN')">
+		<sec:authorize access="(hasRole('PRISON_TERM_REMOVE') and hasRole('PRISON_TERM_VERIFY')) or hasRole('ADMIN')">
 			<c:if test="${not empty prisonTerm}">
 			<li>
 			<a class="removeLink" href="${pageContext.request.contextPath}/prisonTerm/remove.html?prisonTerm=${prisonTerm.id}&offender=${offender.id}">
