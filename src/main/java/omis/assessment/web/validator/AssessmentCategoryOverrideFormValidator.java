@@ -18,27 +18,78 @@
 package omis.assessment.web.validator;
 
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+import omis.assessment.web.form.AssessmentCategoryOverrideForm;
+import omis.assessment.web.form.AssessmentCategoryOverrideNoteItem;
+import omis.assessment.web.form.AssessmentItemOperation;
 
 /**
- * TODO
+ * Assessment Category Override Form Validator.
  * 
  *@author Annie Wahl 
- *@version 0.1.0 (Apr 25, 2018)
+ *@version 0.1.1 (Feb 6, 2019)
  *@since OMIS 3.0
  *
  */
 public class AssessmentCategoryOverrideFormValidator implements Validator {
 
+	private static final String DATE_REQUIRED_MSG_KEY = "date.required";
+	
+	private static final String DESCRIPTION_REQUIRED_MSG_KEY =
+			"description.required";
+	
+	private static final String RATING_REQUIRED_MSG_KEY =
+			"assessmentCategoryOverride.rating.required";
+	
+	private static final String REASON_REQUIRED_MSG_KEY =
+			"assessmentCategoryOverride.reason.required";
+	
+	private static final String AUTHORIZED_BY_REQUIRED_MSG_KEY =
+			"assessmentCategoryOverride.rating.authorizedBy";
+	
 	/**{@inheritDoc} */
 	@Override
-	public boolean supports(Class<?> clazz) {
-		return false;
+	public boolean supports(final Class<?> clazz) {
+		return AssessmentCategoryOverrideForm.class.isAssignableFrom(clazz);
 	}
 
 	/**{@inheritDoc} */
 	@Override
-	public void validate(Object target, Errors errors) {
+	public void validate(final Object target, final Errors errors) {
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "overrideDate",
+				DATE_REQUIRED_MSG_KEY);
+		ValidationUtils.rejectIfEmpty(errors, "overrideRating",
+				RATING_REQUIRED_MSG_KEY);
+		ValidationUtils.rejectIfEmpty(errors, "overrideReason",
+				REASON_REQUIRED_MSG_KEY);
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "authorizedBy",
+				AUTHORIZED_BY_REQUIRED_MSG_KEY);
+		
+		AssessmentCategoryOverrideForm form =
+				(AssessmentCategoryOverrideForm) target;
+		
+		if (form.getAssessmentCategoryOverrideNoteItems() != null) {
+			int i = 0;
+			for (AssessmentCategoryOverrideNoteItem item
+					: form.getAssessmentCategoryOverrideNoteItems()) {
+				if (AssessmentItemOperation.CREATE.equals(
+							item.getItemOperation())
+						|| AssessmentItemOperation.UPDATE.equals(
+							item.getItemOperation())) {
+					if (item.getDate() == null) {
+						errors.rejectValue("assessmentCategoryOverrideNoteItems"
+								+ "[" + i + "].date", DATE_REQUIRED_MSG_KEY);
+					}
+					if (item.getDate() == null) {
+						errors.rejectValue(
+								"assessmentCategoryOverrideNoteItems[" + i + "]"
+										+ ".description",
+								DESCRIPTION_REQUIRED_MSG_KEY);
+					}
+				}
+				i++;
+			}
+		}
 	}
-
 }

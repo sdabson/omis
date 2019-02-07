@@ -87,8 +87,7 @@
 	 			name.lastName,
 	 			name.firstName,
 	 			name.middleName,
-	 			title.name,
-	 			boardAttendee.role)
+	 			title.name)
 		FROM omis.paroleboarditinerary.domain.BoardAttendee boardAttendee
 		INNER JOIN boardAttendee.boardMember boardMember
 		INNER JOIN boardMember.staffAssignment staffAssignment

@@ -24,7 +24,8 @@ import java.math.BigDecimal;
  * Assessment rating summary.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Mar 14, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 1, 2019)
  * @since OMIS 3.0
  */
 public class AssessmentRatingSummary implements Serializable {
@@ -49,6 +50,8 @@ public class AssessmentRatingSummary implements Serializable {
 	
 	private final BigDecimal assessmentRatingMax;
 	
+	private final String categoryOverrideReason;
+	
 	/**
 	 * Instantiates an assessment rating summary with the specified parameters.
 	 * 
@@ -70,7 +73,8 @@ public class AssessmentRatingSummary implements Serializable {
 			final String assessmentRatingDescription,
 			final String rankName,
 			final BigDecimal assessmentRatingMin,
-			final BigDecimal assessmentRatingMax) {
+			final BigDecimal assessmentRatingMax,
+			final String categoryOverrideReason) {
 		this.assessmentRatingId = assessmentRatingId;
 		this.assessmentCategoryScoreId = assessmentCategoryScoreId;
 		this.assessmentCategoryScoreValue = assessmentCategoryScoreValue;
@@ -81,6 +85,7 @@ public class AssessmentRatingSummary implements Serializable {
 		this.rankName = rankName;
 		this.assessmentRatingMin = assessmentRatingMin;
 		this.assessmentRatingMax = assessmentRatingMax;
+		this.categoryOverrideReason = categoryOverrideReason;
 	}
 
 	/**
@@ -162,4 +167,15 @@ public class AssessmentRatingSummary implements Serializable {
 	public BigDecimal getAssessmentRatingMax() {
 		return assessmentRatingMax;
 	}
+
+	/**
+	 * Returns the categoryOverrideReason.
+	 *
+	 * @return categoryOverrideReason category override reason
+	 */
+	public String getCategoryOverrideReason() {
+		return this.categoryOverrideReason;
+	}
+	
+	
 }

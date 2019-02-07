@@ -33,6 +33,8 @@
 		<many-to-one name="assessmentRating" column="`ASSESSMENT_RATING_ID`" entity-name="omis.assessment.domain.AssessmentRating" not-null="true"/>
 		<property name="notes" column="`NOTES`" type="java.lang.String" not-null="false"/>
 		<many-to-one name="approvedStaffAssignment" column="`STAFF_ASSIGNMENT_ID`" entity-name="omis.staff.domain.StaffAssignment" not-null="true"/>
+		<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
+		<many-to-one name="reason" column="`CATEGORY_OVERRIDE_REASON_ID`" entity-name="omis.assessment.domain.CategoryOverrideReason" not-null="true" />
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 			             not-null="true"/>

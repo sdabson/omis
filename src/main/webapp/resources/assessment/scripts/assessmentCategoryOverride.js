@@ -6,4 +6,8 @@ window.onload = function() {
 			document.getElementById("authorizedByDisplay"),
 			document.getElementById("authorizedByCurrent"),
 			document.getElementById("authorizedByClear"));
+	applyActionMenu(document.getElementById("assessmentCategoryOverrideNoteItemsActionMenuLink"), assessmentCategoryOverrideNoteItemsCreateOnClick);
+	for (var index = 0; index < currentAssessmentCategoryOverrideNoteItemIndex; index++) {
+		assessmentCategoryOverrideNoteItemRowOnClick(index);
+	}
 }

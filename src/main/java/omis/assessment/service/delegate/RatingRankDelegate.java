@@ -18,7 +18,6 @@
 package omis.assessment.service.delegate;
 
 import omis.assessment.dao.RatingRankDao;
-import omis.assessment.domain.RatingCategory;
 import omis.assessment.domain.RatingRank;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;

@@ -36,6 +36,12 @@
 		</aop:config>
 		
 		<aop:config>
+			<aop:pointcut id="ratingNoteControllerOperation"
+				expression="execution(* omis.assessment.web.controller.RatingNoteController.*(..))"/>
+			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="ratingNoteControllerOperation"/>	
+		</aop:config>
+		
+		<aop:config>
 			<aop:pointcut id="manageAssessmentControllerOperation"
 				expression="execution(* omis.assessment.web.controller.ManageAssessmentController.*(..))"/>
 			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="manageAssessmentControllerOperation"/>	
@@ -65,6 +71,10 @@
 		
 		<bean id="assessmentNoteFormValidator"
 			class="omis.assessment.web.validator.AssessmentNoteFormValidator">
+		</bean>
+		
+		<bean id="ratingNoteFormValidator"
+			class="omis.assessment.web.validator.RatingNoteFormValidator">
 		</bean>
 		
 		<bean id="assessmentFormValidator"

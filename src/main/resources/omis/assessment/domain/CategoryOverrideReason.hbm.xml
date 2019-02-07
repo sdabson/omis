@@ -51,4 +51,18 @@
 		and
 			categoryOverrideReason <> :excludedCategoryOverrideReason
 	]]></query>
+	<query name="findAllCategoryOverrideReasons"><![CDATA[
+		select categoryOverrideReason
+		from omis.assessment.domain.CategoryOverrideReason categoryOverrideReason
+		where
+			categoryOverrideReason.valid = true
+	]]></query>
+	<query name="findCategoryOverrideReasonsByRatingCategory"><![CDATA[
+		select categoryOverrideReason
+		from omis.assessment.domain.CategoryOverrideReason categoryOverrideReason
+		where
+			categoryOverrideReason.valid = true
+		and
+			categoryOverrideReason.ratingCategory = :ratingCategory
+	]]></query>
 </hibernate-mapping>

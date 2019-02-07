@@ -23,7 +23,7 @@
 			<form:select path="overrideRating">
 				<jsp:include page="../../../includes/nullOption.jsp"/>
 				<c:forEach items="${overrideRatings}" var="rating">
-					<option value="${rating.id}" ${rating.id == assessmentCategoryOverrideForm.overrideRating ? 'selected="selected"' : ''}>
+					<option value="${rating.id}" ${rating.id == assessmentCategoryOverrideForm.overrideRating.id ? 'selected="selected"' : ''}>
 						<c:out value="${rating.rank.name}"/>
 					</option>
 				</c:forEach>
@@ -37,7 +37,7 @@
 			<form:select path="overrideReason">
 				<jsp:include page="../../../includes/nullOption.jsp"/>
 				<c:forEach items="${overrideReasons}" var="reason">
-					<option value="${reason.id}" ${reason.id == assessmentCategoryOverrideForm.overrideReason ? 'selected="selected"' : ''}>
+					<option value="${reason.id}" ${reason.id == assessmentCategoryOverrideForm.overrideReason.id ? 'selected="selected"' : ''}>
 						<c:out value="${reason.name}"/>
 					</option>
 				</c:forEach>
@@ -58,6 +58,19 @@
 				</c:if>
 			</span>
 			<form:errors path="authorizedBy" cssClass="error"/>
+		</span>
+		<span class="fieldGroup">
+			<form:label path="notes" class="fieldLabel">
+				<fmt:message key="notesLabel"/>
+			</form:label>
+			<form:textarea path="notes"/>
+			<form:errors path="notes" cssClass="error"/>
+		</span>
+	</fieldset>
+	<fieldset>
+		<span class="fieldGroup">
+			<c:set var="assessmentCategoryOverrideNoteItems" value="${assessmentCategoryOverrideForm.assessmentCategoryOverrideNoteItems}" scope="request"/>
+			<jsp:include page="assessmentCategoryOverrideNoteTable.jsp"/>
 		</span>
 	</fieldset>
 	<c:if test="${not empty assessmentCategoryOverride}">

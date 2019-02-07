@@ -30,6 +30,7 @@ import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryOverrideNote;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
+import omis.assessment.domain.CategoryOverrideReason;
 import omis.assessment.domain.RatingCategory;
 import omis.assessment.domain.RatingCategorySignificance;
 import omis.assessment.domain.RatingRank;
@@ -38,6 +39,7 @@ import omis.assessment.service.delegate.AssessmentCategoryOverrideDelegate;
 import omis.assessment.service.delegate.AssessmentCategoryOverrideNoteDelegate;
 import omis.assessment.service.delegate.AssessmentCategoryScoreDelegate;
 import omis.assessment.service.delegate.AssessmentRatingDelegate;
+import omis.assessment.service.delegate.CategoryOverrideReasonDelegate;
 import omis.assessment.service.delegate.RatingCategoryDelegate;
 import omis.assessment.service.delegate.RatingRankDelegate;
 import omis.datatype.DateRange;
@@ -104,6 +106,9 @@ public class AssessmentServiceCreateAssessmentCategoryOverrideNoteTests
 	private StaffTitleDelegate staffTitleDelegate;
 	
 	@Autowired
+	private CategoryOverrideReasonDelegate categoryOverrideReasonDelegate;
+	
+	@Autowired
 	private AssessmentCategoryOverrideDelegate 
 			assessmentCategoryOverrideDelegate;
 	
@@ -167,10 +172,13 @@ public class AssessmentServiceCreateAssessmentCategoryOverrideNoteTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, "Notes", 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating, reason,
+						this.parseDateText("01/01/2018"),
+						"Notes", approvedStaff);
 		String description = "Description";
 		Date date = this.parseDateText("01/01/2018");
 
@@ -233,9 +241,12 @@ public class AssessmentServiceCreateAssessmentCategoryOverrideNoteTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, "Notes", 
+						assessmentCategoryScore, assessmentRating,
+						reason, this.parseDateText("01/01/2018"), "Notes", 
 						approvedStaff);
 		String description = "Description";
 		Date date = this.parseDateText("01/01/2018");

@@ -2,13 +2,12 @@ package omis.paroleboarditinerary.report;
 
 import java.io.Serializable;
 
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
-
 /**
  * Board attendee summary.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 20, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class BoardAttendeeSummary implements Serializable {
@@ -25,18 +24,14 @@ public class BoardAttendeeSummary implements Serializable {
 	
 	private final String staffTitle;
 	
-	private final AttendeeRoleCategory memberRole;
-	
 	public BoardAttendeeSummary(final Long id, final String memberLastName,
 			final String memberFirstName, final String memberMiddleName,
-			final String staffTitle,
-			final AttendeeRoleCategory memberRole) {
+			final String staffTitle) {
 		this.id = id;
 		this.memberLastName = memberLastName;
 		this.memberFirstName = memberFirstName;
 		this.memberMiddleName = memberMiddleName;
 		this.staffTitle = staffTitle;
-		this.memberRole = memberRole;
 	}
 
 	/**
@@ -80,14 +75,5 @@ public class BoardAttendeeSummary implements Serializable {
 	 */
 	public String getStaffTitle() {
 		return staffTitle;
-	}
-
-	/**
-	 * Returns the member role.
-	 * 
-	 * @return member role
-	 */
-	public AttendeeRoleCategory getMemberRole() {
-		return memberRole;
 	}
 }

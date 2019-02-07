@@ -1335,7 +1335,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/authPickUpHoldReport.html",
+	@RequestMapping(value = "/authPickUpHoldReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")
@@ -1362,7 +1362,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/authReleaseOffenderReport.html",
+	@RequestMapping(value = "/authReleaseOffenderReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")
@@ -1388,7 +1388,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/warrantToArrestReport.html",
+	@RequestMapping(value = "/warrantToArrestReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")
@@ -1414,7 +1414,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/warrantToArrestIscReport.html",
+	@RequestMapping(value = "/warrantToArrestIscReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")
@@ -1441,7 +1441,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/authCancelWarrantReport.html",
+	@RequestMapping(value = "/authCancelWarrantReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")
@@ -1468,7 +1468,7 @@ public class WarrantController {
 	 * @param reportFormat report format
 	 * @return response entity with report
 	 */
-	@RequestMapping(value = "/authCancelISCWarrantReport.html",
+	@RequestMapping(value = "/authCancelISCWarrantReport.rtf",
 			method = RequestMethod.GET)
 	@PreAuthorize("hasRole('WARRANT_VIEW') "
 			+ "or hasRole('ADMIN')")

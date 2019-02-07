@@ -8,7 +8,6 @@
 	<div id="assessmentModuleGroup" class="moduleGroupLinkContainer">
 		<a href="${pageContext.request.contextPath}/assessment/questionnaire/administer.html?administeredQuestionnaire=${administeredQuestionnaire.id}"><fmt:message key="questionnaireLink"/></a>
 		<a href="${pageContext.request.contextPath}/assessment/rating/list.html?administeredQuestionnaire=${administeredQuestionnaire.id}"><fmt:message key="scoresRatingsLink"/></a>
-		<a href="${pageContext.request.contextPath}/home.html"><fmt:message key="recommendationsLink"/></a>
 		<a href="${pageContext.request.contextPath}/assessment/document/list.html?administeredQuestionnaire=${administeredQuestionnaire.id}"><fmt:message key="attachmentsLink"/></a>
 		<a href="${pageContext.request.contextPath}/assessment/notes/edit.html?administeredQuestionnaire=${administeredQuestionnaire.id}"><fmt:message key="notesLink"/></a>
 	</div>

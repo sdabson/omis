@@ -48,9 +48,17 @@
 					<label class="fieldLabel">
 						<fmt:message key="ratingScoreLabel"/>
 					</label>
-					<span class="detail">
-						<c:out value="TODO"/>
-					</span>
+					<c:forEach items="${assessmentRatingSummaries}" var="ratingSummary">
+						<c:if test="${ratingSummary.assessmentCategoryScorePertinent}">
+							<span class="detail">
+								<fmt:message key="ratingSummaryLabel">
+									<fmt:param value="${ratingSummary.assessmentRatingDescription}" />
+									<fmt:param value="${ratingSummary.assessmentCategoryScoreValue}" />
+									<fmt:param value="${ratingSummary.rankName}" />
+								</fmt:message>
+							</span>
+						</c:if>
+					</c:forEach>
 				</span>
 			</span>
 		</fieldset>

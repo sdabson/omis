@@ -31,7 +31,7 @@
 		</id>
 		<property name="date" column="`DATE`" not-null="true" type="java.util.Date"/>
 		<property name="description" column="`DESCRIPTION`" not-null="true" type="java.lang.String"/>
-		<many-to-one name="assessmentCategoryOverride" entity-name="omis.assessment.domain.AssessmentCategoryOverride" not-null="true" column="`PAROLE_PLAN_ID`"/>
+		<many-to-one name="assessmentCategoryOverride" entity-name="omis.assessment.domain.AssessmentCategoryOverride" not-null="true" column="`ASSESSMENT_CATEGRY_OVRRDE_ID`"/>
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 			             not-null="true"/>

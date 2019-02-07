@@ -166,7 +166,6 @@ public class AssessmentNoteController {
 		this.assessmentNoteFormValidator.validate(form, bindingResult);
 		
 		if (bindingResult.hasErrors()) {
-			System.out.println("kazoooo");
 			return this.prepareEditMav(administeredQuestionnaire, form);
 		} else {
 			this.processNotes(form.getAssessmentNoteItems(),

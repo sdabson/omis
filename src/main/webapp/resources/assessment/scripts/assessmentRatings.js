@@ -7,8 +7,10 @@ window.onload = function() {
 	for(var i = 0; i < rows.length; i++){
 		applyActionMenu(rows[i], function() {
 			applyRemoveLinkConfirmation();
+			applyLinkConfirmation("reassessLink", "reassessConfirmMessage", "omis.assessment.msgs.assessmentRating");
 		});
 	}
+	
 	
 	if (graphData.length > 0) {
 		var c = document.getElementById("assessmentGraph"),

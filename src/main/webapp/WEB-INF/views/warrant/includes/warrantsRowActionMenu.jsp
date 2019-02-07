@@ -58,32 +58,32 @@
 		<sec:authorize access="hasRole('WARRANT_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty warrantCancellation and warrant.warrantReason ne 'ARREST_INTERSTATE_COMPACT_OFFENDER'}">
 			<li>
-			<a href="${pageContext.request.contextPath}/warrant/authCancelWarrantReport.html?offender=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="AuthCancelWarrantReportLinkLabel"/></a>
+			<a href="${pageContext.request.contextPath}/warrant/authCancelWarrantReport.rtf?offender=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="AuthCancelWarrantReportLinkLabel"/></a>
 			</li>
 		    </c:if>
 			<c:if test="${not empty warrantCancellation and warrant.warrantReason eq 'ARREST_INTERSTATE_COMPACT_OFFENDER'}">
 			<li>
-			<a href="${pageContext.request.contextPath}/warrant/authCancelISCWarrantReport.html?offender=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="AuthCancelISCWarrantReportLinkLabel"/></a>
+			<a href="${pageContext.request.contextPath}/warrant/authCancelISCWarrantReport.rtf?offender=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="AuthCancelISCWarrantReportLinkLabel"/></a>
 			</li>
 		    </c:if>		    		
 			<c:if test="${not empty warrant and warrant.warrantReason eq 'AUTHORIZATION_TO_PICKUP_AND_HOLD_PROBATIONER'}">
 			<li>
-				<a href="${pageContext.request.contextPath}/warrant/authPickUpHoldReport.html?warrant=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="authPickUpHoldReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/warrant/authPickUpHoldReport.rtf?warrant=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="authPickUpHoldReportLinkLabel"/></a>
 			</li>
 		    </c:if>
 			<c:if test="${not empty warrantArrest}">
 			<li>
-				<a href="${pageContext.request.contextPath}/warrant/authReleaseOffenderReport.html?offender=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="authReleaseOffenderReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/warrant/authReleaseOffenderReport.rtf?offender=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="authReleaseOffenderReportLinkLabel"/></a>
 			</li>
 		    </c:if>		    	
 			<c:if test="${not empty warrant and (warrant.warrantReason eq 'ARREST_PAROLEE' or warrant.warrantReason eq 'ARREST_CONDITIONAL_RELEASE_OFFENDER' or warrant.warrantReason eq 'ARREST_PAROLE_ABSCONDER' or warrant.warrantReason eq 'ARREST_CONDITIONAL_RELEASE_ABSCONDER')}">
 			<li>
-				<a href="${pageContext.request.contextPath}/warrant/warrantToArrestReport.html?offender=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="warrantToArrestReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/warrant/warrantToArrestReport.rtf?offender=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="warrantToArrestReportLinkLabel"/></a>
 			</li>
 		    </c:if>	
 			<c:if test="${not empty warrant and warrant.warrantReason eq 'ARREST_INTERSTATE_COMPACT_OFFENDER'}">
 			<li>
-				<a href="${pageContext.request.contextPath}/warrant/warrantToArrestIscReport.html?offender=${warrant.id}&reportFormat=DOCX" class="msWordReportLink"><fmt:message key="warrantToArrestIscReportLinkLabel"/></a>
+				<a href="${pageContext.request.contextPath}/warrant/warrantToArrestIscReport.rtf?offender=${warrant.id}&reportFormat=RTF" class="msWordReportLink"><fmt:message key="warrantToArrestIscReportLinkLabel"/></a>
 			</li>
 		    </c:if>			    		    	    
 		    <c:if test="${not empty warrantCancellation or not empty warrantArrest}">

@@ -3,9 +3,11 @@ package omis.paroleboarditinerary.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
+
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.address.service.delegate.AddressDelegate;
@@ -19,7 +21,6 @@ import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
 import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
@@ -160,18 +161,16 @@ public class ParoleBoardItineraryServiceCreateAttendeeTests
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
 		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
 
 		// Action
 		BoardAttendee boardAttendee = this.paroleBoardItineraryService
-				.createAttendee(boardItinerary, boardMember, number, role);
+				.createAttendee(boardItinerary, boardMember, number);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("boardItinerary", boardItinerary)
 			.addExpectedValue("boardMember", boardMember)
 			.addExpectedValue("number", number)
-			.addExpectedValue("role", role)
 			.performAssertions(boardAttendee);
 	}
 
@@ -217,13 +216,11 @@ public class ParoleBoardItineraryServiceCreateAttendeeTests
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
 		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
-		this.boardAttendeeDelegate.create(boardItinerary, boardMember, number, 
-				role);
+		this.boardAttendeeDelegate.create(boardItinerary, boardMember, number);
 
 		// Action
 		this.paroleBoardItineraryService.createAttendee(boardItinerary, 
-				boardMember, number, role);
+				boardMember, number);
 	}
 
 	// Parses date text

@@ -18,7 +18,10 @@
 package omis.assessment.web.form;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import omis.assessment.domain.AssessmentRating;
 import omis.assessment.domain.CategoryOverrideReason;
 import omis.staff.domain.StaffAssignment;
@@ -27,7 +30,7 @@ import omis.staff.domain.StaffAssignment;
  * Assessment Category Override Form.
  * 
  *@author Annie Wahl 
- *@version 0.1.0 (Apr 25, 2018)
+ *@version 0.1.1 (Jan 31, 2019)
  *@since OMIS 3.0
  *
  */
@@ -42,6 +45,12 @@ public class AssessmentCategoryOverrideForm implements Serializable {
 	private CategoryOverrideReason overrideReason;
 	
 	private StaffAssignment authorizedBy;
+	
+	private String notes;
+	
+	private List<AssessmentCategoryOverrideNoteItem>
+		assessmentCategoryOverrideNoteItems =
+		new ArrayList<AssessmentCategoryOverrideNoteItem>();
 	
 	/**
 	 * Default constructor for Assessment Category Override Form.
@@ -111,5 +120,46 @@ public class AssessmentCategoryOverrideForm implements Serializable {
 	 */
 	public void setAuthorizedBy(final StaffAssignment authorizedBy) {
 		this.authorizedBy = authorizedBy;
+	}
+
+	/**
+	 * Returns the notes.
+	 *
+	 * @return notes
+	 */
+	public String getNotes() {
+		return this.notes;
+	}
+
+	/**
+	 * Sets the notes.
+	 *
+	 * @param notes - notes
+	 */
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+
+	/**
+	 * Returns the assessmentCategoryOverrideNoteItems.
+	 *
+	 * @return assessmentCategoryOverrideNoteItems
+	 */
+	public List<AssessmentCategoryOverrideNoteItem>
+			getAssessmentCategoryOverrideNoteItems() {
+		return this.assessmentCategoryOverrideNoteItems;
+	}
+
+	/**
+	 * Sets the assessmentCategoryOverrideNoteItems.
+	 *
+	 * @param assessmentCategoryOverrideNoteItems -
+	 * Assessment Category Override Note Items
+	 */
+	public void setAssessmentCategoryOverrideNoteItems(
+			final List<AssessmentCategoryOverrideNoteItem>
+				assessmentCategoryOverrideNoteItems) {
+		this.assessmentCategoryOverrideNoteItems =
+				assessmentCategoryOverrideNoteItems;
 	}
 }

@@ -29,7 +29,8 @@ import omis.instance.factory.InstanceFactory;
  * Category override reason delegate.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public class CategoryOverrideReasonDelegate {
@@ -51,7 +52,6 @@ public class CategoryOverrideReasonDelegate {
 	 * object
 	 * @param categoryOverrideReasonInstanceFactory category override reason 
 	 * instance factory
-	 * @param auditComponentRetriever audit component retriever
 	 */
 	public CategoryOverrideReasonDelegate(
 			final CategoryOverrideReasonDao categoryOverrideReasonDao,
@@ -121,12 +121,17 @@ public class CategoryOverrideReasonDelegate {
 	}
 
 	/**
-	 * Returns a list of category override reasons.
+	 * Returns a list of valid Category Override Reasons by the specified
+	 * Rating Category.
 	 * 
-	 * @return list of category override reasons
+	 * @param ratingCategory rating category
+	 * @return List of all valid Category Override Reasons by the specified
+	 * Rating Category.
 	 */
-	public List<CategoryOverrideReason> findAll() {
-		return this.categoryOverrideReasonDao.findAll();
+	public List<CategoryOverrideReason> findByRatingCategory(
+			final RatingCategory ratingCategory) {
+		return this.categoryOverrideReasonDao.findByRatingCategory(
+				ratingCategory);
 	}
 	
 	// Populates a category override reason

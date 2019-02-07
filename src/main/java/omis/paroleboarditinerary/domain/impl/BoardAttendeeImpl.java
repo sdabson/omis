@@ -2,7 +2,6 @@ package omis.paroleboarditinerary.domain.impl;
 
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboardmember.domain.ParoleBoardMember;
@@ -11,7 +10,8 @@ import omis.paroleboardmember.domain.ParoleBoardMember;
  * Implementation of board attendee.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Nov 16, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class BoardAttendeeImpl implements BoardAttendee {
@@ -29,8 +29,6 @@ public class BoardAttendeeImpl implements BoardAttendee {
 	private ParoleBoardMember boardMember;
 	
 	private Long number;
-	
-	private AttendeeRoleCategory role;
 	
 	/** 
 	 * Instantiates an implementation of parole board itinerary. 
@@ -115,18 +113,6 @@ public class BoardAttendeeImpl implements BoardAttendee {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setRole(final AttendeeRoleCategory role) {
-		this.role = role;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public AttendeeRoleCategory getRole() {
-		return role;
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
@@ -153,12 +139,6 @@ public class BoardAttendeeImpl implements BoardAttendee {
 		if (!this.getNumber().equals(that.getNumber())) {
 			return false;
 		}
-		if (this.getRole() == null) {
-			throw new IllegalStateException("Role required");
-		}
-		if (!this.getRole().equals(that.getRole())) {
-			return false;
-		}
 		return true;
 	}
 	
@@ -174,14 +154,10 @@ public class BoardAttendeeImpl implements BoardAttendee {
 		if (this.getNumber() == null) {
 			throw new IllegalStateException("Number required");
 		}
-		if (this.getRole() == null) {
-			throw new IllegalStateException("Role required");
-		}
 		int hashCode = 14;
 		hashCode = 29 * hashCode + this.getBoardItinerary().hashCode();
 		hashCode = 29 * hashCode + this.getBoardMember().hashCode();
 		hashCode = 29 * hashCode + this.getNumber().hashCode();
-		hashCode = 29 * hashCode + this.getRole().hashCode();
 		
 		return hashCode;
 	}

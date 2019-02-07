@@ -17,10 +17,12 @@
 */
 package omis.assessment.service.delegate;
 
+import java.util.Date;
 import omis.assessment.dao.AssessmentCategoryOverrideDao;
 import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
+import omis.assessment.domain.CategoryOverrideReason;
 import omis.audit.AuditComponentRetriever;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
@@ -32,7 +34,8 @@ import omis.staff.domain.StaffAssignment;
  * Assessment category override delegate.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public class AssessmentCategoryOverrideDelegate {
@@ -76,6 +79,8 @@ public class AssessmentCategoryOverrideDelegate {
 	 * 
 	 * @param assessmentCategoryScore assessment category score
 	 * @param assessmentRating assessment rating
+	 * @param reason reason
+	 * @param date date
 	 * @param notes notes
 	 * @param approvedStaffAssignment approved staff assignment
 	 * @return assessment category override
@@ -83,8 +88,9 @@ public class AssessmentCategoryOverrideDelegate {
 	 */
 	public AssessmentCategoryOverride create(
 			final AssessmentCategoryScore assessmentCategoryScore, 
-			final AssessmentRating assessmentRating, final String notes, 
-			final StaffAssignment approvedStaffAssignment)  
+			final AssessmentRating assessmentRating,
+			final CategoryOverrideReason reason, final Date date,
+			final String notes, final StaffAssignment approvedStaffAssignment)
 					throws DuplicateEntityFoundException {
 		if (this.assessmentCategoryOverrideDao.find(assessmentCategoryScore, 
 				assessmentRating) != null) {
@@ -94,7 +100,7 @@ public class AssessmentCategoryOverrideDelegate {
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideInstanceFactory.createInstance();
 		populateAssessmentCategoryOverride(assessmentCategoryOverride, 
-				assessmentCategoryScore, assessmentRating, notes,
+				assessmentCategoryScore, assessmentRating, reason, date, notes,
 				approvedStaffAssignment);
 		assessmentCategoryOverride.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
@@ -109,6 +115,8 @@ public class AssessmentCategoryOverrideDelegate {
 	 * @param assessmentCategoryOverride assessment category override
 	 * @param assessmentCategoryScore assessment category score
 	 * @param assessmentRating assessment rating
+	 * @param reason reason
+	 * @param date date
 	 * @param notes notes
 	 * @param approvedStaffAssignment approved staff assignment
 	 * @return assessment category override
@@ -117,8 +125,9 @@ public class AssessmentCategoryOverrideDelegate {
 	public AssessmentCategoryOverride update(
 			final AssessmentCategoryOverride assessmentCategoryOverride,
 			final AssessmentCategoryScore assessmentCategoryScore, 
-			final AssessmentRating assessmentRating, final String notes, 
-			final StaffAssignment approvedStaffAssignment)  
+			final AssessmentRating assessmentRating,
+			final CategoryOverrideReason reason, final Date date,
+			final String notes, final StaffAssignment approvedStaffAssignment)
 					throws DuplicateEntityFoundException {
 		if (this.assessmentCategoryOverrideDao.findExcluding(
 				assessmentCategoryScore, assessmentRating, 
@@ -127,7 +136,7 @@ public class AssessmentCategoryOverrideDelegate {
 					"Assessment category override already exists.");
 		}
 		populateAssessmentCategoryOverride(assessmentCategoryOverride, 
-				assessmentCategoryScore, assessmentRating, notes,
+				assessmentCategoryScore, assessmentRating, reason, date, notes,
 				approvedStaffAssignment);
 		return this.assessmentCategoryOverrideDao.makePersistent(
 				assessmentCategoryOverride);
@@ -162,6 +171,7 @@ public class AssessmentCategoryOverrideDelegate {
 			final AssessmentCategoryOverride assessmentCategoryOverride,
 			final AssessmentCategoryScore assessmentCategoryScore, 
 			final AssessmentRating assessmentRating,
+			final CategoryOverrideReason reason, final Date date,
 			final String notes, final StaffAssignment approvedStaffAssignment) {
 		assessmentCategoryOverride.setApprovedStaffAssignment(
 				approvedStaffAssignment);
@@ -169,6 +179,8 @@ public class AssessmentCategoryOverrideDelegate {
 				assessmentCategoryScore);
 		assessmentCategoryOverride.setAssessmentRating(assessmentRating);
 		assessmentCategoryOverride.setNotes(notes);
+		assessmentCategoryOverride.setDate(date);
+		assessmentCategoryOverride.setReason(reason);
 		assessmentCategoryOverride.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));

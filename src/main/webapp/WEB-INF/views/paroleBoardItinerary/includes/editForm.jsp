@@ -17,7 +17,8 @@
  --%>
 <%--
  - Author: Josh Divine
- - Version: 0.1.1 (Apr 18, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Feb 5, 2019)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -95,16 +96,6 @@
 			<jsp:include page="/WEB-INF/views/paroleBoardItinerary/includes/boardMemberOptions.jsp"/>
 		</form:select>
 		<form:errors path="boardMember3" cssClass="error"/>
-	</span>
-	
-	<span class="fieldGroup">
-		<form:label path="boardMemberAlternate" class="fieldLabel">
-			<fmt:message key="boardMemberAlternateLabel"/></form:label>
-		<c:set var="boardMember" value="${paroleBoardItineraryForm.boardMemberAlternate}" scope="request"/>
-		<form:select path="boardMemberAlternate">
-			<jsp:include page="/WEB-INF/views/paroleBoardItinerary/includes/boardMemberOptions.jsp"/>
-		</form:select>
-		<form:errors path="boardMemberAlternate" cssClass="error"/>
 	</span>
 </fieldset>
 <fieldset id="boardMeetingSitesHolder">

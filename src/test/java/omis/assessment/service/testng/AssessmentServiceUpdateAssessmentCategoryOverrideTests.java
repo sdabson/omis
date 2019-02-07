@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
+import omis.assessment.domain.CategoryOverrideReason;
 import omis.assessment.domain.RatingCategory;
 import omis.assessment.domain.RatingCategorySignificance;
 import omis.assessment.domain.RatingRank;
@@ -36,6 +37,7 @@ import omis.assessment.service.AssessmentService;
 import omis.assessment.service.delegate.AssessmentCategoryOverrideDelegate;
 import omis.assessment.service.delegate.AssessmentCategoryScoreDelegate;
 import omis.assessment.service.delegate.AssessmentRatingDelegate;
+import omis.assessment.service.delegate.CategoryOverrideReasonDelegate;
 import omis.assessment.service.delegate.RatingCategoryDelegate;
 import omis.assessment.service.delegate.RatingRankDelegate;
 import omis.datatype.DateRange;
@@ -100,6 +102,9 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 	
 	@Autowired
 	private StaffTitleDelegate staffTitleDelegate;
+
+	@Autowired
+	private CategoryOverrideReasonDelegate categoryOverrideReasonDelegate;
 	
 	@Autowired
 	private AssessmentCategoryOverrideDelegate 
@@ -163,10 +168,13 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
+		Date date = this.parseDateText("01/01/2018");
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating,
+						reason, date, notes, approvedStaff);
 		RatingCategory newRatingCategory = this.ratingCategoryDelegate.create(
 				"Category 2", new BigDecimal(100),
 				RatingCategorySignificance.PRIMARY, true);
@@ -178,8 +186,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 		// Action
 		assessmentCategoryOverride = this.assessmentService
 				.updateAssessmentCategoryOverride(assessmentCategoryOverride, 
-						newAssessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						newAssessmentCategoryScore, assessmentRating, reason,
+						date, notes, approvedStaff);
 
 		// Assertions
 		PropertyValueAsserter.create()
@@ -188,6 +196,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 			.addExpectedValue("assessmentRating", assessmentRating)
 			.addExpectedValue("notes", notes)
 			.addExpectedValue("approvedStaffAssignment", approvedStaff)
+			.addExpectedValue("reason", reason)
+			.addExpectedValue("date", date)
 			.performAssertions(assessmentCategoryOverride);
 	}
 	
@@ -238,10 +248,13 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
+		Date date = this.parseDateText("01/01/2018");
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating,
+						reason, date, notes, approvedStaff);
 		AssessmentRating newAssessmentRating = this.assessmentRatingDelegate
 				.create(questionnaireType, Sex.FEMALE, 
 						new DateRange(this.parseDateText("01/01/2018"), null), 
@@ -251,8 +264,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 		// Action
 		assessmentCategoryOverride = this.assessmentService
 				.updateAssessmentCategoryOverride(assessmentCategoryOverride, 
-						assessmentCategoryScore, newAssessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, newAssessmentRating,
+						reason, date, notes, approvedStaff);
 
 		// Assertions
 		PropertyValueAsserter.create()
@@ -261,6 +274,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 			.addExpectedValue("assessmentRating", newAssessmentRating)
 			.addExpectedValue("notes", notes)
 			.addExpectedValue("approvedStaffAssignment", approvedStaff)
+			.addExpectedValue("reason", reason)
+			.addExpectedValue("date", date)
 			.performAssertions(assessmentCategoryOverride);
 	}
 	
@@ -310,17 +325,20 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
+		Date date = this.parseDateText("01/01/2018");
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating, reason,
+						date, notes, approvedStaff);
 		String newNotes = "New notes";
 		
 		// Action
 		assessmentCategoryOverride = this.assessmentService
 				.updateAssessmentCategoryOverride(assessmentCategoryOverride, 
-						assessmentCategoryScore, assessmentRating, newNotes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating, reason,
+						date, newNotes, approvedStaff);
 
 		// Assertions
 		PropertyValueAsserter.create()
@@ -329,6 +347,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 			.addExpectedValue("assessmentRating", assessmentRating)
 			.addExpectedValue("notes", newNotes)
 			.addExpectedValue("approvedStaffAssignment", approvedStaff)
+			.addExpectedValue("reason", reason)
+			.addExpectedValue("date", date)
 			.performAssertions(assessmentCategoryOverride);
 	}
 	
@@ -379,10 +399,13 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
+		Date date = this.parseDateText("01/01/2018");
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						assessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating,
+						reason, date, notes, approvedStaff);
 		Person newStaffMember = this.personDelegate.create("Smith", "Jeff", 
 				null, null);
 		StaffAssignment newApprovedStaff = this.staffAssignmentDelegate.create(
@@ -392,8 +415,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 		// Action
 		assessmentCategoryOverride = this.assessmentService
 				.updateAssessmentCategoryOverride(assessmentCategoryOverride, 
-						assessmentCategoryScore, assessmentRating, notes, 
-						newApprovedStaff);
+						assessmentCategoryScore, assessmentRating, reason, date,
+						notes, newApprovedStaff);
 
 		// Assertions
 		PropertyValueAsserter.create()
@@ -402,6 +425,8 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 			.addExpectedValue("assessmentRating", assessmentRating)
 			.addExpectedValue("notes", notes)
 			.addExpectedValue("approvedStaffAssignment", newApprovedStaff)
+			.addExpectedValue("reason", reason)
+			.addExpectedValue("date", date)
 			.performAssertions(assessmentCategoryOverride);
 	}
 
@@ -451,8 +476,11 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 				staffMember, supervisoryOrganization, null, 
 				new DateRange(this.parseDateText("01/01/2000"), null), title, 
 				true, null, null, null, null, null);
+		CategoryOverrideReason reason = this.categoryOverrideReasonDelegate
+				.create("Reason", ratingCategory, true);
+		Date date = this.parseDateText("01/01/2018");
 		this.assessmentCategoryOverrideDelegate.create(assessmentCategoryScore, 
-				assessmentRating, notes, approvedStaff);
+				assessmentRating, reason, date, notes, approvedStaff);
 		RatingCategory newRatingCategory = this.ratingCategoryDelegate.create(
 				"Category 2", new BigDecimal(100),
 				RatingCategorySignificance.PRIMARY, true);
@@ -462,14 +490,14 @@ public class AssessmentServiceUpdateAssessmentCategoryOverrideTests
 						new BigDecimal(75));
 		AssessmentCategoryOverride assessmentCategoryOverride = this
 				.assessmentCategoryOverrideDelegate.create(
-						newAssessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						newAssessmentCategoryScore, assessmentRating,
+						reason, date, notes, approvedStaff);
 
 		// Action
 		assessmentCategoryOverride = this.assessmentService
 				.updateAssessmentCategoryOverride(assessmentCategoryOverride, 
-						assessmentCategoryScore, assessmentRating, notes, 
-						approvedStaff);
+						assessmentCategoryScore, assessmentRating, reason,
+						date, notes, approvedStaff);
 	}
 
 	// Parses date text

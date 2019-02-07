@@ -52,6 +52,8 @@ import omis.offender.web.validator.OffenderPersonalDetailsFormValidator;
 import omis.person.domain.Suffix;
 import omis.person.exception.PersonIdentityExistsException;
 import omis.person.exception.PersonNameExistsException;
+import omis.person.exception.SocialSecurityNumberExistsException;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.exception.CityExistsException;
@@ -77,6 +79,12 @@ public class OffenderPersonalDetailsController {
 
 	private static final String EDIT_VIEW_NAME
 		= "offender/personalDetails/edit";
+	
+	private static final String STATE_ID_NUMBER_EXISTS_CUSTOM_VIEW_NAME
+		= "person/includes/stateIdNumberExists";
+
+	private static final String SOCIAL_SECURITY_NUMBER_EXISTS_CUSTOM_VIEW_NAME
+		= "person/includes/socialSecurityNumberExists";
 	
 	private static final String ACTION_MENU_VIEW_NAME
 		= "offender/personalDetails/includes/personalDetailsActionMenu";
@@ -119,11 +127,34 @@ public class OffenderPersonalDetailsController {
 
 	private static final String PERSON_IDENTITY_EXISTS_MESSAGE_KEY
 		= "personIdentity.exists";
+	
+	private static final String STATE_ID_NUMBER_EXISTS_MESSAGE_KEY
+		= "stateIdNumber.exists";
+
+	private static final String SOCIAL_SECURITY_NUMBER_EXISTS_MESSAGE_KEY
+		= "socialSecurityNumber.exists";
 
 	/* Bundles. */
 	
 	private static final String ERROR_BUNDLE_NAME
 		= "omis.offender.msgs.form";
+	
+	private static final String PERSON_ERROR_BUNDLE_NAME
+		= "omis.person.msgs.form";
+	
+	/* Report names. */
+
+	private static final String LEGAL_NAME_AND_IDENTITY_DETAILS_FULL_REPORT_NAME 
+		= "/BasicInformation/LegalNameandIdentity/Legal_Name_and_Identity";
+
+	private static final String 
+		LEGAL_NAME_AND_IDENTITY_DETAILS_REDACTED_REPORT_NAME 
+		= "/BasicInformation/LegalNameandIdentity/Legal_Name_and_Identity_Redacted";
+
+	/* Report parameter names. */
+
+	private static final String 
+		LEGAL_NAME_AND_IDENTITY_DETAILS_ID_REPORT_PARAM_NAME = "DOC_ID";
 	
 	/* Services. */
 	
@@ -162,20 +193,6 @@ public class OffenderPersonalDetailsController {
 	@Qualifier("offenderPersonalDetailsFormValidator")
 	private OffenderPersonalDetailsFormValidator
 		offenderPersonalDetailsFormValidator;
-
-	/* Report names. */
-
-	private static final String LEGAL_NAME_AND_IDENTITY_DETAILS_FULL_REPORT_NAME 
-		= "/BasicInformation/LegalNameandIdentity/Legal_Name_and_Identity";
-
-	private static final String 
-		LEGAL_NAME_AND_IDENTITY_DETAILS_REDACTED_REPORT_NAME 
-		= "/BasicInformation/LegalNameandIdentity/Legal_Name_and_Identity_Redacted";
-
-	/* Report parameter names. */
-
-	private static final String 
-		LEGAL_NAME_AND_IDENTITY_DETAILS_ID_REPORT_PARAM_NAME = "DOC_ID";
 
 	/* Report runners. */
 	
@@ -288,6 +305,9 @@ public class OffenderPersonalDetailsController {
 	 * validation fails
 	 * @throws PersonIdentityExistsException if identity exists for person
 	 * @throws PersonNameExistsException if name exists for person
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists
+	 * @throws StateIdNumberExistsException if State ID number exists 
 	 */
 	@RequestMapping(value = "/edit.html",
 			method = RequestMethod.POST)
@@ -297,9 +317,10 @@ public class OffenderPersonalDetailsController {
 				final Offender offender,
 			final OffenderPersonalDetailsForm offenderPersonalDetailsForm,
 			final BindingResult result)
-					throws
-						PersonIdentityExistsException,
-						PersonNameExistsException {
+					throws PersonIdentityExistsException,
+						PersonNameExistsException,
+						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException {
 		this.offenderPersonalDetailsFormValidator.validate(
 				offenderPersonalDetailsForm, result);
 		if (result.hasErrors()) {
@@ -530,6 +551,42 @@ public class OffenderPersonalDetailsController {
 				PERSON_IDENTITY_EXISTS_MESSAGE_KEY, ERROR_BUNDLE_NAME,
 				personIdentityExists);
 	}
+	
+	/**
+	 * Handles {@code StateIdNumberExistsException}.
+	 * 
+	 * @param stateIdNumberExistsException exception
+	 * @return screen to handle {@code StateIdNumberExistsException}
+	 */
+	@ExceptionHandler(StateIdNumberExistsException.class)
+	public ModelAndView handleStateIdNumberExistsException(
+			final StateIdNumberExistsException stateIdNumberExistsException) {
+		return this.businessExceptionHandlerDelegate
+				.prepareCustomizedModelAndView(
+						STATE_ID_NUMBER_EXISTS_CUSTOM_VIEW_NAME,
+						STATE_ID_NUMBER_EXISTS_MESSAGE_KEY,
+						PERSON_ERROR_BUNDLE_NAME,
+						stateIdNumberExistsException);
+	}
+	
+	/**
+	 * Handles {@code SocialSecurityNumberExistsException}.
+	 * 
+	 * @param socialSecurityNumberExistsException exception
+	 * @return screen to handle {@code SocialSecurityNumberExistsException}
+	 */
+	@ExceptionHandler(SocialSecurityNumberExistsException.class)
+	public ModelAndView handleSocialSecurityNumberExistsException(
+			final SocialSecurityNumberExistsException
+				socialSecurityNumberExistsException) {
+		return this.businessExceptionHandlerDelegate
+				.prepareCustomizedModelAndView(
+						SOCIAL_SECURITY_NUMBER_EXISTS_CUSTOM_VIEW_NAME,
+						SOCIAL_SECURITY_NUMBER_EXISTS_MESSAGE_KEY,
+						PERSON_ERROR_BUNDLE_NAME,
+						socialSecurityNumberExistsException);
+	}
+	
 	
 	/* Helper methods. */
 	

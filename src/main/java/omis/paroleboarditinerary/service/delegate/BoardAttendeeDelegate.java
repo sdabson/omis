@@ -8,7 +8,6 @@ import omis.audit.domain.UpdateSignature;
 import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.paroleboarditinerary.dao.BoardAttendeeDao;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboardmember.domain.ParoleBoardMember;
@@ -17,7 +16,8 @@ import omis.paroleboardmember.domain.ParoleBoardMember;
  * Board attendee delegate.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 20, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class BoardAttendeeDelegate {
@@ -56,16 +56,14 @@ public class BoardAttendeeDelegate {
 	 * @param boardItinerary parole board itinerary
 	 * @param boardMember parole board member
 	 * @param number number
-	 * @param role attendee role category 
 	 * @return board attendee
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
-	public BoardAttendee create(final ParoleBoardItinerary boardItinerary, 
-			final ParoleBoardMember boardMember, final Long number, 
-			final AttendeeRoleCategory role) 
+	public BoardAttendee create(final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardMember boardMember, final Long number)
 					throws DuplicateEntityFoundException {
-		if (this.boardAttendeeDao.find(boardItinerary, boardMember, number, 
-				role) != null) {
+		if (this.boardAttendeeDao.find(boardItinerary, boardMember, number)
+				!= null) {
 			throw new DuplicateEntityFoundException(
 					"Board attendee already exists.");
 		}
@@ -74,8 +72,7 @@ public class BoardAttendeeDelegate {
 		attendee.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));
-		populateBoardAttendee(attendee, boardItinerary, boardMember, number, 
-				role);
+		populateBoardAttendee(attendee, boardItinerary, boardMember, number);
 		return this.boardAttendeeDao.makePersistent(attendee);
 	}
 
@@ -86,22 +83,20 @@ public class BoardAttendeeDelegate {
 	 * @param boardItinerary parole board itinerary
 	 * @param boardMember parole board member
 	 * @param number number
-	 * @param role attendee role category
 	 * @return board attendee
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
-	public BoardAttendee update(final BoardAttendee attendee, 
-			final ParoleBoardItinerary boardItinerary, 
+	public BoardAttendee update(final BoardAttendee attendee,
+			final ParoleBoardItinerary boardItinerary,
 			final ParoleBoardMember boardMember,
-			final Long number, final AttendeeRoleCategory role) 
+			final Long number)
 					throws DuplicateEntityFoundException {
-		if (this.boardAttendeeDao.findExcluding(boardItinerary, boardMember, 
-				number, role, attendee) != null) {
+		if (this.boardAttendeeDao.findExcluding(boardItinerary, boardMember,
+				number, attendee) != null) {
 			throw new DuplicateEntityFoundException(
 					"Board attendee already exists.");
 		}
-		populateBoardAttendee(attendee, boardItinerary, boardMember, number, 
-				role);
+		populateBoardAttendee(attendee, boardItinerary, boardMember, number);
 		return this.boardAttendeeDao.makePersistent(attendee);
 	}
 	
@@ -127,29 +122,14 @@ public class BoardAttendeeDelegate {
 				.findBoardAttendeesByBoardItinerary(boardItinerary);
 	}
 	
-	/**
-	 * Returns the alternate board attendee for the specified parole board 
-	 * itinerary.
-	 * 
-	 * @param boardItinerary parole board itinerary
-	 * @return board attendee
-	 */
-	public BoardAttendee findBoardAlternateAttendeeByBoardItinerary(
-			final ParoleBoardItinerary boardItinerary) {
-		return this.boardAttendeeDao.findBoardAlternateAttendeeByBoardItinerary(
-				boardItinerary);
-	}
-	
 	// Populates a board attendee
 	private void populateBoardAttendee(
 			final BoardAttendee attendee, 
 			final ParoleBoardItinerary boardItinerary,
-			final ParoleBoardMember boardMember, final Long number, 
-			final AttendeeRoleCategory role) {
+			final ParoleBoardMember boardMember, final Long number) {
 		attendee.setBoardItinerary(boardItinerary);
 		attendee.setBoardMember(boardMember);
 		attendee.setNumber(number);
-		attendee.setRole(role);
 		attendee.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));

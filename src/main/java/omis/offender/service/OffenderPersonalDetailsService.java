@@ -22,13 +22,14 @@ import java.util.List;
 
 import omis.country.domain.Country;
 import omis.demographics.domain.Sex;
-import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
 import omis.person.domain.PersonIdentity;
 import omis.person.domain.PersonName;
 import omis.person.domain.Suffix;
 import omis.person.exception.PersonIdentityExistsException;
 import omis.person.exception.PersonNameExistsException;
+import omis.person.exception.SocialSecurityNumberExistsException;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.region.domain.City;
 import omis.region.domain.State;
 import omis.region.exception.CityExistsException;
@@ -73,13 +74,18 @@ public interface OffenderPersonalDetailsService {
 	 * @param deceased whether offender is deceased
 	 * @param deathDate date of death
 	 * @return changed, including SSN, person identity
-	 * @throws PersonIdentityExistsException if person identity exists 
+	 * @throws PersonIdentityExistsException if person identity exists
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * is used
 	 */
 	PersonIdentity changeIdentity(Offender offender, Date birthDate, 
 			Country birthCountry, State birthState, City birthPlace,
 			Integer socialSecurityNumber, String stateIdNumber, Sex sex,
 			Boolean deceased, Date deathDate) 
-					throws PersonIdentityExistsException;
+					throws PersonIdentityExistsException,
+						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException;
 	
 	/**
 	 * Changes the identity of the specified offender with the specified
@@ -95,12 +101,14 @@ public interface OffenderPersonalDetailsService {
 	 * @param deceased whether offender is deceased
 	 * @param deathDate date of death
 	 * @return changed, not including SSN, person identity
-	 * @throws DuplicateEntityFoundException 
+	 * @throws PersonIdentityExistsException if person identity exists
+	 * @throws StateIdNumberExistsException if State ID number exists 
 	 */
 	PersonIdentity changeIdentityWithoutSsn(Offender offender, Date birthDate, 
 			Country birthCountry, State birthState, City birthPlace,
 			String stateIdNumber, Sex sex, Boolean deceased, Date deathDate)
-					throws PersonIdentityExistsException;
+					throws PersonIdentityExistsException,
+						StateIdNumberExistsException;
 	
 	/**
 	 * Returns a list of suffixes.

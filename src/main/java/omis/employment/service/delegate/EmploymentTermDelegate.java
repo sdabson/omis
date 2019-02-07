@@ -13,7 +13,6 @@ import omis.employment.domain.EmploymentChangeReason;
 import omis.employment.domain.EmploymentTerm;
 import omis.employment.domain.component.Job;
 import omis.employment.exception.EmploymentExistsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 import omis.offender.domain.Offender;
 

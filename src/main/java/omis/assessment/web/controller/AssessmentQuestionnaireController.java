@@ -828,7 +828,6 @@ public class AssessmentQuestionnaireController {
 							hasAnswerValue = true;
 							//Update AdministeredQuestionValue with the
 							//AnswerValue on the form.
-							System.out.println("kazoo " + i);
 							this.administeredQuestionnaireService
 								.editAdministeredQuestionValue(admstrdQstnValue,
 									admnstrdQstnnre, question, qstnnreSctn,

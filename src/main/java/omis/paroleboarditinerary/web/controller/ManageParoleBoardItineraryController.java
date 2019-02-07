@@ -26,7 +26,6 @@ import omis.datatype.DateRange;
 import omis.exception.DuplicateEntityFoundException;
 import omis.facility.domain.Unit;
 import omis.location.domain.Location;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
@@ -49,8 +48,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Controller for managing parole board itineraries.
  *
  * @author Josh Divine
- * @author Annie Wahl 
- * @version 0.1.2 (Apr 10, 2018)
+ * @author Annie Wahl
+ * @version 0.1.3 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 @Controller
@@ -255,10 +254,7 @@ public class ManageParoleBoardItineraryController {
 						attendee.getBoardMember());
 			}
 		}
-		paroleBoardItineraryForm.setBoardMemberAlternate(
-				this.paroleBoardItineraryService
-				.findBoardAlternateAttendeeByBoardItinerary(
-						paroleBoardItinerary).getBoardMember());
+		
 		List<BoardMeetingSite> meetingSites = this.paroleBoardItineraryService
 				.findBoardMeetingSitesByBoardItinerary(paroleBoardItinerary);
 		List<BoardMeetingSiteItem> meetingSiteItems = 
@@ -325,17 +321,11 @@ public class ManageParoleBoardItineraryController {
 						paroleBoardItineraryForm.getEndDate());
 
 		this.paroleBoardItineraryService.createAttendee(boardItinerary, 
-				paroleBoardItineraryForm.getBoardMember1(), 1L, 
-				AttendeeRoleCategory.PRIMARY);
+				paroleBoardItineraryForm.getBoardMember1(), 1L);
 		this.paroleBoardItineraryService.createAttendee(boardItinerary, 
-				paroleBoardItineraryForm.getBoardMember2(), 2L, 
-				AttendeeRoleCategory.PRIMARY);
+				paroleBoardItineraryForm.getBoardMember2(), 2L);
 		this.paroleBoardItineraryService.createAttendee(boardItinerary, 
-				paroleBoardItineraryForm.getBoardMember3(), 3L, 
-				AttendeeRoleCategory.PRIMARY);
-		this.paroleBoardItineraryService.createAttendee(boardItinerary, 
-				paroleBoardItineraryForm.getBoardMemberAlternate(), 1L, 
-				AttendeeRoleCategory.ALTERNATE);
+				paroleBoardItineraryForm.getBoardMember3(), 3L);
 		
 		processBoardMeetingSites(boardItinerary, 
 				paroleBoardItineraryForm.getBoardMeetingSiteItems());
@@ -392,20 +382,12 @@ public class ManageParoleBoardItineraryController {
 				attendee3 = attendee;
 			}
 		}
-		BoardAttendee alternateAttendee = this.paroleBoardItineraryService
-				.findBoardAlternateAttendeeByBoardItinerary(boardItinerary);
-		this.paroleBoardItineraryService.updateAttendee(attendee1, 
-				paroleBoardItineraryForm.getBoardMember1(), 
-				AttendeeRoleCategory.PRIMARY);
-		this.paroleBoardItineraryService.updateAttendee(attendee2, 
-				paroleBoardItineraryForm.getBoardMember2(), 
-				AttendeeRoleCategory.PRIMARY);
-		this.paroleBoardItineraryService.updateAttendee(attendee3, 
-				paroleBoardItineraryForm.getBoardMember3(), 
-				AttendeeRoleCategory.PRIMARY);
-		this.paroleBoardItineraryService.updateAttendee(alternateAttendee, 
-				paroleBoardItineraryForm.getBoardMemberAlternate(), 
-				AttendeeRoleCategory.ALTERNATE);
+		this.paroleBoardItineraryService.updateAttendee(attendee1,
+				paroleBoardItineraryForm.getBoardMember1());
+		this.paroleBoardItineraryService.updateAttendee(attendee2,
+				paroleBoardItineraryForm.getBoardMember2());
+		this.paroleBoardItineraryService.updateAttendee(attendee3,
+				paroleBoardItineraryForm.getBoardMember3());
 		
 		processBoardMeetingSites(boardItinerary, 
 				paroleBoardItineraryForm.getBoardMeetingSiteItems());

@@ -5,7 +5,6 @@ import java.util.List;
 import omis.employment.dao.EmploymentChangeReasonDao;
 import omis.employment.domain.EmploymentChangeReason;
 import omis.employment.exception.EmploymentChangeReasonExistsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 
 /**

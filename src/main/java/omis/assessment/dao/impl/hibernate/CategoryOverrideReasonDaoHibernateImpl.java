@@ -17,6 +17,8 @@
 */
 package omis.assessment.dao.impl.hibernate;
 
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 
 import omis.assessment.dao.CategoryOverrideReasonDao;
@@ -28,7 +30,8 @@ import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
  * Hibernate implementation of the category override reason data access object.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public class CategoryOverrideReasonDaoHibernateImpl 
@@ -37,18 +40,24 @@ public class CategoryOverrideReasonDaoHibernateImpl
 
 	/* Queries. */
 	
-	private final static String FIND_QUERY_NAME = "findCategoryOverrideReason";
+	private static final String FIND_QUERY_NAME = "findCategoryOverrideReason";
 	
-	private final static String FIND_EXCLUDING_QUERY_NAME = 
+	private static final String FIND_EXCLUDING_QUERY_NAME = 
 			"findCategoryOverrideReasonExcluding";
+	
+	private static final String FIND_ALL_QUERY_NAME =
+			"findAllCategoryOverrideReasons";
+	
+	private static final String FIND_BY_RATING_CATEGORY_QUERY_NAME =
+			"findCategoryOverrideReasonsByRatingCategory";
 	
 	/* Parameters. */
 	
-	private final static String NAME_PARAM_NAME = "name";
+	private static final String NAME_PARAM_NAME = "name";
 	
-	private final static String RATING_CATEGORY_PARAM_NAME = "ratingCategory";
+	private static final String RATING_CATEGORY_PARAM_NAME = "ratingCategory";
 	
-	private final static String EXCLUDED_CATEGORY_OVERRIDE_REASON_PARAM_NAME = 
+	private static final String EXCLUDED_CATEGORY_OVERRIDE_REASON_PARAM_NAME = 
 					"excludedCategoryOverrideReason";
 	
 	/**
@@ -90,5 +99,31 @@ public class CategoryOverrideReasonDaoHibernateImpl
 						excludedCategoryOverrideReason)
 				.uniqueResult();
 		return categoryOverrideReason;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<CategoryOverrideReason> findAllReasons() {
+		@SuppressWarnings("unchecked")
+		List<CategoryOverrideReason> reasons =
+			this.getSessionFactory().getCurrentSession()
+			.getNamedQuery(FIND_ALL_QUERY_NAME)
+			.list();
+		
+		return reasons;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<CategoryOverrideReason> findByRatingCategory(
+			final RatingCategory ratingCategory) {
+		@SuppressWarnings("unchecked")
+		List<CategoryOverrideReason> reasons =
+			this.getSessionFactory().getCurrentSession()
+			.getNamedQuery(FIND_BY_RATING_CATEGORY_QUERY_NAME)
+			.setParameter(RATING_CATEGORY_PARAM_NAME, ratingCategory)
+			.list();
+		
+		return reasons;
 	}
 }

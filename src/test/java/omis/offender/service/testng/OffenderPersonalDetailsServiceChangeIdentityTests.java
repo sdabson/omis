@@ -34,6 +34,8 @@ import omis.offender.service.OffenderPersonalDetailsService;
 import omis.offender.service.delegate.OffenderDelegate;
 import omis.person.domain.PersonIdentity;
 import omis.person.exception.PersonIdentityExistsException;
+import omis.person.exception.SocialSecurityNumberExistsException;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.region.domain.City;
 import omis.region.domain.State;
@@ -46,10 +48,11 @@ import omis.util.PropertyValueAsserter;
  * Tests method to change offender person details.
  *
  * @author Sheronda Vaughn
+ * @author Stephen Abson
  * @version 0.0.1 (Feb 21, 2018)
  * @since OMIS 3.0
  */
-@Test
+@Test(groups = {"offender", "service"})
 public class OffenderPersonalDetailsServiceChangeIdentityTests
 	extends AbstractHibernateTransactionalTestNGSpringContextTests {
 
@@ -89,10 +92,16 @@ public class OffenderPersonalDetailsServiceChangeIdentityTests
 	 *
 	 * @throws PersonIdentityExistsException person identity exists
 	 * @throws DuplicateEntityFoundException duplicate entity found
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists
+	 * @throws StateIdNumberExistsException if State ID number exists 
 	 */
 	@Test
 	public void testChangeIdentity() throws PersonIdentityExistsException, 
-			DuplicateEntityFoundException {
+			DuplicateEntityFoundException,
+			StateIdNumberExistsException,
+			SocialSecurityNumberExistsException {
+		
 		// Arrangements
 		final String lastName = "LastName";
 		final String firstName = "FirstName";
@@ -140,10 +149,16 @@ public class OffenderPersonalDetailsServiceChangeIdentityTests
 	 *
 	 *
 	 * @throws DuplicateEntityFoundException duplicate entity found
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists
+	 * @throws StateIdNumberExistsException if State ID number exists 
 	 */
 	@Test(expectedExceptions = {PersonIdentityExistsException.class})
 	public void testPersonIdentityExistsException() 
-			throws DuplicateEntityFoundException {
+			throws DuplicateEntityFoundException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
 		// Arrangements
 		final String lastName = "LastName";
 		final String firstName = "FirstName";
@@ -170,6 +185,137 @@ public class OffenderPersonalDetailsServiceChangeIdentityTests
 			.changeIdentity(offender, birthDate, birthCountry, birthState, 
 				birthPlace, socialSecurityNumber, stateIdNumber, sex, 
 				deceased, deathDate);
+	}
+	
+	/**
+	 * Tests that attempts to change State ID number to a State ID number that
+	 * is already used is prevented with a {@code StateIdNumberExistsException}.
+	 * 
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * is used 
+	 * @throws StateIdNumberExistsException if State ID number is used
+	 * - asserted
+	 * @throws PersonIdentityExistsException if person identity exists 
+	 */
+	@Test(expectedExceptions = {StateIdNumberExistsException.class})
+	public void testWithExistingStateIdNumber()
+			throws PersonIdentityExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
+		// Arranges two offenders with different State ID numbers
+		String juliusIdNumber = "MT123456789";
+		this.offenderDelegate.create("Blofeld", "Julius", null, null, null,
+				juliusIdNumber, this.parseDateText("12/12/1984"), null, null,
+				null, null);
+		Date ernstBirthDate = this.parseDateText("02/22/1984");
+		Offender ernst = this.offenderDelegate.create("Large", "Ernst", null,
+				"X", null, "MT654987321", ernstBirthDate,
+				null, null, null, null);
+		
+		// Action - attempts to change the State ID number of one offender to
+		// that of the other
+		this.offenderPersonalDetailsService.changeIdentity(ernst,
+				ernstBirthDate, null, null, null, null, juliusIdNumber, null,
+				null, null);
+	}
+	
+	/**
+	 * Tests that attempt to change State ID number to a State ID number that is
+	 * used multiple times is prevented with a
+	 * {@code StateIdNumberExistsException}.
+	 * 
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists 
+	 * @throws StateIdNumberExistsException if State ID number is already used
+	 * - asserted
+	 * @throws PersonIdentityExistsException if person identity exists 
+	 */
+	@Test(expectedExceptions = {StateIdNumberExistsException.class})
+	public void testWithMultipleExistingStateIdNumbers()
+			throws PersonIdentityExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+
+		// Arranges three offenders - two with a shared State ID number
+		String stateIdNumber = "MT123456789";
+		this.offenderDelegate.create("Blofeld", "Julius", null, null, null,
+				stateIdNumber, this.parseDateText("12/12/1981"), null, null,
+				null, null);
+		this.offenderDelegate.create("Largo", "Enrst", null, "XX", null, stateIdNumber,
+				this.parseDateText("12/01/1981"), null, null, null, null);
+		Date emilioBirthDate = this.parseDateText("12/03/1981");
+		Offender emilio = this.offenderDelegate.create("No", "Emilio", null,
+				null, null, "MT456321987", emilioBirthDate,
+				null, null, null, null);
+		
+		// Action - attempts to change the State ID number of one offender to
+		// that of the other two
+		this.offenderPersonalDetailsService.changeIdentity(emilio,
+				emilioBirthDate, null, null, null, null, stateIdNumber, null,
+				null, null);
+	}
+	
+	/**
+	 * Tests that attempt to change SSN to an SSN that is already used is
+	 * prevented with a {@code SocialSecurityNumberExistsException}.
+	 * 
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists - asserted
+	 * @throws StateIdNumberExistsException if State ID number exists 
+	 * @throws PersonIdentityExistsException if person identity exists
+	 */
+	@Test(expectedExceptions = {SocialSecurityNumberExistsException.class})
+	public void testChangeIdentityWithExisingSocialSecurityNumber()
+			throws PersonIdentityExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
+		// Arranges two offender's with different SSNs
+		Integer emilioSsn = 123456789;
+		this.offenderDelegate
+				.create("Blofeld", "Emilio", "Francis", "XII", emilioSsn, null,
+						null, null, null, null, Sex.MALE);
+		
+		Offender julius = this.offenderDelegate
+				.create("Scaramanga", "Julius", null, null, 987654321, null,
+						null, null, null, null, Sex.MALE);
+		
+		// Action - attempts to change one offender's SSN to that of the other
+		this.offenderPersonalDetailsService
+			.changeIdentity(julius, null, null, null, null, emilioSsn, null,
+					Sex.MALE, null, null);
+	}
+	
+	/**
+	 * Tests that attempts to change SSN to an SSN that is already used by
+	 * multiple other people is prevented with a
+	 * {@code SocialSecurityNumberExistsException}.
+	 * 
+	 * @throws SocialSecurityNumberExistsException if social security number
+	 * exists - asserted 
+	 * @throws StateIdNumberExistsException if State ID number exists 
+	 * @throws PersonIdentityExistsException if person identity exists
+	 * 
+	 */
+	@Test(expectedExceptions = {SocialSecurityNumberExistsException.class})
+	public void testChangeIdentityWithMultipleExistingSocialSecurityNumbers()
+			throws PersonIdentityExistsException,
+				StateIdNumberExistsException,
+				SocialSecurityNumberExistsException {
+		
+		// Arranges three offenders - two with the same SSN
+		Integer sharedSsn = 123456789;
+		this.offenderDelegate.create("Blofeld", "Auric", "Francis", null,
+				sharedSsn, null, null, null, null, null, null);
+		this.offenderDelegate.create("Scaramanga", "Emilio", null, "X",
+				sharedSsn, null, null, null, null, null, null);
+		Offender julius = this.offenderDelegate.create("Julius", "Ernst", null,
+				null, 321654987, null, null, null, null, null, null);
+		
+		// Action - attempts to change third offender's SSN to that of others
+		this.offenderPersonalDetailsService.changeIdentity(julius, null, null,
+				null, null, sharedSsn, null, null, null, null);
 	}
 	
 	/* Helper methods */

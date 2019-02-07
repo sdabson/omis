@@ -106,12 +106,15 @@
 			assessmentRating.description,
 			rank.name,
 			assessmentRating.min,
-			assessmentRating.max
+			assessmentRating.max,
+			reason.name
 		)
 		from
 			omis.assessment.domain.AssessmentCategoryOverride assessmentCategoryOverride
 		right outer join
 			assessmentCategoryOverride.assessmentCategoryScore assessmentCategoryScore
+		left outer join
+			assessmentCategoryOverride.reason reason
 		inner join
 			assessmentCategoryScore.administeredQuestionnaire administeredQuestionnaire
 		inner join

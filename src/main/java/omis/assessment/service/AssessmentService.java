@@ -22,7 +22,6 @@ import java.util.List;
 
 import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryOverrideNote;
-import omis.assessment.domain.AssessmentCategoryOverrideReason;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
 import omis.assessment.domain.CategoryOverrideReason;
@@ -39,7 +38,7 @@ import omis.staff.domain.StaffAssignment;
  * 
  * @author Josh Divine
  * @author Annie Wahl
- * @version 0.1.2 (Aug 23, 2018)
+ * @version 0.1.3 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public interface AssessmentService {
@@ -60,6 +59,8 @@ public interface AssessmentService {
 	 * 
 	 * @param assessmentCategoryScore assessment category score
 	 * @param assessmentRating assessment rating
+	 * @param reason reason
+	 * @param date date
 	 * @param notes notes
 	 * @param approvedStaff approved staff
 	 * @return assessment category override
@@ -67,7 +68,8 @@ public interface AssessmentService {
 	 */
 	AssessmentCategoryOverride createAssessmentCategoryOverride(
 			AssessmentCategoryScore assessmentCategoryScore, 
-			AssessmentRating assessmentRating, String notes, 
+			AssessmentRating assessmentRating, CategoryOverrideReason reason,
+			Date date, String notes, 
 			StaffAssignment approvedStaff) throws DuplicateEntityFoundException;
 	
 	/**
@@ -77,6 +79,8 @@ public interface AssessmentService {
 	 * @param assessmentCategoryOverride assessment category override
 	 * @param assessmentCategoryScore assessment category score
 	 * @param assessmentRating assessment rating
+	 * @param reason reason
+	 * @param date date
 	 * @param notes notes
 	 * @param approvedStaff approved staff
 	 * @return assessment category override
@@ -85,22 +89,17 @@ public interface AssessmentService {
 	AssessmentCategoryOverride updateAssessmentCategoryOverride(
 			AssessmentCategoryOverride assessmentCategoryOverride, 
 			AssessmentCategoryScore assessmentCategoryScore, 
-			AssessmentRating assessmentRating, String notes, 
+			AssessmentRating assessmentRating, CategoryOverrideReason reason,
+			Date date, String notes, 
 			StaffAssignment approvedStaff) throws DuplicateEntityFoundException;
 	
 	/**
-	 * Creates a new assessment category override reason from the specified 
-	 * parameters.
+	 * Removes the specified assessment category override.
 	 * 
-	 * @param override assessment category override
-	 * @param category category override reason
-	 * @return assessment category override reason
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 * @param assessmentCategoryOverride assessment category override
 	 */
-	AssessmentCategoryOverrideReason createAssessmentCategoryOverrideReason(
-			AssessmentCategoryOverride override, 
-			CategoryOverrideReason category) 
-					throws DuplicateEntityFoundException;
+	void removeAssessmentCategoryOverride(
+			AssessmentCategoryOverride assessmentCategoryOverride);
 	
 	/**
 	 * Returns a list of rating categories for the specified questionnaire type.
@@ -148,22 +147,15 @@ public interface AssessmentService {
 					AssessmentCategoryScore assessmentCategoryScore);
 	
 	/**
-	 * Returns a list of assessment category override reasons for the specified 
-	 * assessment category override.
+	 * Returns a list of valid Category Override Reasons by the specified
+	 * Rating Category.
 	 * 
-	 * @param assessmentCategoryOverride assessment category override
-	 * @return list of assessment category override reasons
+	 * @param ratingCategory rating category
+	 * @return List of all valid Category Override Reasons by the specified
+	 * Rating Category.
 	 */
-	List<AssessmentCategoryOverrideReason> 
-			findAssessmentCategoryOverrideReasonsByAssessmentCategoryOverride(
-					AssessmentCategoryOverride assessmentCategoryOverride);
-	
-	/**
-	 * Returns a list of category override reasons.
-	 * 
-	 * @return list of category override reasons
-	 */
-	List<CategoryOverrideReason> findCategoryOverrideReasons();
+	List<CategoryOverrideReason> findCategoryOverrideReasonsByRatingCategory(
+			RatingCategory ratingCategory);
 	
 	/**
 	 * Returns a list of assessment ratings for the specified rating category.

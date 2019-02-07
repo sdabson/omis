@@ -25,36 +25,39 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <fmt:setBundle basename="omis.person.msgs.person" var="personBundle"/>
 <p>
 	<c:choose>
 		<c:when test="${not empty businessException.person}">
-			<c:choose>
-				<c:when test="${not empty businessException.socialSecurityNumber}">
-					<fmt:formatNumber var="formattedSocialSecurityNumber" pattern="#" value="${businessException.socialSecurityNumber}"/>
-					<fmt:message key="socialSecurityNumberUsedWithValueLabel" bundle="${personBundle}">
-						<fmt:param value="${formattedSocialSecurityNumber}"/>
-					</fmt:message>
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="socialSecurityNumberUsedByLabel"/>
-				</c:otherwise>
-			</c:choose>
-			<c:choose>
-				<c:when test="${not empty businessException.person.name.middleName}">
-					<fmt:message key="lastNameFirstNameMiddleInitialLabel" bundle="${personBundle}">
-						<fmt:param value="${businessException.person.name.lastName}"/>
-						<fmt:param value="${businessException.person.name.firstName}"/>
-						<fmt:param value="${fn:substring(businessException.person.name.middleName, 0, 1)}"/>
-					</fmt:message>
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="lastAndFirstNameLabel" bundle="${personBundle}">
-						<fmt:param value="${businessException.person.name.lastName}"/>
-						<fmt:param value="${businessException.person.name.firstName}"/>
-					</fmt:message>
-				</c:otherwise>
-			</c:choose>
+			<sec:authorize access="hasRole('SSN_VIEW') or hasRole('ADMIN')">
+				<c:choose>
+					<c:when test="${not empty businessException.socialSecurityNumber}">
+						<fmt:formatNumber var="formattedSocialSecurityNumber" pattern="#" value="${businessException.socialSecurityNumber}"/>
+						<fmt:message key="socialSecurityNumberUsedWithValueLabel" bundle="${personBundle}">
+							<fmt:param value="${formattedSocialSecurityNumber}"/>
+						</fmt:message>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="socialSecurityNumberUsedByLabel"/>
+					</c:otherwise>
+				</c:choose>
+				<c:choose>
+					<c:when test="${not empty businessException.person.name.middleName}">
+						<fmt:message key="lastNameFirstNameMiddleInitialLabel" bundle="${personBundle}">
+							<fmt:param value="${businessException.person.name.lastName}"/>
+							<fmt:param value="${businessException.person.name.firstName}"/>
+							<fmt:param value="${fn:substring(businessException.person.name.middleName, 0, 1)}"/>
+						</fmt:message>
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="lastAndFirstNameLabel" bundle="${personBundle}">
+							<fmt:param value="${businessException.person.name.lastName}"/>
+							<fmt:param value="${businessException.person.name.firstName}"/>
+						</fmt:message>
+					</c:otherwise>
+				</c:choose>
+			</sec:authorize>
 		</c:when>
 		<c:otherwise>
 			<c:if test="${not empty businessException.socialSecurityNumber}">

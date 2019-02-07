@@ -17,6 +17,8 @@
 */
 package omis.assessment.domain;
 
+import java.util.Date;
+
 import omis.audit.domain.Creatable;
 import omis.audit.domain.Updatable;
 import omis.staff.domain.StaffAssignment;
@@ -25,7 +27,8 @@ import omis.staff.domain.StaffAssignment;
  * Assessment category override.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 23, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public interface AssessmentCategoryOverride extends Creatable, Updatable {
@@ -99,4 +102,28 @@ public interface AssessmentCategoryOverride extends Creatable, Updatable {
 	 * @return approved staff assignment
 	 */
 	StaffAssignment getApprovedStaffAssignment();
+	
+	/**
+	 * Returns the Date for the Assessment Category Override.
+	 * @return date - Date
+	 */
+	Date getDate();
+	
+	/**
+	 * Sets the Date for the Assessment Category Override.
+	 * @param date - Date
+	 */
+	void setDate(Date date);
+	
+	/**
+	 * Returns the Reason for the Assessment Category Override.
+	 * @return reason - Reason
+	 */
+	CategoryOverrideReason getReason();
+	
+	/**
+	 * Sets the Reason for the Assessment Category Override.
+	 * @param reason - Reason
+	 */
+	void setReason(CategoryOverrideReason reason);
 }

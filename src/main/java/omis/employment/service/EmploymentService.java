@@ -19,7 +19,6 @@ import omis.employment.domain.component.Job;
 import omis.employment.exception.EmployerExistsException;
 import omis.employment.exception.EmploymentExistsException;
 import omis.employment.exception.EmploymentNoteExistsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.location.exception.LocationExistsException;
 import omis.offender.domain.Offender;
 import omis.organization.domain.Organization;

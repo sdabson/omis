@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
 import omis.paroleboarditinerary.dao.BoardAttendeeDao;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboardmember.domain.ParoleBoardMember;
@@ -15,7 +14,8 @@ import omis.paroleboardmember.domain.ParoleBoardMember;
  * Hibernate implementation of the board attendee data access object.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 20, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class BoardAttendeeDaoHibernateImpl 
@@ -32,9 +32,6 @@ public class BoardAttendeeDaoHibernateImpl
 	private static final String FIND_BY_BOARD_ITINERARY_PARAM_NAME =
 			"findBoardAttendeesByBoardItinerary";
 	
-	private static final String FIND_ALTERNATE_BY_BOARD_ITINERARY_PARAM_NAME =
-			"findBoardAttendeeAlternateByBoardItinerary";
-	
 	/* Parameters. */
 	
 	private static final String BOARD_ITINERARY_PARAM_NAME = "boardItinerary";
@@ -42,8 +39,6 @@ public class BoardAttendeeDaoHibernateImpl
 	private static final String BOARD_MEMBER_PARAM_NAME = "boardMember";
 	
 	private static final String NUMBER_PARAM_NAME = "number";
-	
-	private static final String ROLE_PARAM_NAME = "role";
 	
 	private static final String EXCLUDED_BOARD_ATTENDEE_PARAM_NAME = 
 			"excludedBoardAttendee";
@@ -61,16 +56,14 @@ public class BoardAttendeeDaoHibernateImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public BoardAttendee find(final ParoleBoardItinerary boardItinerary, 
-			final ParoleBoardMember boardMember, final Long number, 
-			final AttendeeRoleCategory role) {
+	public BoardAttendee find(final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardMember boardMember, final Long number) {
 		BoardAttendee attendee = (BoardAttendee) this.getSessionFactory()
 				.getCurrentSession()
 				.getNamedQuery(FIND_QUERY_NAME)
 				.setParameter(BOARD_ITINERARY_PARAM_NAME, boardItinerary)
 				.setParameter(BOARD_MEMBER_PARAM_NAME, boardMember)
 				.setParameter(NUMBER_PARAM_NAME, number)
-				.setParameter(ROLE_PARAM_NAME, role)
 				.uniqueResult();
 		return attendee;
 	}
@@ -78,9 +71,8 @@ public class BoardAttendeeDaoHibernateImpl
 	/** {@inheritDoc} */
 	@Override
 	public BoardAttendee findExcluding(
-			final ParoleBoardItinerary boardItinerary, 
-			final ParoleBoardMember boardMember, final Long number, 
-			final AttendeeRoleCategory role, 
+			final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardMember boardMember, final Long number,
 			final BoardAttendee excludedAttendee) {
 		BoardAttendee attendee = (BoardAttendee) this.getSessionFactory()
 				.getCurrentSession()
@@ -88,7 +80,6 @@ public class BoardAttendeeDaoHibernateImpl
 				.setParameter(BOARD_ITINERARY_PARAM_NAME, boardItinerary)
 				.setParameter(BOARD_MEMBER_PARAM_NAME, boardMember)
 				.setParameter(NUMBER_PARAM_NAME, number)
-				.setParameter(ROLE_PARAM_NAME, role)
 				.setParameter(EXCLUDED_BOARD_ATTENDEE_PARAM_NAME, 
 						excludedAttendee)
 				.uniqueResult();
@@ -107,18 +98,4 @@ public class BoardAttendeeDaoHibernateImpl
 				.list();
 		return attendees;
 	}
-
-	/** {@inheritDoc} */
-	@Override
-	public BoardAttendee findBoardAlternateAttendeeByBoardItinerary(
-			final ParoleBoardItinerary boardItinerary) {
-		BoardAttendee attendee = (BoardAttendee) this.getSessionFactory()
-				.getCurrentSession()
-				.getNamedQuery(FIND_ALTERNATE_BY_BOARD_ITINERARY_PARAM_NAME)
-				.setParameter(BOARD_ITINERARY_PARAM_NAME, boardItinerary)
-				.uniqueResult();
-		return attendee;
-	}
-
-
 }

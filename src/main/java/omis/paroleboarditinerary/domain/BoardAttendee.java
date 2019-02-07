@@ -8,7 +8,8 @@ import omis.paroleboardmember.domain.ParoleBoardMember;
  * Board attendee.
  *
  * @author Josh Divine
- * @version 0.1.0 (Nov 16, 2017)
+ * @author Annie Wahl
+ * @version 0.1.1 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public interface BoardAttendee extends Creatable, Updatable {
@@ -68,20 +69,6 @@ public interface BoardAttendee extends Creatable, Updatable {
 	 * @return number
 	 */
 	Long getNumber();
-	
-	/**
-	 * Sets the attendee role category.
-	 * 
-	 * @param attendeeRoleCategory attendee role category
-	 */
-	void setRole(AttendeeRoleCategory attendeeRoleCategory);
-	
-	/**
-	 * Returns the attendee role category.
-	 * 
-	 * @return attendee role category
-	 */
-	AttendeeRoleCategory getRole();
 	
 	/**
 	 * Compares {@code this} and {@code obj} for equality.

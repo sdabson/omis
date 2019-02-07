@@ -17,9 +17,11 @@
 */
 package omis.assessment.domain.impl;
 
+import java.util.Date;
 import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
+import omis.assessment.domain.CategoryOverrideReason;
 import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.staff.domain.StaffAssignment;
@@ -28,7 +30,8 @@ import omis.staff.domain.StaffAssignment;
  * Implementation of assessment category override.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public class AssessmentCategoryOverrideImpl 
@@ -45,6 +48,10 @@ public class AssessmentCategoryOverrideImpl
 	private String notes;
 	
 	private StaffAssignment approvedStaffAssignment;
+	
+	private Date date;
+	
+	private CategoryOverrideReason reason;
 	
 	private CreationSignature creationSignature;
 	
@@ -118,6 +125,42 @@ public class AssessmentCategoryOverrideImpl
 	public StaffAssignment getApprovedStaffAssignment() {
 		return approvedStaffAssignment;
 	}
+	
+	/**
+	 * Returns the date.
+	 *
+	 * @return date
+	 */
+	public Date getDate() {
+		return this.date;
+	}
+
+	/**
+	 * Sets the date.
+	 *
+	 * @param date - date
+	 */
+	public void setDate(final Date date) {
+		this.date = date;
+	}
+
+	/**
+	 * Returns the reason.
+	 *
+	 * @return reason
+	 */
+	public CategoryOverrideReason getReason() {
+		return this.reason;
+	}
+
+	/**
+	 * Sets the reason.
+	 *
+	 * @param reason - reason
+	 */
+	public void setReason(final CategoryOverrideReason reason) {
+		this.reason = reason;
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -146,7 +189,7 @@ public class AssessmentCategoryOverrideImpl
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}

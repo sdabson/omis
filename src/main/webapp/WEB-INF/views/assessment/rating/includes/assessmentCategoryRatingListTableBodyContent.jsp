@@ -3,7 +3,7 @@
 <fmt:bundle basename="omis.assessment.msgs.assessmentRating">
 <c:forEach var="summary" items="${assessmentCategoryScoreSummaries}">
 <tr>
-	<td><a class="actionMenuItem rowActionMenuItem" href="${pageContext.request.contextPath}/assessment/rating/assessmentCategoryRatingsRowActionMenu.html?assessmentCategoryScore=${summary.assessmentCategoryScoreId}"></a></td>
+	<td><a id="assessmentCategoryScoreRowActionMenu${summary.assessmentCategoryScoreId}" class="actionMenuItem rowActionMenuItem" href="${pageContext.request.contextPath}/assessment/rating/assessmentCategoryRatingsRowActionMenu.html?assessmentCategoryScore=${summary.assessmentCategoryScoreId}"></a></td>
 	<td>
 		<c:out value="${summary.ratingCategoryDescription}"/>
 	</td>

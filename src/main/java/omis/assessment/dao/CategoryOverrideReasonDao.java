@@ -17,6 +17,8 @@
 */
 package omis.assessment.dao;
 
+import java.util.List;
+
 import omis.assessment.domain.CategoryOverrideReason;
 import omis.assessment.domain.RatingCategory;
 import omis.dao.GenericDao;
@@ -25,7 +27,8 @@ import omis.dao.GenericDao;
  * Data access object for category override reason.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Feb 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public interface CategoryOverrideReasonDao
@@ -49,6 +52,25 @@ public interface CategoryOverrideReasonDao
 	 * @param excludedCategoryOverrideReason excluded category override reason
 	 * @return category override reason
 	 */
-	CategoryOverrideReason findExcluding(String name, RatingCategory ratingCategory,
+	CategoryOverrideReason findExcluding(String name,
+			RatingCategory ratingCategory,
 			CategoryOverrideReason excludedCategoryOverrideReason);
+	
+	/**
+	 * Returns a list of all valid Category Override Reasons.
+	 * 
+	 * @return List of all valid Category Override Reasons.
+	 */
+	List<CategoryOverrideReason> findAllReasons();
+	
+	/**
+	 * Returns a list of valid Category Override Reasons by the specified
+	 * Rating Category.
+	 * 
+	 * @param ratingCategory rating category
+	 * @return List of all valid Category Override Reasons by the specified
+	 * Rating Category.
+	 */
+	List<CategoryOverrideReason> findByRatingCategory(
+			RatingCategory ratingCategory);
 }

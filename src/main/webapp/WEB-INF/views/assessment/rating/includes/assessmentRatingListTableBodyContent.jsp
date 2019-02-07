@@ -12,7 +12,7 @@
 </c:choose>
 <tr class="${pertinent ? 'pertinent accentRegular' : ''}">
 	<td><c:choose>
-			<c:when test="${pertinent}"><a class="actionMenuItem rowActionMenuItem" href="${pageContext.request.contextPath}/assessment/rating/assessmentRatingsRowActionMenu.html?assessmentCategoryScore=${summary.assessmentCategoryScoreId}"></a></c:when>
+			<c:when test="${pertinent}"><a id="assessmentRatingRowActionMenu${summary.assessmentCategoryScoreId}" class="actionMenuItem rowActionMenuItem" href="${pageContext.request.contextPath}/assessment/rating/assessmentRatingsRowActionMenu.html?assessmentCategoryScore=${summary.assessmentCategoryScoreId}"></a></c:when>
 		</c:choose>
 	</td>
 	<td>
@@ -40,8 +40,8 @@
 	</td>
 	<td>
 		<c:choose>
-			<c:when test="${summary.override eq 'TRUE'}">
-				<c:out value="foreach categoryOverrideReasonNames"/>
+			<c:when test="${summary.override eq 'TRUE' and pertinent}">
+				<c:out value="${summary.categoryOverrideReason}"/>
 			</c:when>
 		</c:choose>
 	</td>

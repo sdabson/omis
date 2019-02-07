@@ -23,7 +23,6 @@ import java.util.List;
 
 import omis.assessment.domain.AssessmentCategoryOverride;
 import omis.assessment.domain.AssessmentCategoryOverrideNote;
-import omis.assessment.domain.AssessmentCategoryOverrideReason;
 import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.AssessmentRating;
 import omis.assessment.domain.CategoryOverrideReason;
@@ -33,7 +32,6 @@ import omis.assessment.service.AssessmentRatingServiceDelegateRegistry;
 import omis.assessment.service.AssessmentService;
 import omis.assessment.service.delegate.AssessmentCategoryOverrideDelegate;
 import omis.assessment.service.delegate.AssessmentCategoryOverrideNoteDelegate;
-import omis.assessment.service.delegate.AssessmentCategoryOverrideReasonDelegate;
 import omis.assessment.service.delegate.AssessmentCategoryScoreDelegate;
 import omis.assessment.service.delegate.AssessmentRatingDelegate;
 import omis.assessment.service.delegate.CategoryOverrideReasonDelegate;
@@ -52,7 +50,7 @@ import omis.staff.domain.StaffAssignment;
  * 
  * @author Josh Divine
  * @author Annie Wahl
- * @version 0.1.3 (Aug 23, 2018)
+ * @version 0.1.4 (Jan 31, 2019)
  * @since OMIS 3.0
  */
 public class AssessmentServiceImpl implements AssessmentService {
@@ -61,9 +59,6 @@ public class AssessmentServiceImpl implements AssessmentService {
 	
 	private final AssessmentCategoryOverrideDelegate 
 			assessmentCategoryOverrideDelegate;
-	
-	private final AssessmentCategoryOverrideReasonDelegate 
-			assessmentCategoryOverrideReasonDelegate;
 	
 	private final AssessmentCategoryScoreDelegate 
 			assessmentCategoryScoreDelegate;
@@ -91,7 +86,6 @@ public class AssessmentServiceImpl implements AssessmentService {
 	 * 
 	 * @param assessmentCategoryOverrideDelegate assessment category override 
 	 * delegate
-	 * @param assessmentCategoryOverrideReasonDelegate assessment category 
 	 * override reason delegate
 	 * @param assessmentCategoryScoreDelegate assessment category score delegate
 	 * @param categoryOverrideReasonDelegate category override reason delegate
@@ -105,8 +99,6 @@ public class AssessmentServiceImpl implements AssessmentService {
 	public AssessmentServiceImpl(
 			final AssessmentCategoryOverrideDelegate 
 					assessmentCategoryOverrideDelegate,
-			final AssessmentCategoryOverrideReasonDelegate 
-					assessmentCategoryOverrideReasonDelegate,
 			final AssessmentCategoryScoreDelegate 
 					assessmentCategoryScoreDelegate,
 			final CategoryOverrideReasonDelegate categoryOverrideReasonDelegate,
@@ -121,8 +113,6 @@ public class AssessmentServiceImpl implements AssessmentService {
 					assessmentCategoryOverrideNoteDelegate) {
 		this.assessmentCategoryOverrideDelegate = 
 				assessmentCategoryOverrideDelegate;
-		this.assessmentCategoryOverrideReasonDelegate = 
-				assessmentCategoryOverrideReasonDelegate;
 		this.assessmentCategoryScoreDelegate = assessmentCategoryScoreDelegate;
 		this.assessmentRatingDelegate = assessmentRatingDelegate;
 		this.categoryOverrideReasonDelegate = categoryOverrideReasonDelegate;
@@ -172,11 +162,13 @@ public class AssessmentServiceImpl implements AssessmentService {
 	@Override
 	public AssessmentCategoryOverride createAssessmentCategoryOverride(
 			final AssessmentCategoryScore assessmentCategoryScore,
-			final AssessmentRating assessmentRating, final String notes, 
+			final AssessmentRating assessmentRating,
+			final CategoryOverrideReason reason, final Date date,
+			final String notes, 
 			final StaffAssignment approvedStaff) 
 					throws DuplicateEntityFoundException {
 		return this.assessmentCategoryOverrideDelegate.create(
-				assessmentCategoryScore, assessmentRating, notes, 
+				assessmentCategoryScore, assessmentRating, reason, date, notes,
 				approvedStaff);
 	}
 
@@ -185,23 +177,22 @@ public class AssessmentServiceImpl implements AssessmentService {
 	public AssessmentCategoryOverride updateAssessmentCategoryOverride(
 			final AssessmentCategoryOverride assessmentCategoryOverride, 
 			final AssessmentCategoryScore assessmentCategoryScore,
-			final AssessmentRating assessmentRating, final String notes, 
+			final AssessmentRating assessmentRating,
+			final CategoryOverrideReason reason, final Date date,
+			final String notes,
 			final StaffAssignment approvedStaff) 
 					throws DuplicateEntityFoundException {
 		return this.assessmentCategoryOverrideDelegate.update(
-				assessmentCategoryOverride, assessmentCategoryScore, 
-				assessmentRating, notes, approvedStaff);
+				assessmentCategoryOverride, assessmentCategoryScore,
+				assessmentRating, reason, date, notes, approvedStaff);
 	}
-
+	
 	/** {@inheritDoc} */
 	@Override
-	public AssessmentCategoryOverrideReason 
-			createAssessmentCategoryOverrideReason(
-					final AssessmentCategoryOverride override,
-					final CategoryOverrideReason category) 
-							throws DuplicateEntityFoundException {
-		return this.assessmentCategoryOverrideReasonDelegate.create(override, 
-				category);
+	public void removeAssessmentCategoryOverride(
+			final AssessmentCategoryOverride assessmentCategoryOverride) {
+		this.assessmentCategoryOverrideDelegate.remove(
+				assessmentCategoryOverride);
 	}
 
 	/** {@inheritDoc} */
@@ -227,7 +218,7 @@ public class AssessmentServiceImpl implements AssessmentService {
 	@Override
 	public List<AssessmentCategoryScore>
 		findAssessmentCategoryScoresByAdministeredQuestionnaire(
-			AdministeredQuestionnaire administeredQuestionnaire) {
+			final AdministeredQuestionnaire administeredQuestionnaire) {
 		return this.assessmentCategoryScoreDelegate
 				.findByAdministeredQuestionnaire(administeredQuestionnaire);
 	}
@@ -243,17 +234,11 @@ public class AssessmentServiceImpl implements AssessmentService {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<AssessmentCategoryOverrideReason> 
-			findAssessmentCategoryOverrideReasonsByAssessmentCategoryOverride(
-					final AssessmentCategoryOverride assessmentCategoryOverride) {
-		return this.assessmentCategoryOverrideReasonDelegate
-				.findByAssessmentCategoryOverride(assessmentCategoryOverride);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public List<CategoryOverrideReason> findCategoryOverrideReasons() {
-		return this.categoryOverrideReasonDelegate.findAll();
+	public List<CategoryOverrideReason>
+		findCategoryOverrideReasonsByRatingCategory(
+				final RatingCategory ratingCategory) {
+		return this.categoryOverrideReasonDelegate.findByRatingCategory(
+				ratingCategory);
 	}
 
 	/** {@inheritDoc} */

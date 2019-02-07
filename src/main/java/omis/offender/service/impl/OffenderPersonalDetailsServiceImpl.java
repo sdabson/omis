@@ -31,6 +31,8 @@ import omis.person.domain.PersonName;
 import omis.person.domain.Suffix;
 import omis.person.exception.PersonIdentityExistsException;
 import omis.person.exception.PersonNameExistsException;
+import omis.person.exception.SocialSecurityNumberExistsException;
+import omis.person.exception.StateIdNumberExistsException;
 import omis.person.service.delegate.PersonIdentityDelegate;
 import omis.person.service.delegate.PersonNameDelegate;
 import omis.person.service.delegate.SuffixDelegate;
@@ -67,6 +69,8 @@ public class OffenderPersonalDetailsServiceImpl
 	
 	private final OffenderDelegate offenderDelegate;
 	
+	/* Constructors. */
+	
 	/**
 	 * Instantiates implementation of service for offender personal details.
 	 * 
@@ -94,6 +98,8 @@ public class OffenderPersonalDetailsServiceImpl
 		this.offenderDelegate = offenderDelegate;
 	}
 	
+	/* Method implementations. */
+	
 	/** {@inheritDoc} */
 	@Override
 	public PersonName updateName(final Offender offender, final String lastName,
@@ -111,7 +117,39 @@ public class OffenderPersonalDetailsServiceImpl
 			final State birthState, final City birthPlace,
 			final Integer socialSecurityNumber, final String stateIdNumber,
 			final Sex sex, final Boolean deceased, final Date deathDate) 
-					throws PersonIdentityExistsException {
+					throws PersonIdentityExistsException,
+						StateIdNumberExistsException,
+						SocialSecurityNumberExistsException {
+		final long stateIdNumberCount
+			= this.personIdentityDelegate.countByStateIdNumber(
+				stateIdNumber, offender.getIdentity()); 
+		if (stateIdNumberCount == 1) {
+			throw new StateIdNumberExistsException(
+					stateIdNumber,
+					this.personIdentityDelegate.findByStateIdNumber(
+							stateIdNumber, offender.getIdentity()).get(0)
+								.getPerson());
+		} else if (stateIdNumberCount > 1) {
+			throw new StateIdNumberExistsException(
+					String.format(
+							"State ID number %s is used by %d people",
+							stateIdNumber, stateIdNumberCount));
+		}
+		final long socialSecurityNumberCount
+			= this.personIdentityDelegate.countBySocialSecurityNumber(
+					socialSecurityNumber, offender.getIdentity());
+		if (socialSecurityNumberCount == 1) {
+			throw new SocialSecurityNumberExistsException(
+					socialSecurityNumber,
+					this.personIdentityDelegate.findBySocialSecurityNumber(
+							socialSecurityNumber, offender.getIdentity())
+								.get(0).getPerson());
+		} else if (socialSecurityNumberCount > 1) {
+			throw new SocialSecurityNumberExistsException(
+					String.format(
+							"Social security number %d is used by %d people",
+							socialSecurityNumber, socialSecurityNumberCount));
+		}
 		final PersonIdentity identity;
 		if (offender.getIdentity() != null) {
 			identity = this.personIdentityDelegate
@@ -127,7 +165,6 @@ public class OffenderPersonalDetailsServiceImpl
 		}
 		this.offenderDelegate.updateOffender(offender, offender.getName(),
 				identity);
-		
 		return identity;
 	}
 
@@ -137,7 +174,22 @@ public class OffenderPersonalDetailsServiceImpl
 			final Date birthDate, final Country birthCountry,
 			final State birthState, final City birthPlace,
 			final String stateIdNumber, final Sex sex, final Boolean deceased,
-			final Date deathDate) throws PersonIdentityExistsException {
+			final Date deathDate)
+					throws PersonIdentityExistsException,
+						StateIdNumberExistsException {
+		final long stateIdNumberCount = this.personIdentityDelegate
+				.countByStateIdNumber(stateIdNumber, offender.getIdentity());
+		if (stateIdNumberCount == 1) {
+			throw new StateIdNumberExistsException(
+					stateIdNumber, this.personIdentityDelegate
+						.findByStateIdNumber(
+								stateIdNumber, offender.getIdentity())
+							.get(0).getPerson());
+		} else if (stateIdNumberCount > 1) {
+			throw new StateIdNumberExistsException(
+					String.format("State ID number %s used by %d people",
+							stateIdNumber, stateIdNumberCount));
+		}
 		final PersonIdentity identity;
 		if (offender.getIdentity() != null) {
 			identity = this.personIdentityDelegate

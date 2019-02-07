@@ -454,7 +454,8 @@ public class PrisonTermController {
 		ModelAndView mav = this.prepareEditMav(form, prisonTerm.getOffender());
 		mav.addObject(PRISON_TERM_MODEL_KEY, prisonTerm);
 		mav.addObject(SENTENCE_CALCULATION_MODEL_KEY,
-				prisonTerm.getSentenceCalculation());
+			prisonTerm.getSentenceCalculation());
+	
 		return mav;
 	}
 	

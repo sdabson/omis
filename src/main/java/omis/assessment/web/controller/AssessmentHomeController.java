@@ -40,7 +40,7 @@ import omis.questionnaire.domain.AdministeredQuestionnaire;
  * Assessment Home Controller.
  * 
  *@author Annie Wahl 
- *@version 0.1.0 (Feb 22, 2018)
+ *@version 0.1.1 (Feb 4, 2019)
  *@since OMIS 3.0
  *
  */
@@ -55,6 +55,9 @@ public class AssessmentHomeController {
 	
 	private static final String ASSESSMENT_SUMMARY_MODEL_KEY =
 			"assessmentSummary";
+	
+	private static final String ASSESSMENT_RATING_SUMMARIES_MODEL_KEY =
+			"assessmentRatingSummaries";
 	
 	private static final String ADMINISTERED_QUESTIONNAIRE_MODEL_KEY =
 			"administeredQuestionnaire";
@@ -94,6 +97,10 @@ public class AssessmentHomeController {
 		map.addAttribute(ASSESSMENT_SUMMARY_MODEL_KEY,
 				this.assessmentSummaryReportService.summarize(
 						administeredQuestionnaire));
+		map.addAttribute(ASSESSMENT_RATING_SUMMARIES_MODEL_KEY,
+				this.assessmentSummaryReportService
+			.findAssessmentRatingSummariesByAdministeredQuestionnaire(
+					administeredQuestionnaire));
 		this.offenderSummaryModelDelegate.add(map,
 				(Offender) administeredQuestionnaire.getAnswerer());
 		return new ModelAndView(HOME_VIEW_NAME, map);

@@ -32,8 +32,6 @@ public class ParoleBoardItineraryForm implements Serializable {
 	private ParoleBoardMember boardMember2;
 
 	private ParoleBoardMember boardMember3;
-
-	private ParoleBoardMember boardMemberAlternate;
 	
 	private List<BoardMeetingSiteItem> boardMeetingSiteItems;
 	
@@ -171,25 +169,6 @@ public class ParoleBoardItineraryForm implements Serializable {
 	 */
 	public void setBoardMember3(final ParoleBoardMember boardMember) {
 		this.boardMember3 = boardMember;
-	}
-
-	/**
-	 * Returns the alternate board attendee.
-	 *  
-	 * @return the boardMemberAlternate
-	 */
-	public ParoleBoardMember getBoardMemberAlternate() {
-		return boardMemberAlternate;
-	}
-
-	/**
-	 * Sets the alternate board attendee.
-	 * 
-	 * @param boardMemberAlternate alternate board attendee
-	 */
-	public void setBoardMemberAlternate(
-			final ParoleBoardMember boardMemberAlternate) {
-		this.boardMemberAlternate = boardMemberAlternate;
 	}
 
 	/**

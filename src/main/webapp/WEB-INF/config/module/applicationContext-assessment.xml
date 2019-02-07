@@ -20,6 +20,7 @@
   - Assessment configuration.
   -
   - Author: Josh Divine
+  - Author: Annie Wahl
   -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:context="http://www.springframework.org/schema/context"
@@ -35,7 +36,6 @@
         <bean id="assessmentService"
         	class="omis.assessment.service.impl.AssessmentServiceImpl">
         	<constructor-arg name="assessmentCategoryOverrideDelegate" ref="assessmentCategoryOverrideDelegate"/>
-        	<constructor-arg name="assessmentCategoryOverrideReasonDelegate" ref="assessmentCategoryOverrideReasonDelegate"/>
         	<constructor-arg name="assessmentCategoryScoreDelegate" ref="assessmentCategoryScoreDelegate"/>
         	<constructor-arg name="categoryOverrideReasonDelegate" ref="categoryOverrideReasonDelegate"/>
         	<constructor-arg name="assessmentRatingDelegate" ref="assessmentRatingDelegate"/>
@@ -103,12 +103,6 @@
         	<constructor-arg name="assessmentCategoryOverrideDao" ref="assessmentCategoryOverrideDao"/>
         	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
         	<constructor-arg name="assessmentCategoryOverrideInstanceFactory" ref="assessmentCategoryOverrideInstanceFactory"/>
-        </bean>
-        
-        <bean id="assessmentCategoryOverrideReasonDelegate"
-        	class="omis.assessment.service.delegate.AssessmentCategoryOverrideReasonDelegate">
-        	<constructor-arg name="assessmentCategoryOverrideReasonDao" ref="assessmentCategoryOverrideReasonDao"/>
-        	<constructor-arg name="assessmentCategoryOverrideReasonInstanceFactory" ref="assessmentCategoryOverrideReasonInstanceFactory"/>
         </bean>
         
         <bean id="assessmentCategoryScoreDelegate"
@@ -207,12 +201,6 @@
     		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
   		</bean>
   		
-  		<bean id="assessmentCategoryOverrideReasonDao"
-        	class="omis.assessment.dao.impl.hibernate.AssessmentCategoryOverrideReasonDaoHibernateImpl">
-    		<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryOverrideReason"/>
-    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
-  		</bean>
-  		
   		<bean id="assessmentCategoryScoreDao"
         	class="omis.assessment.dao.impl.hibernate.AssessmentCategoryScoreDaoHibernateImpl">
     		<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryScore"/>
@@ -301,12 +289,6 @@
 			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
 			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
 			<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryOverride"/>
-		</bean>
-		
-		<bean id="assessmentCategoryOverrideReasonInstanceFactory"
-			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
-			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
-			<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryOverrideReason"/>
 		</bean>
 		
 		<bean id="assessmentCategoryScoreInstanceFactory"
@@ -399,13 +381,6 @@
  			<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryOverride"/>
  			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
   			<constructor-arg name="dao" ref="assessmentCategoryOverrideDao"/>
-		</bean>
-		
-		<bean id="assessmentCategoryOverrideReasonPropertyEditorFactory"
-       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
- 			<constructor-arg name="entityName" value="omis.assessment.domain.AssessmentCategoryOverrideReason"/>
- 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
-  			<constructor-arg name="dao" ref="assessmentCategoryOverrideReasonDao"/>
 		</bean>
 		
 		<bean id="assessmentCategoryScorePropertyEditorFactory"

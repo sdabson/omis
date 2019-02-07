@@ -10,7 +10,6 @@ import omis.employment.dao.EmploymentNoteDao;
 import omis.employment.domain.EmploymentNote;
 import omis.employment.domain.EmploymentTerm;
 import omis.employment.exception.EmploymentNoteExistsException;
-import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
 
 /**

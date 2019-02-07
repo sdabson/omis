@@ -28,7 +28,7 @@
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/searchResources.jsp"/>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/common/scripts/SessionConfig.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/paroleBoardItinerary/scripts/JQuery/jquery.omis.paroleBoardItinerary.js?VERSION=1"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/paroleBoardItinerary/scripts/JQuery/jquery.omis.paroleBoardItinerary.js?VERSION=2"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/paroleBoardItinerary/scripts/paroleBoardItinerary.js?VERSION=1"></script>
 	<script type="text/javascript">
 		//Track current indexes

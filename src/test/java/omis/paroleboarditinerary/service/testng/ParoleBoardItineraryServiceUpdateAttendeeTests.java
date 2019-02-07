@@ -3,9 +3,11 @@ package omis.paroleboarditinerary.service.testng;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.testng.annotations.Test;
+
 import omis.address.domain.Address;
 import omis.address.domain.ZipCode;
 import omis.address.service.delegate.AddressDelegate;
@@ -19,7 +21,6 @@ import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
 import omis.organization.domain.Organization;
 import omis.organization.service.delegate.OrganizationDelegate;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.service.ParoleBoardItineraryService;
@@ -160,9 +161,8 @@ public class ParoleBoardItineraryServiceUpdateAttendeeTests
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
 		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
 		BoardAttendee boardAttendee = this.boardAttendeeDelegate.create(
-				boardItinerary, boardMember, number, role);
+				boardItinerary, boardMember, number);
 		Person newStaffMember = this.personDelegate.create("Smith", "John", 
 				"Jay", null);
 		StaffAssignment newStaffAssignment = this.staffAssignmentDelegate
@@ -173,72 +173,12 @@ public class ParoleBoardItineraryServiceUpdateAttendeeTests
 		
 		// Action
 		boardAttendee = this.paroleBoardItineraryService.updateAttendee(
-				boardAttendee, newBoardMember, role);
+				boardAttendee, newBoardMember);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("boardItinerary", boardItinerary)
 			.addExpectedValue("boardMember", newBoardMember)
-			.addExpectedValue("role", role)
-			.performAssertions(boardAttendee);
-	}
-
-	/**
-	 * Tests the update of the role for a board attendee.
-	 * 
-	 * @throws DuplicateEntityFoundException if duplicate entity exists
-	 * @throws DateConflictException if parole board member date range not 
-	 * within staff assignment date range
-	 */
-	@Test
-	public void testUpdateAttendeeRole() throws DuplicateEntityFoundException, 
-			DateConflictException {
-		// Arrangements
-		Organization organization = this.organizationDelegate.create("Org", "O",
-				null);
-		Country country = this.countryDelegate.create("Country", "C", true);
-		City city = this.cityDelegate.create("City", true, null, country);
-		ZipCode zipCode = this.zipCodeDelegate.create(city, "12345", null, 
-				true);
-		Address address = this.addressDelegate.findOrCreate("123 Some St.", 
-				null, null, null, zipCode);
-		Location location = this.locationDelegate.create(organization, 
-				new DateRange(this.parseDateText("01/01/2000"), null), address);
-		ParoleBoardLocation paroleBoardLocation = this
-				.paroleBoardLocationDelegate.create(location, true);
-		Date startDate = this.parseDateText("01/01/2017");
-		Date endDate = this.parseDateText("12/31/2017");
-		ParoleBoardItinerary boardItinerary = this.paroleBoardItineraryDelegate
-				.create(paroleBoardLocation, true, startDate, endDate);
-		Date memberStartDate = this.parseDateText("01/01/2017");
-		Date memberEndDate = null;
-		Person staffMember = this.personDelegate.create("Smith", "John", "Jay", 
-				null);
-		SupervisoryOrganization supervisoryOrganization = this
-				.supervisoryOrganizationDelegate.create("SupOrg", "SO", null);
-		DateRange dateRange = new DateRange(memberStartDate, memberEndDate);
-		StaffTitle title = this.staffTitleDelegate.create("Title", (short) 1, 
-				true);
-		StaffAssignment staffAssignment = this.staffAssignmentDelegate.create(
-				staffMember, supervisoryOrganization, null, dateRange, title, 
-				true, null, null, null, null, null);
-		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
-				staffAssignment, dateRange);
-		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
-		BoardAttendee boardAttendee = this.boardAttendeeDelegate.create(
-				boardItinerary, boardMember, number, role);
-		AttendeeRoleCategory newRole = AttendeeRoleCategory.ALTERNATE;
-		
-		// Action
-		boardAttendee = this.paroleBoardItineraryService.updateAttendee(
-				boardAttendee, boardMember, newRole);
-
-		// Assertions
-		PropertyValueAsserter.create()
-			.addExpectedValue("boardItinerary", boardItinerary)
-			.addExpectedValue("boardMember", boardMember)
-			.addExpectedValue("role", newRole)
 			.performAssertions(boardAttendee);
 	}
 	
@@ -284,16 +224,13 @@ public class ParoleBoardItineraryServiceUpdateAttendeeTests
 		ParoleBoardMember boardMember = this.paroleBoardMemberDelegate.create(
 				staffAssignment, dateRange);
 		Long number = 1L;
-		AttendeeRoleCategory role = AttendeeRoleCategory.PRIMARY;
-		this.boardAttendeeDelegate.create(boardItinerary, boardMember, number, 
-				role);
+		this.boardAttendeeDelegate.create(boardItinerary, boardMember, number);
 		BoardAttendee boardAttendee = this.boardAttendeeDelegate.create(
-				boardItinerary, boardMember, number, 
-				AttendeeRoleCategory.ALTERNATE);
+				boardItinerary, boardMember, number);
 
 		// Action
 		boardAttendee = this.paroleBoardItineraryService.updateAttendee(
-				boardAttendee, boardMember, role);
+				boardAttendee, boardMember);
 	}
 
 	// Parses date text

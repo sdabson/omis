@@ -12,8 +12,8 @@ import omis.paroleboarditinerary.web.form.ParoleBoardItineraryNoteItemOperation;
  * Validator for parole board itinerary.
  * 
  * @author Josh Divine
- * @author Annie Wahl 
- * @version 0.1.2 (Apr 11, 2018)
+ * @author Annie Wahl
+ * @version 0.1.3 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryFormValidator implements Validator {
@@ -78,28 +78,7 @@ public class ParoleBoardItineraryFormValidator implements Validator {
 				errors.rejectValue("boardMember3", 
 						"paroleBoardItinerary.boardMember.notUnique");
 			}
-		}
-		if (form.getBoardMemberAlternate() == null) {
-			errors.rejectValue("boardMemberAlternate", 
-					"paroleBoardItinerary.boardMember.empty");
-		} else {
-			if (form.getBoardMember1() != null
-					&& form.getBoardMemberAlternate().equals(
-							form.getBoardMember1())) {
-				errors.rejectValue("boardMemberAlternate", 
-						"paroleBoardItinerary.boardMember.notUnique");
-			} else if (form.getBoardMember2() != null
-					&& form.getBoardMemberAlternate().equals(
-							form.getBoardMember2())) {
-				errors.rejectValue("boardMemberAlternate",
-						"paroleBoardItinerary.boardMember.notUnique");
-			} else if (form.getBoardMember3() != null
-					&& form.getBoardMemberAlternate().equals(
-							form.getBoardMember3())) {
-				errors.rejectValue("boardMemberAlternate", 
-						"paroleBoardItinerary.boardMember.notUnique");
-			}
-		}
+		} 
 		if (form.getBoardMeetingSiteItems() != null
 				&& form.getBoardMeetingSiteItems().size() > 0) {
 			for (int index = 0; index < form.getBoardMeetingSiteItems().size(); 

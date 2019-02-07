@@ -2,7 +2,8 @@
  * Jquery implementation of functions for paroleBoardItinerary.js
  * 
  * @author: Josh Divine
- * @version: 0.1.0 (Dec 6, 2017)
+ * @author: Annie Wahl
+ * @version: 0.1.1 (Feb 5, 2019)
  * @since: OMIS 3.0
  */
 function applyBoardItineraryBehavior() {
@@ -18,16 +19,20 @@ function applyBoardItineraryBehavior() {
 
 function startDateOnChange() {
 	$("#startDate").change(function() {
+		var input = this.value;
+		var dateEntered = new Date(input);
+		if (typeof dateEntered.getMonth === 'function' && !$("#endDate").val()) {
+			$("#endDate").val(input);
+		}
 		$.ajax(config.ServerConfig.getContextPath() + "/paroleBoardItinerary/findBoardMembersOnDate.html",
 			   {
 				   type: "GET",
 				   async: false,
-				   data: { date: this.value },
+				   data: { date: input },
 				   success: function(data) {
 				   		$("#boardMember1").empty().append(data);
 				   		$("#boardMember2").empty().append(data);
 				   		$("#boardMember3").empty().append(data);
-				   		$("#boardMemberAlternate").empty().append(data);
 				   },
 				   error: function(jqXHR, textStatus, errorThrown) {
 						alert("Error - status: " + textStatus + "; error: "

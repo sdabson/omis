@@ -11,7 +11,6 @@ import omis.facility.service.delegate.FacilityDelegate;
 import omis.facility.service.delegate.UnitDelegate;
 import omis.location.domain.Location;
 import omis.location.service.delegate.LocationDelegate;
-import omis.paroleboarditinerary.domain.AttendeeRoleCategory;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.BoardMeetingSite;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
@@ -31,7 +30,7 @@ import omis.paroleboardmember.service.delegate.ParoleBoardMemberDelegate;
  * 
  * @author Josh Divine
  * @author Annie Wahl 
- * @version 0.1.3 (Apr 18, 2018)
+ * @version 0.1.4 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 public class ParoleBoardItineraryServiceImpl 
@@ -123,11 +122,6 @@ public class ParoleBoardItineraryServiceImpl
 						paroleBoardItinerary)) {
 			this.removeAttendee(boardAttendee);
 		}
-		if (this.findBoardAlternateAttendeeByBoardItinerary(
-				paroleBoardItinerary) != null) {
-			this.removeAttendee(this.findBoardAlternateAttendeeByBoardItinerary(
-					paroleBoardItinerary));
-		}
 		for (BoardMeetingSite boardMeetingSite
 				: this.findBoardMeetingSitesByBoardItinerary(
 						paroleBoardItinerary)) {
@@ -175,23 +169,21 @@ public class ParoleBoardItineraryServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public BoardAttendee createAttendee(
-			final ParoleBoardItinerary boardItinerary, 
-			final ParoleBoardMember boardMember, final Long number,
-			final AttendeeRoleCategory role) 
+			final ParoleBoardItinerary boardItinerary,
+			final ParoleBoardMember boardMember, final Long number)
 					throws DuplicateEntityFoundException {
 		return this.boardAttendeeDelegate.create(boardItinerary, boardMember,
-				number, role);
+				number);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public BoardAttendee updateAttendee(final BoardAttendee boardAttendee, 
-			final ParoleBoardMember boardMember, 
-			final AttendeeRoleCategory role) 
+			final ParoleBoardMember boardMember) 
 					throws DuplicateEntityFoundException {
-		return this.boardAttendeeDelegate.update(boardAttendee, 
-				boardAttendee.getBoardItinerary(), boardMember, 
-				boardAttendee.getNumber(), role);
+		return this.boardAttendeeDelegate.update(boardAttendee,
+				boardAttendee.getBoardItinerary(), boardMember,
+				boardAttendee.getNumber());
 	}
 
 	/** {@inheritDoc} */
@@ -203,7 +195,7 @@ public class ParoleBoardItineraryServiceImpl
 	/** {@inheritDoc} */
 	@Override
 	public BoardMeetingSite createBoardMeetingSite(
-			final ParoleBoardItinerary boardItinerary, final Location location, 
+			final ParoleBoardItinerary boardItinerary, final Location location,
 			final Unit unit, final Date date, final Integer order) 
 					throws DuplicateEntityFoundException {
 		return this.boardMeetingSiteDelegate.create(boardItinerary, location,
@@ -261,15 +253,7 @@ public class ParoleBoardItineraryServiceImpl
 		return this.boardAttendeeDelegate.findBoardAttendeesByBoardItinerary(
 				boardItinerary);
 	}
-
-	/** {@inheritDoc} */
-	@Override
-	public BoardAttendee findBoardAlternateAttendeeByBoardItinerary(
-			final ParoleBoardItinerary boardItinerary) {
-		return this.boardAttendeeDelegate
-				.findBoardAlternateAttendeeByBoardItinerary(boardItinerary);
-	}
-
+	
 	/** {@inheritDoc} */
 	@Override
 	public List<BoardMeetingSite> findBoardMeetingSitesByBoardItinerary(
