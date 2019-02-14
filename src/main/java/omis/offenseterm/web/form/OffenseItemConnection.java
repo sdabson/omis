@@ -50,6 +50,8 @@ public class OffenseItemConnection
 	 * <p>Value is parsed; other properties are set.
 	 * 
 	 * @param value value
+	 * @throws IllegalArgumentException if classification supplied in
+	 * {@code value} does not exist or is empty
 	 */
 	public OffenseItemConnection(final String value) {
 		if (OffenseItemConnectionClassification.INITIAL.getName()
@@ -62,13 +64,13 @@ public class OffenseItemConnection
 		} else {
 			this.index = Long.valueOf(value.substring(
 					value.indexOf('[') + 1, value.indexOf(']')));
+			
+			// Enum#valueOf throws IllegalArgumentException if no instance with
+			// name exists thus satisfying the contact of this method
+			// String.substring(int, int) will not return null so Enum#valueOf
+			// will not throw NullPointerException
 			this.classification = OffenseItemConnectionClassification.valueOf(
 					value.substring(0, value.indexOf('[')));
-			if (this.classification == null) {
-				throw new IllegalArgumentException(
-						String.format("Cannot find classification in \'%s\'",
-								value));
-			}
 		}
 		this.value = value;
 	}

@@ -1,6 +1,7 @@
 <%--
  - Author: Trevor Isles
- - Version: 0.1.0 (April 17, 2017)
+ - Author: Josh Divine
+ - Version: 0.1.1 (Feb 5, 2019)
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -132,7 +133,7 @@
 				<form:label path="title" class="fieldLabel">
 					<fmt:message key="titleLabel" />
 				</form:label>
-				<form:input path="title" />
+				<form:input path="title" class="medium"/>
 				<form:errors path="title" cssClass="error" />
 			</span>
 			<span class="fieldGroup">
@@ -150,7 +151,7 @@
 				<form:label path="data" class="fieldLabel">
 					<fmt:message key="documentLabel" />
 				</form:label>
-				<input id="documentData" type="file" name="data">
+				<input id="documentData" type="file" name="data" accept=".pdf, application/pdf">
 				<form:hidden path="fileExtension" id="dataFileExtension" />
 				<form:errors path="data" cssClass="error" />
 			</span>

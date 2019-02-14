@@ -2,7 +2,8 @@
  * Prison term detail screen behavior.
  * 
  * Author: Trevor Isles
- * Version: 0.1.0 April 24, 2017
+ * Author: Josh Divine
+ * Version: 0.1.1 (Feb 5, 2019)
  * Since: OMIS 3.0
  */
 window.onload = function() {	
@@ -61,8 +62,18 @@ window.onload = function() {
 function applyFileExtensionNamer() {
 	var documentData = document.getElementById("documentData");
 	var fileExtension = document.getElementById("dataFileExtension");
+	var title = document.getElementById("title");
+	var docDate = document.getElementById("date");
 	documentData.onchange = function() {
 		var fileExtensionValue = documentData.value.substr(documentData.value.lastIndexOf('.')+1);
 		fileExtension.value = fileExtensionValue;
+		if (title.value == null || title.value == "") {
+			var resolver = new common.MessageResolver("omis.prisonterm.msgs.prisonTerm");
+			title.value = resolver.getMessage("sentenceCalculationSpreadsheet")
+		}
+		if (docDate.value == null || docDate.value == "") {
+			var d = new Date();
+			docDate.value = ("0"+(d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
+		}
 	}
 }

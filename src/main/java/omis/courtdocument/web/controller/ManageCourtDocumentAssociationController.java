@@ -166,7 +166,7 @@ public class ManageCourtDocumentAssociationController {
 	 * @return court document association edit
 	 */
 	@RequestMapping(value = "create.html", method = RequestMethod.GET)
-	@PreAuthorize("hasRole('COURT_CASE_DOCUMENT_VIEW') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('COURT_CASE_DOCUMENT_CREATE') or hasRole('ADMIN')")
 	public ModelAndView create(
 			@RequestParam(value = "offender", required = true) 
 				final Offender offender,
@@ -354,7 +354,7 @@ public class ManageCourtDocumentAssociationController {
 	 * @return document associations profile
 	 */
 	@RequestMapping(value = "remove.html", method = RequestMethod.GET)
-	@PreAuthorize("hasRole('DOCUMENT_REMOVE') or hasRole('ADMIN')")
+	@PreAuthorize("hasRole('COURT_CASE_DOCUMENT_REMOVE') or hasRole('ADMIN')")
 	public ModelAndView remove(
 			@RequestParam(value = "courtDocumentAssociation", required = true)
 				final CourtDocumentAssociation courtDocumentAssociation) {

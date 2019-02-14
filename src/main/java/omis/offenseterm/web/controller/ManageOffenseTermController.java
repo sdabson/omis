@@ -46,6 +46,7 @@ import omis.conviction.domain.OffenseSeverity;
 import omis.conviction.domain.component.ConvictionCredit;
 import omis.conviction.domain.component.ConvictionFlags;
 import omis.conviction.exception.ConvictionExistsException;
+import omis.conviction.web.form.ConvictionFields;
 import omis.court.domain.Court;
 import omis.courtcase.domain.CourtCase;
 import omis.courtcase.domain.JurisdictionAuthority;
@@ -412,143 +413,13 @@ public class ManageOffenseTermController {
 			offenseTermForm.getFields().setYouthTransfer(
 					courtCase.getFlags().getYouthTransfer());
 		}
-		List<OffenseItem> offenses = new ArrayList<OffenseItem>();
-		List<Conviction> convictions = this.offenseTermService
-				.findConvictions(courtCase);
+		List<OffenseItem> offenses = this.buildOffenseItems(
+				courtCase, expandedSentence);
 		Map<Conviction, List<SentenceSummary>>
 			inactiveSentenceSummariesForConviction
 				= new HashMap<Conviction, List<SentenceSummary>>();
-		for (Conviction conviction : convictions) {
-			OffenseItem offenseItem = new OffenseItem();
-			offenseItem.setOperation(OffenseItemOperation.UPDATE);
-			offenseItem.setConviction(conviction);
-			offenseItem.getConvictionFields().setOffense(
-					conviction.getOffense());
-			offenseItem.getConvictionFields().setDate(
-					conviction.getDate());
-			offenseItem.getConvictionFields().setCounts(
-					conviction.getCounts());
-			offenseItem.getConvictionFields().setSeverity(
-					conviction.getSeverity());
-			if (conviction.getFlags() != null) {
-				offenseItem.getConvictionFields().setViolentOffense(
-						conviction.getFlags().getViolentOffense());
-				offenseItem.getConvictionFields().setSexualOffense(
-						conviction.getFlags().getSexualOffense());
-				offenseItem.getConvictionFields().setParoleIneligible(
-						conviction.getFlags().getParoleIneligible());
-				offenseItem.getConvictionFields()
-							.setSupervisedReleaseIneligible(
-									conviction.getFlags()
-										.getSupervisedReleaseIneligible());
-			}
-			Sentence sentence = this.offenseTermService
-					.findActiveSentence(conviction);
-			if (sentence != null) {
-				offenseItem.setSentenceOperation(SentenceOperation.UPDATE);
-				offenseItem.setSentence(sentence);
-				if (sentence.getConnection() != null) {
-					OffenseItemConnection connection;
-					if (SentenceConnectionClassification.INITIAL
-							.equals(sentence.getConnection()
-									.getClassification())) {
-						connection = OffenseItemConnection.createInitial();
-					} else if (SentenceConnectionClassification.CONCURRENT
-							.equals(sentence.getConnection()
-									.getClassification())) {
-						connection = OffenseItemConnection.createConcurrent();
-					} else if (SentenceConnectionClassification.CONSECUTIVE
-							.equals(sentence.getConnection()
-									.getClassification())) {
-						if (sentence.getConnection().getSentence()
-								.getConviction().getCourtCase()
-								.equals(courtCase)) {
-							int consecutiveSentenceIndex = convictions
-									.indexOf(sentence.getConnection()
-											.getSentence().getConviction());
-							if (consecutiveSentenceIndex > -1) {
-								connection = OffenseItemConnection
-									.createConsecutive(
-											new Long(consecutiveSentenceIndex));
-							} else {
-								throw new UnsupportedOperationException(
-									"Operation not supported - this is a known bug");
-							}
-						} else {
-							connection = OffenseItemConnection
-									.createConsecutiveOtherDocket(
-											sentence.getConnection()
-												.getSentence().getId());
-						}
-					} else {
-						throw new UnsupportedOperationException(
-									"Connection classification not supported");
-					}
-					offenseItem.setConnection(connection);
-				}
-				offenseItem.getSentenceFields()
-					.setCategory(sentence.getCategory());
-				offenseItem.getSentenceFields()
-					.setLengthClassification(
-							sentence.getLengthClassification());
-				offenseItem.getSentenceFields().setLegalDispositionCategory(
-							sentence.getLegalDispositionCategory());
-				if (sentence.getPrisonTerm() != null) {
-					offenseItem.getSentenceFields().setPrisonYears(
-							sentence.getPrisonTerm().getYears());
-					offenseItem.getSentenceFields().setPrisonMonths(
-							sentence.getPrisonTerm().getMonths());
-					offenseItem.getSentenceFields().setPrisonDays(
-							sentence.getPrisonTerm().getDays());
-					offenseItem.getSentenceFields().setPrisonTotalDays(
-							this.offenseTermService
-								.calculateTotalDays(sentence.getPrisonTerm()));
-				}
-				if (sentence.getProbationTerm() != null) {
-					offenseItem.getSentenceFields().setProbationYears(
-							sentence.getProbationTerm().getYears());
-					offenseItem.getSentenceFields().setProbationMonths(
-							sentence.getProbationTerm().getMonths());
-					offenseItem.getSentenceFields().setProbationDays(
-							sentence.getProbationTerm().getDays());
-					offenseItem.getSentenceFields().setProbationTotalDays(
-							this.offenseTermService
-								.calculateTotalDays(
-										sentence.getProbationTerm()));
-				}
-				if (sentence.getDeferredTerm() != null) {
-					offenseItem.getSentenceFields().setDeferredYears(
-							sentence.getDeferredTerm().getYears());
-					offenseItem.getSentenceFields().setDeferredMonths(
-							sentence.getDeferredTerm().getMonths());
-					offenseItem.getSentenceFields().setDeferredDays(
-							sentence.getDeferredTerm().getDays());
-					offenseItem.getSentenceFields().setDeferredTotalDays(
-							this.offenseTermService
-								.calculateTotalDays(
-										sentence.getDeferredTerm()));
-				}
-				offenseItem.getSentenceFields().setEffectiveDate(
-						sentence.getEffectiveDate());
-				offenseItem.getSentenceFields().setPronouncementDate(
-						sentence.getPronouncementDate());
-				if (sentence.getCredit() != null) {
-					offenseItem.getSentenceFields().setJailTimeCredit(
-							sentence.getCredit().getJailTime());
-					offenseItem.getSentenceFields().setStreetTimeCredit(
-							sentence.getCredit().getStreetTime());
-				}
-				offenseItem.getSentenceFields().setTurnSelfInDate(
-						sentence.getTurnSelfInDate());
-				if (sentence.equals(expandedSentence)) {
-					offenseItem.setExpanded(true);
-				} else {
-					offenseItem.setExpanded(false);
-				}
-			} else {
-				offenseItem.setExpanded(false);
-			}
-			offenses.add(offenseItem);
+		for (OffenseItem offenseItem : offenses) {
+			Conviction conviction = offenseItem.getConviction();
 			inactiveSentenceSummariesForConviction.put(conviction,
 					this.sentenceReportService
 						.summarizeInactiveSentencesByConviction(conviction));
@@ -565,7 +436,7 @@ public class ManageOffenseTermController {
 				inactiveSentenceSummariesForConviction);
 		return mav;
 	}
-	
+
 	/**
 	 * Saves court case.
 	 * 
@@ -1603,6 +1474,77 @@ public class ManageOffenseTermController {
 			this.contactSummaryModelDelegate.add(mav.getModelMap(), person);
 		}
 		return mav;
+	}
+	
+	// Returns offense items for court case with supplied sentence expanded
+	private List<OffenseItem> buildOffenseItems(
+			final CourtCase courtCase, final Sentence expandedSentence) {
+		List<OffenseItem> offenses = new ArrayList<OffenseItem>();
+		List<Conviction> convictions = this.offenseTermService
+				.findConvictions(courtCase);
+		for (Conviction conviction : convictions) {
+			OffenseItem offenseItem = new OffenseItem();
+			offenseItem.setOperation(OffenseItemOperation.UPDATE);
+			offenseItem.setConviction(conviction);
+			offenseItem.setConvictionFields(new ConvictionFields(conviction));
+			Sentence sentence = this.offenseTermService
+					.findActiveSentence(conviction);
+			if (sentence != null) {
+				offenseItem.setSentenceOperation(SentenceOperation.UPDATE);
+				offenseItem.setSentence(sentence);
+				if (sentence.getConnection() != null) {
+					OffenseItemConnection connection;
+					if (SentenceConnectionClassification.INITIAL
+							.equals(sentence.getConnection()
+									.getClassification())) {
+						connection = OffenseItemConnection.createInitial();
+					} else if (SentenceConnectionClassification.CONCURRENT
+							.equals(sentence.getConnection()
+									.getClassification())) {
+						connection = OffenseItemConnection.createConcurrent();
+					} else if (SentenceConnectionClassification.CONSECUTIVE
+							.equals(sentence.getConnection()
+									.getClassification())) {
+						if (sentence.getConnection().getSentence()
+								.getConviction().getCourtCase()
+								.equals(courtCase)) {
+							int consecutiveSentenceIndex = convictions
+									.indexOf(sentence.getConnection()
+											.getSentence().getConviction());
+							if (consecutiveSentenceIndex > -1) {
+								connection = OffenseItemConnection
+									.createConsecutive(
+											new Long(consecutiveSentenceIndex));
+							} else {
+								throw new UnsupportedOperationException(
+									"Operation not supported - this is a known bug");
+							}
+						} else {
+							connection = OffenseItemConnection
+									.createConsecutiveOtherDocket(
+											sentence.getConnection()
+												.getSentence().getId());
+						}
+					} else {
+						throw new UnsupportedOperationException(
+									"Connection classification not supported");
+					}
+					offenseItem.setConnection(connection);
+				}
+				offenseItem.setSentenceFields(
+						new SentenceFields(sentence,
+						this.offenseTermService::calculateTotalDays));
+				if (sentence.equals(expandedSentence)) {
+					offenseItem.setExpanded(true);
+				} else {
+					offenseItem.setExpanded(false);
+				}
+			} else {
+				offenseItem.setExpanded(false);
+			}
+			offenses.add(offenseItem);
+		}
+		return offenses;
 	}
 	
 	// Returns true if value is true; false otherwise

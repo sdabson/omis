@@ -16,7 +16,7 @@ import omis.prisonterm.web.form.PrisonTermForm;
  * @author Trevor Isles
  * @author Josh Divine
  * @author Annie Wahl
- * @version 0.1.2 (Dec 24, 2018)
+ * @version 0.1.3 (Feb 5, 2019)
  * @since OMIS 3.0
  */
 
@@ -28,6 +28,9 @@ public class PrisonTermFormValidator implements Validator {
 	
 	private static final String DOCUMENT_REQUIRED_MSG = "document.required";
 
+	private static final String INCORRECT_FILE_EXTENSION_MSG = 
+			"document.incorrectType";
+	
 	private final DocumentTagItemValidator documentTagItemValidator =
 			new DocumentTagItemValidator();
 	
@@ -66,6 +69,10 @@ public class PrisonTermFormValidator implements Validator {
 					TITLE_REQUIRED_MSG);
 			ValidationUtils.rejectIfEmpty(errors, "data",
 					DOCUMENT_REQUIRED_MSG);
+			if (form.getFileExtension() != null && 
+					!form.getFileExtension().toUpperCase().equals("PDF")) {
+				errors.rejectValue("data", INCORRECT_FILE_EXTENSION_MSG);
+			}
 			List<DocumentTagItem> documentTagItems = form.getDocumentTagItems();
 			if (documentTagItems != null) {
 				this.documentTagItemValidator.validate(
@@ -84,6 +91,10 @@ public class PrisonTermFormValidator implements Validator {
 					TITLE_REQUIRED_MSG);
 			ValidationUtils.rejectIfEmpty(errors, "replaceData",
 					DOCUMENT_REQUIRED_MSG);
+			if (form.getFileExtension() != null && 
+					!form.getFileExtension().toUpperCase().equals("PDF")) {
+				errors.rejectValue("replaceData", INCORRECT_FILE_EXTENSION_MSG);
+			}
 			List<DocumentTagItem> documentTagItems = form.getDocumentTagItems();
 			if (documentTagItems != null) {
 				this.documentTagItemValidator.validate(

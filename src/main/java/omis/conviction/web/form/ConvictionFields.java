@@ -1,8 +1,26 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.conviction.web.form;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import omis.conviction.domain.Conviction;
 import omis.conviction.domain.OffenseSeverity;
 import omis.offense.domain.Offense;
 
@@ -42,6 +60,26 @@ public class ConvictionFields
 	/** Instantiates conviction fields. */
 	public ConvictionFields() {
 		// Default instantiation
+	}
+	
+	/**
+	 * Instantiates conviction fields from conviction.
+	 * 
+	 * @param conviction conviction
+	 */
+	public ConvictionFields(final Conviction conviction) {
+		this.offense = conviction.getOffense();
+		this.date = conviction.getDate();
+		this.counts = conviction.getCounts();
+		this.severity = conviction.getSeverity();
+		if (conviction.getFlags() != null) {
+			this.violentOffense = conviction.getFlags().getViolentOffense();
+			this.sexualOffense = conviction.getFlags().getSexualOffense();
+			this.paroleIneligible = conviction.getFlags().getParoleIneligible();
+			this.supervisedReleaseIneligible
+					= conviction.getFlags()
+						.getSupervisedReleaseIneligible();
+		}
 	}
 	
 	/**

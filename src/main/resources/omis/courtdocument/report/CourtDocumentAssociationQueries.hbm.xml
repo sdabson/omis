@@ -63,6 +63,7 @@
    		 left join courtDocumentAssociation.offender offender
    		 left join offender.name offName
              where docket.person = :offender
+         order by document.date desc
 	</query>
 	<query name="findCourtDocumentAssociationSummariesWithoutDocketByOffender">
 		select distinct new omis.courtdocument.report.CourtDocumentAssociationSummary(
@@ -89,5 +90,6 @@
    		 left join offender.name offName
              where offender = :offender
                and courtDocumentAssociation.docket is null
+         order by document.date desc
 	</query>
 </hibernate-mapping>

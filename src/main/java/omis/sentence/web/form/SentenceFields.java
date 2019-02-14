@@ -1,11 +1,31 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.sentence.web.form;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.function.Function;
 
 import omis.sentence.domain.LegalDispositionCategory;
+import omis.sentence.domain.Sentence;
 import omis.sentence.domain.SentenceCategory;
 import omis.sentence.domain.SentenceLengthClassification;
+import omis.term.domain.component.Term;
 
 /**
  * Fields for sentences.
@@ -65,6 +85,50 @@ public class SentenceFields
 	/** Instantiates sentence fields. */
 	public SentenceFields() {
 		// Default instantiation
+	}
+	
+	/**
+	 * Instantiates sentence fields from sentence.
+	 * 
+	 * @param sentence sentence
+	 * @param totalDayCalculator function to calculate total days
+	 */
+	public SentenceFields(
+			final Sentence sentence,
+			final Function<Term, Integer> totalDayCalculator) {
+		this.category = sentence.getCategory();
+		this.lengthClassification = sentence.getLengthClassification();
+		this.legalDispositionCategory = sentence.getLegalDispositionCategory();
+		if (sentence.getPrisonTerm() != null) {
+			this.prisonYears = sentence.getPrisonTerm().getYears();
+			this.prisonMonths = sentence.getPrisonTerm().getMonths();
+			this.prisonDays = sentence.getPrisonTerm().getDays();
+			this.prisonTotalDays
+					= totalDayCalculator.apply(sentence.getPrisonTerm());
+		}
+		if (sentence.getProbationTerm() != null) {
+			this.probationYears = sentence.getProbationTerm().getYears();
+			this.probationMonths = sentence.getProbationTerm().getMonths();
+			this.probationDays = sentence.getProbationTerm().getDays();
+			this.probationTotalDays
+					= totalDayCalculator.apply(
+							sentence.getProbationTerm());
+		}
+		if (sentence.getDeferredTerm() != null) {
+			this.deferredYears = sentence.getDeferredTerm().getYears();
+			this.deferredMonths = sentence.getDeferredTerm().getMonths();
+			this.deferredDays = sentence.getDeferredTerm().getDays();
+			this.deferredTotalDays
+					= totalDayCalculator.apply(
+								sentence.getDeferredTerm());
+		}
+		this.effectiveDate = sentence.getEffectiveDate();
+		this.pronouncementDate = sentence.getPronouncementDate();
+		if (sentence.getCredit() != null) {
+			this.jailTimeCredit = sentence.getCredit().getJailTime();
+			this.streetTimeCredit = sentence.getCredit().getStreetTime();
+		}
+		this.turnSelfInDate = sentence.getTurnSelfInDate();
 	}
 
 	/**

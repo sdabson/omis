@@ -182,9 +182,15 @@ public class ConvictionImpl
 			return false;
 		}
 		if (this.getCounts() == null) {
-			throw new IllegalStateException("Count required");
+			throw new IllegalStateException("Counts required");
 		}
 		if (!this.getCounts().equals(that.getCounts())) {
+			return false;
+		}
+		if (this.getDate() == null) {
+			throw new IllegalStateException("Date required");
+		}
+		if (!this.getDate().equals(that.getDate())) {
 			return false;
 		}
 		return true;
@@ -200,12 +206,16 @@ public class ConvictionImpl
 			throw new IllegalStateException("Offense required");
 		}
 		if (this.getCounts() == null) {
-			throw new IllegalStateException("Count required");
+			throw new IllegalStateException("Counts required");
+		}
+		if (this.getDate() == null) {
+			throw new IllegalStateException("Date required");
 		}
 		int hashCode = 14;
 		hashCode = 29 * hashCode + this.getCourtCase().hashCode();
 		hashCode = 29 * hashCode + this.getOffense().hashCode();
 		hashCode = 29 * hashCode + this.getCounts().hashCode();
+		hashCode = 29 * hashCode + this.getDate().hashCode();
 		return hashCode;
 	}
 	
@@ -223,7 +233,7 @@ public class ConvictionImpl
 		} else {
 			offenseName = null;
 		}
-		return String.format("#%d - %s %d", this.getId(), offenseName,
-				this.getCounts());
+		return String.format("#%d - %s %d %s", this.getId(), offenseName,
+				this.getCounts(), this.getDate());
 	}
 }

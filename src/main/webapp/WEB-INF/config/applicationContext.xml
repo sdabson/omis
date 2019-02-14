@@ -123,6 +123,7 @@
     			<value>/WEB-INF/classes/omis/dna/msgs/form</value>
     			<value>/WEB-INF/classes/omis/docket/msgs/form</value>
     			<value>/WEB-INF/classes/omis/document/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/earlyreleasetracking/msgs/form</value>
     			<value>/WEB-INF/classes/omis/employment/msgs/form</value>
     			<value>/WEB-INF/classes/omis/education/msgs/form</value>
     			<value>/WEB-INF/classes/omis/facility/msgs/form</value>

@@ -109,6 +109,8 @@
   
   <import resource="applicationContext-dnaSampleWeb.xml"/>
   
+  <import resource="applicationContext-earlyReleaseTrackingWeb.xml"/>
+  
   <import resource="applicationContext-employmentWeb.xml"/>
   
   <import resource="applicationContext-educationWeb.xml"/>

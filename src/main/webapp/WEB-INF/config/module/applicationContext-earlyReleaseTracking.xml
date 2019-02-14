@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean id="earlyReleaseRequestService" class="omis.earlyreleasetracking.service.impl.EarlyReleaseRequestServiceImpl">
+			<constructor-arg name="earlyReleaseRequestDelegate" ref="earlyReleaseRequestDelegate" />
+			<constructor-arg name="earlyReleaseRequestNoteAssociationDelegate" ref="earlyReleaseRequestNoteAssociationDelegate" />
+			<constructor-arg name="earlyReleaseRequestDocumentAssociationDelegate" ref="earlyReleaseRequestDocumentAssociationDelegate" />
+			<constructor-arg name="earlyReleaseRequestInternalApprovalDelegate" ref="earlyReleaseRequestInternalApprovalDelegate" />
+			<constructor-arg name="earlyReleaseRequestExternalOppositionDelegate" ref="earlyReleaseRequestExternalOppositionDelegate" />
+			<constructor-arg name="earlyReleaseJudgeResponseCategoryDelegate" ref="earlyReleaseJudgeResponseCategoryDelegate" />
+			<constructor-arg name="earlyReleaseStatusCategoryDelegate" ref="earlyReleaseStatusCategoryDelegate" />
+			<constructor-arg name="externalOppositionPartyCategoryDelegate" ref="externalOppositionPartyCategoryDelegate" />
+			<constructor-arg name="documentDelegate" ref="documentDelegate" />
+			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+		</bean>
+		
+		<!-- EarlyReleaseRequest Beans -->
+		
+		<bean id="earlyReleaseRequestDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseRequestDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequest" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestDelegate">
+			<constructor-arg name="earlyReleaseRequestDao" ref="earlyReleaseRequestDao" />
+			<constructor-arg name="earlyReleaseRequestInstanceFactory" ref="earlyReleaseRequestInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequest" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseRequestDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseRequest" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseRequestNoteAssociation Beans -->
+		
+		<bean id="earlyReleaseRequestNoteAssociationDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseRequestNoteAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestNoteAssociationDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestNoteAssociationDelegate">
+			<constructor-arg name="earlyReleaseRequestNoteAssociationDao" ref="earlyReleaseRequestNoteAssociationDao" />
+			<constructor-arg name="earlyReleaseRequestNoteAssociationInstanceFactory" ref="earlyReleaseRequestNoteAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestNoteAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestNoteAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseRequestNoteAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseRequestDocumentAssociation Beans -->
+		
+		<bean id="earlyReleaseRequestDocumentAssociationDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseRequestDocumentAssociationDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestDocumentAssociation" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestDocumentAssociationDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestDocumentAssociationDelegate">
+			<constructor-arg name="earlyReleaseRequestDocumentAssociationDao" ref="earlyReleaseRequestDocumentAssociationDao" />
+			<constructor-arg name="earlyReleaseRequestDocumentAssociationInstanceFactory" ref="earlyReleaseRequestDocumentAssociationInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestDocumentAssociationInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestDocumentAssociation" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestDocumentAssociationPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseRequestDocumentAssociationDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseRequestDocumentAssociation" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseRequestInternalApproval Beans -->
+		
+		<bean id="earlyReleaseRequestInternalApprovalDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseRequestInternalApprovalDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestInternalApproval" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestInternalApprovalDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestInternalApprovalDelegate">
+			<constructor-arg name="earlyReleaseRequestInternalApprovalDao" ref="earlyReleaseRequestInternalApprovalDao" />
+			<constructor-arg name="earlyReleaseRequestInternalApprovalInstanceFactory" ref="earlyReleaseRequestInternalApprovalInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestInternalApprovalInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestInternalApproval" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestInternalApprovalPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseRequestInternalApprovalDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseRequestInternalApproval" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseRequestExternalOpposition Beans -->
+		
+		<bean id="earlyReleaseRequestExternalOppositionDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseRequestExternalOppositionDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestExternalOpposition" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestExternalOppositionDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestExternalOppositionDelegate">
+			<constructor-arg name="earlyReleaseRequestExternalOppositionDao" ref="earlyReleaseRequestExternalOppositionDao" />
+			<constructor-arg name="earlyReleaseRequestExternalOppositionInstanceFactory" ref="earlyReleaseRequestExternalOppositionInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestExternalOppositionInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseRequestExternalOpposition" />
+		</bean>
+		
+		<bean id="earlyReleaseRequestExternalOppositionPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseRequestExternalOppositionDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseRequestExternalOpposition" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseJudgeResponseCategory Beans -->
+		
+		<bean id="earlyReleaseJudgeResponseCategoryDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseJudgeResponseCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory" />
+		</bean>
+		
+		<bean id="earlyReleaseJudgeResponseCategoryDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseJudgeResponseCategoryDelegate">
+			<constructor-arg name="earlyReleaseJudgeResponseCategoryDao" ref="earlyReleaseJudgeResponseCategoryDao" />
+			<constructor-arg name="earlyReleaseJudgeResponseCategoryInstanceFactory" ref="earlyReleaseJudgeResponseCategoryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseJudgeResponseCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory" />
+		</bean>
+		
+		<bean id="earlyReleaseJudgeResponseCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseJudgeResponseCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- EarlyReleaseStatusCategory Beans -->
+		
+		<bean id="earlyReleaseStatusCategoryDao" class="omis.earlyreleasetracking.dao.impl.hibernate.EarlyReleaseStatusCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory" />
+		</bean>
+		
+		<bean id="earlyReleaseStatusCategoryDelegate" class="omis.earlyreleasetracking.service.delegate.EarlyReleaseStatusCategoryDelegate">
+			<constructor-arg name="earlyReleaseStatusCategoryDao" ref="earlyReleaseStatusCategoryDao" />
+			<constructor-arg name="earlyReleaseStatusCategoryInstanceFactory" ref="earlyReleaseStatusCategoryInstanceFactory" />
+			<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever" />
+		</bean>
+		
+		<bean id="earlyReleaseStatusCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory" />
+		</bean>
+		
+		<bean id="earlyReleaseStatusCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="earlyReleaseStatusCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		<!-- ExternalOppositionPartyCategory Beans -->
+		
+		<bean id="externalOppositionPartyCategoryDao" class="omis.earlyreleasetracking.dao.impl.hibernate.ExternalOppositionPartyCategoryDaoHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory" />
+		</bean>
+		
+		<bean id="externalOppositionPartyCategoryDelegate" class="omis.earlyreleasetracking.service.delegate.ExternalOppositionPartyCategoryDelegate">
+			<constructor-arg name="externalOppositionPartyCategoryDao" ref="externalOppositionPartyCategoryDao" />
+			<constructor-arg name="externalOppositionPartyCategoryInstanceFactory" ref="externalOppositionPartyCategoryInstanceFactory" />
+		</bean>
+		
+		<bean id="externalOppositionPartyCategoryInstanceFactory" class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate" />
+			<constructor-arg name="entityName" value="omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory" />
+		</bean>
+		
+		<bean id="externalOppositionPartyCategoryPropertyEditorFactory"
+		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+			<constructor-arg name="dao" ref="externalOppositionPartyCategoryDao" />
+			<constructor-arg name="entityName"
+				value="omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory" />
+			<constructor-arg name="configuration" ref="hibernateConfiguration" />
+		</bean>
+		
+		
+		<!-- Document Beans -->
+		
+		<bean id="earlyReleaseRequestDocumentPersister" class="omis.document.io.impl.SimpleDocumentPersisterImpl">
+			<constructor-arg name="fileLocator" ref="earlyReleaseRequestDocumentLocator"/>
+		</bean>
+	
+		<bean id="earlyReleaseRequestDocumentRetriever" class="omis.document.io.impl.SimpleDocumentRetrieverImpl">
+			<constructor-arg name="fileLocator" ref="earlyReleaseRequestDocumentLocator"/>
+			<constructor-arg name="defaultFilename" value="notFound"/>
+		</bean>
+	
+		<bean id="earlyReleaseRequestDocumentLocator" class="omis.io.impl.FileFromPathLocatorImpl">
+			<constructor-arg name="path" value="${application.resource.path}\Documents\EarlyReleaseRequestDocuments"/>
+		</bean>
+		
+		<bean id="earlyReleaseRequestDocumentRemover" class="omis.io.impl.SimpleFileRemoverImpl">
+			<constructor-arg name="fileLocator" ref="earlyReleaseRequestDocumentLocator"/>
+		</bean>
+		
+</beans>

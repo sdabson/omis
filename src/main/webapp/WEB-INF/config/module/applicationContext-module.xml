@@ -110,6 +110,8 @@
   
   <import resource="applicationContext-document.xml"/>
   
+  <import resource="applicationContext-earlyReleaseTracking.xml"/>
+  
   <import resource="applicationContext-employment.xml"/>
   
   <import resource="applicationContext-education.xml"/>

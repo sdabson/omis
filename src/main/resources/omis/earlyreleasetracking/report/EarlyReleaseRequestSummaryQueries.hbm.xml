@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.earlyreleasetracking.report">
+	<query name="findEarlyReleaseRequestSummariesByOffender"><![CDATA[
+		select new omis.earlyreleasetracking.report.EarlyReleaseRequestSummary(
+			earlyReleaseRequest.id,
+			cast(earlyReleaseRequest.category as string),
+			earlyReleaseRequest.requestDate,
+			docket.value,
+			judgeResponse.name,
+			statusCategory.name,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			offender.id,
+			cast((select offender2.offenderNumber
+				from
+					omis.offender.domain.Offender offender2
+				where
+					offender2 = offender
+			) as string) as offenderNumber
+		)
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseRequest earlyReleaseRequest
+		inner join
+			earlyReleaseRequest.docket docket
+		left outer join
+			earlyReleaseRequest.judgeResponse judgeResponse
+		left outer join
+			earlyReleaseRequest.requestStatus statusCategory
+		inner join
+			docket.person offender
+		inner join
+			offender.name name
+		where
+			offender = :offender
+	]]></query>
+</hibernate-mapping>
