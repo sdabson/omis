@@ -26,7 +26,7 @@ import omis.earlyreleasetracking.dao.EarlyReleaseRequestExternalOppositionDao;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestExternalOpposition;
 import omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory;
-import omis.exception.DuplicateEntityFoundException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExternalOppositionExists;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -82,18 +82,19 @@ public class EarlyReleaseRequestExternalOppositionDelegate {
 	 * @param date Date
 	 * @param narrative Narrative
 	 * @return Newly created Early Release Request External Opposition
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * External Opposition already exists with the given party for the specified
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestExternalOppositionExists When a Early Release
+	 * Request External Opposition already exists with the given party for the
+	 * specified Early Release Request
 	 */
 	public EarlyReleaseRequestExternalOpposition create(
 			final EarlyReleaseRequest earlyReleaseRequest,
 			final ExternalOppositionPartyCategory party, final Date date,
 			final String narrative)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExternalOppositionExists {
 		if (this.earlyReleaseRequestExternalOppositionDao.find(
 				earlyReleaseRequest, party) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestExternalOppositionExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		EarlyReleaseRequestExternalOpposition
@@ -130,9 +131,9 @@ public class EarlyReleaseRequestExternalOppositionDelegate {
 	 * @param date Date
 	 * @param narrative Narrative
 	 * @return Updated Early Release Request External Opposition
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * External Opposition already exists with the given party for the specified
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestExternalOppositionExists When a Early Release
+	 * Request External Opposition already exists with the given party for the
+	 * specified Early Release Request
 	 */
 	public EarlyReleaseRequestExternalOpposition update(
 			final EarlyReleaseRequestExternalOpposition
@@ -140,11 +141,12 @@ public class EarlyReleaseRequestExternalOppositionDelegate {
 			final EarlyReleaseRequest earlyReleaseRequest,
 			final ExternalOppositionPartyCategory party, final Date date,
 			final String narrative)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExternalOppositionExists {
 		if (this.earlyReleaseRequestExternalOppositionDao.findExcluding(
 				earlyReleaseRequest, party,
 				earlyReleaseRequestExternalOpposition) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestExternalOppositionExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		earlyReleaseRequestExternalOpposition.setDate(date);

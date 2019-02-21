@@ -19,6 +19,7 @@
 			<constructor-arg name="externalOppositionPartyCategoryDelegate" ref="externalOppositionPartyCategoryDelegate" />
 			<constructor-arg name="documentDelegate" ref="documentDelegate" />
 			<constructor-arg name="documentTagDelegate" ref="documentTagDelegate" />
+			<constructor-arg name="docketDelegate" ref="docketDelegate" />
 		</bean>
 		
 		<!-- EarlyReleaseRequest Beans -->

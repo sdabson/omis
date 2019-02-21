@@ -26,7 +26,7 @@ import omis.earlyreleasetracking.dao.EarlyReleaseRequestInternalApprovalDao;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestInternalApproval;
 import omis.earlyreleasetracking.domain.InternalApprovalDecisionCategory;
-import omis.exception.DuplicateEntityFoundException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestInternalApprovalExists;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -83,19 +83,20 @@ public class EarlyReleaseRequestInternalApprovalDelegate {
 	 * @param decision Decision
 	 * @param narrative Narrative
 	 * @return Newly created Early Release Request Internal Approval
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Internal Approval already exists with the given Name and Early Release
-	 * Request.
+	 * @throws EarlyReleaseRequestInternalApprovalExists When a Early Release
+	 * Request Internal Approval already exists with the given Name and Early
+	 * Release Request.
 	 */
 	public EarlyReleaseRequestInternalApproval create(
 			final EarlyReleaseRequest earlyReleaseRequest,
 			final String name, final Date date,
 			final InternalApprovalDecisionCategory decision,
 			final String narrative)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestInternalApprovalExists {
 		if (this.earlyReleaseRequestInternalApprovalDao.find(
 				earlyReleaseRequest, name) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestInternalApprovalExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		EarlyReleaseRequestInternalApproval
@@ -134,9 +135,9 @@ public class EarlyReleaseRequestInternalApprovalDelegate {
 	 * @param decision Decision
 	 * @param narrative Narrative
 	 * @return Updated Early Release Request Internal Approval
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Internal Approval already exists with the given Name and Early Release
-	 * Request.
+	 * @throws EarlyReleaseRequestInternalApprovalExists When a Early Release
+	 * Request Internal Approval already exists with the given Name and Early
+	 * Release Request.
 	 */
 	public EarlyReleaseRequestInternalApproval update(
 			final EarlyReleaseRequestInternalApproval
@@ -145,11 +146,12 @@ public class EarlyReleaseRequestInternalApprovalDelegate {
 			final String name, final Date date,
 			final InternalApprovalDecisionCategory decision,
 			final String narrative)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestInternalApprovalExists {
 		if (this.earlyReleaseRequestInternalApprovalDao.findExcluding(
 				earlyReleaseRequest, name,
 				earlyReleaseRequestInternalApproval) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestInternalApprovalExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		earlyReleaseRequestInternalApproval.setDate(date);

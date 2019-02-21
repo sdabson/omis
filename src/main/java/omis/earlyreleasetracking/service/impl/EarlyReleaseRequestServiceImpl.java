@@ -20,6 +20,7 @@ package omis.earlyreleasetracking.service.impl;
 import java.util.Date;
 import java.util.List;
 import omis.docket.domain.Docket;
+import omis.docket.service.delegate.DocketDelegate;
 import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
 import omis.document.service.delegate.DocumentDelegate;
@@ -34,6 +35,11 @@ import omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation;
 import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
 import omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory;
 import omis.earlyreleasetracking.domain.InternalApprovalDecisionCategory;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestDocumentAssociationExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExistsException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExternalOppositionExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestInternalApprovalExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestNoteAssociationExistsException;
 import omis.earlyreleasetracking.service.EarlyReleaseRequestService;
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseJudgeResponseCategoryDelegate;
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestDelegate;
@@ -44,6 +50,7 @@ import omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestNoteAssocia
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseStatusCategoryDelegate;
 import omis.earlyreleasetracking.service.delegate.ExternalOppositionPartyCategoryDelegate;
 import omis.exception.DuplicateEntityFoundException;
+import omis.offender.domain.Offender;
 import omis.user.domain.UserAccount;
 
 /**
@@ -84,6 +91,8 @@ public class EarlyReleaseRequestServiceImpl
 	
 	private final DocumentTagDelegate documentTagDelegate;
 	
+	private final DocketDelegate docketDelegate;
+	
 	/**
 	 * Constructor for EarlyReleaseRequestServiceImpl.
 	 * 
@@ -104,6 +113,7 @@ public class EarlyReleaseRequestServiceImpl
 	 * Category Delegate
 	 * @param documentDelegate Document Delegate
 	 * @param documentTagDelegate Document Tag Delegate
+	 * @param docketDelegate Docket Delegate
 	 */
 	public EarlyReleaseRequestServiceImpl(
 			final EarlyReleaseRequestDelegate earlyReleaseRequestDelegate,
@@ -122,7 +132,8 @@ public class EarlyReleaseRequestServiceImpl
 			final ExternalOppositionPartyCategoryDelegate
 				externalOppositionPartyCategoryDelegate,
 			final DocumentDelegate documentDelegate,
-			final DocumentTagDelegate documentTagDelegate) {
+			final DocumentTagDelegate documentTagDelegate,
+			final DocketDelegate docketDelegate) {
 		this.earlyReleaseRequestDelegate = earlyReleaseRequestDelegate;
 		this.earlyReleaseRequestNoteAssociationDelegate =
 				earlyReleaseRequestNoteAssociationDelegate;
@@ -140,6 +151,7 @@ public class EarlyReleaseRequestServiceImpl
 				externalOppositionPartyCategoryDelegate;
 		this.documentDelegate = documentDelegate;
 		this.documentTagDelegate = documentTagDelegate;
+		this.docketDelegate = docketDelegate;
 	}
 
 	/** {@inheritDoc} */
@@ -150,7 +162,7 @@ public class EarlyReleaseRequestServiceImpl
 			final EarlyReleaseJudgeResponseCategory judgeResponse,
 			final UserAccount requestBy, final Date approvalDate,
 			final String comments)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExistsException {
 		return this.earlyReleaseRequestDelegate.create(docket, requestDate,
 				category, requestStatus, judgeResponse, requestBy, approvalDate,
 				comments);
@@ -165,7 +177,7 @@ public class EarlyReleaseRequestServiceImpl
 			final EarlyReleaseJudgeResponseCategory judgeResponse,
 			final UserAccount requestBy, final Date approvalDate,
 			final String comments)
-			throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExistsException {
 		return this.earlyReleaseRequestDelegate.update(earlyReleaseRequest,
 				docket, requestDate, category, requestStatus, judgeResponse,
 				requestBy, approvalDate, comments);
@@ -184,7 +196,7 @@ public class EarlyReleaseRequestServiceImpl
 			createEarlyReleaseRequestNoteAssociation(
 					final EarlyReleaseRequest earlyReleaseRequest,
 					final String description, final Date date)
-							throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestNoteAssociationExistsException {
 		return this.earlyReleaseRequestNoteAssociationDelegate.create(
 				earlyReleaseRequest, description, date);
 	}
@@ -197,7 +209,7 @@ public class EarlyReleaseRequestServiceImpl
 						earlyReleaseRequestNoteAssociation,
 					final EarlyReleaseRequest earlyReleaseRequest,
 					final String description, final Date date)
-							throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestNoteAssociationExistsException {
 		return this.earlyReleaseRequestNoteAssociationDelegate.update(
 				earlyReleaseRequestNoteAssociation, earlyReleaseRequest,
 				description, date);
@@ -218,7 +230,7 @@ public class EarlyReleaseRequestServiceImpl
 			createEarlyReleaseRequestDocumentAssociation(
 					final Document document,
 					final EarlyReleaseRequest earlyReleaseRequest)
-							throws DuplicateEntityFoundException {
+						throws EarlyReleaseRequestDocumentAssociationExists {
 		return this.earlyReleaseRequestDocumentAssociationDelegate.create(
 				document, earlyReleaseRequest);
 	}
@@ -231,7 +243,7 @@ public class EarlyReleaseRequestServiceImpl
 						earlyReleaseRequestDocumentAssociation,
 					final Document document,
 					final EarlyReleaseRequest earlyReleaseRequest)
-							throws DuplicateEntityFoundException {
+						throws EarlyReleaseRequestDocumentAssociationExists {
 		return this.earlyReleaseRequestDocumentAssociationDelegate.update(
 				earlyReleaseRequestDocumentAssociation, document,
 				earlyReleaseRequest);
@@ -254,7 +266,7 @@ public class EarlyReleaseRequestServiceImpl
 					final String name, final Date date,
 					final InternalApprovalDecisionCategory decision,
 					final String narrative)
-							throws DuplicateEntityFoundException {
+							throws EarlyReleaseRequestInternalApprovalExists {
 		return this.earlyReleaseRequestInternalApprovalDelegate.create(
 				earlyReleaseRequest, name, date, decision, narrative);
 	}
@@ -269,7 +281,7 @@ public class EarlyReleaseRequestServiceImpl
 					final String name, final Date date,
 					final InternalApprovalDecisionCategory decision,
 					final String narrative)
-							throws DuplicateEntityFoundException {
+							throws EarlyReleaseRequestInternalApprovalExists {
 		return this.earlyReleaseRequestInternalApprovalDelegate.update(
 				earlyReleaseRequestInternalApproval, earlyReleaseRequest, name,
 				date, decision, narrative);
@@ -291,7 +303,7 @@ public class EarlyReleaseRequestServiceImpl
 					final EarlyReleaseRequest earlyReleaseRequest,
 					final ExternalOppositionPartyCategory party,
 					final Date date, final String narrative)
-							throws DuplicateEntityFoundException {
+							throws EarlyReleaseRequestExternalOppositionExists {
 		return this.earlyReleaseRequestExternalOppositionDelegate.create(
 				earlyReleaseRequest, party, date, narrative);
 	}
@@ -305,7 +317,7 @@ public class EarlyReleaseRequestServiceImpl
 					final EarlyReleaseRequest earlyReleaseRequest,
 					final ExternalOppositionPartyCategory party,
 					final Date date, final String narrative)
-							throws DuplicateEntityFoundException {
+							throws EarlyReleaseRequestExternalOppositionExists {
 		return this.earlyReleaseRequestExternalOppositionDelegate.update(
 				earlyReleaseRequestExternalOpposition, earlyReleaseRequest,
 				party, date, narrative);
@@ -429,5 +441,10 @@ public class EarlyReleaseRequestServiceImpl
 		return this.earlyReleaseJudgeResponseCategoryDelegate
 				.findAllCategories();
 	}
-
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<Docket> findDocketsByOffender(final Offender offender) {
+		return this.docketDelegate.findByPerson(offender);
+	}
 }

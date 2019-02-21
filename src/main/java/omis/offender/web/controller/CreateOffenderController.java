@@ -302,9 +302,11 @@ public class CreateOffenderController {
 						person.getIdentity().getBirthCountry());
 				createOffenderForm.setBirthPlace(
 						person.getIdentity().getBirthPlace());
-				createOffenderForm.setSocialSecurityNumber(
-						person.getIdentity().getSocialSecurityNumber()
-							.toString());
+				if (person.getIdentity().getSocialSecurityNumber() != null) {
+					createOffenderForm.setSocialSecurityNumber(
+							person.getIdentity().getSocialSecurityNumber()
+								.toString());
+				}
 				createOffenderForm.setStateIdNumber(
 						person.getIdentity().getStateIdNumber());
 				createOffenderForm.setSex(person.getIdentity().getSex());

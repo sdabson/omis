@@ -25,7 +25,7 @@ import omis.audit.domain.UpdateSignature;
 import omis.earlyreleasetracking.dao.EarlyReleaseRequestNoteAssociationDao;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation;
-import omis.exception.DuplicateEntityFoundException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestNoteAssociationExistsException;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -81,17 +81,18 @@ public class EarlyReleaseRequestNoteAssociationDelegate {
 	 * @param description Description
 	 * @param date Date
 	 * @return Newly created Early Release Request Note Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request Note
-	 * Association already exists with the given Date, description, and
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestNoteAssociationExistsException When a Early
+	 * Release Request Note Association already exists with the given Date,
+	 * description, and Early Release Request
 	 */
 	public EarlyReleaseRequestNoteAssociation create(
 			final EarlyReleaseRequest earlyReleaseRequest,
 			final String description, final Date date)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestNoteAssociationExistsException {
 		if (this.earlyReleaseRequestNoteAssociationDao.find(
 				earlyReleaseRequest, description, date) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestNoteAssociationExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		EarlyReleaseRequestNoteAssociation earlyReleaseRequestNoteAssociation =
@@ -125,20 +126,21 @@ public class EarlyReleaseRequestNoteAssociationDelegate {
 	 * @param description Description
 	 * @param date Date
 	 * @return Updated Early Release Request Note Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request Note
-	 * Association already exists with the given Date, description, and
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestNoteAssociationExistsException When a Early
+	 * Release Request Note Association already exists with the given Date,
+	 * description, and Early Release Request
 	 */
 	public EarlyReleaseRequestNoteAssociation update(
 			final EarlyReleaseRequestNoteAssociation
 				earlyReleaseRequestNoteAssociation,
 			final EarlyReleaseRequest earlyReleaseRequest,
 			final String description, final Date date)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestNoteAssociationExistsException {
 		if (this.earlyReleaseRequestNoteAssociationDao.findExcluding(
 				earlyReleaseRequest, description, date,
 				earlyReleaseRequestNoteAssociation) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestNoteAssociationExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 
 		earlyReleaseRequestNoteAssociation.setDate(date);

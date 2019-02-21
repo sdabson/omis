@@ -24,7 +24,7 @@
 			<many-to-one name="requestBy" column="`REQUEST_BY_USER_ACCOUNT_ID`" entity-name="omis.user.domain.UserAccount" not-null="true" />
 			<property name="approvalDate" column="`APPROVAL_DATE`" type="java.util.Date" not-null="false" />
 			<many-to-one name="requestStatus" column="`EARLY_RELEASE_STATS_CATGRY_ID`" entity-name="omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory" not-null="false" />
-			<many-to-one name="judgeResponse" column="`EAR:U_RELSE_JDG_RSPS_CAT_ID`" entity-name="omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory" not-null="false" />
+			<many-to-one name="judgeResponse" column="`EARLY_RELSE_JDG_RSPS_CAT_ID`" entity-name="omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory" not-null="false" />
 			<property name="comments" column="`COMMENTS`" type="java.lang.String" not-null="false" />
 			<component name="creationSignature">
 				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>

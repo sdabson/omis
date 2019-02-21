@@ -171,6 +171,12 @@
     		</a>
     	</li>
     </sec:authorize>
+    <sec:authorize access="hasRole('EARLY_RELEASE_REQUEST_LIST') or hasRole('ADMIN')">
+		<li  class="moduleLink">
+			<a href="${pageContext.request.contextPath}/earlyReleaseTracking/list.html?offender=${offenderSummary.id}">
+				<fmt:message key="earlyReleaseRequestLink"/></a>
+		</li>
+		</sec:authorize>
     <sec:authorize access="hasRole('ADMIN') or hasRole('EDUCATION_TERM_LIST')">
     	<li class="moduleLink">
     		<a href="${pageContext.request.contextPath}/education/list.html?offender=${offenderSummary.id}">

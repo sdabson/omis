@@ -32,7 +32,13 @@ import omis.earlyreleasetracking.domain.EarlyReleaseRequestNoteAssociation;
 import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
 import omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory;
 import omis.earlyreleasetracking.domain.InternalApprovalDecisionCategory;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestDocumentAssociationExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExistsException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExternalOppositionExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestInternalApprovalExists;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestNoteAssociationExistsException;
 import omis.exception.DuplicateEntityFoundException;
+import omis.offender.domain.Offender;
 import omis.user.domain.UserAccount;
 
 /**
@@ -57,7 +63,7 @@ public interface EarlyReleaseRequestService {
 	 * @param approvalDate Approval Date
 	 * @param comments Comments
 	 * @return Newly created Early Release Request
-	 * @throws DuplicateEntityFoundException When a Early Release Request
+	 * @throws EarlyReleaseRequestExistsException When a Early Release Request
 	 * already exists with the given Docket and Request Date
 	 */
 	EarlyReleaseRequest createEarlyReleaseRequest(Docket docket,
@@ -66,7 +72,7 @@ public interface EarlyReleaseRequestService {
 			EarlyReleaseJudgeResponseCategory judgeResponse,
 			UserAccount requestBy, Date approvalDate,
 			String comments)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestExistsException;
 	
 	/**
 	 * Update the specified Early Release Request with the given properties.
@@ -81,7 +87,7 @@ public interface EarlyReleaseRequestService {
 	 * @param approvalDate Approval Date
 	 * @param comments Comments
 	 * @return Updated Early Release Request
-	 * @throws DuplicateEntityFoundException When a Early Release Request
+	 * @throws EarlyReleaseRequestExistsException When a Early Release Request
 	 * already exists with the given Docket and Request Date
 	 */
 	EarlyReleaseRequest updateEarlyReleaseRequest(
@@ -91,7 +97,7 @@ public interface EarlyReleaseRequestService {
 			EarlyReleaseJudgeResponseCategory judgeResponse,
 			UserAccount requestBy, Date approvalDate,
 			String comments)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestExistsException;
 	
 	/**
 	 * Removes the specified Early Release Request.
@@ -108,14 +114,14 @@ public interface EarlyReleaseRequestService {
 	 * @param description Description
 	 * @param date Date
 	 * @return Newly created Early Release Request Note Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request Note
-	 * Association already exists with the given Date, description, and
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestNoteAssociationExistsException When a Early
+	 * Release Request Note Association already exists with the given Date,
+	 * description, and Early Release Request
 	 */
 	EarlyReleaseRequestNoteAssociation createEarlyReleaseRequestNoteAssociation(
 			EarlyReleaseRequest earlyReleaseRequest,
 			String description, Date date)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestNoteAssociationExistsException;
 	
 	/**
 	 * Updates the specified Early Release Request Note Association with the
@@ -127,16 +133,16 @@ public interface EarlyReleaseRequestService {
 	 * @param description Description
 	 * @param date Date
 	 * @return Updated Early Release Request Note Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request Note
-	 * Association already exists with the given Date, description, and
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestNoteAssociationExistsException When a Early
+	 * Release Request Note Association already exists with the given Date,
+	 * description, and Early Release Request
 	 */
 	EarlyReleaseRequestNoteAssociation updateEarlyReleaseRequestNoteAssociation(
 			EarlyReleaseRequestNoteAssociation
 				earlyReleaseRequestNoteAssociation,
 			EarlyReleaseRequest earlyReleaseRequest,
 			String description, Date date)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestNoteAssociationExistsException;
 	
 	/**
 	 * Removes the specified Early Release Request Note Association.
@@ -155,14 +161,14 @@ public interface EarlyReleaseRequestService {
 	 * @param document Document
 	 * @param earlyReleaseRequest Early Release Request
 	 * @return Newly created Early Release Request Document Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Document Association already exists with the given Document and
+	 * @throws EarlyReleaseRequestDocumentAssociationExists When a Early Release
+	 * Request Document Association already exists with the given Document and
 	 * Early Release Request.
 	 */
 	EarlyReleaseRequestDocumentAssociation
 		createEarlyReleaseRequestDocumentAssociation(Document document,
 			EarlyReleaseRequest earlyReleaseRequest)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestDocumentAssociationExists;
 	
 	/**
 	 * Updates the specified Early Release Request Document Association with
@@ -173,8 +179,8 @@ public interface EarlyReleaseRequestService {
 	 * @param document Document
 	 * @param earlyReleaseRequest Early Release Request
 	 * @return Updated Early Release Request Document Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Document Association already exists with the given Document and
+	 * @throws EarlyReleaseRequestDocumentAssociationExists When a Early Release
+	 * Request Document Association already exists with the given Document and
 	 * Early Release Request.
 	 */
 	EarlyReleaseRequestDocumentAssociation
@@ -182,7 +188,7 @@ public interface EarlyReleaseRequestService {
 			EarlyReleaseRequestDocumentAssociation
 				earlyReleaseRequestDocumentAssociation, Document document,
 			EarlyReleaseRequest earlyReleaseRequest)
-						throws DuplicateEntityFoundException;
+						throws EarlyReleaseRequestDocumentAssociationExists;
 	
 	/**
 	 * Removes the given Early Release Request Document Association.
@@ -204,9 +210,9 @@ public interface EarlyReleaseRequestService {
 	 * @param decision Decision
 	 * @param narrative Narrative
 	 * @return Newly created Early Release Request Internal Approval
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Internal Approval already exists with the given Name and Early Release
-	 * Request.
+	 * @throws EarlyReleaseRequestInternalApprovalExists When a Early Release
+	 * Request Internal Approval already exists with the given Name and Early
+	 * Release Request.
 	 */
 	EarlyReleaseRequestInternalApproval
 		createEarlyReleaseRequestInternalApproval(
@@ -214,7 +220,7 @@ public interface EarlyReleaseRequestService {
 			String name, Date date,
 			InternalApprovalDecisionCategory decision,
 			String narrative)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestInternalApprovalExists;
 	
 	/**
 	 * Updates the specified Early Release Request Internal Approval with the
@@ -228,9 +234,9 @@ public interface EarlyReleaseRequestService {
 	 * @param decision Decision
 	 * @param narrative Narrative
 	 * @return Updated Early Release Request Internal Approval
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Internal Approval already exists with the given Name and Early Release
-	 * Request.
+	 * @throws EarlyReleaseRequestInternalApprovalExists When a Early Release
+	 * Request Internal Approval already exists with the given Name and Early
+	 * Release Request.
 	 */
 	EarlyReleaseRequestInternalApproval
 		updateEarlyReleaseRequestInternalApproval(
@@ -240,7 +246,7 @@ public interface EarlyReleaseRequestService {
 			String name, Date date,
 			InternalApprovalDecisionCategory decision,
 			String narrative)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestInternalApprovalExists;
 	
 	/**
 	 * Removes the specified Early Release Request Internal Approval.
@@ -261,16 +267,16 @@ public interface EarlyReleaseRequestService {
 	 * @param date Date
 	 * @param narrative Narrative
 	 * @return Newly created Early Release Request External Opposition
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * External Opposition already exists with the given party for the specified
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestExternalOppositionExists When a Early Release
+	 * Request External Opposition already exists with the given party for the
+	 * specified Early Release Request
 	 */
 	EarlyReleaseRequestExternalOpposition
 		createEarlyReleaseRequestExternalOpposition(
 			EarlyReleaseRequest earlyReleaseRequest,
 			ExternalOppositionPartyCategory party, Date date,
 			String narrative)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestExternalOppositionExists;
 	
 	/**
 	 * Updates the specified Early Release Request External Opposition with
@@ -283,9 +289,9 @@ public interface EarlyReleaseRequestService {
 	 * @param date Date
 	 * @param narrative Narrative
 	 * @return Updated Early Release Request External Opposition
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * External Opposition already exists with the given party for the specified
-	 * Early Release Request
+	 * @throws EarlyReleaseRequestExternalOppositionExists When a Early Release
+	 * Request External Opposition already exists with the given party for the
+	 * specified Early Release Request
 	 */
 	EarlyReleaseRequestExternalOpposition
 		updateEarlyReleaseRequestExternalOpposition(
@@ -294,7 +300,7 @@ public interface EarlyReleaseRequestService {
 			EarlyReleaseRequest earlyReleaseRequest,
 			ExternalOppositionPartyCategory party, Date date,
 			String narrative)
-					throws DuplicateEntityFoundException;
+					throws EarlyReleaseRequestExternalOppositionExists;
 	
 	/**
 	 * Removes the specified Early Release Request External Opposition.
@@ -445,4 +451,12 @@ public interface EarlyReleaseRequestService {
 	 */
 	List<EarlyReleaseJudgeResponseCategory>
 		findEarlyReleaseJudgeResponseCategories();
+	
+	/**
+	 * Returns a list of dockets for the specified offender.
+	 * 
+	 * @param offender Offender
+	 * @return list of dockets
+	 */
+	List<Docket> findDocketsByOffender(Offender offender);
 }

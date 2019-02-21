@@ -27,7 +27,7 @@ import omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestCategory;
 import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
-import omis.exception.DuplicateEntityFoundException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestExistsException;
 import omis.instance.factory.InstanceFactory;
 import omis.user.domain.UserAccount;
 
@@ -83,7 +83,7 @@ public class EarlyReleaseRequestDelegate {
 	 * @param approvalDate Approval Date
 	 * @param comments Comments
 	 * @return Newly created Early Release Request
-	 * @throws DuplicateEntityFoundException When a Early Release Request
+	 * @throws EarlyReleaseRequestExistsException When a Early Release Request
 	 * already exists with the given Docket and Request Date
 	 */
 	public EarlyReleaseRequest create(final Docket docket,
@@ -92,9 +92,10 @@ public class EarlyReleaseRequestDelegate {
 			final EarlyReleaseJudgeResponseCategory judgeResponse,
 			final UserAccount requestBy, final Date approvalDate,
 			final String comments)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExistsException {
 		if (this.earlyReleaseRequestDao.find(docket, requestDate) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		EarlyReleaseRequest earlyReleaseRequest = 
@@ -133,7 +134,7 @@ public class EarlyReleaseRequestDelegate {
 	 * @param approvalDate Approval Date
 	 * @param comments Comments
 	 * @return Updated Early Release Request
-	 * @throws DuplicateEntityFoundException When a Early Release Request
+	 * @throws EarlyReleaseRequestExistsException When a Early Release Request
 	 * already exists with the given Docket and Request Date
 	 */
 	public EarlyReleaseRequest update(
@@ -143,10 +144,11 @@ public class EarlyReleaseRequestDelegate {
 			final EarlyReleaseJudgeResponseCategory judgeResponse,
 			final UserAccount requestBy, final Date approvalDate,
 			final String comments)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestExistsException {
 		if (this.earlyReleaseRequestDao.findExcluding(docket, requestDate,
 				earlyReleaseRequest) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestExistsException(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 
 		earlyReleaseRequest.setApprovalDate(approvalDate);

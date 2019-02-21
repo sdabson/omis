@@ -25,7 +25,7 @@ import omis.document.domain.Document;
 import omis.earlyreleasetracking.dao.EarlyReleaseRequestDocumentAssociationDao;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestDocumentAssociation;
-import omis.exception.DuplicateEntityFoundException;
+import omis.earlyreleasetracking.exception.EarlyReleaseRequestDocumentAssociationExists;
 import omis.instance.factory.InstanceFactory;
 
 /**
@@ -79,17 +79,18 @@ public class EarlyReleaseRequestDocumentAssociationDelegate {
 	 * @param document Document
 	 * @param earlyReleaseRequest Early Release Request
 	 * @return Newly created Early Release Request Document Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Document Association already exists with the given Document and
-	 * Early Release Request.
+	 * @throws EarlyReleaseRequestDocumentAssociationExists When a Early
+	 * Release Request Document Association already exists with the given
+	 * Document and Early Release Request.
 	 */
 	public EarlyReleaseRequestDocumentAssociation create(
 			final Document document,
 			final EarlyReleaseRequest earlyReleaseRequest)
-					throws DuplicateEntityFoundException {
+					throws EarlyReleaseRequestDocumentAssociationExists {
 		if (this.earlyReleaseRequestDocumentAssociationDao.find(
 				earlyReleaseRequest, document) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestDocumentAssociationExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		EarlyReleaseRequestDocumentAssociation
@@ -122,19 +123,20 @@ public class EarlyReleaseRequestDocumentAssociationDelegate {
 	 * @param document Document
 	 * @param earlyReleaseRequest Early Release Request
 	 * @return Updated Early Release Request Document Association
-	 * @throws DuplicateEntityFoundException When a Early Release Request
-	 * Document Association already exists with the given Document and
+	 * @throws EarlyReleaseRequestDocumentAssociationExists When a Early Release
+	 * Request Document Association already exists with the given Document and
 	 * Early Release Request.
 	 */
 	public EarlyReleaseRequestDocumentAssociation update(
 			final EarlyReleaseRequestDocumentAssociation
 				earlyReleaseRequestDocumentAssociation, final Document document,
 			final EarlyReleaseRequest earlyReleaseRequest)
-						throws DuplicateEntityFoundException {
+						throws EarlyReleaseRequestDocumentAssociationExists {
 		if (this.earlyReleaseRequestDocumentAssociationDao.findExcluding(
 				earlyReleaseRequest, document,
 				earlyReleaseRequestDocumentAssociation) != null) {
-			throw new DuplicateEntityFoundException(DUPLICATE_ENTITY_FOUND_MSG);
+			throw new EarlyReleaseRequestDocumentAssociationExists(
+					DUPLICATE_ENTITY_FOUND_MSG);
 		}
 		
 		earlyReleaseRequestDocumentAssociation.setDocument(document);

@@ -12,7 +12,7 @@
 					<param name="sequence">`EARLY_RELSE_RQST_EXT_OPPSN_SEQ`</param>
 				</generator>
 			</id>
-			<many-to-one name="party" column="`EARLY_REKSE_OPSN_PRTY_CAT_ID`" entity-name="omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory" not-null="true" />
+			<many-to-one name="party" column="`EARLY_RELSE_OPSN_PRTY_CAT_ID`" entity-name="omis.earlyreleasetracking.domain.ExternalOppositionPartyCategory" not-null="true" />
 			<property name="narrative" column="`NARRATIVE`" type="java.lang.String" not-null="true" />
 			<many-to-one name="earlyReleaseRequest" column="`EARLY_RELEASE_REQUEST_ID`" entity-name="omis.earlyreleasetracking.domain.EarlyReleaseRequest" not-null="true" />
 			<property name="date" column="`DATE`" type="java.util.Date" not-null="true" />
