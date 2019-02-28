@@ -13,23 +13,17 @@ window.onload = function() {
 				document.getElementById("photoPreviewFieldGroup"), document.getElementById("photoPreview"),
 				document.getElementById("photoFile"), document.getElementById("photoData"),
 				refreshOffenderPhoto, function() { 
-					if(allowEnhancedImageEditor) {
 						assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
-					}
 				},
 				640, 480);
 	}
 	if(document.getElementById("photoPreview").classList.contains("enhancedImageUploadResultImage")) {
-		if(allowEnhancedImageEditor) {
 			document.getElementById("photoPreview").onload = function() {
 				assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
 			};
-		}
 	}
-	if(allowEnhancedImageEditor) {
-		if(document.getElementById("photoData") && document.getElementById("photoData").value != "") {
-			assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
-		}
+	if(document.getElementById("photoData") && document.getElementById("photoData").value != "") {
+		assignSingleImageEdit(document.getElementById("photoPreview"), refreshOffenderPhoto, 640, 480);
 	}
 	applyFormUpdateChecker(document.getElementById("offenderPhotoForm"));
 	applyActionMenu(document.getElementById("actionMenuLink"));

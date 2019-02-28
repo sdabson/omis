@@ -21,7 +21,7 @@
  * Author: Joel Norris
  * Author: Annie Wahl
  * Author: Josh Divine
- * Version: 0.1.3 (Jan 29, 2019)
+ * Version: 0.1.4 (Feb 27, 2019)
  * Since: OMIS 3.0
  */
 window.onload = function() {
@@ -51,5 +51,29 @@ window.onload = function() {
 				document.getElementById("currentUserAccount"));
 		applyDatePicker(document.getElementById("startDate"));
 		applyDatePicker(document.getElementById("endDate"));
+		
+		applyFieldFocus("searchByUser", "userAccountInput");
+		applyInputFocus("userAccountInput", "searchByUser");
+		applyFieldFocus("searchByName", "lastName");
+		applyInputFocus("lastName", "searchByName");
+		applyInputFocus("firstName", "searchByName");
+		
+		// Focuses input when label or radio box is clicked
+		function applyFieldFocus(radioEltName, inputEltName) {
+			var radioElt = document.getElementById(radioEltName);
+			var inputElt = document.getElementById(inputEltName);
+			radioElt.onfocus = function() {
+				inputElt.focus();
+			};
+		}
+		
+		// Checks radio button when input is focused
+		function applyInputFocus(inputEltName, radioEltName) {
+			var inputElt = document.getElementById(inputEltName);
+			var radioElt = document.getElementById(radioEltName);
+			inputElt.onfocus = function() {
+				radioElt.checked = true;
+			};
+		}
 	}
 }

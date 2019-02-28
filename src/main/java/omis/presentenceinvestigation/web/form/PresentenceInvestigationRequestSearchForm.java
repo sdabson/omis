@@ -25,7 +25,7 @@ import omis.user.domain.UserAccount;
  * Presentence Investigation Request Search Form.
  * 
  *@author Annie Wahl 
- *@version 0.1.0 (Jan 28, 2019)
+ *@version 0.1.1 (Feb 26, 2019)
  *@since OMIS 3.0
  *
  */
@@ -38,6 +38,12 @@ public class PresentenceInvestigationRequestSearchForm implements Serializable {
 	private Date startDate;
 	
 	private Date endDate;
+	
+	private Boolean userSearch;
+	
+	private String lastName;
+	
+	private String firstName;
 	
 	/**
 	 * Default constructor for PresentenceInvestigationRequestForm.
@@ -97,5 +103,59 @@ public class PresentenceInvestigationRequestSearchForm implements Serializable {
 	 */
 	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
+	}
+
+	/**
+	 * Returns the userSearch.
+	 *
+	 * @return userSearch
+	 */
+	public Boolean getUserSearch() {
+		return this.userSearch;
+	}
+
+	/**
+	 * Sets the userSearch.
+	 *
+	 * @param userSearch - userSearch
+	 */
+	public void setUserSearch(Boolean userSearch) {
+		this.userSearch = userSearch;
+	}
+
+	/**
+	 * Returns the lastName.
+	 *
+	 * @return lastName
+	 */
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	/**
+	 * Sets the lastName.
+	 *
+	 * @param lastName - lastName
+	 */
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	/**
+	 * Returns the firstName.
+	 *
+	 * @return firstName
+	 */
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	/**
+	 * Sets the firstName.
+	 *
+	 * @param firstName - firstName
+	 */
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 }

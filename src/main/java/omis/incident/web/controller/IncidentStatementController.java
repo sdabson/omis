@@ -1,6 +1,7 @@
 package omis.incident.web.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -52,9 +53,11 @@ import omis.incident.web.form.IncidentStatementNoteItem;
 import omis.incident.web.form.IncidentStatementNoteItemOperation;
 import omis.incident.web.form.InvolvedPartyItem;
 import omis.incident.web.form.InvolvedPartyItemOperation;
+import omis.incident.web.form.InvolvedPartyOption;
 import omis.incident.web.form.InvolvedPersonItem;
 import omis.incident.web.form.SearchIncidentStatementForm;
 import omis.incident.web.validator.IncidentStatementFormValidator;
+import omis.incident.web.validator.SearchIncidentStatementFormValidator;
 import omis.location.domain.Location;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
@@ -70,13 +73,16 @@ import omis.util.DateManipulator;
  * 
  * @author Joel Norris
  * @author Yidong Li
- * @version 0.1.0 (Sep 6, 2015)
+ * @version 0.1.1 (February 6, 2019)
  * @since OMIS 3.0
  */
 @Controller
 @RequestMapping("/incident/statement")
 @PreAuthorize("hasRole('USER')")
 public class IncidentStatementController {
+	
+	/* Global values */
+	private static final long DAY_LENGTH = 24 * 60 * 60 * 1000;
 	
 	/* Redirect URLs. */
 	
@@ -140,81 +146,58 @@ public class IncidentStatementController {
 	private static final String INCIDENT_STATEMENT_ROW_ACTION_MENU_VIEW_NAME
 		= "incident/statement/includes/incidentStatementRowActionMenu";
 	
+	private static final String SEARCH_INCIDENT_STATEMENT_VIEW_NAME
+		= "incident/statement/search";
+	
 	/* Model keys. */
 
 	private static final String BOOLEAN_VALUE_MODEL_KEY = "booleanValue";
-	
 	private static final String INCIDENT_STATEMENT_MODEL_KEY
 		= "incidentStatement";
-	
 	private static final String JURISDICTIONS_MODEL_KEY
 		= "jurisdictions";
-	
 	private static final String ROOMS_MODEL_KEY = "rooms";
-	
 	private static final String SECTIONS_MODEL_KEY = "sections";
-	
 	private static final String LEVELS_MODEL_KEY = "levels";
-	
 	private static final String UNITS_MODEL_KEY = "units";
-	
 	private static final String COMPLEXES_MODEL_KEY = "complexes";
-
 	private static final String FACILITIES_MODEL_KEY = "facilities";
-	
 	private static final String EDIT_FORM_MODEL_KEY = "incidentStatementForm";
-	
 	private static final String INVOLVED_PARTY_ITEM_MODEL_KEY
 		= "involvedPartyItem";
-	
 	private static final String INVOLVED_PARTY_ITEM_INDEX_MODEL_KEY
 		= "involvedPartyItemIndex";
-	
 	private static final String INVOLVED_PERSON_ITEM_MODEL_KEY
 		= "involvedPersonItem";
-	
 	private static final String INVOLVED_PERSON_ITEM_INDEX_MODEL_KEY
 		= "involvedPersonItemIndex";
-	
 	private static final String INCIDENT_STATEMENT_NOTE_ITEM_MODEL_KEY
 		= "incidentStatementNoteItem";
-	
 	private static final String INCIDENT_STATEMENT_NOTE_ITEM_INDEX_MODEL_KEY
 		= "incidentStatementNoteItemIndex";
-	
 	private static final String INVOLVED_PARTY_CATEGORIES_MODEL_KEY
 		= "involvedPartyCategories";
-	
 	private static final String INVOLVED_PARTY_CATEGORY_MODEL_KEY
 		= "involvedPartyCategory";
-	
 	private static final String INCIDENT_REPORT_NUMBER_MODEL_KEY
 		= "incidentReportNumber";
-	
 	private static final String SEARCH_INCIDENT_REPORT_FORM_MODEL_KEY
 		= "searchIncidentReportForm";
-	
 	private static final String SUMMARY_MAP_MODEL_KEY
 		= "summaryMap";
-	
 	private static final String INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY 
 		= "incidentStatementSummaries";
-	
 	private static final String USER_ACCOUNT_MODEL_KEY
 		= "AuditComponentRetrieverSpringMvcImpl#auditUserAccount";
-	
 	private static final String INFORMATION_SOURCE_CATEGORIES_MODEL_KEY
 		= "informationSourceCategories";
-	
 	private static final String INFORMATION_SOURCE_CATEGORY_MODEL_KEY
 		= "informationSourceCategory";
-	
 	private static final String INCIDENT_CATEGORIES_MODEL_KEY = "categories";
-	
-//	private static final String
-//	INCIDENT_STATEMENT_SUBMISSION_CATEGORIES_MODEL_KEY = "submissionCategories";
-	
 	private static final String FACILITY_AREAS_MODEL_KEY = "facilityAreas";
+	private static final String SEARCH_INCIDENT_STATEMENT_FORM_MODEL_KEY
+	= "searchIncidentStatementForm";
+	private static final String INVOLVED_PARTY_OPTIONS_MODEL_KEY = "involvedPartyOptions";
 	
 	/* Report names. */
 	private static final String STATEMENT_OF_INCIDENT_REPORT_NAME
@@ -318,6 +301,10 @@ public class IncidentStatementController {
 	@Autowired
 	@Qualifier("incidentStatementFormValidator")
 	private IncidentStatementFormValidator incidentStatementFormValidator;
+	
+	@Autowired
+	@Qualifier("searchIncidentStatementFormValidator")
+	private SearchIncidentStatementFormValidator searchIncidentStatementFormValidator;
 	
 	/* Report runners. */
 	
@@ -774,10 +761,89 @@ public class IncidentStatementController {
 			searchIncidentReportForm);
 		mav.addObject(JURISDICTIONS_MODEL_KEY,
 				this.incidentStatementService.findJurisdictions());
-		mav.addObject(INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY,
-				this.incidentStatementSummaryService.findByCurrentUser());
+		List<IncidentStatementSummary> incidentStatementSummaries =
+				this.incidentStatementSummaryService.findByCurrentUser();
+		mav.addObject(INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY, incidentStatementSummaries);
 		mav.addObject(INVOLVED_PERSON_ITEM_INDEX_MODEL_KEY, 0);
+		Map<IncidentStatementSummary, List<InvolvedPartySummary>> summaryMap 
+		= new HashMap<IncidentStatementSummary, List<InvolvedPartySummary>>();
+		List<InvolvedPartySummary> involvedPartySummaries;
+		for(IncidentStatementSummary incidentStatementSummary
+				: incidentStatementSummaries){
+			involvedPartySummaries = this.incidentStatementSummaryService
+				.findInvolvedParties(incidentStatementSummary.getId());
+			summaryMap.put(incidentStatementSummary, involvedPartySummaries);
+		}
+		mav.addObject(SUMMARY_MAP_MODEL_KEY, summaryMap);
 		return mav;
+	}
+	
+	@RequestMapping(value="/search.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('INCIDENT_STATEMENT_SEARCH') or hasRole('ADMIN')")
+	public ModelAndView search(@RequestParam(value = "jurisdiction", required = false)
+		final Jurisdiction jurisdiction) {
+		ModelMap map = new ModelMap();
+		SearchIncidentStatementForm form = new SearchIncidentStatementForm();
+		if(jurisdiction != null) {
+			form.setJurisdiction(jurisdiction);
+			form.setStartDate(new Date(new Date().getTime() - (30*DAY_LENGTH)));
+			form.setEndDate(new Date());
+			List<IncidentStatementSummary> summaries =
+					this.incidentStatementSummaryService
+					.findByCriteria(form.getStartDate(), form.getEndDate(),
+							jurisdiction, null, null, null, null, null, null);
+			map.addAttribute(INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY, summaries);
+			map.addAttribute(INVOLVED_PERSON_ITEM_INDEX_MODEL_KEY, 0);
+			Map<IncidentStatementSummary, List<InvolvedPartySummary>> summaryMap 
+			= new HashMap<IncidentStatementSummary, List<InvolvedPartySummary>>();
+			List<InvolvedPartySummary> involvedPartySummaries;
+			for(IncidentStatementSummary summary : summaries){
+				involvedPartySummaries = this.incidentStatementSummaryService
+					.findInvolvedParties(summary.getId());
+				summaryMap.put(summary, involvedPartySummaries);
+			}
+			map.addAttribute(SUMMARY_MAP_MODEL_KEY, summaryMap);
+		}
+		return this.prepareSearchIncidentStatementModelAndView(map, form);
+	}
+
+	
+	/**
+	 * Search for incident statements with the specified criteria from the search incident statement form.
+	 * 
+	 * @return view to display the incident search form
+	 */
+	@RequestMapping(value="/searchResults.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('INCIDENT_STATEMENT_SEARCH') or hasRole('ADMIN')")
+	public ModelAndView searchResult(final SearchIncidentStatementForm form,
+			BindingResult result) {
+		ModelMap map = new ModelMap();
+		this.searchIncidentStatementFormValidator.validate(form, result);
+		if(result.hasErrors()) {
+			map.addAttribute(BindingResult.MODEL_KEY_PREFIX
+					+ SEARCH_INCIDENT_STATEMENT_FORM_MODEL_KEY, result);
+			return this.prepareSearchIncidentStatementModelAndView(map, form);
+		}
+		List<String> searchTerms = new ArrayList<String>(Arrays.asList(
+				form.getKeywords().split(" ")));
+		List<IncidentStatementSummary> summaries =
+				this.incidentStatementSummaryService
+				.findByCriteria(form.getStartDate(), form.getEndDate(),
+						form.getJurisdiction(), form.getCategory(), form.getReporter(),
+						form.getTitle(), searchTerms,
+						form.getInvolvedParty(), form.getInvolvedPartyName());
+		map.addAttribute(INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY, summaries);
+		map.addAttribute(INVOLVED_PERSON_ITEM_INDEX_MODEL_KEY, 0);
+		Map<IncidentStatementSummary, List<InvolvedPartySummary>> summaryMap 
+		= new HashMap<IncidentStatementSummary, List<InvolvedPartySummary>>();
+		List<InvolvedPartySummary> involvedPartySummaries;
+		for(IncidentStatementSummary summary : summaries){
+			involvedPartySummaries = this.incidentStatementSummaryService
+				.findInvolvedParties(summary.getId());
+			summaryMap.put(summary, involvedPartySummaries);
+		}
+		map.addAttribute(SUMMARY_MAP_MODEL_KEY, summaryMap);
+		return this.prepareSearchIncidentStatementModelAndView(map, form);
 	}
 	
 	/**
@@ -794,63 +860,6 @@ public class IncidentStatementController {
 		ModelMap map = new ModelMap();
 		map.addAttribute(INCIDENT_STATEMENT_MODEL_KEY, incidentStatement);
 		return new ModelAndView(INCIDENT_STATEMENT_ROW_ACTION_MENU_VIEW_NAME, map);
-	}
-	
-	/**
-	 * Search for incident with the specified criteria.
-	 * 
-	 * @return view to display the incident search form
-	 */
-	@RequestMapping(value="/list.html", method = RequestMethod.POST)
-	public ModelAndView searchResult(
-		final SearchIncidentStatementForm form) {
-		Map<IncidentStatementSummary, List<InvolvedPartySummary>> summaryMap 
-			= new HashMap<IncidentStatementSummary, List<InvolvedPartySummary>>();
-		final List<IncidentStatementSummary> incidentStatementSummaries;
-		final List<Person> involvedPeople = new ArrayList<Person>();
-		if (form.getItems() != null && !form.getItems().isEmpty()) {
-			for (int i = 0; i < form.getItems().size(); i++) {
-				InvolvedPersonItem item = form.getItems().get(i);
-				if(item.getPerson() != null) {
-					involvedPeople.add(item.getPerson());
-				} else {
-					form.getItems().remove(i);
-				}
-			}
-		}
-		if (!involvedPeople.isEmpty()) {
-			incidentStatementSummaries = this.incidentStatementSummaryService
-					.findByInvolvedPeople(form.getStartDate(),
-							form.getEndDate(), form.getJurisdiction(),
-							form.getLocation(),
-							involvedPeople);
-		} else {
-			incidentStatementSummaries = this.incidentStatementSummaryService
-					.findByLocation(form.getStartDate(), form.getEndDate(),
-							form.getJurisdiction(), form.getLocation());
-		}
-		List<InvolvedPartySummary> involvedPartySummaries;
-		for(IncidentStatementSummary incidentStatementSummary
-				: incidentStatementSummaries){
-			involvedPartySummaries = this.incidentStatementSummaryService
-				.findInvolvedParties(incidentStatementSummary.getId());
-			summaryMap.put(incidentStatementSummary, involvedPartySummaries);
-		}
-		ModelAndView mav = new ModelAndView(LIST_VIEW_NAME);
-		mav.addObject(SUMMARY_MAP_MODEL_KEY, summaryMap);
-		mav.addObject(INCIDENT_STATEMENT_SUMMARIES_MODEL_KEY,
-				incidentStatementSummaries);
-		mav.addObject(SEARCH_INCIDENT_REPORT_FORM_MODEL_KEY, form);
-		final int index;
-		if (form.getItems() != null) {
-			index=form.getItems().size();
-		} else {
-			index = 0;
-		}
-		mav.addObject(JURISDICTIONS_MODEL_KEY, this.incidentStatementService
-				.findJurisdictions());
-		mav.addObject(INVOLVED_PERSON_ITEM_INDEX_MODEL_KEY, index);
-		return mav;
 	}
 	
 	/**
@@ -890,8 +899,6 @@ public class IncidentStatementController {
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);
 	}
-	
-	/* TODO: Figure this out */
 	
 	/**
 	 * Reserved for extending session.
@@ -1044,6 +1051,25 @@ public class IncidentStatementController {
 //				IncidentStatementSubmissionCategory.values());
 		map.addAttribute(EDIT_FORM_MODEL_KEY, form);
 		return new ModelAndView(EDIT_VIEW_NAME, map);
+	}
+	
+
+	/*
+	 * Prepares a model and view for search incident statements.
+	 * 
+	 * @param map model map
+	 * @param form search incident statement form
+	 * @return model and view for search incident statements
+	 */
+	private ModelAndView prepareSearchIncidentStatementModelAndView(final ModelMap map,
+			final SearchIncidentStatementForm form) {
+		map.addAttribute(SEARCH_INCIDENT_STATEMENT_FORM_MODEL_KEY, form);
+		map.addAttribute(JURISDICTIONS_MODEL_KEY,
+				this.incidentStatementService.findJurisdictions());
+		map.addAttribute(INCIDENT_CATEGORIES_MODEL_KEY,
+				this.incidentStatementService.findCategories());
+		map.addAttribute(INVOLVED_PARTY_OPTIONS_MODEL_KEY, InvolvedPartyOption.values());
+		return new ModelAndView(SEARCH_INCIDENT_STATEMENT_VIEW_NAME, map);
 	}
 	
 	/*

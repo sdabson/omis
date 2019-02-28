@@ -37,4 +37,140 @@
 		where
 			offender = :offender
 	]]></query>
+	
+	<query name="findEarlyReleaseRequestSummariesByDatesWithStatus"><![CDATA[
+		select new omis.earlyreleasetracking.report.EarlyReleaseRequestSummary(
+			earlyReleaseRequest.id,
+			cast(earlyReleaseRequest.category as string),
+			earlyReleaseRequest.requestDate,
+			docket.value,
+			judgeResponse.name,
+			statusCategory.name,
+			name.lastName,
+			name.firstName,
+			name.middleName,
+			offender.id,
+			cast((select offender2.offenderNumber
+				from
+					omis.offender.domain.Offender offender2
+				where
+					offender2 = offender
+			) as string) as offenderNumber,
+			prisonTerm.paroleEligibilityDate,
+			(select placementTerm.dateRange.startDate
+				from
+					omis.supervision.domain.PlacementTerm placementTerm
+				inner join
+					placementTerm.offender pmOffender
+				inner join
+					placementTerm.correctionalStatusTerm correctionalStatusTerm
+				inner join
+					correctionalStatusTerm.correctionalStatus correctionalStatus
+				where
+					(pmOffender = offender
+					and
+						(placementTerm.dateRange.startDate is null
+						or
+						(placementTerm.dateRange.startDate <= :effectiveDate
+						and (placementTerm.dateRange.endDate > :effectiveDate
+							or placementTerm.dateRange.endDate is null)))
+					and
+						upper(correctionalStatus.name) = 'PROBATION')
+					or
+						placementTerm is null
+			),
+			(select residenceTerm.dateRange.startDate
+				from
+					omis.residence.domain.ResidenceTerm residenceTerm
+				inner join
+					residenceTerm.person rtPerson
+				where
+					(rtPerson = offender
+					and
+						(residenceTerm.dateRange.startDate is null
+						or
+						(residenceTerm.dateRange.startDate <= :effectiveDate
+						and (residenceTerm.dateRange.endDate > :effectiveDate
+							or residenceTerm.dateRange.endDate is null)))
+					and
+						residenceTerm.category = 'PRIMARY')
+					or
+						residenceTerm is null
+			),
+			(select min(employmentTerm.dateRange.startDate)
+			from
+				omis.employment.domain.EmploymentTerm employmentTerm
+			inner join
+				employmentTerm.offender etOffender
+			where
+				etOffender = offender
+				and
+					(employmentTerm.dateRange.startDate is null
+					or
+					(employmentTerm.dateRange.startDate <= :effectiveDate
+					and (employmentTerm.dateRange.endDate > :effectiveDate
+						or employmentTerm.dateRange.endDate is null)))
+				or
+					employmentTerm is null
+			group by employmentTerm.dateRange.startDate)
+		)
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseRequest earlyReleaseRequest
+		inner join
+			earlyReleaseRequest.docket docket
+		left outer join
+			earlyReleaseRequest.judgeResponse judgeResponse
+		left outer join
+			earlyReleaseRequest.requestStatus statusCategory
+		inner join
+			docket.person offender
+		inner join
+			offender.name name,
+				omis.prisonterm.domain.PrisonTerm prisonTerm
+		inner join
+			prisonTerm.offender ptOffender
+		where
+			offender = ptOffender
+		and
+			prisonTerm.paroleEligibilityDate is not null
+		and
+			prisonTerm.status is 'ACTIVE'
+		and
+			(
+				(prisonTerm.paroleEligibilityDate >= :eligibilityStartDate
+					or :eligibilityStartDate is null)
+				and
+				(prisonTerm.paroleEligibilityDate <= :eligibilityEndDate
+					or :eligibilityEndDate is null)
+				or
+				(:eligibilityStartDate is null
+					and :eligibilityEndDate is null)
+			)
+		and
+			(
+				(earlyReleaseRequest.requestDate >= :requestStartDate
+					or :requestStartDate is null)
+				and
+				(earlyReleaseRequest.requestDate <= :requestEndDate
+					or :requestEndDate is null)
+				or
+				(:requestStartDate is null
+					and :requestEndDate is null)
+			)
+		and
+			(
+				prisonTerm.paroleEligibilityDate >= :eligibilityDate
+					or :eligibilityDate is null
+			)
+		and
+			(
+				earlyReleaseRequest.requestDate >= :requestDate
+					or :requestDate is null
+			)
+		and
+			(
+				statusCategory = :requestStatus
+					or :requestStatus is null
+			)
+	]]></query>
 </hibernate-mapping>

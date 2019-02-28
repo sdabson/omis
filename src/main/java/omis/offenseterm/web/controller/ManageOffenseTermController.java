@@ -54,6 +54,7 @@ import omis.courtcase.domain.OffenderDangerDesignator;
 import omis.courtcase.domain.component.CourtCaseFlags;
 import omis.courtcase.domain.component.CourtCasePersonnel;
 import omis.courtcase.exception.CourtCaseExistsException;
+import omis.courtcase.web.form.CourtCaseFields;
 import omis.docket.domain.Docket;
 import omis.docket.exception.DocketExistsException;
 import omis.offender.domain.Offender;
@@ -385,34 +386,7 @@ public class ManageOffenseTermController {
 				courtCase.getDocket().getCourt());
 		offenseTermForm.getDocketFields().setValue(
 				courtCase.getDocket().getValue());
-		offenseTermForm.getFields().setInterState(courtCase.getInterState());
-		offenseTermForm.getFields().setInterStateNumber(
-				courtCase.getInterStateNumber());
-		offenseTermForm.getFields().setPronouncementDate(
-				courtCase.getPronouncementDate());
-		offenseTermForm.getFields().setJurisdictionAuthority(
-				courtCase.getJurisdictionAuthority());
-		offenseTermForm.getFields().setComments(courtCase.getComments());
-		if (courtCase.getPersonnel() != null) {
-			offenseTermForm.getFields().setJudge(
-					courtCase.getPersonnel().getJudge());
-			offenseTermForm.getFields().setDefenseAttorneyName(
-					courtCase.getPersonnel().getDefenseAttorneyName());
-			offenseTermForm.getFields().setProsecutingAttorneyName(
-					courtCase.getPersonnel().getProsecutingAttorneyName());
-		}
-		offenseTermForm.getFields().setSentenceReviewDate(
-				courtCase.getSentenceReviewDate());
-		offenseTermForm.getFields().setDangerDesignator(
-				courtCase.getDangerDesignator());
-		if (courtCase.getFlags() != null) {
-			offenseTermForm.getFields().setConvictionOverturned(
-					courtCase.getFlags().getConvictionOverturned());
-			offenseTermForm.getFields().setCriminallyConvictedYouth(
-					courtCase.getFlags().getCriminallyConvictedYouth());
-			offenseTermForm.getFields().setYouthTransfer(
-					courtCase.getFlags().getYouthTransfer());
-		}
+		offenseTermForm.setFields(new CourtCaseFields(courtCase));
 		List<OffenseItem> offenses = this.buildOffenseItems(
 				courtCase, expandedSentence);
 		Map<Conviction, List<SentenceSummary>>

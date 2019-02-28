@@ -32,7 +32,7 @@ import omis.user.domain.UserAccount;
  * 
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.5 (Jan 25, 2019)
+ * @version 0.1.6 (Feb 26, 2019)
  * @since OMIS 3.0
  */
 public class 
@@ -56,6 +56,12 @@ public class
 	private static final String FIND_DOCKET_VALUES_BY_REQUEST_QUERY_NAME = 
 			"findDocketValuesByPresentenceInvestigationRequest";
 
+	private static final String FIND_UNSUBMITTED_BY_NAME_QUERY_NAME = 
+			"findUnsubmittedPresentenceInvestigationRequestSummariesByName";
+
+	private static final String FIND_SUBMITTED_BY_NAME_QUERY_NAME = 
+			"findSubmittedPresentenceInvestigationRequestSummariesByName";
+	
 	/* Parameter names. */
 	
 	private static final String USER_PARAM_NAME = "assignedUser";
@@ -71,6 +77,10 @@ public class
 	private static final String START_DATE_PARAM_NAME = "startDate";
 	
 	private static final String END_DATE_PARAM_NAME = "endDate";
+	
+	private static final String LAST_NAME_PARAM_NAME = "lastName";
+	
+	private static final String FIRST_NAME_PARAM_NAME = "firstName";
 	
 	private final SessionFactory sessionFactory;
 	
@@ -171,5 +181,51 @@ public class
 				.setReadOnly(true)
 				.list();
 		return docketValues;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<PresentenceInvestigationRequestSummary>
+		findUnsubmittedPresentenceInvestigationRequestSummariesByName(
+			final String firstName, final String lastName,
+			final Date startDate, final Date endDate) {
+		@SuppressWarnings("unchecked")
+		List<PresentenceInvestigationRequestSummary> summaries = this
+				.sessionFactory.getCurrentSession()
+				.getNamedQuery(FIND_UNSUBMITTED_BY_NAME_QUERY_NAME)
+				.setParameter(LAST_NAME_PARAM_NAME, lastName)
+				.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.setTimestamp(END_DATE_PARAM_NAME, endDate)
+				.setReadOnly(true)
+				.list();
+		for (PresentenceInvestigationRequestSummary summary : summaries) {
+			summary.getDocketValues().addAll(this.findDocketValuesByRequest(
+					summary.getPresentenceInvestigationRequestId()));
+		}
+		return summaries;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public List<PresentenceInvestigationRequestSummary>
+		findSubmittedPresentenceInvestigationRequestSummariesByName(
+			final String firstName, final String lastName,
+			final Date startDate, final Date endDate) {
+		@SuppressWarnings("unchecked")
+		List<PresentenceInvestigationRequestSummary> summaries = this
+				.sessionFactory.getCurrentSession()
+				.getNamedQuery(FIND_SUBMITTED_BY_NAME_QUERY_NAME)
+				.setParameter(LAST_NAME_PARAM_NAME, lastName)
+				.setParameter(FIRST_NAME_PARAM_NAME, firstName)
+				.setTimestamp(START_DATE_PARAM_NAME, startDate)
+				.setTimestamp(END_DATE_PARAM_NAME, endDate)
+				.setReadOnly(true)
+				.list();
+		for (PresentenceInvestigationRequestSummary summary : summaries) {
+			summary.getDocketValues().addAll(this.findDocketValuesByRequest(
+					summary.getPresentenceInvestigationRequestId()));
+		}
+		return summaries;
 	}
 }

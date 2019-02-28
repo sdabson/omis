@@ -18,6 +18,8 @@
 package omis.earlyreleasetracking.report;
 
 import java.io.Serializable;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -53,6 +55,14 @@ public class EarlyReleaseRequestSummary implements Serializable {
 	private final Long offenderId;
 	
 	private final String offenderNumber;
+	
+	private final Date eligibilityDate;
+	
+	private final Long monthsOnProbation;
+	
+	private final Long monthsInResidence;
+	
+	private final Long monthsEmployed;
 
 	/**
 	 * @param earlyReleaseRequestId Early Release Request ID
@@ -90,8 +100,66 @@ public class EarlyReleaseRequestSummary implements Serializable {
 		this.offenderMiddleName = offenderMiddleName;
 		this.offenderId = offenderId;
 		this.offenderNumber = offenderNumber;
+		this.eligibilityDate = null;
+		this.monthsOnProbation = null;
+		this.monthsInResidence = null;
+		this.monthsEmployed = null;
 	}
-
+	
+	/**
+	 * @param earlyReleaseRequestId Early Release Request ID
+	 * @param earlyReleaseCategoryName Early Release Category Name
+	 * @param requestDate Request Date
+	 * @param docketValue Docket Value
+	 * @param earlyReleaseJudgeResponseCategoryName Early Release Judge
+	 * Response Category Name
+	 * @param earlyReleaseRequestStatusCategoryName Early Release Request
+	 * Status Category Name
+	 * @param offenderLastName Offender Last Name
+	 * @param offenderFirstName Offender First Name
+	 * @param offenderMiddleName Offender Middle Name
+	 * @param offenderId Offender ID
+	 * @param offenderNumber Offender Number
+	 * @param eligibilityDate Eligibility Date
+	 * @param probationStartDate
+	 * @param residenceStartDate
+	 * @param employmentStartDate
+	 */
+	public EarlyReleaseRequestSummary(final Long earlyReleaseRequestId,
+			final String earlyReleaseCategoryName, final Date requestDate,
+			final String docketValue,
+			final String earlyReleaseJudgeResponseCategoryName,
+			final String earlyReleaseRequestStatusCategoryName,
+			final String offenderLastName, final String offenderFirstName,
+			final String offenderMiddleName, final Long offenderId,
+			final String offenderNumber,
+			final Date eligibilityDate,
+			final Date probationStartDate,
+			final Date residenceStartDate,
+			final Date employmentStartDate) {
+		this.earlyReleaseRequestId = earlyReleaseRequestId;
+		this.earlyReleaseCategoryName = earlyReleaseCategoryName;
+		this.requestDate = requestDate;
+		this.docketValue = docketValue;
+		this.earlyReleaseJudgeResponseCategoryName =
+				earlyReleaseJudgeResponseCategoryName;
+		this.earlyReleaseRequestStatusCategoryName =
+				earlyReleaseRequestStatusCategoryName;
+		this.offenderLastName = offenderLastName;
+		this.offenderFirstName = offenderFirstName;
+		this.offenderMiddleName = offenderMiddleName;
+		this.offenderId = offenderId;
+		this.offenderNumber = offenderNumber;
+		this.eligibilityDate = eligibilityDate;
+		
+		this.monthsOnProbation = this.monthsBetweenDates(
+				probationStartDate, new Date());
+		this.monthsInResidence = this.monthsBetweenDates(
+				residenceStartDate, new Date());
+		this.monthsEmployed = this.monthsBetweenDates(
+				employmentStartDate, new Date());
+	}
+	
 	/**
 	 * Returns the earlyReleaseRequestId.
 	 *
@@ -189,5 +257,52 @@ public class EarlyReleaseRequestSummary implements Serializable {
 	 */
 	public String getOffenderNumber() {
 		return this.offenderNumber;
+	}
+
+	/**
+	 * Returns the eligibilityDate.
+	 *
+	 * @return eligibilityDate
+	 */
+	public Date getEligibilityDate() {
+		return this.eligibilityDate;
+	}
+
+	/**
+	 * Returns the monthsOnProbation.
+	 *
+	 * @return monthsOnProbation
+	 */
+	public Long getMonthsOnProbation() {
+		return this.monthsOnProbation;
+	}
+
+	/**
+	 * Returns the monthsInResidence.
+	 *
+	 * @return monthsInResidence
+	 */
+	public Long getMonthsInResidence() {
+		return this.monthsInResidence;
+	}
+
+	/**
+	 * Returns the monthsEmployed.
+	 *
+	 * @return monthsEmployed
+	 */
+	public Long getMonthsEmployed() {
+		return this.monthsEmployed;
+	}
+	
+	private Long monthsBetweenDates(final Date startDate, final Date endDate) {
+		if (startDate != null && endDate != null) {
+			return ChronoUnit.MONTHS.between(
+					startDate.toInstant().atZone(ZoneId.systemDefault())
+					.toLocalDate(), endDate.toInstant().atZone(
+					ZoneId.systemDefault()).toLocalDate());
+		} else {
+			return null;
+		}
 	}
 }

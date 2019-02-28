@@ -63,6 +63,8 @@ public class OffenseItemSortDelegateImprovedImpl
 					if (referencedOrderedIndex > -1) {
 						orderedItems.add(referencedOrderedIndex + 1, offenseItem);
 					} else {
+						
+						// This is possibly unreachable - SA
 						boolean added = false;
 						for (OffenseItem orderedItem : orderedItems) {
 							if (OffenseItemConnectionClassification.CONSECUTIVE
@@ -87,6 +89,8 @@ public class OffenseItemSortDelegateImprovedImpl
 							unorderedItems.get(offenseItem
 									.getConnection().getIndex().intValue()));
 					if (referencedOrderedIndex > -1) {
+						
+						// This is possibly unreachable - SA
 						orderedItems.add(referencedOrderedIndex, offenseItem);
 					} else {
 						boolean added = false;
@@ -96,6 +100,8 @@ public class OffenseItemSortDelegateImprovedImpl
 											.getClassification())) {
 								if(orderedItem.getConnection().getIndex()
 										.intValue() == totalCount) {
+									
+									// This is possibly unreachable - SA
 									orderedItems.add(orderedItems.indexOf(
 											orderedItem), offenseItem);
 									added = true;

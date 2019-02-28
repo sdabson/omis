@@ -174,4 +174,90 @@
 		where docketAssoc.presentenceInvestigationRequest.id = :presentenceInvestigationRequestId
 		order by docket.value
 	]]></query>
+	<query name="findUnsubmittedPresentenceInvestigationRequestSummariesByName"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			   psir.id,
+			   offender.id,
+			   psir.requestDate, personName.firstName, personName.lastName, userAccount.username,
+			   psir.expectedCompletionDate, 
+			   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name,
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+			       from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			            omis.task.domain.TaskTemplate tt
+			      where pitg.presentenceInvestigationCategory = category
+			        and pitg.group = tt.group),
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+	      from
+		omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+			where
+				(upper(offenderName.lastName) like upper('%'||:lastName||'%')
+				or :lastName is null)
+			and
+				(upper(offenderName.firstName) like upper('%'||:firstName||'%')
+				or :firstName is null)
+			and psir.submissionDate is null
+			and
+				((psir.requestDate >= :startDate or :startDate is null)
+				and (psir.requestDate <= :endDate or :endDate is null))
+		order by personName.lastName, personName.firstName
+	]]></query>
+	<query name="findSubmittedPresentenceInvestigationRequestSummariesByName"><![CDATA[
+		select new omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummary(
+			   psir.id,
+			   offender.id,
+			   psir.requestDate, personName.firstName, personName.lastName, userAccount.username,
+			   psir.expectedCompletionDate, 
+			   offenderName.firstName, offenderName.lastName, offenderName.middleName, offender.offenderNumber,
+			   psir.sentenceDate, category.name,
+			   (select count(*)
+			      from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskAssociation pita2
+			inner join pita2.task task
+			     where pita2.presentenceInvestigationRequest = psir
+			       and task.completionDate is not null
+			   ),
+			   (select count(*) 
+			       from omis.presentenceinvestigation.domain.PresentenceInvestigationTaskGroup pitg,
+			            omis.task.domain.TaskTemplate tt
+			      where pitg.presentenceInvestigationCategory = category
+			        and pitg.group = tt.group),
+			  psir.submissionDate,
+			  (select count(*) 
+			  	from omis.presentenceinvestigation.domain.PresentenceInvestigationDelay delay
+			  	where delay.presentenceInvestigationRequest = psir))
+	      from
+		omis.presentenceinvestigation.domain.PresentenceInvestigationRequest psir
+			inner join psir.category category
+			inner join psir.person offender
+			inner join psir.assignedUser userAccount
+			inner join userAccount.user user
+			left outer join user.name personName
+			left outer join offender.name offenderName
+			where
+				(upper(offenderName.lastName) like upper('%'||:lastName||'%')
+				or :lastName is null)
+			and
+				(upper(offenderName.firstName) like upper('%'||:firstName||'%')
+				or :firstName is null)
+			and psir.submissionDate is not null
+			and
+				((psir.requestDate >= :startDate or :startDate is null)
+				and (psir.requestDate <= :endDate or :endDate is null))
+		order by personName.lastName, personName.firstName
+	]]></query>
 </hibernate-mapping>

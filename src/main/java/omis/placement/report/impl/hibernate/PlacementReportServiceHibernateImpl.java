@@ -20,12 +20,7 @@ package omis.placement.report.impl.hibernate;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TimestampType;
 
 import omis.datatype.DateRange;
 import omis.locationterm.report.LocationTermSummary;
@@ -37,7 +32,6 @@ import omis.placement.report.OffenderPlacementSummary;
 import omis.placement.report.PlacementReportService;
 import omis.placement.report.PlacementSummary;
 import omis.placement.report.PlacementTermChangeActionSummary;
-import omis.placement.report.impl.OffenderPlacementSummaryImpl;
 import omis.supervision.domain.CorrectionalStatus;
 import omis.supervision.domain.CorrectionalStatusTerm;
 import omis.supervision.domain.SupervisoryOrganization;
@@ -50,7 +44,7 @@ import omis.supervision.report.SupervisoryOrganizationTermSummary;
  *
  * @author Stephen Abson
  * @author Josh Divine
- * @version 0.0.2 (Feb 14, 2018)
+ * @version 0.0.3 (Feb 22, 2019)
  * @since OMIS 3.0
  */
 public class PlacementReportServiceHibernateImpl
@@ -63,11 +57,7 @@ public class PlacementReportServiceHibernateImpl
 	/* Helpers. */
 	
 	private final LocationTermSummaryDelegate locationTermSummaryDelegate;
-	
-	/* Toggles. */
-	
-	private final boolean useIdiomaticOffenderPlacementSummaryQuery;
-	
+		
 	/* Query names. */
 	
 	private static final String
@@ -129,17 +119,12 @@ public class PlacementReportServiceHibernateImpl
 	 * 
 	 * @param sessionFactory session factory
 	 * @param locationTermSummaryDelegate delegate for location term summaries
-	 * @param useIdiomaticOffenderPlacementSummaryQuery whether to use idiomatic
-	 * query; use native query otherwise
 	 */
 	public PlacementReportServiceHibernateImpl(
 			final LocationTermSummaryDelegate locationTermSummaryDelegate,
-			final SessionFactory sessionFactory,
-			final boolean useIdiomaticOffenderPlacementSummaryQuery) {
+			final SessionFactory sessionFactory) {
 		this.locationTermSummaryDelegate = locationTermSummaryDelegate;
 		this.sessionFactory = sessionFactory;
-		this.useIdiomaticOffenderPlacementSummaryQuery
-			= useIdiomaticOffenderPlacementSummaryQuery;
 	}
 
 	/* Method implementations. */
@@ -292,12 +277,14 @@ FIND_LOCATION_TERM_CHANGE_ACTION_SUMMARIES_BY_CORRECTIONAL_STATUS_QUERY_NAME)
 	@Override
 	public OffenderPlacementSummary findOffenderPlacementSummaryByOffender(
 					final Offender offender, final Date effectiveDate) {
-		if (useIdiomaticOffenderPlacementSummaryQuery) {
-			return this.findPlacementSummaryIdiomatically(
-					offender, effectiveDate);
-		} else {
-			return this.findPlacementSummaryNatively(offender, effectiveDate);
-		}
+		OffenderPlacementSummary offenderPlacementSummary
+			= (OffenderPlacementSummary) this.sessionFactory
+				.getCurrentSession().getNamedQuery(
+						SUMMARIZE_OFFENDER_PLACEMENT_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
+				.uniqueResult();
+		return offenderPlacementSummary;
 	}
 	
 	/** {@inheritDoc} */
@@ -318,89 +305,5 @@ FIND_LOCATION_TERM_CHANGE_ACTION_SUMMARIES_BY_CORRECTIONAL_STATUS_QUERY_NAME)
 				.setReadOnly(true)
 				.list();
 		return summaries;
-	}
-	
-	/* Helper methods. */
-	
-	// Returns results using idiomatic query
-	private OffenderPlacementSummary findPlacementSummaryIdiomatically(
-			final Offender offender, final Date effectiveDate) {
-		OffenderPlacementSummary offenderPlacementSummary
-			= (OffenderPlacementSummary) this.sessionFactory
-				.getCurrentSession().getNamedQuery(
-						SUMMARIZE_OFFENDER_PLACEMENT_QUERY_NAME)
-				.setParameter(OFFENDER_PARAM_NAME, offender)
-				.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, effectiveDate)
-				.uniqueResult();
-		return offenderPlacementSummary;
-	}
-	
-	// Returns results using native query
-	private OffenderPlacementSummary findPlacementSummaryNatively(
-			final Offender offender, final Date effectiveDate) {
-		final String findLocationSummaryByOffenderQuery 
-			= "select LOCATION_REASON as "
-			+ "\"currentLocationReasonName\"," 
-			+ "LOCATION_START_DATE as "
-			+ "\"currentLocationStartDate\","
-			+ "LOCATION_START_TIME as "
-			+ "\"currentLocationStartTime\"," 
-			+ "CURRENT_LOCATION as \"currentLocationName\","
-			+ "CORRECTIONAL_STATUS as "
-			+ "\"correctionalStatusName\","
-			+ "STATUS_START_DATE as "
-			+ "\"correctionalStatusStartDate\","
-			+ "STATUS_START_TIME as "
-			+ "\"correctionalStatusStartTime\","
-			+ "STATUS_REASON as \"correctionalStatusReasonName\","
-			+ "CONFIDENTIAL_OFFENDER_MSG as "
-			+"\"confidentialOffender\","
-			+ "SUPERVISING_OFFICER as "
-			+ "\"supervisingOfficer\","
-			+ "SUPERVISION_START_DATE as "
-			+ "\"supervisionStartDate\","
-			+ "PRISON_DISCHARGE_DATE as "
-			+ "\"prisonDischargeDate\","
-			+ "PAROLE_ELIGIBILITY_DATE as "
-			+ "\"paroleEligibilityDate\","
-			+ "PROBATION_DISCHARGE_DT as "
-			+ "\"probationDischargeDate\","
-			+ "CHIMES_ID as "
-			+ "\"chimesId\","
-			+ "case when CORRECTIONAL_STATUS is not null then 1 else 0 end as "
-			+ "\"placed\","
-			+ "case when CURRENT_LOCATION is not null then 1 else 0 end as "
-			+ "\"located\","
-			+ "case when SUPERVISING_OFFICER is not null then 1 else 0 end as "
-			+ "\"officerAssigned\""
-			+ " from offender_header_view"
-			+ " where offender_number = %1d";
-		SQLQuery q = this.sessionFactory.getCurrentSession().createSQLQuery(
-			String.format(findLocationSummaryByOffenderQuery, 
-			offender.getOffenderNumber()));
-		q.setResultTransformer(Transformers.aliasToBean(
-			OffenderPlacementSummaryImpl.class));
-		q.addScalar("currentLocationReasonName", StringType.INSTANCE);
-		q.addScalar("currentLocationStartDate", TimestampType.INSTANCE);
-		q.addScalar("currentLocationStartTime", TimestampType.INSTANCE);
-		q.addScalar("currentLocationName", StringType.INSTANCE);
-		q.addScalar("correctionalStatusName", StringType.INSTANCE);
-		q.addScalar("correctionalStatusStartDate", TimestampType.INSTANCE);
-		q.addScalar("correctionalStatusStartTime", TimestampType.INSTANCE);
-		q.addScalar("correctionalStatusReasonName", StringType.INSTANCE);
-		q.addScalar("confidentialOffender", StringType.INSTANCE);
-		q.addScalar("supervisingOfficer", StringType.INSTANCE);
-		q.addScalar("supervisionStartDate", TimestampType.INSTANCE);
-		q.addScalar("prisonDischargeDate", TimestampType.INSTANCE);
-		q.addScalar("paroleEligibilityDate", TimestampType.INSTANCE);
-		q.addScalar("probationDischargeDate", TimestampType.INSTANCE);
-		q.addScalar("chimesId", StringType.INSTANCE);
-		q.addScalar("placed", BooleanType.INSTANCE);
-		q.addScalar("located", BooleanType.INSTANCE);
-		q.addScalar("officerAssigned", BooleanType.INSTANCE);
-		q.setReadOnly(true);
-		OffenderPlacementSummary result
-			= (OffenderPlacementSummary) q.uniqueResult();
-		return result;
 	}
 }

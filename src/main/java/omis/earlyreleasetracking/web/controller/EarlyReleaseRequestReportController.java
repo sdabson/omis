@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,8 @@ import omis.beans.factory.PropertyEditorFactory;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestCategory;
 import omis.earlyreleasetracking.report.EarlyReleaseRequestSummaryReportService;
+import omis.earlyreleasetracking.service.EarlyReleaseRequestService;
+import omis.earlyreleasetracking.web.form.EarlyReleaseRequestFilterForm;
 import omis.offender.beans.factory.OffenderPropertyEditorFactory;
 import omis.offender.domain.Offender;
 import omis.offender.web.controller.delegate.OffenderSummaryModelDelegate;
@@ -57,6 +60,9 @@ public class EarlyReleaseRequestReportController {
 	private static final String
 		EARLY_RELEASE_REQUESTS_ROW_ACTION_MENU_VIEW_NAME =
 			"/earlyReleaseTracking/includes/earlyReleaseRequestsRowActionMenu";
+
+	private static final String NOC_LIST_VIEW_NAME =
+			"/earlyReleaseTracking/noc/list";
 	
 	/* Model Keys */
 	
@@ -70,6 +76,12 @@ public class EarlyReleaseRequestReportController {
 	
 	private static final String EARLY_RELEASE_REQUEST_MODEL_KEY =
 			"earlyReleaseRequest";
+	
+	private static final String EARLY_RELEASE_STATUS_CATEGORIES_MODEL_KEY =
+			"earlyReleaseStatusCategories";
+	
+	private static final String FORM_MODEL_KEY =
+			"earlyReleaseRequestFilterForm";
 	
 	/* Property Editor Factories */
 	
@@ -87,6 +99,10 @@ public class EarlyReleaseRequestReportController {
 	@Qualifier("earlyReleaseRequestSummaryReportService")
 	private EarlyReleaseRequestSummaryReportService
 			earlyReleaseRequestSummaryReportService;
+
+	@Autowired
+	@Qualifier("earlyReleaseRequestService")
+	private EarlyReleaseRequestService earlyReleaseRequestService;
 	
 	/* Model Delegate */
 	
@@ -120,6 +136,53 @@ public class EarlyReleaseRequestReportController {
 		
 		return new ModelAndView(LIST_VIEW_NAME, map);
 	}
+	
+	@RequestMapping(value = "/noc/list.html", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('EARLY_RELEASE_TRACKING_LIST') or hasRole('ADMIN')")
+	public ModelAndView nocList() {
+		ModelMap map = new ModelMap();
+		map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY, null);
+		map.addAttribute(EARLY_RELEASE_STATUS_CATEGORIES_MODEL_KEY,
+				this.earlyReleaseRequestService
+				.findEarlyReleaseStatusCategories());
+		map.addAttribute(FORM_MODEL_KEY, new EarlyReleaseRequestFilterForm());
+		
+		return new ModelAndView(NOC_LIST_VIEW_NAME, map);
+	}
+	
+	@RequestMapping(value = "/noc/list.html", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('EARLY_RELEASE_TRACKING_LIST') or hasRole('ADMIN')")
+	public ModelAndView nocFilterList(
+			final EarlyReleaseRequestFilterForm form,
+			final BindingResult bindingResult) {
+		ModelMap map = new ModelMap();
+		/*if (form.getSingleEligibilityDate()) {
+			form.setEligibilityStartDate(null);
+			form.setEligibilityEndDate(null);
+		} else {
+			form.setEligibilityDate(null);
+		}
+		if (form.getSingleRequestDate()) {
+			form.setRequestStartDate(null);
+			form.setRequestEndDate(null);
+		} else {
+			form.setRequestDate(null);
+		}*/
+		map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY,
+				this.earlyReleaseRequestSummaryReportService
+				.findByDatesWithStatus(form.getRequestStartDate(),
+						form.getRequestEndDate(), form.getRequestDate(),
+						form.getEligibilityStartDate(),
+						form.getEligibilityEndDate(), form.getEligibilityDate(),
+						form.getReleaseStatus()));
+		map.addAttribute(EARLY_RELEASE_STATUS_CATEGORIES_MODEL_KEY,
+				this.earlyReleaseRequestService
+				.findEarlyReleaseStatusCategories());
+		map.addAttribute(FORM_MODEL_KEY, new EarlyReleaseRequestFilterForm());
+		
+		return new ModelAndView(NOC_LIST_VIEW_NAME, map);
+	}
+	
 	
 	/**
 	 * Returns the Model and View for the Early Release Requests Action Menu.

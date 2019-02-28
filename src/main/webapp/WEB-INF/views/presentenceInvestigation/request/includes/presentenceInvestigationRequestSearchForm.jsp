@@ -18,7 +18,7 @@
 
 <%--
  - Author: Annie Wahl
- - Date: Jan 29, 2019
+ - Date: Feb 26, 2019
  - Since: OMIS 3.0
  --%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
@@ -30,6 +30,9 @@
 	<form:form commandName="presentenceInvestigationRequestSearchForm" class="filterForm">
 		<fieldset class="foregroundUltraLight">
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="userSearch" id="searchByUser" value="true"/>
+				</span>
 				<span class="fieldGroup">
 					<form:label path="userAccount" class="fieldLabel">
 						<fmt:message key="officerLabel"/>
@@ -50,14 +53,33 @@
 				</span>
 			</div>
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="userSearch" id="searchByName" value="false"/>
+				</span>
+				<span class="fieldGroup">
+					<form:label path="lastName" class="fieldLabel">
+						<fmt:message key="subjectLastNameLabel"/>
+					</form:label>
+					<form:input path="lastName"/>
+					<form:errors path="lastName" cssClass="error"/>
+				</span>
+				<span class="fieldGroup">
+					<form:label path="firstName">
+						<fmt:message key="subjectFirstNameLabel"/>
+					</form:label>
+					<form:input path="firstName"/>
+					<form:errors path="firstName" cssClass="error"/>
+				</span>
+			</div>
+			<div>
 				<span class="fieldGroup">
 					<label for="startDate" class="fieldLabel"><fmt:message key="fromDateLabel" /></label>
-					<form:input class="date" id="startDate" path="startDate"/>
+					<form:input id="startDate" path="startDate"/>
 					<form:errors cssClass="error" path="startDate"/>
 				</span>
 				<span class="fieldGroup">
 					<label for="endDate"><fmt:message key="toDateLabel"/></label>
-					<form:input class="date" id="endDate" path="endDate"/>
+					<form:input id="endDate" path="endDate"/>
 					<form:errors cssClass="error" path="endDate"/>
 				</span>
 			</div>

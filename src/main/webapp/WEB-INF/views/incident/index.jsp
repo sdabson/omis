@@ -32,13 +32,13 @@
 					<img class="jurisdictionPhoto" id="jurisdictionPhoto${status.index}" src="${pageContext.request.contextPath}/incident/displayJurisdictionPhoto?jurisdiction=${summary.jurisdictionId}"/>
 				</span>
 				<span class="jurisdicitonInfo">
+<!-- 					<span class="infoGroup"> -->
+<%-- 						<input type="hidden" value="${summary.jurisdictionId}"/> --%>
+<%-- 						<label class="infoNameLabel"><fmt:message key="incidentsInfoNameLabel"/></label> --%>
+<%-- 						<label class="infoLabel"><c:out value="${summary.incidentCount}"/></label> --%>
+<!-- 					</span> -->
 					<span class="infoGroup">
-						<input type="hidden" value="${summary.jurisdictionId}"/>
-						<label class="infoNameLabel"><fmt:message key="incidentsInfoNameLabel"/></label>
-						<label class="infoLabel"><c:out value="${summary.incidentCount}"/></label>
-					</span>
-					<span class="infoGroup">
-						<label class="infoNameLabel"><fmt:message key="incidentReportsInfoNameLabel"/></label>
+						<label class="infoNameLabel"><fmt:message key="incidentStatementsInfoNameLabel"/></label>
 						<label class="infoLabel"><c:out value="${summary.incidentReportCount}"/></label>
 					</span>
 				</span>

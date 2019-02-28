@@ -101,28 +101,39 @@
 		]]></query>
 		<query name="findSeparationNeedProfileItemSummaryByOffenderAndDate"><![CDATA[
 			select new omis.separationneed.report.SeparationNeedProfileItemSummary(
-			       sum(case when ((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
-                                    from omis.offender.domain.Offender firstOffender
-                                   where firstOffender = relationship.firstPerson)) as string) = 'SEC')
-				and (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
-                                    from omis.offender.domain.Offender secondOffender
-                                   where secondOffender = relationship.secondPerson)) as string) = 'SEC')) 
+			       sum(case when ((select term.correctionalStatus 
+			       					from omis.supervision.domain.CorrectionalStatusTerm term
+					    			where term.offender = relationship.firstPerson
+					    				and term.correctionalStatus.locationRequired = true
+					    				and term.dateRange.startDate <= :date
+					    				and (term.dateRange.endDate is null or term.dateRange.endDate > :date))
+					    		= (select term.correctionalStatus
+					    			from omis.supervision.domain.CorrectionalStatusTerm term
+					    			where term.offender = relationship.secondPerson
+					    				and term.correctionalStatus.locationRequired = true
+					    				and term.dateRange.startDate <= :date
+					    				and (term.dateRange.endDate is null or term.dateRange.endDate > :date)))
 			          then 1 
 			          else 0 
 			           end),
-			    	sum(case when ((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
-                                    from omis.offender.domain.Offender firstOffender
-                                   where firstOffender = relationship.firstPerson)) as string) <> 'SEC')
-				or (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
-                                    from omis.offender.domain.Offender secondOffender
-                                   where secondOffender = relationship.secondPerson)) as string) <> 'SEC')) 
-			            then 1
-			            else 0
-			             end))
+			    	sum(case when ((select term.correctionalStatus 
+			       					from omis.supervision.domain.CorrectionalStatusTerm term
+					    			where term.offender = relationship.firstPerson
+					    				and term.correctionalStatus.locationRequired = true
+					    				and term.dateRange.startDate <= :date
+					    				and (term.dateRange.endDate is null or term.dateRange.endDate > :date))
+					    		= (select term.correctionalStatus
+					    			from omis.supervision.domain.CorrectionalStatusTerm term
+					    			where term.offender = relationship.secondPerson
+					    				and term.correctionalStatus.locationRequired = true
+					    				and term.dateRange.startDate <= :date
+					    				and (term.dateRange.endDate is null or term.dateRange.endDate > :date)))
+			          then 0 
+			          else 1 
+			           end))
 			  from omis.separationneed.domain.SeparationNeed separationNeed
    				left outer join separationNeed.relationship relationship
 			 where (relationship.firstPerson = :offender
 			    or relationship.secondPerson = :offender)
-			  
 		]]></query>
 	</hibernate-mapping>

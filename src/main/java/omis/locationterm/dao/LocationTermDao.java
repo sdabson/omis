@@ -29,6 +29,7 @@ import omis.supervision.domain.SupervisoryOrganization;
  * Data access object for location term.
  * 
  * @author Stephen Abson
+ * @author Yidong Li
  * @version 0.1.0 (Nov 7, 2013)
  * @since OMIS 3.0
  */
@@ -135,17 +136,6 @@ public interface LocationTermDao
 	long countAfterDateExcluding(Offender offender, Date startDate, 
 			LocationTerm excludedLocationTerm);
 	
-	/**
-	 * Ends location term on date. 
-	 * 
-	 * @param offender offender
-	 * @param effectiveDate effective date
-	 * @return ended location term
-	 * @deprecated update location term instead
-	 */
-	@Deprecated
-	LocationTerm endLocationTerm(Offender offender, Date effectiveDate);
-
 	/**
 	 * Returns location term with start date.
 	 * 

@@ -41,20 +41,10 @@
      where subjectOffender.id = firstPerson.id),
     separationNeed.date,
     separationNeed.removal.date,
-    case
-		when
-				separationNeed.removal.date is null and
-				((cast(legacy_find_ofndr_cor_status((select firstOffender.offenderNumber
-                                    from omis.offender.domain.Offender firstOffender
-                                   where firstOffender = firstPerson)) as string) = 'SEC')
-				and (cast(legacy_find_ofndr_cor_status((select secondOffender.offenderNumber
-                                    from omis.offender.domain.Offender secondOffender
-                                   where secondOffender = secondPerson)) as string) = 'SEC'))                                  
-		then
-			true
-		else
-			false
-		end,
+    (select term.correctionalStatus from omis.supervision.domain.CorrectionalStatusTerm term
+    where term.offender = firstPerson and term.dateRange.startDate <= :date and (term.dateRange.endDate is null or term.dateRange.endDate > :date)),
+    (select term.correctionalStatus from omis.supervision.domain.CorrectionalStatusTerm term
+    where term.offender = secondPerson and term.dateRange.startDate <= :date and (term.dateRange.endDate is null or term.dateRange.endDate > :date)),
     separationNeed.creationComment)
   from omis.separationneed.domain.SeparationNeed separationNeed
     left join separationNeed.relationship relationship

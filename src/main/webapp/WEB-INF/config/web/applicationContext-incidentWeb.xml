@@ -33,4 +33,8 @@
 		class="omis.incident.web.validator.IncidentStatementFormValidator">
 		<constructor-arg name="stringLengthChecks" ref="stringLengthChecks"/>
 	</bean>
+	
+	<bean id="searchIncidentStatementFormValidator" 
+		class="omis.incident.web.validator.SearchIncidentStatementFormValidator">
+	</bean>
 </beans>

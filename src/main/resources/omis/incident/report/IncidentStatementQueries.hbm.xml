@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
  - Author: Yidong Li
- - Date:   July 5, 2014
+ - Author: Joel Norris
+ - Version: 0.1.1 (February 1, 2019)
+ - Since: OMIS 3.0
  -->
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
@@ -354,6 +356,65 @@
 			left outer join statement.jurisdiction jurisdiction
 		where
 			:documenter = statement.documenter
+		group by
+			statement.id,
+			statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		order by
+			statement.incidentDate desc, statement.number
+	]]></query>
+	<query name="findIncidentStatementsByCriteria"><![CDATA[
+		select new omis.incident.report.IncidentStatementSummary(
+	 	 	statement.id,
+	 	 	statement.number,
+			statement.incidentDate,
+			statement.title,
+			name.lastName,
+			name.firstName,
+			statement.scene.location,
+			facility.name,
+			complex.name,
+			unit.name,
+			level.name,
+			section.name,
+			room.name,
+			statement.submissionCategory
+		)
+		from
+			omis.incident.domain.InvolvedParty party
+			right outer join party.statement statement
+			inner join statement.reporter reporter
+			inner join reporter.name name
+			left outer join statement.scene.facility facility
+			left outer join statement.scene.complex complex
+			left outer join statement.scene.unit unit
+			left outer join statement.scene.level level
+			left outer join statement.scene.section section
+			left outer join statement.scene.room room
+			left outer join statement.jurisdiction jurisdiction
+		where
+				(:startDate <= statement.incidentDate
+			and
+				:endDate >= statement.incidentDate)
+			and
+				(:jurisdiction is null or :jurisdiction = jurisdiction)
+			and
+				(:category is null or :category = statement.category)
+			and
+				(:reporter is null or :reporter = statement.reporter)
+			and
+				(:title is null or :title = statement.title)
 		group by
 			statement.id,
 			statement.number,

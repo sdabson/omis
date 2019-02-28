@@ -48,6 +48,7 @@ import omis.presentenceinvestigation.domain.PresentenceInvestigationRequest;
 import omis.presentenceinvestigation.report.PresentenceInvestigationRequestSummaryReportService;
 import omis.presentenceinvestigation.service.PresentenceInvestigationRequestService;
 import omis.presentenceinvestigation.web.form.PresentenceInvestigationRequestSearchForm;
+import omis.presentenceinvestigation.web.validator.PresentenceInvestigationRequestSearchFormValidator;
 import omis.report.ReportFormat;
 import omis.report.ReportRunner;
 import omis.report.web.controller.delegate.ReportControllerDelegate;
@@ -60,7 +61,7 @@ import omis.user.domain.UserAccount;
  * @author Annie Wahl
  * @author Josh Divine
  * @author Sierra Haynes
- * @version 0.1.5 (Jan 28, 2019)
+ * @version 0.1.6 (Feb 26, 2019)
  * @since OMIS 3.0
  */
 @Controller
@@ -207,6 +208,11 @@ public class ReportPresentenceInvestigationRequestController {
 	@Qualifier("offenderSummaryModelDelegate")
 	private OffenderSummaryModelDelegate offenderSummaryModelDelegate;
 	
+	@Autowired
+	@Qualifier("presentenceInvestigationRequestSearchFormValidator")
+	private PresentenceInvestigationRequestSearchFormValidator
+				presentenceInvestigationRequestSearchFormValidator;
+	
 	/* Constructor. */
 	
 	/**
@@ -235,8 +241,10 @@ public class ReportPresentenceInvestigationRequestController {
 				final Person offender) {
 		ModelMap map = new ModelMap();
 		if (offender == null && assignedUser != null) {
-			map.addAttribute(FORM_MODEL_KEY,
-					new PresentenceInvestigationRequestSearchForm());
+			PresentenceInvestigationRequestSearchForm form =
+					new PresentenceInvestigationRequestSearchForm();
+			form.setUserSearch(true);
+			map.addAttribute(FORM_MODEL_KEY, form);
 			map.addAttribute(ASSIGNED_USER_MODEL_KEY, assignedUser);
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
@@ -259,8 +267,10 @@ public class ReportPresentenceInvestigationRequestController {
 							offender));
 			
 		} else if (offender == null && assignedUser == null) {
-			map.addAttribute(FORM_MODEL_KEY,
-					new PresentenceInvestigationRequestSearchForm());
+			PresentenceInvestigationRequestSearchForm form =
+					new PresentenceInvestigationRequestSearchForm();
+			form.setUserSearch(true);
+			map.addAttribute(FORM_MODEL_KEY, form);
 			UserAccount user = this.retrieveUserAccount();
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
@@ -292,29 +302,38 @@ public class ReportPresentenceInvestigationRequestController {
 			final PresentenceInvestigationRequestSearchForm form,
 			final BindingResult bindingResult) {
 		ModelMap map = new ModelMap();
-		if (form.getUserAccount() == null) {
-			UserAccount user = this.retrieveUserAccount();
+		
+		if (form.getUserSearch()) {
+			UserAccount user;
+			if (form.getUserAccount() == null) {
+				user = this.retrieveUserAccount();
+			} else {
+				user = form.getUserAccount();
+			}
 			map.addAttribute(ASSIGNED_USER_MODEL_KEY, user);
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
 				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-						user, form.getStartDate(), form.getEndDate()));
+						user, form.getStartDate(),
+						form.getEndDate()));
 			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
 				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
-						user, form.getStartDate(), form.getEndDate()));
+						user, form.getStartDate(),
+						form.getEndDate()));
 		} else {
-			map.addAttribute(ASSIGNED_USER_MODEL_KEY, form.getUserAccount());
+			map.addAttribute(ASSIGNED_USER_MODEL_KEY,
+					this.retrieveUserAccount());
 			map.addAttribute(UNSUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
-				.findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
-							form.getUserAccount(), form.getStartDate(),
-							form.getEndDate()));
+				.findUnsubmittedPresentenceInvestigationRequestSummariesByName(
+							form.getFirstName(), form.getLastName(),
+							form.getStartDate(), form.getEndDate()));
 			map.addAttribute(SUBMITTED_SUMMARIES_MODEL_KEY, this
 				.presentenceInvestigationRequestReportService
-				.findSubmittedPresentenceInvestigationRequestSummariesByUser(
-							form.getUserAccount(), form.getStartDate(),
-							form.getEndDate()));
+				.findSubmittedPresentenceInvestigationRequestSummariesByName(
+						form.getFirstName(), form.getLastName(),
+						form.getStartDate(), form.getEndDate()));
 		}
 		map.addAttribute(FORM_MODEL_KEY, form);
 		

@@ -15,23 +15,61 @@ import omis.incident.domain.IncidentStatementSubmissionCategory;
 
 public class IncidentStatementSummary implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private final Long id;
-	private final String reportNumber;
-	private final Date incidentDate;
-	private final String reportTitle;
-	private final String reportingStaffLastName;
-	private final String reportingStaffFirstName;
-	private final String locationName;
-	private final String facilityName;
-	private final String complexName;
-	private final String unitName;
-	private final String levelName;
-	private final String sectionName;
-	private final String roomName;
-	private final IncidentStatementSubmissionCategory submissionCategory;
+//	private final Long id;
+//	private final String reportNumber;
+//	private final Date incidentDate;
+//	private final String reportTitle;
+//	private final String reportingStaffLastName;
+//	private final String reportingStaffFirstName;
+//	private final String locationName;
+//	private final String facilityName;
+//	private final String complexName;
+//	private final String unitName;
+//	private final String levelName;
+//	private final String sectionName;
+//	private final String roomName;
+//	private final IncidentStatementSubmissionCategory submissionCategory;
+	
+	private Long id;
+	private String reportNumber;
+	private Date incidentDate;
+	private String reportTitle;
+	private String reportingStaffLastName;
+	private String reportingStaffFirstName;
+	private String locationName;
+	private String facilityName;
+	private String complexName;
+	private String unitName;
+	private String levelName;
+	private String sectionName;
+	private String roomName;
+	private IncidentStatementSubmissionCategory submissionCategory;
 	
 	/**
 	 * Instantiates a default instance of the incident summary.
+	 */
+	
+	public IncidentStatementSummary() {
+		//Default constructor.
+	}
+	
+	/**
+	 * Instantiates an instance of incident statement summary with the specified properties.
+	 * 
+	 * @param id id
+	 * @param reportNumber report number
+	 * @param incidentDate incident date
+	 * @param reportTitle report title
+	 * @param reportingStaffLastName reporting staff last name
+	 * @param reportingStaffFirstName reporting staff first name
+	 * @param locationName location name
+	 * @param facilityName facility name
+	 * @param complexName complex name
+	 * @param unitName unit name
+	 * @param levelName level name
+	 * @param sectionName section name
+	 * @param roomName room name
+	 * @param submissionCategory submission category
 	 */
 	public IncidentStatementSummary(
 			final Long id,

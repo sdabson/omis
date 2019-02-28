@@ -30,7 +30,8 @@ import omis.separationneed.report.SeparationNeedProfileItemSummary;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.1 (Feb 14, 2018)
+ * @author Joel Norris
+ * @version 0.1.2 (Feb 26, 2019)
  * @since OMIS 3.0 
  */
 public class SeparationNeedProfileItemReportServiceHibernateImpl 
@@ -39,8 +40,7 @@ public class SeparationNeedProfileItemReportServiceHibernateImpl
 		FIND_SEPARATION_NEED_PROFILE_ITEM_SUMMARY_BY_OFFENDER_AND_DATE_QUERY_NAME
 		 = "findSeparationNeedProfileItemSummaryByOffenderAndDate";
 	private static final String OFFENDER_PARAM_NAME = "offender";
-	//private static final String EFFECTIVE_DATE_PARAM_NAME 
-	//	= "effectiveDate";
+	private static final String DATE_PARAM_NAME = "date";
 	
 	private final SessionFactory sessionFactory;
 	
@@ -61,6 +61,7 @@ public class SeparationNeedProfileItemReportServiceHibernateImpl
 				.getNamedQuery(
 						FIND_SEPARATION_NEED_PROFILE_ITEM_SUMMARY_BY_OFFENDER_AND_DATE_QUERY_NAME)
 				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setDate(DATE_PARAM_NAME, effectiveDate)
 				.setReadOnly(true)
 				.uniqueResult());
 	}

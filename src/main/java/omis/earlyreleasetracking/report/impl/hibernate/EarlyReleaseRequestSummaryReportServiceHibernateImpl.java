@@ -17,8 +17,10 @@
  */
 package omis.earlyreleasetracking.report.impl.hibernate;
 
+import java.util.Date;
 import java.util.List;
 import org.hibernate.SessionFactory;
+import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
 import omis.earlyreleasetracking.report.EarlyReleaseRequestSummary;
 import omis.earlyreleasetracking.report.EarlyReleaseRequestSummaryReportService;
 import omis.offender.domain.Offender;
@@ -37,7 +39,32 @@ public class EarlyReleaseRequestSummaryReportServiceHibernateImpl
 	private static final String FIND_BY_OFFENDER_QUERY_NAME =
 			"findEarlyReleaseRequestSummariesByOffender";
 	
+	private static final String FIND_BY_DATES_AND_STATUS_QUERY_NAME =
+			"findEarlyReleaseRequestSummariesByDatesWithStatus";
+	
 	private static final String OFFENDER_PARAM_NAME = "offender";
+	
+	private static final String REQUEST_START_DATE_PARAM_NAME =
+			"requestStartDate";
+
+	private static final String REQUEST_END_DATE_PARAM_NAME =
+			"requestEndDate";
+	
+	private static final String REQUEST_STATUS_PARAM_NAME = "requestStatus";
+
+	private static final String ELGIIBILITY_START_DATE_PARAM_NAME =
+			"eligibilityStartDate";
+
+	private static final String ELIGIBILITY_END_DATE_PARAM_NAME =
+			"eligibilityEndDate";
+
+	private static final String REQUEST_DATE_PARAM_NAME =
+			"requestDate";
+
+	private static final String ELIGIBILITY_DATE_PARAM_NAME =
+			"eligibilityDate";
+	
+	private static final String EFFECTIVE_DATE_PARAM_NAME = "effectiveDate";
 	
 	private final SessionFactory sessionFactory;
 	
@@ -50,9 +77,7 @@ public class EarlyReleaseRequestSummaryReportServiceHibernateImpl
 			final SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-
-
-
+	
 	/** {@inheritDoc} */
 	@Override
 	public List<EarlyReleaseRequestSummary> findByOffender(
@@ -66,5 +91,31 @@ public class EarlyReleaseRequestSummaryReportServiceHibernateImpl
 		
 		return summaries;
 	}
-
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<EarlyReleaseRequestSummary> findByDatesWithStatus(
+			final Date requestStartDate, final Date requestEndDate,
+			final Date requestDate, final Date eligibilityStartDate,
+			final Date eligibilityEndDate, final Date eligibilityDate,
+			final EarlyReleaseStatusCategory earlyReleaseStatusCategory) {
+		@SuppressWarnings("unchecked")
+		List<EarlyReleaseRequestSummary> summaries = this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(FIND_BY_DATES_AND_STATUS_QUERY_NAME)
+				.setTimestamp(REQUEST_START_DATE_PARAM_NAME, requestStartDate)
+				.setTimestamp(REQUEST_END_DATE_PARAM_NAME, requestEndDate)
+				.setParameter(REQUEST_STATUS_PARAM_NAME,
+						earlyReleaseStatusCategory)
+				.setTimestamp(ELGIIBILITY_START_DATE_PARAM_NAME,
+						eligibilityStartDate)
+				.setTimestamp(ELIGIBILITY_END_DATE_PARAM_NAME,
+						eligibilityEndDate)
+				.setTimestamp(ELIGIBILITY_DATE_PARAM_NAME, eligibilityDate)
+				.setTimestamp(REQUEST_DATE_PARAM_NAME, requestDate)
+				.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, new Date())
+				.list();
+		
+		return summaries;
+	}
 }

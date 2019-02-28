@@ -23,4 +23,13 @@ window.onload = function() {
 			applyRemoveLinkConfirmation();
 		});
 	}
+	
+	if (document.getElementsByClassName("requestDate")) {
+		applyDatePicker(document.getElementById("requestDate"));
+		applyDatePicker(document.getElementById("requestStartDate"));
+		applyDatePicker(document.getElementById("requestEndDate"));
+		applyDatePicker(document.getElementById("eligibilityDate"));
+		applyDatePicker(document.getElementById("eligibilityStartDate"));
+		applyDatePicker(document.getElementById("eligibilityEndDate"));
+	}
 }

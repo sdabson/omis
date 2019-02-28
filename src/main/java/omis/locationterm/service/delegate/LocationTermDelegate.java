@@ -202,17 +202,4 @@ public class LocationTermDelegate {
 		return this.locationTermDao.makePersistent(locationTerm);
 	}
 	
-	/**
-	 * End location term.
-	 * 
-	 * @param offender offender
-	 * @param effectiveDate effective date
-	 * @return ended location term
-	 * @deprecated update location term instead
-	 */
-	@Deprecated
-	public LocationTerm endLocationTerm(
-			final Offender offender, final Date effectiveDate) {
-		return this.locationTermDao.endLocationTerm(offender, effectiveDate);
-	}
 }

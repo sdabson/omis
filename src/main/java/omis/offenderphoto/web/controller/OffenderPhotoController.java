@@ -129,8 +129,6 @@ public class OffenderPhotoController {
 	private static final String NOTE_ITEM_INDEX_MODEL_KEY
 		= "offenderPhotoAssociationNoteItemIndex";
 	private static final String PHOTO_DATA_MODEL_KEY = "photoData";
-	private static final String ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY
-		= "allowEnhancedImageEditor";
 	private static final String OFFENDER_PHOTO_JOIN_FORM_MODEL_KEY
 	= "offenderPhotoJoinForm";
 	
@@ -465,22 +463,6 @@ public class OffenderPhotoController {
 			form.getPhotoItems().add(new OffenderPhotoItem(association.getId(),
 					photoData, association.getPhoto().getDate()));
 		}
-//		map.addAttribute(OFFENDER_PHOTO_JOIN_FORM, form);
-//		map.addAttribute(OFFENDER_MODEL_KEY, offender);
-//		final Integer offenderPhotoAssociationNoteIndex;
-//		if (form.getNoteItems() != null) {
-//			offenderPhotoAssociationNoteIndex = form
-//					.getNoteItems().size(); 
-//		} else {
-//			offenderPhotoAssociationNoteIndex = 0;
-//		}
-//		map.addAttribute(NOTE_ITEM_INDEX_MODEL_KEY, 
-//				offenderPhotoAssociationNoteIndex);
-//		this.offenderSummaryModelDelegate.add(map, offender);
-//		if(this.getAllowEnhancedImageEditor()) {
-//			map.addAttribute(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
-//		}
-		//return new ModelAndView(JOIN_PHOTO_FORM_VIEW_NAME, map);
 		return this.prepareJoinMav(offender, form, map);
 	}
 	
@@ -498,9 +480,6 @@ public class OffenderPhotoController {
 		map.addAttribute(NOTE_ITEM_INDEX_MODEL_KEY, 
 				offenderPhotoAssociationNoteIndex);
 		this.offenderSummaryModelDelegate.add(map, offender);
-		if(this.getAllowEnhancedImageEditor()) {
-			map.addAttribute(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
-		}
 		return new ModelAndView(JOIN_PHOTO_FORM_VIEW_NAME, map);
 	}
 	
@@ -696,9 +675,6 @@ public class OffenderPhotoController {
 		mav.addObject(NOTE_ITEM_INDEX_MODEL_KEY, 
 				offenderPhotoAssociationNoteIndex);
 		this.addOffenderSummary(mav, offender);
-		if(this.getAllowEnhancedImageEditor()) {
-			mav.addObject(ALLOW_ENHANCED_IMAGE_EDITOR_MODEL_KEY, true);
-		}
 		return mav;
 	}
 	
@@ -775,12 +751,6 @@ public class OffenderPhotoController {
 	// Re-encodes photo data - not null safe
 	private String reencodePhotoData(final byte[] photoData) {
 		return this.encodePhotoData(this.decodePhotoData(photoData));
-	}
-	
-	//Returns whether enhanced image editing is allowed via feature toggle.
-	private boolean getAllowEnhancedImageEditor() {
-		return this.featureToggles
-				.get("offenderphoto" ,"allowEnhancedImageEditor");
 	}
 	
 	/* Reports. */

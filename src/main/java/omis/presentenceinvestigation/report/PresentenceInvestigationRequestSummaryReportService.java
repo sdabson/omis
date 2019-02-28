@@ -82,4 +82,34 @@ public interface PresentenceInvestigationRequestSummaryReportService {
 	List<PresentenceInvestigationRequestSummary> 
 			findUnsubmittedPresentenceInvestigationRequestSummariesByUser(
 					UserAccount user, Date startDate, Date endDate);
+	
+	/**
+	 * Returns a list of unsubmitted Presentence Investigation Request Summaries
+	 * for the requests with subjects with the given name.
+	 * 
+	 * @param firstName first name
+	 * @param lastName last name
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @return List of unsubmitted Presentence Investigation Request Summaries
+	 * for the requests with subjects with the given name.
+	 */
+	List<PresentenceInvestigationRequestSummary>
+		findUnsubmittedPresentenceInvestigationRequestSummariesByName(
+			String firstName, String lastName, Date startDate, Date endDate);
+
+	/**
+	 * Returns a list of submitted Presentence Investigation Request Summaries
+	 * for the requests with subjects with the given name.
+	 * 
+	 * @param firstName first name
+	 * @param lastName last name
+	 * @param startDate start date
+	 * @param endDate end date
+	 * @return List of submitted Presentence Investigation Request Summaries
+	 * for the requests with subjects with the given name.
+	 */
+	List<PresentenceInvestigationRequestSummary>
+		findSubmittedPresentenceInvestigationRequestSummariesByName(
+			String firstName, String lastName, Date startDate, Date endDate);
 }

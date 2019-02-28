@@ -44,8 +44,8 @@
 			<jsp:include page="/WEB-INF/views/offender/includes/offenderNameSummary.jsp"/>
 		</c:if>
 	</title>
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/presentenceInvestigation/style/presentenceInvestigation.css?VERSION=3"/>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/presentenceInvestigationRequests.js?VERSION=2"> </script>
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/presentenceInvestigation/style/presentenceInvestigation.css?VERSION=4"/>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/presentenceInvestigation/scripts/presentenceInvestigationRequests.js?VERSION=3"> </script>
 </head>
  <body>
  	<c:choose>

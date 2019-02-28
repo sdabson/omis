@@ -74,6 +74,11 @@
 		<c:if test="${empty officerCaseAssignment and empty offender}">
 			<sec:authorize access="hasRole('OFFICER_CASE_ASSIGNMENT_LIST') or hasRole('ADMIN')">
 				<li>
+				 <omis:reportPro reportPath="/CaseManagement/OfficerCaseAssignment/Officer_Case_Assignment_by_Institution" decorate="no" title="" className="newTab reportLink"><fmt:message key="officerCaseAssignmentsInstitutionReportLinkLabel"/></omis:reportPro>
+				</li>
+			</sec:authorize>		
+			<sec:authorize access="hasRole('OFFICER_CASE_ASSIGNMENT_LIST') or hasRole('ADMIN')">
+				<li>
 				 <omis:reportPro reportPath="/CaseManagement/OfficerCaseAssignment/Officer_Case_Assignment_by_Region_Supervising_Office" decorate="no" title="" className="newTab reportLink"><fmt:message key="officerCaseAssignmentsRegionReportLinkLabel"/></omis:reportPro>
 				</li>
 			</sec:authorize>

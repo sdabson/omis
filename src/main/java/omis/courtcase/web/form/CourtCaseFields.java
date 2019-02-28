@@ -3,6 +3,7 @@ package omis.courtcase.web.form;
 import java.io.Serializable;
 import java.util.Date;
 
+import omis.courtcase.domain.CourtCase;
 import omis.courtcase.domain.JurisdictionAuthority;
 import omis.courtcase.domain.OffenderDangerDesignator;
 import omis.person.domain.Person;
@@ -51,6 +52,32 @@ public class CourtCaseFields
 	/** Instantiates fields for court case. */
 	public CourtCaseFields() {
 		// Default instantiation
+	}
+	
+	/** Instantiates fields from court case. */
+	public CourtCaseFields(final CourtCase courtCase) {
+		this.interStateNumber = courtCase.getInterStateNumber();
+		this.interState = courtCase.getInterState();
+		this.pronouncementDate = courtCase.getPronouncementDate();
+		this.sentenceReviewDate = courtCase.getSentenceReviewDate();
+		this.jurisdicationAuthority = courtCase.getJurisdictionAuthority();
+		if (courtCase.getPersonnel() != null) {
+			this.judge = courtCase.getPersonnel().getJudge();
+			this.prosecutingAttorneyName
+				= courtCase.getPersonnel().getProsecutingAttorneyName();
+			this.defenseAttorneyName
+				= courtCase.getPersonnel().getDefenseAttorneyName();
+		}
+		this.dangerDesignator = courtCase.getDangerDesignator();
+		if (courtCase.getFlags() != null) {
+			this.criminallyConvictedYouth
+				= courtCase.getFlags().getCriminallyConvictedYouth();
+			this.youthTransfer
+				= courtCase.getFlags().getYouthTransfer();
+			this.convictionOverturned
+				= courtCase.getFlags().getConvictionOverturned();
+		}
+		this.comments = courtCase.getComments();
 	}
 		
 	/**

@@ -98,11 +98,6 @@
   </aop:config>
   
   <aop:config>
-      <aop:pointcut id="endLocationTermControllerOperation" expression="execution(* omis.locationterm.web.controller.EndLocationTermController.*(..))"/>
-      <aop:advisor advice-ref="transactionAdvice" pointcut-ref="endLocationTermControllerOperation"/>
-  </aop:config>
-
-  <aop:config>
       <aop:pointcut id="locationTermProfileControllerOperation" expression="execution(* omis.locationterm.web.controller.LocationTermProfileController.*(..))"/>
       <aop:advisor advice-ref="transactionAdvice" pointcut-ref="locationTermProfileControllerOperation"/>
   </aop:config>

@@ -40,6 +40,10 @@
 			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationAddOffenderFormValidator">
 		</bean>
 		
+		<bean id="presentenceInvestigationRequestSearchFormValidator"
+			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationRequestSearchFormValidator">
+		</bean>
+		
 		<bean id="presentenceInvestigationHomeFormValidator"
 			class="omis.presentenceinvestigation.web.validator.PresentenceInvestigationHomeFormValidator">
 		</bean>

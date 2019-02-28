@@ -17,7 +17,10 @@
  */
 package omis.earlyreleasetracking.report;
 
+import java.util.Date;
 import java.util.List;
+
+import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
 import omis.offender.domain.Offender;
 
 /**
@@ -40,4 +43,24 @@ public interface EarlyReleaseRequestSummaryReportService {
 	 */
 	List<EarlyReleaseRequestSummary> findByOffender(Offender offender);
 	
+	/**
+	 * Returns a list of Early Release Request Summaries within the specified
+	 * request dates and for offenders with Parole Eligibilities within the
+	 * specified eligibility dates and with the specified Early Release Status
+	 * Category.
+	 * 
+	 * @param requestStartDate Request Start Date
+	 * @param requestEndDate Request End Date
+	 * @param requestDate Request Date
+	 * @param eligibilityStartDate Eligibility Start Date
+	 * @param eligibilityEndDate Eligibility End Date
+	 * @param eligibilityDate Eligibility Date
+	 * @param earlyReleaseStatusCategory Early Release Status Category
+	 * @return List of Early Release Request Summaries.
+	 */
+	List<EarlyReleaseRequestSummary> findByDatesWithStatus(
+			Date requestStartDate, Date requestEndDate,
+			Date requestDate, Date eligibilityStartDate,
+			Date eligibilityEndDate, Date eligibilityDate,
+			EarlyReleaseStatusCategory earlyReleaseStatusCategory);
 }

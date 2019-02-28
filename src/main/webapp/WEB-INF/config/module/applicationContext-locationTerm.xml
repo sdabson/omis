@@ -161,10 +161,6 @@
   
   <!-- Service delegates -->
   
-  <bean id="endLocationTermService" class="omis.locationterm.service.impl.EndLocationTermServiceImpl">
-	<constructor-arg name="locationTermDelegate" ref="locationTermDelegate"/>
-  </bean>
-  
   <bean id="locationTermDelegate" class="omis.locationterm.service.delegate.LocationTermDelegate">
 	<constructor-arg name="locationTermDao" ref="locationTermDao"/>
 	<constructor-arg name="locationTermInstanceFactory" ref="locationTermInstanceFactory"/>
