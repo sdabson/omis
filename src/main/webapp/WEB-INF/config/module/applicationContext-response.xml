@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ - OMIS - Offender Management Information System
+ - Copyright (C) 2011 - 2017 State of Montana
+ -
+ - This program is free software: you can redistribute it and/or modify
+ - it under the terms of the GNU General Public License as published by
+ - the Free Software Foundation, either version 3 of the License, or
+ - (at your option) any later version.
+ -
+ - This program is distributed in the hope that it will be useful,
+ - but WITHOUT ANY WARRANTY; without even the implied warranty of
+ - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ - GNU General Public License for more details.
+ -
+ - You should have received a copy of the GNU General Public License
+ - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!-- 
+  - Response configuration.
+  -
+  - Author: Josh Divine
+  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+        
+        <!-- Services -->
+        
+        <bean id="responseService"
+        	class="omis.response.service.impl.ResponseServiceImpl">
+        	<constructor-arg name="responseDelegate" ref="responseDelegate"/>
+        	<constructor-arg name="gridDelegate" ref="gridDelegate"/>
+        	<constructor-arg name="responseLevelDelegate" ref="responseLevelDelegate"/>
+        </bean>        
+        
+        <!-- Report services -->
+        
+        <bean id="responseSummaryReportService"
+        	class="omis.response.report.impl.hibernate.ResponseSummaryReportServiceHibernateImpl">
+        	<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+        </bean>
+        
+        <!-- Delegates -->
+        
+        <bean id="responseDelegate"
+        	class="omis.response.service.delegate.ResponseDelegate">
+        	<constructor-arg name="responseDao" ref="responseDao"/>
+        	<constructor-arg name="auditComponentRetriever" ref="auditComponentRetriever"/>
+        	<constructor-arg name="responseInstanceFactory" ref="responseInstanceFactory"/>
+        </bean>
+        
+        <bean id="responseLevelDelegate"
+        	class="omis.response.service.delegate.ResponseLevelDelegate">
+        	<constructor-arg name="responseLevelDao" ref="responseLevelDao"/>
+        	<constructor-arg name="responseLevelInstanceFactory" ref="responseLevelInstanceFactory"/>
+        </bean>
+        
+        <bean id="gridDelegate"
+        	class="omis.response.service.delegate.GridDelegate">
+        	<constructor-arg name="gridDao" ref="gridDao"/>
+        	<constructor-arg name="gridInstanceFactory" ref="gridInstanceFactory"/>
+        </bean>
+        
+        <!-- Data access objects -->
+        
+        <bean id="responseDao"
+        	class="omis.response.dao.impl.hibernate.ResponseDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.response.domain.Response"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="responseLevelDao"
+        	class="omis.response.dao.impl.hibernate.ResponseLevelDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.response.domain.ResponseLevel"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<bean id="gridDao"
+        	class="omis.response.dao.impl.hibernate.GridDaoHibernateImpl">
+    		<constructor-arg name="entityName" value="omis.response.domain.Grid"/>
+    		<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+  		</bean>
+  		
+  		<!-- Instance factories -->
+  		 
+		<bean id="responseInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.response.domain.Response"/>
+		</bean>
+		
+		<bean id="responseLevelInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.response.domain.ResponseLevel"/>
+		</bean>
+		
+		<bean id="gridInstanceFactory"
+			class="omis.instance.factory.hibernate.impl.InstanceFactoryHibernateImpl">
+			<constructor-arg name="instanceFactoryDelegate" ref="instanceFactoryDelegate"/>
+			<constructor-arg name="entityName" value="omis.response.domain.Grid"/>
+		</bean>
+
+  		<!--Property editor factories -->
+ 		 
+ 		<bean id="responsePropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.response.domain.Response"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="responseDao"/>
+		</bean>
+		
+		<bean id="responseLevelPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.response.domain.ResponseLevel"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="responseLevelDao"/>
+		</bean>
+		
+		<bean id="gridPropertyEditorFactory"
+       		class="omis.beans.factory.impl.hibernate.PropertyEditorFactoryHibernateImpl">
+ 			<constructor-arg name="entityName" value="omis.response.domain.Grid"/>
+ 			<constructor-arg name="configuration" ref="hibernateConfiguration"/>
+  			<constructor-arg name="dao" ref="gridDao"/>
+		</bean>
+		
+</beans>

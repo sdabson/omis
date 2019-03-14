@@ -23,6 +23,7 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 
 import omis.dao.impl.hibernate.GenericHibernateDaoImpl;
+import omis.location.domain.Location;
 import omis.offender.domain.Offender;
 import omis.paroleeligibility.dao.ParoleEligibilityDao;
 import omis.paroleeligibility.domain.ParoleEligibility;
@@ -33,7 +34,7 @@ import omis.paroleeligibility.domain.ParoleEligibility;
  * @author Trevor Isles
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.3 (Dec 3, 2018)
+ * @version 0.1.4 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class ParoleEligibilityDaoHibernateImpl 
@@ -54,6 +55,9 @@ public class ParoleEligibilityDaoHibernateImpl
 	private static final String FIND_UNSCHEDULED_QUERY_NAME =
 			"findUnscheduledParoleEligibilities";
 	
+	private static final String FIND_UNSCHEDULED_BY_LOCATION_QUERY_NAME =
+			"findUnscheduledParoleEligibilitiesByLocation";
+	
 	/* Parameter names. */
 	
 	private static final String OFFENDER_PARAM_NAME = "offender";
@@ -65,6 +69,8 @@ public class ParoleEligibilityDaoHibernateImpl
 		= "excludedEligibility";
 	
 	private static final String DATE_PARAM_NAME = "date";
+	
+	private static final String LOCATION_PARAM_NAME = "location";
 
 	/* Constructor */
 	
@@ -86,12 +92,12 @@ public class ParoleEligibilityDaoHibernateImpl
 	public ParoleEligibility find(final Offender offender, 
 			final Date hearingEligibilityDate) {
 		ParoleEligibility eligibility = (ParoleEligibility)
-		this.getSessionFactory().getCurrentSession()
-			.getNamedQuery(FIND_PAROLE_ELIGIBILITY_QUERY_NAME)
-			.setParameter(OFFENDER_PARAM_NAME, offender)
-			.setParameter(HEARING_ELIGIBILITY_DATE_PARAM_NAME, 
-					hearingEligibilityDate)
-			.uniqueResult();
+			this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(FIND_PAROLE_ELIGIBILITY_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setParameter(HEARING_ELIGIBILITY_DATE_PARAM_NAME, 
+						hearingEligibilityDate)
+				.uniqueResult();
 		return eligibility;
 	}
 
@@ -102,14 +108,14 @@ public class ParoleEligibilityDaoHibernateImpl
 			final Offender offender, 
 			final Date hearingEligibilityDate) {
 		ParoleEligibility eligibility = (ParoleEligibility)
-		this.getSessionFactory().getCurrentSession()
-			.getNamedQuery(FIND_PAROLE_ELIGIBILITY_EXCLUDING_QUERY_NAME)
-			.setParameter(OFFENDER_PARAM_NAME, offender)
-			.setParameter(EXCLUDED_PAROLE_ELIGIBILITY_PARAM_NAME, 
-					excludedEligibility)
-			.setParameter(HEARING_ELIGIBILITY_DATE_PARAM_NAME, 
-					hearingEligibilityDate)
-			.uniqueResult();
+			this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(FIND_PAROLE_ELIGIBILITY_EXCLUDING_QUERY_NAME)
+				.setParameter(OFFENDER_PARAM_NAME, offender)
+				.setParameter(EXCLUDED_PAROLE_ELIGIBILITY_PARAM_NAME, 
+						excludedEligibility)
+				.setParameter(HEARING_ELIGIBILITY_DATE_PARAM_NAME, 
+						hearingEligibilityDate)
+				.uniqueResult();
 		return eligibility;
 	}
 
@@ -134,6 +140,20 @@ public class ParoleEligibilityDaoHibernateImpl
 		List<ParoleEligibility> paroleEligibilities =
 				this.getSessionFactory().getCurrentSession()
 				.getNamedQuery(FIND_UNSCHEDULED_QUERY_NAME)
+				.list();
+		return paroleEligibilities;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<ParoleEligibility> findUnscheduledByLocation(
+				final Location location) {
+		@SuppressWarnings("unchecked")
+		List<ParoleEligibility> paroleEligibilities =
+				this.getSessionFactory().getCurrentSession()
+				.getNamedQuery(FIND_UNSCHEDULED_BY_LOCATION_QUERY_NAME)
+				.setParameter(LOCATION_PARAM_NAME, location)
+				.setTimestamp(DATE_PARAM_NAME, new Date())
 				.list();
 		return paroleEligibilities;
 	}

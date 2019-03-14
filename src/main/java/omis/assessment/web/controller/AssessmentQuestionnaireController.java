@@ -69,7 +69,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Assessment Questionnaire Controller.
  * 
  *@author Annie Wahl 
- *@version 0.1.0 (Mar 21, 2018)
+ *@version 0.1.1 (Mar 12, 2019)
  *@since OMIS 3.0
  *
  */
@@ -247,12 +247,12 @@ public class AssessmentQuestionnaireController {
 				this.administeredQuestionnaireService
 				.findAllowedQuestionsByQuestionSection(
 						sectionStatus.getQuestionnaireSection());
+		
 		checkReturned
 			: for (AllowedQuestion allowedQuestion : allowedQuestions) {
 			if (this.administeredQuestionnaireService
-					.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-					allowedQuestion.getQuestion(),
-					sectionStatus.getAdministeredQuestionnaire()) != null) {
+				.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+				allowedQuestion.getQuestion(), sectionStatus) != null) {
 				returning = true;
 				break checkReturned;
 			}
@@ -272,9 +272,9 @@ public class AssessmentQuestionnaireController {
 						.equals(AnswerCardinality.SINGLE)) {
 					AdministeredQuestionValue administeredQuestionValue =
 							this.administeredQuestionnaireService
-							.findAdministeredQuestionValueByQuestionAndQuestionnaire(
+							.findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
 								allowedQuestion.getQuestion(), 
-								sectionStatus.getAdministeredQuestionnaire());
+								sectionStatus);
 					if (administeredQuestionValue != null) {
 						item.setAnswerValue(administeredQuestionValue
 								.getAnswerValue());
@@ -289,9 +289,8 @@ public class AssessmentQuestionnaireController {
 						.equals(AnswerCardinality.MULTIPLE)) {
 					List<AdministeredQuestionValue> administeredQuestionValues
 						= this.administeredQuestionnaireService
-							.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-								allowedQuestion.getQuestion(), 
-								sectionStatus.getAdministeredQuestionnaire());
+							.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+								allowedQuestion.getQuestion(), sectionStatus);
 					List<AdministeredQuestionValueItem> admnstrdQstnValueItems =
 							new ArrayList<AdministeredQuestionValueItem>();
 					
@@ -647,8 +646,8 @@ public class AssessmentQuestionnaireController {
 						.equals(AnswerCardinality.SINGLE)) {
 					administeredQuestionValue = 
 							this.administeredQuestionnaireService
-					.findAdministeredQuestionValueByQuestionAndQuestionnaire(
-					allowedQuestion.getQuestion(), administeredQuestionnaire);
+					.findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
+					allowedQuestion.getQuestion(), sectionStatus);
 					if (administeredQuestionValue != null) {
 						item.setAnswerValue(administeredQuestionValue
 								.getAnswerValue());
@@ -661,9 +660,8 @@ public class AssessmentQuestionnaireController {
 						.equals(AnswerCardinality.MULTIPLE)) {
 					administeredQuestionValues
 						= this.administeredQuestionnaireService
-					.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-							allowedQuestion.getQuestion(), 
-							administeredQuestionnaire);
+					.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+							allowedQuestion.getQuestion(), sectionStatus);
 					List<AdministeredQuestionValueItem> admnstrdQstnValueItems =
 							new ArrayList<AdministeredQuestionValueItem>();
 					

@@ -213,6 +213,8 @@
   
   <import resource="applicationContext-residenceWeb.xml"/>
   
+  <import resource="applicationContext-responseWeb.xml"/>
+  
   <import resource="applicationContext-scheduleWeb.xml"/>
   
   <import resource="applicationContext-searchWeb.xml"/>

@@ -57,27 +57,25 @@
 					offender2 = offender
 			) as string) as offenderNumber,
 			prisonTerm.paroleEligibilityDate,
-			(select placementTerm.dateRange.startDate
+			(select correctionalStatusTerm.dateRange.startDate
 				from
-					omis.supervision.domain.PlacementTerm placementTerm
+					omis.supervision.domain.CorrectionalStatusTerm correctionalStatusTerm
 				inner join
-					placementTerm.offender pmOffender
-				inner join
-					placementTerm.correctionalStatusTerm correctionalStatusTerm
+					correctionalStatusTerm.offender cstOffender
 				inner join
 					correctionalStatusTerm.correctionalStatus correctionalStatus
 				where
-					(pmOffender = offender
+					(cstOffender = offender
 					and
-						(placementTerm.dateRange.startDate is null
+						(correctionalStatusTerm.dateRange.startDate is null
 						or
-						(placementTerm.dateRange.startDate <= :effectiveDate
-						and (placementTerm.dateRange.endDate > :effectiveDate
-							or placementTerm.dateRange.endDate is null)))
+						(correctionalStatusTerm.dateRange.startDate <= :effectiveDate
+						and (correctionalStatusTerm.dateRange.endDate > :effectiveDate
+							or correctionalStatusTerm.dateRange.endDate is null)))
 					and
 						upper(correctionalStatus.name) = 'PROBATION')
 					or
-						placementTerm is null
+						correctionalStatusTerm is null
 			),
 			(select residenceTerm.dateRange.startDate
 				from
@@ -126,27 +124,10 @@
 			docket.person offender
 		inner join
 			offender.name name,
-				omis.prisonterm.domain.PrisonTerm prisonTerm
-		inner join
+		omis.prisonterm.domain.PrisonTerm prisonTerm
+		right outer join
 			prisonTerm.offender ptOffender
 		where
-			offender = ptOffender
-		and
-			prisonTerm.paroleEligibilityDate is not null
-		and
-			prisonTerm.status is 'ACTIVE'
-		and
-			(
-				(prisonTerm.paroleEligibilityDate >= :eligibilityStartDate
-					or :eligibilityStartDate is null)
-				and
-				(prisonTerm.paroleEligibilityDate <= :eligibilityEndDate
-					or :eligibilityEndDate is null)
-				or
-				(:eligibilityStartDate is null
-					and :eligibilityEndDate is null)
-			)
-		and
 			(
 				(earlyReleaseRequest.requestDate >= :requestStartDate
 					or :requestStartDate is null)
@@ -159,18 +140,45 @@
 			)
 		and
 			(
-				prisonTerm.paroleEligibilityDate >= :eligibilityDate
-					or :eligibilityDate is null
-			)
-		and
-			(
-				earlyReleaseRequest.requestDate >= :requestDate
+				earlyReleaseRequest.requestDate = :requestDate
 					or :requestDate is null
 			)
 		and
 			(
-				statusCategory = :requestStatus
+				(statusCategory = :requestStatus
 					or :requestStatus is null
+					and :noResponse is false)
+				or
+					(:noResponse is true
+						and :requestStatus is null
+						and statusCategory is null)
 			)
+		and
+			(offender = ptOffender
+			and
+				(prisonTerm.status is 'ACTIVE'
+					and
+						(
+							(prisonTerm.paroleEligibilityDate >= :eligibilityStartDate
+								or :eligibilityStartDate is null)
+							and
+							(prisonTerm.paroleEligibilityDate <= :eligibilityEndDate
+								or :eligibilityEndDate is null)
+							or
+							(:eligibilityStartDate is null
+								and :eligibilityEndDate is null)
+						)
+					and
+						(prisonTerm.paroleEligibilityDate = :eligibilityDate
+								or :eligibilityDate is null)
+					or prisonTerm is null
+				)
+			)
+		order by
+					name.lastName,
+					name.firstName,
+					name.middleName,
+					earlyReleaseRequest.requestDate
+			
 	]]></query>
 </hibernate-mapping>

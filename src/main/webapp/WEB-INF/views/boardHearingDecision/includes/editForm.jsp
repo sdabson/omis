@@ -60,6 +60,13 @@
 			</form:select>
 			<form:errors path="category" cssClass="error"/>
 		</span>
+		<span class="fieldGroup">
+			<form:label path="rulingDetails" class="fieldLabel">
+				<fmt:message key="rulingDetailsLabel"/>
+			</form:label>
+			<form:textarea path="rulingDetails"/>
+			<form:errors path="rulingDetails" cssClass="error"/>
+		</span>
 	</fieldset>
 	<fieldset>
 		<legend>

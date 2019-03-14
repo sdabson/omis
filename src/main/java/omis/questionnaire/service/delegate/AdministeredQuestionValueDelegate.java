@@ -9,6 +9,7 @@ import omis.instance.factory.InstanceFactory;
 import omis.questionnaire.dao.AdministeredQuestionValueDao;
 import omis.questionnaire.domain.AdministeredQuestionValue;
 import omis.questionnaire.domain.AdministeredQuestionnaire;
+import omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus;
 import omis.questionnaire.domain.AnswerValue;
 import omis.questionnaire.domain.Question;
 import omis.questionnaire.domain.QuestionnaireSection;
@@ -17,7 +18,7 @@ import omis.questionnaire.domain.QuestionnaireSection;
  * Administered Question Value Delegate.
  * 
  *@author Annie Wahl 
- *@version 0.1.1 (Apr 5, 2018)
+ *@version 0.1.2 (Mar 12, 2019)
  *@since OMIS 3.0
  *
  */
@@ -154,19 +155,22 @@ public class AdministeredQuestionValueDelegate {
 	}
 	
 	/**
-	 * Returns an AdministeredQuestionValue by specified question and
-	 * administered questionnaire.
+	 * Returns an AdministeredQuestionValue by specified question
+	 * and Administered Questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
-	 * @return AdministeredQuestionValue found by specified question and
-	 * administered questionnaire.
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
+	 * @return AdministeredQuestionValue by specified question
+	 * and Administered Questionnaire Section Status.
 	 */
-	public AdministeredQuestionValue findByQuestionAndAdministeredQuestionnaire(
+	public AdministeredQuestionValue
+				findByQuestionAndAdministeredQuestionnaireSectionStatus(
 			final Question question, 
-			final AdministeredQuestionnaire administeredQuestionnaire) {
+			final AdministeredQuestionnaireSectionStatus
+				administeredQuestionnaireSectionStatus) {
 		return this.administeredQuestionValueDao
-			.findByQuestionAndAdministeredQuestionnaire(question, 
-				administeredQuestionnaire);
+			.findByQuestionAndAdministeredQuestionnaireSectionStatus(question,
+					administeredQuestionnaireSectionStatus);
 	}
 	
 	/**
@@ -188,17 +192,20 @@ public class AdministeredQuestionValueDelegate {
 	
 	/**
 	 * Returns a list of AdministeredQuestionValues by specified question and
-	 * administered questionnaire.
+	 * administered questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
 	 * @return List of AdministeredQuestionValues by specified question and
-	 * administered questionnaire.
+	 * administered questionnaire Section Status.
 	 */
 	public List<AdministeredQuestionValue> 
-		findAllByQuestionAndAdministeredQuestionnaire(final Question question, 
-			final AdministeredQuestionnaire administeredQuestionnaire) {
+		findAllByQuestionAndAdministeredQuestionnaireSectionStatus(
+				final Question question, 
+				final AdministeredQuestionnaireSectionStatus
+					administeredQuestionnaireSectionStatus) {
 		return this.administeredQuestionValueDao
-			.findAllByQuestionAndAdministeredQuestionnaire(question, 
-				administeredQuestionnaire);
+			.findAllByQuestionAndAdministeredQuestionnaireSectionStatus(
+					question, administeredQuestionnaireSectionStatus);
 	}
 }

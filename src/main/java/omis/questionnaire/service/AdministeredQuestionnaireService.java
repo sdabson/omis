@@ -19,7 +19,7 @@ import omis.user.domain.UserAccount;
  * Administered Questionnaire Service.
  * 
  *@author Annie Wahl 
- *@version 0.1.1 (Apr 5, 2018)
+ *@version 0.1.2 (Mar 12, 2019)
  *@since OMIS 3.0
  *
  */
@@ -169,29 +169,32 @@ public interface AdministeredQuestionnaireService {
 	
 	/**
 	 * Returns an AdministeredQuestionValue by specified question
-	 * and administered questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
 	 * @return AdministeredQuestionValue by specified question
-	 * and administered questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 */
 	AdministeredQuestionValue 
-		findAdministeredQuestionValueByQuestionAndQuestionnaire(
-			Question question, 
-			AdministeredQuestionnaire administeredQuestionnaire);
-	
+		findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
+			Question question,
+			AdministeredQuestionnaireSectionStatus 
+				administeredQuestionnaireSectionStatus);
+
 	/**
-	 * Returns a list of AdministeredQuestionValues by specified question
-	 * and administered questionnaire.
+	 * Returns a list of AdministeredQuestionValues by specified question and
+	 * administered questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
-	 * @return List of AdministeredQuestionValues by specified question
-	 * and administered questionnaire.
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
+	 * @return List of AdministeredQuestionValues by specified question and
+	 * administered questionnaire Section Status.
 	 */
 	List<AdministeredQuestionValue> 
-		findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-				Question question, AdministeredQuestionnaire
-					administeredQuestionnaire);
+		findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+				Question question, AdministeredQuestionnaireSectionStatus
+					administeredQuestionnaireSectionStatus);
 	
 	/**
 	 * Returns an AdministeredQuestionnaireSectionNote found by 

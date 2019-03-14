@@ -24,6 +24,9 @@
 	<form:form commandName="earlyReleaseRequestFilterForm" class="filterForm">
 		<fieldset class="foregroundUltraLight">
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="singleEligibilityDate" id="searchSingleEligibilityDate" value="true"/>
+				</span>
 				<span class="fieldGroup">
 					<label for="eligibilityDate" class="fieldLabel"><fmt:message key="eligibilityDateLabel" /></label>
 					<form:input class="date" path="eligibilityDate"/>
@@ -31,6 +34,9 @@
 				</span>
 			</div>
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="singleEligibilityDate" id="searchEligibilityDateRange" value="false"/>
+				</span>
 				<span class="fieldGroup">
 					<label for="eligibilityStartDate" class="fieldLabel"><fmt:message key="eligibilityDateRangeLabel" /></label>
 					<form:input class="date" path="eligibilityStartDate"/>
@@ -42,15 +48,21 @@
 					<form:errors cssClass="error" path="eligibilityEndDate"/>
 				</span>
 			</div>
+			<br />
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="noResponse" id="response" value="false"/>
+				</span>
 				<span class="fieldGroup">
 					<form:label path="releaseStatus" class="fieldLabel">
 						<fmt:message key="requestStatusLabel"/>
 					</form:label>
 					<form:select path="releaseStatus">
-						<jsp:include page="../../../includes/nullOption.jsp"/>
+						<option value="">
+								<fmt:message key="anyStatusLabel"/>
+						</option>
 						<c:forEach items="${earlyReleaseStatusCategories}" var="statusCategory">
-							<option value="${statusCategory.id}" ${statusCategory.id == earlyReleaseRequestSearchForm.releaseStatus.id ? 'selected="selected"' : ''}>
+							<option value="${statusCategory.id}" ${statusCategory.id == earlyReleaseRequestFilterForm.releaseStatus.id ? 'selected="selected"' : ''}>
 								<c:out value="${statusCategory.name}"/>
 							</option>
 						</c:forEach>
@@ -59,6 +71,20 @@
 				</span>
 			</div>
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="noResponse" id="noResponse" value="true"/>
+				</span>
+				<span class="fieldGroup">
+					<form:label id="noResponseLabel" path="noResponse" class="fieldLabel">
+						<fmt:message key="noResponseLabel"/>
+					</form:label>
+				</span>
+			</div>
+			<br />
+			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="singleRequestDate" id="searchSingleRequestDate" value="true"/>
+				</span>
 				<span class="fieldGroup">
 					<label for="requestDate" class="fieldLabel"><fmt:message key="requestDateLabel" /></label>
 					<form:input class="date" path="requestDate"/>
@@ -66,6 +92,9 @@
 				</span>
 			</div>
 			<div>
+				<span class="fieldGroup relevantOptionFieldGroup">
+					<form:radiobutton path="singleRequestDate" id="searchRequestDateRange" value="false"/>
+				</span>
 				<span class="fieldGroup">
 					<label for="requestStartDate" class="fieldLabel"><fmt:message key="requestDateRangeLabel" /></label>
 					<form:input class="date" path="requestStartDate"/>

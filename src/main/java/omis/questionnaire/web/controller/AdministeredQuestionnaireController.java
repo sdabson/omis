@@ -54,7 +54,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Administered Questionnaire Controller.
  * 
  *@author Annie Wahl 
- *@version 0.1.1 (Apr 6, 2018)
+ *@version 0.1.2 (Mar 12, 2019)
  *@since OMIS 3.0
  *
  */
@@ -298,9 +298,9 @@ public class AdministeredQuestionnaireController {
 						sectionStatus.getQuestionnaireSection())) {
 				for (AdministeredQuestionValue administeredQuestionValue
 						: this.administeredQuestionnaireService
-					.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-							allowedQuestion.getQuestion(), 
-							administeredQuestionnaire)) {
+					.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+							allowedQuestion.getQuestion(),
+							sectionStatus)) {
 					this.administeredQuestionnaireService
 						.removeAdministeredQuestionValue(
 							administeredQuestionValue);
@@ -501,8 +501,8 @@ public class AdministeredQuestionnaireController {
 						.equals(AnswerCardinality.SINGLE)) {
 					administeredQuestionValue = 
 							this.administeredQuestionnaireService
-					.findAdministeredQuestionValueByQuestionAndQuestionnaire(
-					allowedQuestion.getQuestion(), administeredQuestionnaire);
+					.findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
+					allowedQuestion.getQuestion(), sectionStatus);
 					if (administeredQuestionValue != null) {
 						item.setAnswerValue(administeredQuestionValue
 								.getAnswerValue());
@@ -515,9 +515,8 @@ public class AdministeredQuestionnaireController {
 						.equals(AnswerCardinality.MULTIPLE)) {
 					administeredQuestionValues
 						= this.administeredQuestionnaireService
-					.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-							allowedQuestion.getQuestion(), 
-							administeredQuestionnaire);
+					.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+							allowedQuestion.getQuestion(), sectionStatus);
 					List<AdministeredQuestionValueItem> admnstrdQstnValueItems =
 							new ArrayList<AdministeredQuestionValueItem>();
 					

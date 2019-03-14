@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="omis.earlyreleasetracking.domain">
+	<class entity-name="omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus"
+			proxy="omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus"
+			name="omis.earlyreleasetracking.domain.impl.EarlyReleaseEligibleCorrectionalStatusImpl"
+			table="`ERLY_RLSE_ELGBL_CRCTN_STS`">
+			<id name="id" column="`ID`" type="java.lang.Long">
+				<generator class="sequence">
+					<param name="sequence">`ERLY_RLSE_ELGBL_CRCTN_STS_SEQ`</param>
+				</generator>
+			</id>
+			<many-to-one name="correctionalStatus" column="`CORRECTIONAL_STATUS_ID`" entity-name="omis.supervision.domain.CorrectionalStatus" not-null="true" />
+			<property name="valid" column="`VALID`" type="yes_no" not-null="true" />
+			<component name="creationSignature">
+				<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`CREATE_DATE`" not-null="true"/> 	
+			</component>
+			<component name="updateSignature">
+				<many-to-one name="userAccount" column="`UPDATE_ACCOUNT_ID`" not-null="true"/>
+				<property name="date" column="`UPDATE_DATE`" not-null="true"/>
+			</component>
+	</class>
+	<query name="findEarlyReleaseEligibleCorrectionalStatus"><![CDATA[
+		select earlyReleaseEligibleCorrectionalStatus
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus earlyReleaseEligibleCorrectionalStatus
+		where
+			earlyReleaseEligibleCorrectionalStatus.correctionalStatus = :correctionalStatus
+	]]></query>
+	<query name="findEarlyReleaseEligibleCorrectionalStatusExcluding"><![CDATA[
+		select earlyReleaseEligibleCorrectionalStatus
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus earlyReleaseEligibleCorrectionalStatus
+		where
+			earlyReleaseEligibleCorrectionalStatus.correctionalStatus = :correctionalStatus
+		and
+			earlyReleaseEligibleCorrectionalStatus != :earlyReleaseEligibleCorrectionalStatus
+	]]></query>
+	<query name="findEarlyReleaseEligibleCorrectionalStatuses"><![CDATA[
+		select earlyReleaseEligibleCorrectionalStatus
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus earlyReleaseEligibleCorrectionalStatus
+		where
+			earlyReleaseEligibleCorrectionalStatus.valid = true
+	]]></query>
+</hibernate-mapping>

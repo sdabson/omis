@@ -63,7 +63,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * 
  * @author Annie Wahl
  * @author Josh Divine 
- * @version 0.1.2 (Apr 5, 2018)
+ * @version 0.1.3 (Mar 12, 2019)
  * @since OMIS 3.0
  *
  */
@@ -209,9 +209,8 @@ public class QuestionnaireSectionController {
 		checkReturned : for (AllowedQuestion allowedQuestion
 				: allowedQuestions) {
 			if (this.administeredQuestionnaireService
-					.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-					allowedQuestion.getQuestion(), 
-					sectionStatus.getAdministeredQuestionnaire()) != null) {
+					.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+					allowedQuestion.getQuestion(), sectionStatus) != null) {
 				returning = true;
 				break checkReturned;
 			}
@@ -231,9 +230,9 @@ public class QuestionnaireSectionController {
 						.equals(AnswerCardinality.SINGLE)) {
 					AdministeredQuestionValue administeredQuestionValue =
 							this.administeredQuestionnaireService
-							.findAdministeredQuestionValueByQuestionAndQuestionnaire(
-								allowedQuestion.getQuestion(), 
-								sectionStatus.getAdministeredQuestionnaire());
+							.findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
+								allowedQuestion.getQuestion(),
+								sectionStatus);
 					if (administeredQuestionValue != null) {
 						item.setAnswerValue(administeredQuestionValue
 								.getAnswerValue());
@@ -248,9 +247,8 @@ public class QuestionnaireSectionController {
 						.equals(AnswerCardinality.MULTIPLE)) {
 					List<AdministeredQuestionValue> administeredQuestionValues
 						= this.administeredQuestionnaireService
-							.findAdministeredQuestionValuesByQuestionAndQuestionnaire(
-								allowedQuestion.getQuestion(),
-								sectionStatus.getAdministeredQuestionnaire());
+							.findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
+								allowedQuestion.getQuestion(), sectionStatus);
 					List<AdministeredQuestionValueItem> admnstrdQstnValueItems =
 							new ArrayList<AdministeredQuestionValueItem>();
 					

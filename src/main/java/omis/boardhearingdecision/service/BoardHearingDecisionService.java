@@ -34,7 +34,8 @@ import omis.exception.DuplicateEntityFoundException;
  * Board hearing decision service.
  *
  * @author Josh Divine
- * @version 0.1.0 (Jan 22, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public interface BoardHearingDecisionService {
@@ -45,11 +46,12 @@ public interface BoardHearingDecisionService {
 	 * 
 	 * @param hearing board hearing
 	 * @param category board hearing decision category
+	 * @param rulingDetails ruling details
 	 * @return board hearing decision
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	BoardHearingDecision createBoardHearingDecision(BoardHearing hearing, 
-			BoardHearingDecisionCategory category) 
+			BoardHearingDecisionCategory category, String rulingDetails) 
 					throws DuplicateEntityFoundException;
 	
 	/**
@@ -58,12 +60,13 @@ public interface BoardHearingDecisionService {
 	 * 
 	 * @param boardDecision board hearing decision
 	 * @param category board hearing decision category
+	 * @param rulingDetails ruling details
 	 * @return board hearing decision
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	BoardHearingDecision updateBoardHearingDecision(
 			BoardHearingDecision boardDecision, 
-			BoardHearingDecisionCategory category) 
+			BoardHearingDecisionCategory category, String rulingDetails) 
 					throws DuplicateEntityFoundException;
 	
 	/**

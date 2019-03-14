@@ -17,6 +17,9 @@
  */
 package omis.earlyreleasetracking.service.impl;
 
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import omis.docket.domain.Docket;
@@ -25,6 +28,7 @@ import omis.document.domain.Document;
 import omis.document.domain.DocumentTag;
 import omis.document.service.delegate.DocumentDelegate;
 import omis.document.service.delegate.DocumentTagDelegate;
+import omis.earlyreleasetracking.domain.EarlyReleaseEligibleCorrectionalStatus;
 import omis.earlyreleasetracking.domain.EarlyReleaseJudgeResponseCategory;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestCategory;
@@ -41,6 +45,7 @@ import omis.earlyreleasetracking.exception.EarlyReleaseRequestExternalOpposition
 import omis.earlyreleasetracking.exception.EarlyReleaseRequestInternalApprovalExists;
 import omis.earlyreleasetracking.exception.EarlyReleaseRequestNoteAssociationExistsException;
 import omis.earlyreleasetracking.service.EarlyReleaseRequestService;
+import omis.earlyreleasetracking.service.delegate.EarlyReleaseEligibleCorrectionalStatusDelegate;
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseJudgeResponseCategoryDelegate;
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestDelegate;
 import omis.earlyreleasetracking.service.delegate.EarlyReleaseRequestDocumentAssociationDelegate;
@@ -51,6 +56,9 @@ import omis.earlyreleasetracking.service.delegate.EarlyReleaseStatusCategoryDele
 import omis.earlyreleasetracking.service.delegate.ExternalOppositionPartyCategoryDelegate;
 import omis.exception.DuplicateEntityFoundException;
 import omis.offender.domain.Offender;
+import omis.supervision.domain.CorrectionalStatus;
+import omis.supervision.domain.CorrectionalStatusTerm;
+import omis.supervision.service.delegate.CorrectionalStatusTermDelegate;
 import omis.user.domain.UserAccount;
 
 /**
@@ -87,11 +95,16 @@ public class EarlyReleaseRequestServiceImpl
 	private final ExternalOppositionPartyCategoryDelegate
 				externalOppositionPartyCategoryDelegate;
 	
+	private final EarlyReleaseEligibleCorrectionalStatusDelegate
+				earlyReleaseEligibleCorrectionalStatusDelegate;
+	
 	private final DocumentDelegate documentDelegate;
 	
 	private final DocumentTagDelegate documentTagDelegate;
 	
 	private final DocketDelegate docketDelegate;
+	
+	private final CorrectionalStatusTermDelegate correctionalStatusTermDelegate;
 	
 	/**
 	 * Constructor for EarlyReleaseRequestServiceImpl.
@@ -111,9 +124,12 @@ public class EarlyReleaseRequestServiceImpl
 	 * Delegate
 	 * @param externalOppositionPartyCategoryDelegate External Opposition Party
 	 * Category Delegate
+	 * @param earlyReleaseEligibleCorrectionalStatusDelegate Early Release
+	 * Eligible Correctional Status Delegate
 	 * @param documentDelegate Document Delegate
 	 * @param documentTagDelegate Document Tag Delegate
 	 * @param docketDelegate Docket Delegate
+	 * @param correctionalStatusTermDelegate Correctional Status Term Delegate
 	 */
 	public EarlyReleaseRequestServiceImpl(
 			final EarlyReleaseRequestDelegate earlyReleaseRequestDelegate,
@@ -131,9 +147,13 @@ public class EarlyReleaseRequestServiceImpl
 				earlyReleaseStatusCategoryDelegate,
 			final ExternalOppositionPartyCategoryDelegate
 				externalOppositionPartyCategoryDelegate,
+			final EarlyReleaseEligibleCorrectionalStatusDelegate
+				earlyReleaseEligibleCorrectionalStatusDelegate,
 			final DocumentDelegate documentDelegate,
 			final DocumentTagDelegate documentTagDelegate,
-			final DocketDelegate docketDelegate) {
+			final DocketDelegate docketDelegate,
+			final CorrectionalStatusTermDelegate
+				correctionalStatusTermDelegate) {
 		this.earlyReleaseRequestDelegate = earlyReleaseRequestDelegate;
 		this.earlyReleaseRequestNoteAssociationDelegate =
 				earlyReleaseRequestNoteAssociationDelegate;
@@ -149,9 +169,12 @@ public class EarlyReleaseRequestServiceImpl
 				earlyReleaseStatusCategoryDelegate;
 		this.externalOppositionPartyCategoryDelegate =
 				externalOppositionPartyCategoryDelegate;
+		this.earlyReleaseEligibleCorrectionalStatusDelegate =
+				earlyReleaseEligibleCorrectionalStatusDelegate;
 		this.documentDelegate = documentDelegate;
 		this.documentTagDelegate = documentTagDelegate;
 		this.docketDelegate = docketDelegate;
+		this.correctionalStatusTermDelegate = correctionalStatusTermDelegate;
 	}
 
 	/** {@inheritDoc} */
@@ -446,5 +469,38 @@ public class EarlyReleaseRequestServiceImpl
 	@Override
 	public List<Docket> findDocketsByOffender(final Offender offender) {
 		return this.docketDelegate.findByPerson(offender);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public Long getMonthsOnProbation(final Offender offender) {
+		Date today = new Date();
+		CorrectionalStatusTerm correctionalStatusTerm =
+				this.correctionalStatusTermDelegate.findForOffenderOnDate(
+						offender, today);
+		Long months = null;
+		
+		if (correctionalStatusTerm != null) {
+			List<CorrectionalStatus> correctionalStatuses =
+					new ArrayList<CorrectionalStatus>();
+			for (EarlyReleaseEligibleCorrectionalStatus
+					eligibleCorrectionalStatus
+					: this.earlyReleaseEligibleCorrectionalStatusDelegate
+					.findAllStatuses()) {
+				correctionalStatuses.add(eligibleCorrectionalStatus
+						.getCorrectionalStatus());
+			}
+			
+			if (correctionalStatuses.contains(correctionalStatusTerm
+					.getCorrectionalStatus())) {
+				months = ChronoUnit.MONTHS.between(
+					correctionalStatusTerm.getDateRange().getStartDate()
+					.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+					today.toInstant().atZone(ZoneId.systemDefault())
+					.toLocalDate());
+			}
+		}
+		
+		return months;
 	}
 }

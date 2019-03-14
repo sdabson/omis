@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
-<fmt:bundle basename="omis.assessment.msgs.ratingNotes">
+<fmt:bundle basename="omis.assessment.msgs.assessmentNotes">
 	<tr id="ratingNoteItemRow${ratingNoteItemIndex}" class="ratingNoteItemRow">
 		<td>
 			<a class="removeLink" id="removeRatingNoteLink${ratingNoteItemIndex}" href="${pageContext.request.contextPath}/assessment/rating/notes/removeRatingNote.html?assessment=${assessment.id}"><span class="linkLabel"><fmt:message key="removeLink" bundle="${commonBundle}"/></span></a>

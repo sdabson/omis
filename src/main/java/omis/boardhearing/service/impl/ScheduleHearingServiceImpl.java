@@ -31,6 +31,7 @@ import omis.boardhearing.service.delegate.BoardHearingDelegate;
 import omis.boardhearing.service.delegate.BoardHearingParticipantDelegate;
 import omis.hearinganalysis.domain.HearingAnalysis;
 import omis.hearinganalysis.service.delegate.HearingAnalysisDelegate;
+import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboarditinerary.service.delegate.BoardAttendeeDelegate;
@@ -194,7 +195,9 @@ public class ScheduleHearingServiceImpl implements ScheduleHearingService {
 
 	/**{@inheritDoc} */
 	@Override
-	public List<ParoleEligibility> findParoleEligibilitiesUnscheduled() {
-		return this.paroleEligibilityDelegate.findUnscheduled();
+	public List<ParoleEligibility> findParoleEligibilitiesUnscheduledByLocation(
+			final Location location) {
+		return this.paroleEligibilityDelegate.findUnscheduledByLocation(
+				location);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import omis.dao.GenericDao;
 import omis.questionnaire.domain.AdministeredQuestionValue;
 import omis.questionnaire.domain.AdministeredQuestionnaire;
+import omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus;
 import omis.questionnaire.domain.AnswerValue;
 import omis.questionnaire.domain.Question;
 import omis.questionnaire.domain.QuestionnaireSection;
@@ -12,7 +13,7 @@ import omis.questionnaire.domain.QuestionnaireSection;
  * Administered Question Value Data access object.
  * 
  *@author Annie Wahl 
- *@version 0.1.1 (Apr 5, 2018)
+ *@version 0.1.2 (Mar 12, 2019)
  *@since OMIS 3.0
  *
  */
@@ -55,15 +56,18 @@ public interface AdministeredQuestionValueDao
 	
 	/**
 	 * Returns an AdministeredQuestionValue by specified question
-	 * and Administered Questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
 	 * @return AdministeredQuestionValue by specified question
-	 * and Administered Questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 */
-	AdministeredQuestionValue findByQuestionAndAdministeredQuestionnaire(
+	AdministeredQuestionValue
+		findByQuestionAndAdministeredQuestionnaireSectionStatus(
 			Question question, 
-			AdministeredQuestionnaire administeredQuestionnaire);
+			AdministeredQuestionnaireSectionStatus
+				administeredQuestionnaireSectionStatus);
 	
 	/**
 	 * Returns Administered Question Value with specified properties
@@ -80,14 +84,17 @@ public interface AdministeredQuestionValueDao
 	
 	/**
 	 * Returns a list of AdministeredQuestionValues by specified question
-	 * and Administered Questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 * @param question - Question
-	 * @param administeredQuestionnaire - Administered Questionnaire
+	 * @param administeredQuestionnaireSectionStatus - Administered
+	 * Questionnaire Section Status
 	 * @return List of AdministeredQuestionValues by specified question
-	 * and Administered Questionnaire.
+	 * and Administered Questionnaire Section Status.
 	 */
 	List<AdministeredQuestionValue> 
-		findAllByQuestionAndAdministeredQuestionnaire(Question question, 
-				AdministeredQuestionnaire administeredQuestionnaire);
+		findAllByQuestionAndAdministeredQuestionnaireSectionStatus(
+				Question question, 
+				AdministeredQuestionnaireSectionStatus
+					administeredQuestionnaireSectionStatus);
 	
 }

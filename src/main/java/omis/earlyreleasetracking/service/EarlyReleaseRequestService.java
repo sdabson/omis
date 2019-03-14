@@ -459,4 +459,14 @@ public interface EarlyReleaseRequestService {
 	 * @return list of dockets
 	 */
 	List<Docket> findDocketsByOffender(Offender offender);
+	
+	/**
+	 * Returns the number of months that the given Offender has been on
+	 * Probation.
+	 * 
+	 * @param offender Offender
+	 * @return Number of months that the given Offender has been on
+	 * Probation.
+	 */
+	Long getMonthsOnProbation(Offender offender);
 }

@@ -71,7 +71,7 @@ window.onload = function() {
 	//If new photo flag is true, assign image editing
 	if(allowEnhancedImageEditor) {
 		if(document.getElementById("newPhoto").value) {
-			assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 640, 480);
+			assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 320, 480);
 		}
 	}
 	
@@ -81,11 +81,11 @@ window.onload = function() {
 		document.getElementById("photoFile"), document.getElementById("photoData"),
 		refreshPhoto, function() { 
 			if(allowEnhancedImageEditor) {
-				assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 640, 480);
+				assignSingleImageEdit(document.getElementById("photoPreview"), refreshPhoto, 320, 480);
 			}
 			document.getElementById("newPhoto").value = true;
 		},
-		640, 480);
+		320, 480);
 	
 	//apply date pickers
 	applyDatePicker(document.getElementById("photoDate"));

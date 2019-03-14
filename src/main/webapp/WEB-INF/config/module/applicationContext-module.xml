@@ -224,6 +224,8 @@
   
   <import resource="applicationContext-residence.xml"/>
   
+  <import resource="applicationContext-response.xml"/>
+  
   <import resource="applicationContext-schedule.xml"/>
   
   <import resource="applicationContext-search.xml"/>

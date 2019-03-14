@@ -171,16 +171,18 @@ public class BoardHearingDecisionServiceCreateBoardHearingDecisionTests
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
-
+		String rulingDetails= "Ruling Details.";
+		
 		// Action
 		BoardHearingDecision boardHearingDecision = this
 				.boardHearingDecisionService.createBoardHearingDecision(hearing, 
-						category);
+						category, rulingDetails);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("hearing", hearing)
 			.addExpectedValue("category", category)
+			.addExpectedValue("rulingDetails", rulingDetails)
 			.performAssertions(boardHearingDecision);
 	}
 
@@ -223,11 +225,13 @@ public class BoardHearingDecisionServiceCreateBoardHearingDecisionTests
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
-		this.boardHearingDecisionDelegate.create(hearing, category);
+		String rulingDetails= "Ruling Details.";
+		this.boardHearingDecisionDelegate.create(hearing, category,
+				rulingDetails);
 		
 		// Action
 		this.boardHearingDecisionService.createBoardHearingDecision(hearing,
-				category);
+				category, rulingDetails);
 	}
 
 	// Parses date text

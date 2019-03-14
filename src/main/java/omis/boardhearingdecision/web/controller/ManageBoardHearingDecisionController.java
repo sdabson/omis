@@ -58,7 +58,8 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Controller for managing board hearing decisions.
  * 
  * @author Josh Divine
- * @version 0.1.1 (Jul 26, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 @Controller
@@ -217,6 +218,7 @@ public class ManageBoardHearingDecisionController {
 		if (boardHearingDecision != null) {
 			// populate form
 			form.setCategory(boardHearingDecision.getCategory());
+			form.setRulingDetails(boardHearingDecision.getRulingDetails());
 			List<BoardMemberDecision> memberDecisions = this
 					.boardHearingDecisionService
 					.findBoardMemberDecisionsByBoardHearingDecision(
@@ -295,11 +297,13 @@ public class ManageBoardHearingDecisionController {
 		if (boardHearingDecision == null) {
 			boardHearingDecision = this.boardHearingDecisionService
 					.createBoardHearingDecision(boardHearing, 
-							boardHearingDecisionForm.getCategory());
+							boardHearingDecisionForm.getCategory(),
+							boardHearingDecisionForm.getRulingDetails());
 		} else {
 			boardHearingDecision = this.boardHearingDecisionService
 					.updateBoardHearingDecision(boardHearingDecision, 
-							boardHearingDecisionForm.getCategory());
+							boardHearingDecisionForm.getCategory(),
+							boardHearingDecisionForm.getRulingDetails());
 		}
 		
 		processBoardMemberDecisionItems(boardHearingDecision, 

@@ -27,7 +27,12 @@
 <form:form commandName="earlyReleaseRequestForm" class="editForm" method="post" enctype="multipart/form-data">
 	<fieldset>
 		<legend><fmt:message key="requestDetailsLegend" /></legend>
-		
+		<span class="fieldGroup">
+			<label class="fieldLabel">
+				<fmt:message key="monthsOnProbationLabel"/>
+			</label>
+			<c:out value="${monthsOnProbation}" />
+		</span>
 		<span class="fieldGroup">
 			<form:label path="docket" class="fieldLabel">
 				<fmt:message key="docketLabel"/>

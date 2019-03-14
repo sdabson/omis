@@ -14,7 +14,7 @@
 						<input type="text" name="informationSourceName" value="${incidentStatementForm.informationSourceName}"/>
 					</c:otherwise>
 				</c:choose>
-				<form:errors cssClass="error" path="informationSourceName"/>
+				
 			</c:when>
 			<c:otherwise>
 				<c:if test="${informationSourceCategory ne 'ANONYMOUS'}">
@@ -44,5 +44,4 @@
 			</c:otherwise>
 		</c:choose>
 	</c:if>
-	<form:errors cssClass="error" path="informant"/>
 </fmt:bundle>

@@ -3,7 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<fmt:bundle basename="omis.assessment.msgs.ratingNotes">
+<fmt:bundle basename="omis.assessment.msgs.assessmentNotes">
 	<head>
 		<jsp:include page="/WEB-INF/views/common/includes/headerOffenderFormResources.jsp"/>
 		<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
@@ -18,6 +18,7 @@
 	</head>
 	<body>
 		<h1>
+			<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/assessment/rating/notes/ratingNotesActionMenu.html?administeredQuestionnaire=${administeredQuestionnaire.id}"></a>
 			<fmt:message key="editRatingNotesTitle" />
 		</h1>
 		<jsp:include page="includes/editForm.jsp"/>

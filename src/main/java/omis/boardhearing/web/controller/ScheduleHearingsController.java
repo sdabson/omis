@@ -62,7 +62,7 @@ import omis.web.controller.delegate.BusinessExceptionHandlerDelegate;
  * Schedule Hearings Controller.
  * 
  *@author Annie Wahl
- *@version 0.1.0 (Jun 28, 2018)
+ *@version 0.1.1 (Mar 13, 2019)
  *@since OMIS 3.0
  *
  */
@@ -196,7 +196,8 @@ public class ScheduleHearingsController {
 				DateRange.getStartDate(itinerary.getDateRange()))
 				.build();
 		pastCal.add(Calendar.MONTH, -3);
-		itinerary.getDateRange().setStartDate(new Date(pastCal.getTimeInMillis()));
+		itinerary.getDateRange().setStartDate(
+				new Date(pastCal.getTimeInMillis()));
 		//Date newDate = new Date(pastCal.getTimeInMillis());
 		return this.prepareEditMav(itinerary, this.prepareForm(itinerary));
 	}
@@ -377,7 +378,8 @@ public class ScheduleHearingsController {
 		
 		for (ParoleEligibility eligibility
 				: this.scheduleHearingService
-						.findParoleEligibilitiesUnscheduled()) {
+						.findParoleEligibilitiesUnscheduledByLocation(
+							itinerary.getParoleBoardLocation().getLocation())) {
 			BoardHearingItem item = new BoardHearingItem();
 			item.setParoleEligibility(eligibility);
 			BoardHearing boardHearing = this.scheduleHearingService
@@ -404,28 +406,28 @@ public class ScheduleHearingsController {
 					}
 				}
 			} else {
-					List<BoardAttendee> boardAttendees =
-							this.scheduleHearingService
-							.findBoardAttendeesByBoardItinerary(itinerary);
-					for (BoardAttendee boardAttendee : boardAttendees) {
-						if (boardAttendee.getNumber() != null) {
-							if (boardAttendee.getNumber().equals(ONE)) {
-								item.setBoardMember1(
-										boardAttendee.getBoardMember());
-							} else if (boardAttendee.getNumber().equals(TWO)) {
-								item.setBoardMember2(
-										boardAttendee.getBoardMember());
-							} else if (
-									boardAttendee.getNumber().equals(THREE)) {
-								item.setBoardMember3(
-										boardAttendee.getBoardMember());
-							}
+				List<BoardAttendee> boardAttendees =
+						this.scheduleHearingService
+						.findBoardAttendeesByBoardItinerary(itinerary);
+				for (BoardAttendee boardAttendee : boardAttendees) {
+					if (boardAttendee.getNumber() != null) {
+						if (boardAttendee.getNumber().equals(ONE)) {
+							item.setBoardMember1(
+									boardAttendee.getBoardMember());
+						} else if (boardAttendee.getNumber().equals(TWO)) {
+							item.setBoardMember2(
+									boardAttendee.getBoardMember());
+						} else if (
+								boardAttendee.getNumber().equals(THREE)) {
+							item.setBoardMember3(
+									boardAttendee.getBoardMember());
 						}
 					}
-					item.setHearingDate(itinerary.getDateRange()
-							.getStartDate());
-					item.setVideoConference(itinerary.getParoleBoardLocation()
-							.getVideoConferenceCapable());
+				}
+				item.setHearingDate(itinerary.getDateRange()
+						.getStartDate());
+				item.setVideoConference(itinerary.getParoleBoardLocation()
+						.getVideoConferenceCapable());
 				item.setSelected(false);
 				item.setItemOperation(BoardHearingItemOperation.CREATE);
 			}

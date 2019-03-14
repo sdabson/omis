@@ -201,6 +201,9 @@ public class EarlyReleaseRequestController {
 	private static final String DOCUMENT_TAG_ITEM_INDEXES_MODEL_KEY =
 			"documentTagItemIndexes";
 	
+	private static final String MONTHS_ON_PROBATION_MODEL_KEY =
+			"monthsOnProbation";
+	
 	private static final String FORM_MODEL_KEY = "earlyReleaseRequestForm";
 	
 	/* Message Keys */
@@ -365,7 +368,7 @@ public class EarlyReleaseRequestController {
 	 * @param offender Offender
 	 * @param category Category
 	 * @param form Early Release Request Form
-	 * @param bindingResult ginding Result
+	 * @param bindingResult binding Result
 	 * @return ModelAndView for list screen, or back to create screen on form
 	 * error
 	 * @throws EarlyReleaseRequestDocumentAssociationExists When an Early
@@ -444,7 +447,7 @@ public class EarlyReleaseRequestController {
 	 * 
 	 * @param earlyReleaseRequest Early Release Request to update
 	 * @param form Early Release Request Form
-	 * @param bindingResult ginding Result
+	 * @param bindingResult binding Result
 	 * @return ModelAndView for list screen, or back to edit screen on form
 	 * error
 	 * @throws EarlyReleaseRequestDocumentAssociationExists When an Early
@@ -858,6 +861,8 @@ public class EarlyReleaseRequestController {
 				form.getEarlyReleaseRequestExternalOppositionItems().size());
 		map.addAttribute(INTERNAL_APPROVAL_ITEM_INDEX_MODEL_KEY,
 				form.getEarlyReleaseRequestInternalApprovalItems().size());
+		map.addAttribute(MONTHS_ON_PROBATION_MODEL_KEY,
+				this.earlyReleaseRequestService.getMonthsOnProbation(offender));
 		List<Integer> dtIndexes = new ArrayList<Integer>();
 		for (int i = 0;
 				 i < form.getEarlyReleaseRequestDocumentAssociationItems()

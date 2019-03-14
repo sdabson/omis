@@ -6,7 +6,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <sec:authorize var="editRatingNote" access="hasRole('RATING_NOTE_EDIT') or hasRole('ADMIN') or hasRole('RATING_NOTE_CREATE')"/>
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle"/>
-<fmt:bundle basename="omis.assessment.msgs.ratingNotes">
+<fmt:bundle basename="omis.assessment.msgs.assessmentNotes">
 <form:form commandName="ratingNoteForm" class="editForm">
 	<fieldset>
 		<span class="fieldGroup">

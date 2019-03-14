@@ -39,6 +39,19 @@ public class Term
 	}
 	
 	/**
+	 * Instantiates term.
+	 * 
+	 * <p>Copies supplied {@code term}.
+	 * 
+	 * @param term term to copy
+	 */
+	public Term(final Term term) {
+		this.years = term.years;
+		this.months = term.months;
+		this.days = term.days;
+	}
+	
+	/**
 	 * Sets the years.
 	 * 
 	 * @param years years

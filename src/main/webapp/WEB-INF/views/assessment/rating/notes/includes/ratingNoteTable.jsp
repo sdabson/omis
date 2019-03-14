@@ -1,5 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<fmt:bundle basename="omis.assessment.msgs.ratingNotes">
+<fmt:bundle basename="omis.assessment.msgs.assessmentNotes">
 <table id="ratingNoteTable" class="editTable">
 	<thead>
 		<tr>

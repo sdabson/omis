@@ -66,6 +66,8 @@ public class EarlyReleaseRequestSummaryReportServiceHibernateImpl
 	
 	private static final String EFFECTIVE_DATE_PARAM_NAME = "effectiveDate";
 	
+	private static final String NO_RESPONSE_PARAM_NAME = "noResponse";
+	
 	private final SessionFactory sessionFactory;
 	
 	/**
@@ -107,6 +109,33 @@ public class EarlyReleaseRequestSummaryReportServiceHibernateImpl
 				.setTimestamp(REQUEST_END_DATE_PARAM_NAME, requestEndDate)
 				.setParameter(REQUEST_STATUS_PARAM_NAME,
 						earlyReleaseStatusCategory)
+				.setBoolean(NO_RESPONSE_PARAM_NAME, false)
+				.setTimestamp(ELGIIBILITY_START_DATE_PARAM_NAME,
+						eligibilityStartDate)
+				.setTimestamp(ELIGIBILITY_END_DATE_PARAM_NAME,
+						eligibilityEndDate)
+				.setTimestamp(ELIGIBILITY_DATE_PARAM_NAME, eligibilityDate)
+				.setTimestamp(REQUEST_DATE_PARAM_NAME, requestDate)
+				.setTimestamp(EFFECTIVE_DATE_PARAM_NAME, new Date())
+				.list();
+		
+		return summaries;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public List<EarlyReleaseRequestSummary> findByDatesWithStatus(
+			final Date requestStartDate, final Date requestEndDate,
+			final Date requestDate, final Date eligibilityStartDate,
+			final Date eligibilityEndDate, final Date eligibilityDate) {
+		@SuppressWarnings("unchecked")
+		List<EarlyReleaseRequestSummary> summaries = this.sessionFactory
+				.getCurrentSession()
+				.getNamedQuery(FIND_BY_DATES_AND_STATUS_QUERY_NAME)
+				.setTimestamp(REQUEST_START_DATE_PARAM_NAME, requestStartDate)
+				.setTimestamp(REQUEST_END_DATE_PARAM_NAME, requestEndDate)
+				.setParameter(REQUEST_STATUS_PARAM_NAME, null)
+				.setBoolean(NO_RESPONSE_PARAM_NAME, true)
 				.setTimestamp(ELGIIBILITY_START_DATE_PARAM_NAME,
 						eligibilityStartDate)
 				.setTimestamp(ELIGIBILITY_END_DATE_PARAM_NAME,

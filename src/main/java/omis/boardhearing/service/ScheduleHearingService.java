@@ -25,6 +25,7 @@ import omis.boardhearing.domain.BoardHearingParticipant;
 import omis.boardhearing.exception.BoardHearingExistsException;
 import omis.boardhearing.exception.BoardHearingParticipantExistsException;
 import omis.hearinganalysis.domain.HearingAnalysis;
+import omis.location.domain.Location;
 import omis.paroleboarditinerary.domain.BoardAttendee;
 import omis.paroleboarditinerary.domain.ParoleBoardItinerary;
 import omis.paroleboardmember.domain.ParoleBoardMember;
@@ -36,7 +37,7 @@ import omis.paroleeligibility.domain.ParoleEligibility;
  * 
  * @author Annie Wahl
  * @author Josh Divine 
- * @version 0.1.1 (Dec 3, 2018)
+ * @version 0.1.2 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public interface ScheduleHearingService {
@@ -189,9 +190,13 @@ public interface ScheduleHearingService {
 			ParoleBoardItinerary boardItinerary);
 	
 	/**
-	 * Returns a list of Parole Eligibilities that have no scheduled hearing.
+	 * Returns a list of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
 	 * 
-	 * @return List of Parole Eligibilities that have no scheduled hearing.
+	 * @param location Location
+	 * @return List of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
 	 */
-	List<ParoleEligibility> findParoleEligibilitiesUnscheduled();
+	List<ParoleEligibility> findParoleEligibilitiesUnscheduledByLocation(
+			Location location);
 }

@@ -56,7 +56,7 @@ public class IncidentStatementFormValidator implements Validator {
 		}
 		if (form.getJurisdiction() == null) {
 			errors.rejectValue("jurisdiction",
-					"incidentStatement.jurisdication.empty");
+					"incidentStatement.jurisdiction.empty");
 		}
 		if (form.getIncidentDate() == null) {
 			errors.rejectValue("incidentDate",

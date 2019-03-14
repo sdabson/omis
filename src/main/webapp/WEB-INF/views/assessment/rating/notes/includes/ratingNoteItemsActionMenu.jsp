@@ -4,9 +4,9 @@
 <fmt:setBundle basename="omis.msgs.common" var="commonBundle" />
 <fmt:bundle basename="omis.assessment.msgs.assessmentNotes">
 	<ul>
-		<sec:authorize access="hasRole('ASSESSMENT_CREATE') or hasRole('ASSESSMENT_EDIT') or hasRole('ADMIN')">
+		<sec:authorize access="hasRole('RATING_NOTE_CREATE') or hasRole('RATING_NOTE_EDIT') or hasRole('ADMIN')">
 			<li>
-				<a id="createAssessmentNoteItemLink" class="createLink" href="${pageContext.request.contextPath}/assessment/notes/createAssessmentNoteItem.html?assessmentNoteItemIndex=${assessmentNoteItemIndex}"><span class="visibleLinkLabel"><fmt:message key="addAssessmentNoteLink"/></span></a>
+				<a id="createRatingNoteItemLink" class="createLink" href="${pageContext.request.contextPath}/assessment/rating/notes/createRatingNoteItem.html?ratingNoteItemIndex=${ratingNoteItemIndex}"><span class="visibleLinkLabel"><fmt:message key="addRatingNoteLink"/></span></a>
 			</li>
 		</sec:authorize>
 	</ul>

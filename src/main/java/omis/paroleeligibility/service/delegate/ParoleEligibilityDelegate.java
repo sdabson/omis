@@ -25,6 +25,7 @@ import omis.audit.domain.CreationSignature;
 import omis.audit.domain.UpdateSignature;
 import omis.exception.DuplicateEntityFoundException;
 import omis.instance.factory.InstanceFactory;
+import omis.location.domain.Location;
 import omis.offender.domain.Offender;
 import omis.paroleeligibility.dao.ParoleEligibilityDao;
 import omis.paroleeligibility.domain.AppearanceCategory;
@@ -37,7 +38,7 @@ import omis.paroleeligibility.domain.component.ParoleEligibilityStatus;
  * @author Trevor Isles
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.3 (Dec 3, 2018)
+ * @version 0.1.4 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class ParoleEligibilityDelegate {
@@ -148,7 +149,7 @@ public class ParoleEligibilityDelegate {
 	 * given date.
 	 */
 	public List<ParoleEligibility> findByOffenderAfterDate(
-			Offender offender, Date date) {
+			final Offender offender, final Date date) {
 		return this.paroleEligibilityDao
 				.findByOffenderAfterDate(offender, date);
 	}
@@ -160,6 +161,19 @@ public class ParoleEligibilityDelegate {
 	 */
 	public List<ParoleEligibility> findUnscheduled() {
 		return this.paroleEligibilityDao.findUnscheduled();
+	}
+
+	/**
+	 * Returns a list of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
+	 * 
+	 * @param location Location
+	 * @return List of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
+	 */
+	public List<ParoleEligibility> findUnscheduledByLocation(
+			final Location location) {
+		return this.paroleEligibilityDao.findUnscheduledByLocation(location);
 	}
 	
 	/**

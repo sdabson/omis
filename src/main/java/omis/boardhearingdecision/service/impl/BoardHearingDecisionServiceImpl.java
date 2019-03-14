@@ -38,8 +38,11 @@ import omis.boardhearingdecision.service.delegate.HearingDecisionReasonDelegate;
 import omis.exception.DuplicateEntityFoundException;
 
 /**
- * @author CID017
- * @version 0.1.0 (Jan 22, 2018)
+ * Board Hearing Decision Service Implementation.
+ * 
+ * @author Josh Divine
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class BoardHearingDecisionServiceImpl 
@@ -93,19 +96,22 @@ public class BoardHearingDecisionServiceImpl
 	@Override
 	public BoardHearingDecision createBoardHearingDecision(
 			final BoardHearing hearing, 
-			final BoardHearingDecisionCategory category) 
+			final BoardHearingDecisionCategory category,
+			final String rulingDetails) 
 					throws DuplicateEntityFoundException {
-		return this.boardHearingDecisionDelegate.create(hearing, category);
+		return this.boardHearingDecisionDelegate.create(
+				hearing, category, rulingDetails);
 	}
 
 	/**{@inheritDoc} */
 	@Override
 	public BoardHearingDecision updateBoardHearingDecision(
 			final BoardHearingDecision boardDecision, 
-			final BoardHearingDecisionCategory category) 
+			final BoardHearingDecisionCategory category,
+			final String rulingDetails) 
 					throws DuplicateEntityFoundException {
 		return this.boardHearingDecisionDelegate.update(boardDecision,
-				boardDecision.getHearing(), category);
+				boardDecision.getHearing(), category, rulingDetails);
 	}
 
 	/**{@inheritDoc} */

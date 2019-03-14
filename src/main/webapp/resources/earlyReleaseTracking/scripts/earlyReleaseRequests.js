@@ -16,7 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 window.onload = function() {
-	applyActionMenu(document.getElementById("actionMenuLink"));
+	if (document.getElementById("actionMenuLink")) {
+		applyActionMenu(document.getElementById("actionMenuLink"));
+	}
 	var rows = document.getElementsByClassName('rowActionMenuItem');
 	for(var i = 0; i < rows.length; i++){
 		applyActionMenu(rows[i], function() {
@@ -24,12 +26,47 @@ window.onload = function() {
 		});
 	}
 	
-	if (document.getElementsByClassName("requestDate")) {
+	if (document.getElementById("requestDate")) {
 		applyDatePicker(document.getElementById("requestDate"));
 		applyDatePicker(document.getElementById("requestStartDate"));
 		applyDatePicker(document.getElementById("requestEndDate"));
 		applyDatePicker(document.getElementById("eligibilityDate"));
 		applyDatePicker(document.getElementById("eligibilityStartDate"));
 		applyDatePicker(document.getElementById("eligibilityEndDate"));
+		
+		applyFieldFocus("searchSingleEligibilityDate", "eligibilityDate");
+		applyInputFocus("eligibilityDate", "searchSingleEligibilityDate");
+		applyFieldFocus("searchEligibilityDateRange", "eligibilityStartDate");
+		applyInputFocus("eligibilityStartDate", "searchEligibilityDateRange");
+		applyInputFocus("eligibilityEndDate", "searchEligibilityDateRange");
+
+		applyFieldFocus("searchSingleRequestDate", "requestDate");
+		applyInputFocus("requestDate", "searchSingleRequestDate");
+		applyFieldFocus("searchRequestDateRange", "requestStartDate");
+		applyInputFocus("requestStartDate", "searchRequestDateRange");
+		applyInputFocus("requestEndDate", "searchRequestDateRange");
+		
+		applyFieldFocus("response", "releaseStatus");
+		applyInputFocus("releaseStatus", "response");
+		applyFieldFocus("noResponse", "noResponseLabel");
+		applyInputFocus("noResponseLabel", "noResponse");
+		
+		// Focuses input when label or radio box is clicked
+		function applyFieldFocus(radioEltName, inputEltName) {
+			var radioElt = document.getElementById(radioEltName);
+			var inputElt = document.getElementById(inputEltName);
+			radioElt.onfocus = function() {
+				inputElt.focus();
+			};
+		}
+		
+		// Checks radio button when input is focused
+		function applyInputFocus(inputEltName, radioEltName) {
+			var inputElt = document.getElementById(inputEltName);
+			var radioElt = document.getElementById(radioEltName);
+			inputElt.onfocus = function() {
+				radioElt.checked = true;
+			};
+		}
 	}
 }

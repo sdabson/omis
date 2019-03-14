@@ -31,7 +31,8 @@ import omis.instance.factory.InstanceFactory;
  * Delegate for board hearing decision.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Jan 22, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class BoardHearingDecisionDelegate {
@@ -76,11 +77,13 @@ public class BoardHearingDecisionDelegate {
 	 * 
 	 * @param hearing board hearing
 	 * @param category board hearing decision category
+	 * @param rulingDetails ruling details
 	 * @return board hearing decision
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
 	public BoardHearingDecision create(final BoardHearing hearing, 
-			final BoardHearingDecisionCategory category) 
+			final BoardHearingDecisionCategory category,
+			final String rulingDetails) 
 					throws DuplicateEntityFoundException {
 		if (this.boardHearingDecisionDao.find(hearing) != null) {
 			throw new DuplicateEntityFoundException(
@@ -88,7 +91,8 @@ public class BoardHearingDecisionDelegate {
 		}
 		BoardHearingDecision boardDecision = 
 				this.boardHearingDecisionInstanceFactory.createInstance();
-		populateBoardHearingDecision(boardDecision, hearing, category);
+		populateBoardHearingDecision(boardDecision, hearing, category,
+				rulingDetails);
 		boardDecision.setCreationSignature(new CreationSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));
@@ -102,19 +106,23 @@ public class BoardHearingDecisionDelegate {
 	 * @param boardDecision board hearing decision
 	 * @param hearing board hearing
 	 * @param category board hearing decision category
+	 * @param rulingDetails ruling details
 	 * @return board hearing decision
 	 * @throws DuplicateEntityFoundException if duplicate entity exists
 	 */
-	public BoardHearingDecision update(final BoardHearingDecision boardDecision, 
-			final BoardHearing hearing, 
-			final BoardHearingDecisionCategory category) 
-					throws DuplicateEntityFoundException {
+	public BoardHearingDecision update(
+			final BoardHearingDecision boardDecision, 
+				final BoardHearing hearing, 
+				final BoardHearingDecisionCategory category,
+				final String rulingDetails) 
+						throws DuplicateEntityFoundException {
 		if (this.boardHearingDecisionDao.findExcluding(hearing, boardDecision) 
 				!= null) {
 			throw new DuplicateEntityFoundException(
 					"Board hearing decision already exists.");
 		}
-		populateBoardHearingDecision(boardDecision, hearing, category);
+		populateBoardHearingDecision(boardDecision, hearing, category,
+				rulingDetails);
 		return this.boardHearingDecisionDao.makePersistent(boardDecision);
 	}
 
@@ -141,9 +149,11 @@ public class BoardHearingDecisionDelegate {
 	private void populateBoardHearingDecision(
 			final BoardHearingDecision boardDecision, 
 			final BoardHearing hearing, 
-			final BoardHearingDecisionCategory category) {
+			final BoardHearingDecisionCategory category,
+			final String rulingDetails) {
 		boardDecision.setHearing(hearing);
 		boardDecision.setCategory(category);
+		boardDecision.setRulingDetails(rulingDetails);
 		boardDecision.setUpdateSignature(new UpdateSignature(
 				this.auditComponentRetriever.retrieveUserAccount(), 
 				this.auditComponentRetriever.retrieveDate()));

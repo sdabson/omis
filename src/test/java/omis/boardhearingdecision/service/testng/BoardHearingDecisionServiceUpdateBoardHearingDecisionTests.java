@@ -171,20 +171,80 @@ public class BoardHearingDecisionServiceUpdateBoardHearingDecisionTests
 		BoardHearingDecisionCategory category = this
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
+		String rulingDetails = "Ruling Details";
 		BoardHearingDecision boardDecision = this.boardHearingDecisionDelegate
-				.create(hearing, category);
+				.create(hearing, category, rulingDetails);
 		BoardHearingDecisionCategory newCategory = this
 				.boardHearingDecisionCategoryDelegate.create("Category 2", 
 						DecisionCategory.GRANT, true);
 		
 		// Action
 		boardDecision = this.boardHearingDecisionService
-				.updateBoardHearingDecision(boardDecision, newCategory);
+				.updateBoardHearingDecision(boardDecision, newCategory,
+						rulingDetails);
 
 		// Assertions
 		PropertyValueAsserter.create()
 			.addExpectedValue("hearing", hearing)
 			.addExpectedValue("category", newCategory)
+			.addExpectedValue("rulingDetails", rulingDetails)
+			.performAssertions(boardDecision);
+	}
+	
+	/**
+	 * Tests the update of the ruling details for a board hearing decision.
+	 * 
+	 * @throws DuplicateEntityFoundException if duplicate entity exists
+	 */
+	@Test
+	public void testUpdateBoardHearingDecisionRulingDetails() 
+			throws DuplicateEntityFoundException {
+		// Arrangements
+		Offender offender = this.offenderDelegate.createWithoutIdentity("Smith",
+				"John", "Jay", null);
+		ParoleEligibility paroleEligibility = this.paroleEligibilityDelegate
+				.create(offender, this.parseDateText("01/01/2018"), null, null,
+						null);
+		Organization organization = this.organizationDelegate.create(
+				"Organization", "org", null);
+		Country country = this.countryDelegate.create(
+				"Country", "USA", true);
+		State state = this.stateDelegate.create(
+				"State", "ST", country, true, true);
+		City city = this.cityDelegate.create(
+				"City", true, state, country);
+		ZipCode zipCode = this.zipCodeDelegate.create(
+				city, "12345", null, true);
+		Address address = this.addressDelegate.findOrCreate("123", "321",
+				null, null, zipCode);
+		Location location = this.locationDelegate.create(organization,
+				new DateRange(this.parseDateText("01/01/2001"),
+						this.parseDateText("01/01/2020")), address);
+		ParoleBoardLocation paroleBoardLocation =
+				this.paroleBoardLocationDelegate.create(location, true);
+		ParoleBoardItinerary itinerary =
+				this.paroleBoardItineraryDelegate.create(paroleBoardLocation,
+						true, this.parseDateText("01/01/2015"), 
+						this.parseDateText("01/01/2015"));
+		BoardHearing hearing = this.boardHearingDelegate.create(itinerary, null, 
+				paroleEligibility, null, null, false);
+		BoardHearingDecisionCategory category = this
+				.boardHearingDecisionCategoryDelegate.create("Category", 
+						DecisionCategory.GRANT, true);
+		BoardHearingDecision boardDecision = this.boardHearingDecisionDelegate
+				.create(hearing, category, "Old Details");
+		String rulingDetails = "New Details";
+		
+		// Action
+		boardDecision = this.boardHearingDecisionService
+				.updateBoardHearingDecision(boardDecision, category,
+						rulingDetails);
+
+		// Assertions
+		PropertyValueAsserter.create()
+			.addExpectedValue("hearing", hearing)
+			.addExpectedValue("category", category)
+			.addExpectedValue("rulingDetails", rulingDetails)
 			.performAssertions(boardDecision);
 	}
 

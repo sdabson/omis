@@ -178,7 +178,7 @@ public class BoardHearingDecisionServiceCreateHearingDecisionNoteTests
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
 		BoardHearingDecision boardDecision = this.boardHearingDecisionDelegate
-				.create(hearing, category);
+				.create(hearing, category, null);
 		Date date = this.parseDateText("01/01/2018");
 		String description = "Description";
 
@@ -236,7 +236,7 @@ public class BoardHearingDecisionServiceCreateHearingDecisionNoteTests
 				.boardHearingDecisionCategoryDelegate.create("Category", 
 						DecisionCategory.GRANT, true);
 		BoardHearingDecision boardDecision = this.boardHearingDecisionDelegate
-				.create(hearing, category);
+				.create(hearing, category, null);
 		Date date = this.parseDateText("01/01/2018");
 		String description = "Description";
 		this.hearingDecisionNoteDelegate.create(boardDecision, date, 

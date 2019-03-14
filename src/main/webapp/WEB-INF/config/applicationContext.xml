@@ -169,6 +169,7 @@
     			<value>/WEB-INF/classes/omis/region/msgs/form</value>
     			<value>/WEB-INF/classes/omis/religion/msgs/forms</value>
     			<value>/WEB-INF/classes/omis/residence/msgs/form</value>
+    			<value>/WEB-INF/classes/omis/response/msgs/form</value>
     			<value>/WEB-INF/classes/omis/sentence/msgs/form</value>
     			<value>/WEB-INF/classes/omis/separationneed/msgs/form</value>
     			<value>/WEB-INF/classes/omis/specialneed/msgs/form</value>

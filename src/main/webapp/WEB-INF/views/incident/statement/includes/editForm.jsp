@@ -190,6 +190,8 @@
 			</span>
 			<span class="fieldGroup" id="informantFieldGroup">
 				<jsp:include page="informantSearch.jsp"/>
+				<form:errors cssClass="error" path="informant"/>
+				<form:errors cssClass="error" path="informationSourceName"/>
 			</span>
 			<span class="fieldGroup">
 				<form:label path="reporter" class="fieldLabel"><fmt:message key="reporterLabel"/></form:label>

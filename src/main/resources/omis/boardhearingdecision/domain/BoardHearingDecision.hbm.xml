@@ -31,6 +31,7 @@
 		</id>
 		<many-to-one name="hearing" entity-name="omis.boardhearing.domain.BoardHearing" not-null="true" column="`BOARD_HEARING_ID`"/>
 		<many-to-one name="category" entity-name="omis.boardhearingdecision.domain.BoardHearingDecisionCategory" not-null="true" column="`BOARD_HEARING_DECISN_CATGY_ID`"/>
+		<property name="rulingDetails" column="`RULING_DETAILS`" type="java.lang.String" not-null="false" />
 		<component name="creationSignature">
 			<many-to-one name="userAccount" column="`CREATE_ACCOUNT_ID`"
 			             not-null="true"/>

@@ -26,11 +26,31 @@
 				</li>
 			</sec:authorize>
 		</c:if>
+		<sec:authorize access="hasRole('MSP_BADGE_REPORT') or hasRole('ADMIN')">
+			<li>
+				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderBadgeMSPReport.html?association=${association.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="offenderBadgeMSPReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+			</li>
+		</sec:authorize>	
+		<sec:authorize access="hasRole('MWP_BADGE_REPORT') or hasRole('ADMIN')">				
+			<li>
+				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderBadgeMWPReport.html?association=${association.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="offenderBadgeMWPReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+			</li>
+		</sec:authorize>		
+		<sec:authorize access="hasRole('PINE_BADGE_REPORT') or hasRole('ADMIN')">				
+			<li>
+				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderBadgePINEReport.html?association=${association.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="offenderBadgePINEReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+			</li>
+		</sec:authorize>	
+		<sec:authorize access="hasRole('MSP_BADGE_REPORT') or hasRole('ADMIN')">					
+			<li>
+				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderExitBadgeMSPReport.html?association=${association.id}&reportFormat=PDF" class="newTab adobeReportLink"><fmt:message key="offenderExitBadgeMSPReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+			</li>														
+	    </sec:authorize>
 		<sec:authorize access="hasRole('OFFENDER_PHOTO_VIEW') or hasRole('ADMIN')">
 			<c:if test="${not empty association}">
-			<li>
-				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosDetailsReport.html?association=${association.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderPhotosDetailsReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
-			</li>
+				<li>
+					<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosDetailsReport.html?association=${association.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderPhotosDetailsReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+				</li>
 			</c:if>
 		</sec:authorize>
 	</ul>

@@ -1,5 +1,6 @@
 <!-- 
  - Author: Sheronda Vaughn
+ - Author: Sierra Haynes
  - Version: 0.1.0 (May 05, 2016)
  - Since: OMIS 3.0
  -->
@@ -32,12 +33,12 @@
 					<a class="createLink" href="${pageContext.request.contextPath}/offenderPhoto/join.html?offender=${offender.id}&amp;profile=false">
 						<fmt:message key="joinAndCreateOffenderPhotoLink" bundle="${offenderPhotoBundle}"/></a>
 				</li>
-			</sec:authorize>
+			</sec:authorize>			
 			<sec:authorize access="hasRole('OFFENDER_PHOTO_VIEW') or hasRole('ADMIN')">
-			<c:if test="${not empty offender}">
-			<li>
-				<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderPhotosListingReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
-			</li>
-			</c:if>
-		</sec:authorize>
+				<c:if test="${not empty offender}">
+					<li>
+						<a href="${pageContext.request.contextPath}/offenderPhoto/offenderPhotosListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="offenderPhotosListingReportLinkLabel" bundle="${offenderPhotoBundle}"/></a>
+					</li>
+				</c:if>
+	        </sec:authorize>
 	</ul>

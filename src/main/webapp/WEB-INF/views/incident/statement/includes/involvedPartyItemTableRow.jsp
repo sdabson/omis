@@ -51,13 +51,13 @@
 							</c:choose>
 						</c:if>
 					</span>
-					<form:errors cssClass="error" path="involvedPartyItems[${involvedPartyItemIndex}].person"/>
 				</c:when>
 				<c:otherwise>
 					<input type="text" name="involvedPartyItems[${involvedPartyItemIndex}].name" value="${involvedPartyItems[involvedPartyItemIndex].name}"/>
-					<form:errors path="involvedPartyItems[${involvedPartyItemIndex}].name" cssClass="error"/>
 				</c:otherwise>
 			</c:choose>
+			<form:errors path="involvedPartyItems[${involvedPartyItemIndex}].name" cssClass="error"/>
+			<form:errors cssClass="error" path="involvedPartyItems[${involvedPartyItemIndex}].person"/>
 		</td>
 		<td>
 			<textarea rows="4" name="involvedPartyItems[${involvedPartyItemIndex}].narrative" id="involvedPartyItems[${involvedPartyItemIndex}].narrative"><c:out value="${involvedPartyItems[involvedPartyItemIndex].narrative}"/></textarea>

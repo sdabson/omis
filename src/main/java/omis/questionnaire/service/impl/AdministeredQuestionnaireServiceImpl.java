@@ -220,23 +220,26 @@ public class AdministeredQuestionnaireServiceImpl
 	/**{@inheritDoc} */
 	@Override
 	public AdministeredQuestionValue 
-		findAdministeredQuestionValueByQuestionAndQuestionnaire(
+		findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus(
 			final Question question, 
-			final AdministeredQuestionnaire administeredQuestionnaire) {
+			final AdministeredQuestionnaireSectionStatus
+					administeredQuestionnaireSectionStatus) {
 		return this.administeredQuestionValueDelegate
-				.findByQuestionAndAdministeredQuestionnaire(question,
-						administeredQuestionnaire);
+				.findByQuestionAndAdministeredQuestionnaireSectionStatus(
+						question, administeredQuestionnaireSectionStatus);
 	}
 	
 	/**{@inheritDoc} */
 	@Override
 	public List<AdministeredQuestionValue> 
-		findAdministeredQuestionValuesByQuestionAndQuestionnaire(
+		findAdministeredQuestionValuesByQuestionAndQuestionnaireSectionStatus(
 			final Question question, 
-			final AdministeredQuestionnaire administeredQuestionnaire) {
+			final AdministeredQuestionnaireSectionStatus
+				administeredQuestionnaireSectionStatus) {
 		return this.administeredQuestionValueDelegate
-				.findAllByQuestionAndAdministeredQuestionnaire(question,
-						administeredQuestionnaire);
+				.findAllByQuestionAndAdministeredQuestionnaireSectionStatus(
+						question,
+						administeredQuestionnaireSectionStatus);
 	}
 
 	/**{@inheritDoc} */

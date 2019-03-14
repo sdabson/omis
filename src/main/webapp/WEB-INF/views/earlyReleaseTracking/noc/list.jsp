@@ -22,6 +22,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <fmt:bundle basename="omis.earlyreleasetracking.msgs.earlyReleaseRequest">
 <head>
+	<jsp:include page="/WEB-INF/views/common/includes/formResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/headerOffenderListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/headerListResources.jsp"/>
 	<jsp:include page="/WEB-INF/views/common/includes/toolsResources.jsp"/>
@@ -33,7 +34,7 @@
 </head>
 <body>
 	<h1>
-		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/earlyReleaseTracking/earlyReleaseRequestsActionMenu.html?offender=${offender.id}"></a>
+<%-- 		<a class="actionMenuItem" id="actionMenuLink" href="${pageContext.request.contextPath}/earlyReleaseTracking/earlyReleaseRequestsActionMenu.html?offender=${offender.id}"></a> --%>
 		<fmt:message key="earlyReleaseRequestListHeader"/>
 	</h1>
 	<jsp:include page="includes/filterForm.jsp"/>

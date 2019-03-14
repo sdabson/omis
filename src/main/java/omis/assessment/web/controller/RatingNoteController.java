@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import omis.assessment.domain.AssessmentCategoryScore;
 import omis.assessment.domain.RatingNote;
 import omis.assessment.service.RatingNoteService;
 import omis.assessment.web.form.AssessmentItemOperation;
@@ -65,6 +66,9 @@ public class RatingNoteController {
 	
 	private static final String EDIT_VIEW_NAME =
 			"/assessment/rating/notes/edit";
+	
+	private static final String RATING_NOTES_ACTION_MENU_VIEW_NAME =
+			"/assessment/rating/notes/includes/ratingNotesActionMenu";
 	
 	private static final String RATING_NOTE_ITEMS_ACTION_MENU_VIEW_NAME =
 			"/assessment/rating/notes/includes/ratingNoteItemsActionMenu";
@@ -195,6 +199,23 @@ public class RatingNoteController {
 		map.addAttribute(RATING_NOTE_ITEM_INDEX_MODEL_KEY,
 				ratingNoteItemIndex);
 		return new ModelAndView(RATING_NOTE_ITEM_ROW_VIEW_NAME, map);
+	}
+	
+	/**
+	 * Returns the model and view for the rating notes action menu.
+	 * 
+	 * @param administeredQuestionnaire - Administered Questionnaire
+	 * @return Model and view for the rating notes action menu.
+	 */
+	@RequestMapping(value = "/ratingNotesActionMenu.html",
+			method = RequestMethod.GET)
+	public ModelAndView displayAssessmentCategoryOverrideActionMenu(
+			@RequestParam(value = "administeredQuestionnaire", required = true)
+			final AdministeredQuestionnaire administeredQuestionnaire) {
+		ModelMap map = new ModelMap();
+		map.addAttribute(ADMINISTERED_QUESTIONNAIRE_MODEL_KEY,
+				administeredQuestionnaire);
+		return new ModelAndView(RATING_NOTES_ACTION_MENU_VIEW_NAME, map);
 	}
 	
 	/**

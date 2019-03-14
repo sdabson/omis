@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import omis.dao.GenericDao;
+import omis.location.domain.Location;
 import omis.offender.domain.Offender;
 import omis.paroleeligibility.domain.ParoleEligibility;
 
@@ -30,7 +31,7 @@ import omis.paroleeligibility.domain.ParoleEligibility;
  * @author Trevor Isles
  * @author Annie Wahl
  * @author Josh Divine
- * @version 0.1.3 (Dec 3, 2018)
+ * @version 0.1.4 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public interface ParoleEligibilityDao extends GenericDao<ParoleEligibility> {
@@ -74,4 +75,14 @@ public interface ParoleEligibilityDao extends GenericDao<ParoleEligibility> {
 	 * @return List of Parole Eligibilities that have no scheduled hearing.
 	 */
 	List<ParoleEligibility> findUnscheduled();
+	
+	/**
+	 * Returns a list of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
+	 * 
+	 * @param location Location
+	 * @return List of Parole Eligibilities that have no scheduled hearing
+	 * for the specified Location.
+	 */
+	List<ParoleEligibility> findUnscheduledByLocation(Location location);
 }

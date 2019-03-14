@@ -125,4 +125,36 @@
 		order by
 			eligibility.hearingEligibilityDate asc
 	]]></query>
+	<query name="findUnscheduledParoleEligibilitiesByLocation"><![CDATA[
+		select eligibility
+		from
+			omis.paroleeligibility.domain.ParoleEligibility eligibility
+		inner join
+			eligibility.offender offender,
+			omis.locationterm.domain.LocationTerm locationTerm
+		inner join
+			locationTerm.location location
+		inner join
+			locationTerm.offender locOffender
+		where
+			(eligibility.status.category = 'APPEARING'
+			and
+			eligibility not in
+				(select eligibility2
+				from
+					omis.boardhearing.domain.BoardHearing as boardHearing
+				inner join
+					boardHearing.paroleEligibility as eligibility2)
+			)
+			and
+				locOffender = offender
+			and
+				(locationTerm.startDate <= :date 
+			and 
+				(locationTerm.endDate > :date or locationTerm.endDate is null))
+			and
+				location = :location
+		order by
+			eligibility.hearingEligibilityDate asc
+	]]></query>
 </hibernate-mapping>

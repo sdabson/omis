@@ -60,14 +60,27 @@
 		and
 			administeredQuestionValue != :administeredQuestionValue
 	]]></query>
-	<query name="findAdministeredQuestionValueByQuestionAndQuestionnaire"><![CDATA[
+	<query name="findAdministeredQuestionValueByQuestionAndQuestionnaireSectionStatus"><![CDATA[
 		select administeredQuestionValue
 		from
 			omis.questionnaire.domain.AdministeredQuestionValue administeredQuestionValue
+		inner join
+			administeredQuestionValue.questionnaireSection questionnaireSection
+		inner join
+			administeredQuestionValue.administeredQuestionnaire administeredQuestionnaire,
+			omis.questionnaire.domain.AdministeredQuestionnaireSectionStatus sectionStatus
+		inner join
+			sectionStatus.questionnaireSection ssQuestionnaireSection
+		inner join
+			sectionStatus.administeredQuestionnaire ssAdministeredQuestionnaire
 		where
+			questionnaireSection = ssQuestionnaireSection
+		and
+			administeredQuestionnaire = ssAdministeredQuestionnaire
+		and
 			administeredQuestionValue.question = :question
 		and
-			administeredQuestionValue.administeredQuestionnaire = :administeredQuestionnaire
+			sectionStatus = :administeredQuestionnaireSectionStatus
 	]]></query>
 	<query name="findAdministeredQuestionValueWithNoAnswerValue"><![CDATA[
 		select administeredQuestionValue

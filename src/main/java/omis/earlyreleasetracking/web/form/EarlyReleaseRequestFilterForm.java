@@ -51,6 +51,8 @@ public class EarlyReleaseRequestFilterForm implements Serializable {
 	
 	private Boolean singleRequestDate;
 	
+	private Boolean noResponse;
+	
 	/**
 	 * Default constructor for EarlyReleaseRequestFilterForm.
 	 */
@@ -219,4 +221,24 @@ public class EarlyReleaseRequestFilterForm implements Serializable {
 	public void setSingleRequestDate(final Boolean singleRequestDate) {
 		this.singleRequestDate = singleRequestDate;
 	}
+
+	/**
+	 * Returns the noResponse.
+	 *
+	 * @return noResponse
+	 */
+	public Boolean getNoResponse() {
+		return this.noResponse;
+	}
+
+	/**
+	 * Sets the noResponse.
+	 *
+	 * @param noResponse - no response
+	 */
+	public void setNoResponse(final Boolean noResponse) {
+		this.noResponse = noResponse;
+	}
+	
+	
 }

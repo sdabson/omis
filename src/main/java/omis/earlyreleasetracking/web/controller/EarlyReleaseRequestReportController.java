@@ -17,6 +17,7 @@
  */
 package omis.earlyreleasetracking.web.controller;
 
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,8 +31,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import omis.beans.factory.PropertyEditorFactory;
+import omis.beans.factory.spring.CustomDateEditorFactory;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequest;
 import omis.earlyreleasetracking.domain.EarlyReleaseRequestCategory;
+import omis.earlyreleasetracking.domain.EarlyReleaseStatusCategory;
 import omis.earlyreleasetracking.report.EarlyReleaseRequestSummaryReportService;
 import omis.earlyreleasetracking.service.EarlyReleaseRequestService;
 import omis.earlyreleasetracking.web.form.EarlyReleaseRequestFilterForm;
@@ -88,10 +91,18 @@ public class EarlyReleaseRequestReportController {
 	@Autowired
 	@Qualifier("earlyReleaseRequestPropertyEditorFactory")
 	private PropertyEditorFactory earlyReleaseRequestPropertyEditorFactory;
+	
+	@Autowired
+	@Qualifier("earlyReleaseStatusCategoryPropertyEditorFactory")
+	private PropertyEditorFactory
+				earlyReleaseStatusCategoryPropertyEditorFactory;
 
 	@Autowired
 	@Qualifier("offenderPropertyEditorFactory")
 	private OffenderPropertyEditorFactory offenderPropertyEditorFactory;
+
+	@Autowired
+	private CustomDateEditorFactory customDateEditorFactory;
 	
 	/* Service */
 	
@@ -137,26 +148,50 @@ public class EarlyReleaseRequestReportController {
 		return new ModelAndView(LIST_VIEW_NAME, map);
 	}
 	
+	/**
+	 * Returns the Model and View for the non-offender-centric Early Release
+	 * Request list screen.
+	 * 
+	 * @return Model and View for the non-offender-centric Early Release
+	 * Request list screen.
+	 */
 	@RequestMapping(value = "/noc/list.html", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('EARLY_RELEASE_TRACKING_LIST') or hasRole('ADMIN')")
 	public ModelAndView nocList() {
 		ModelMap map = new ModelMap();
-		map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY, null);
 		map.addAttribute(EARLY_RELEASE_STATUS_CATEGORIES_MODEL_KEY,
 				this.earlyReleaseRequestService
 				.findEarlyReleaseStatusCategories());
-		map.addAttribute(FORM_MODEL_KEY, new EarlyReleaseRequestFilterForm());
+		map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY,
+						this.earlyReleaseRequestSummaryReportService
+						.findByDatesWithStatus(null, null, null, null, null,
+								null, null));
+		EarlyReleaseRequestFilterForm form =
+				new EarlyReleaseRequestFilterForm();
+		form.setSingleEligibilityDate(true);
+		form.setSingleRequestDate(true);
+		form.setNoResponse(false);
+		map.addAttribute(FORM_MODEL_KEY, form);
 		
 		return new ModelAndView(NOC_LIST_VIEW_NAME, map);
 	}
 	
+	/**
+	 * Returns the Model and View for the filtered non-offender-centric Early
+	 * Release Request list screen.
+	 * 
+	 * @param form Early Release Request Filter Form
+	 * @param bindingResult Bind Result
+	 * @return Model and View for the filtered non-offender-centric Early
+	 * Release Request list screen.
+	 */
 	@RequestMapping(value = "/noc/list.html", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('EARLY_RELEASE_TRACKING_LIST') or hasRole('ADMIN')")
 	public ModelAndView nocFilterList(
 			final EarlyReleaseRequestFilterForm form,
 			final BindingResult bindingResult) {
 		ModelMap map = new ModelMap();
-		/*if (form.getSingleEligibilityDate()) {
+		if (form.getSingleEligibilityDate()) {
 			form.setEligibilityStartDate(null);
 			form.setEligibilityEndDate(null);
 		} else {
@@ -167,18 +202,33 @@ public class EarlyReleaseRequestReportController {
 			form.setRequestEndDate(null);
 		} else {
 			form.setRequestDate(null);
-		}*/
-		map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY,
-				this.earlyReleaseRequestSummaryReportService
-				.findByDatesWithStatus(form.getRequestStartDate(),
-						form.getRequestEndDate(), form.getRequestDate(),
-						form.getEligibilityStartDate(),
-						form.getEligibilityEndDate(), form.getEligibilityDate(),
-						form.getReleaseStatus()));
+		}
+		if (form.getNoResponse()) {
+			form.setReleaseStatus(null);
+		}
+		
+		if (!form.getNoResponse()) {
+			map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY,
+					this.earlyReleaseRequestSummaryReportService
+					.findByDatesWithStatus(form.getRequestStartDate(),
+							form.getRequestEndDate(), form.getRequestDate(),
+							form.getEligibilityStartDate(),
+							form.getEligibilityEndDate(),
+							form.getEligibilityDate(),
+							form.getReleaseStatus()));
+		} else {
+			map.addAttribute(EARLY_RELEASE_REQUEST_SUMMARIES_MODEL_KEY,
+					this.earlyReleaseRequestSummaryReportService
+					.findByDatesWithStatus(form.getRequestStartDate(),
+							form.getRequestEndDate(), form.getRequestDate(),
+							form.getEligibilityStartDate(),
+							form.getEligibilityEndDate(),
+							form.getEligibilityDate()));
+		}
 		map.addAttribute(EARLY_RELEASE_STATUS_CATEGORIES_MODEL_KEY,
 				this.earlyReleaseRequestService
 				.findEarlyReleaseStatusCategories());
-		map.addAttribute(FORM_MODEL_KEY, new EarlyReleaseRequestFilterForm());
+		map.addAttribute(FORM_MODEL_KEY, form);
 		
 		return new ModelAndView(NOC_LIST_VIEW_NAME, map);
 	}
@@ -235,5 +285,11 @@ public class EarlyReleaseRequestReportController {
 		binder.registerCustomEditor(EarlyReleaseRequest.class,
 				this.earlyReleaseRequestPropertyEditorFactory
 				.createPropertyEditor());
+		binder.registerCustomEditor(EarlyReleaseStatusCategory.class,
+				this.earlyReleaseStatusCategoryPropertyEditorFactory
+				.createPropertyEditor());
+		binder.registerCustomEditor(Date.class,
+				this.customDateEditorFactory
+				.createCustomDateOnlyEditor(true));
 	}
 }

@@ -26,7 +26,8 @@ import omis.boardhearingdecision.domain.BoardHearingDecisionCategory;
  * Board hearing decision form.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Jan 23, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class BoardHearingDecisionForm implements Serializable {
@@ -38,6 +39,8 @@ public class BoardHearingDecisionForm implements Serializable {
 	private List<HearingDecisionNoteItem> hearingDecisionNoteItems;
 	
 	private List<BoardMemberDecisionItem> boardMemberDecisionItems;
+	
+	private String rulingDetails;
 	
 	/**
 	 * Instantiates a default board hearing decision form. 
@@ -100,5 +103,23 @@ public class BoardHearingDecisionForm implements Serializable {
 	public void setBoardMemberDecisionItems(
 			final List<BoardMemberDecisionItem> boardMemberDecisionItems) {
 		this.boardMemberDecisionItems = boardMemberDecisionItems;
+	}
+
+	/**
+	 * Returns the ruling details.
+	 *
+	 * @return rulingDetails
+	 */
+	public String getRulingDetails() {
+		return this.rulingDetails;
+	}
+
+	/**
+	 * Sets the ruling details.
+	 *
+	 * @param rulingDetails - ruling details
+	 */
+	public void setRulingDetails(final String rulingDetails) {
+		this.rulingDetails = rulingDetails;
 	}
 }

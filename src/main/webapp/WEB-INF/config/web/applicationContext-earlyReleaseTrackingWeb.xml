@@ -17,6 +17,10 @@
 			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
 		</bean>
 		
+		<bean id="earlyReleaseRequestProfileItemReportService" class="omis.earlyreleasetracking.report.impl.hibernate.EarlyReleaseRequestProfileItemReportServiceHibernateImpl">
+			<constructor-arg name="sessionFactory" ref="sessionFactory"/>
+		</bean>
+		
 		<bean id="earlyReleaseRequestFormValidator"
 			class="omis.earlyreleasetracking.web.validator.EarlyReleaseRequestFormValidator">
 		</bean>
@@ -27,4 +31,18 @@
 			<aop:advisor advice-ref="transactionAdvice" pointcut-ref="earlyReleaseRequestControllerOperation"/>	
 		</aop:config>
 		
+		<!-- Profile Items -->
+		<bean id="earlyReleaseRequestProfileItem" class="omis.earlyreleasetracking.web.profile.EarlyReleaseRequestProfileItem">
+			<constructor-arg name="requiredAuthorizations">
+				<set>
+					<value>EARLY_RELEASE_TRACKING_LIST</value>
+					<value>ADMIN</value>
+				</set>
+			</constructor-arg>
+			<constructor-arg name="includePage" value="/WEB-INF/views/earlyReleaseTracking/profile/includes/profileItem.jsp"/>
+			<constructor-arg name="name" value="earlyReleaseTracking"/>
+			<constructor-arg name="profileItemRegistry" ref="caseManagementProfileItemRegistry"/>
+			<constructor-arg name="enabled" value="${earlyReleaseRequestProfileItemEnabled}"/>
+			<constructor-arg name="earlyReleaseRequestProfileItemReportService" ref="earlyReleaseRequestProfileItemReportService"/>
+		</bean>
 </beans>

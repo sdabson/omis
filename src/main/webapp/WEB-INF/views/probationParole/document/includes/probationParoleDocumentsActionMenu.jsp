@@ -9,5 +9,12 @@
 				<a class="createLink" href="${pageContext.request.contextPath}/probationParole/document/create.html?offender=${offender.id}"><span class="visibleLinkLabel"><fmt:message key="createProbationParoleDocumentLink"/></span></a>
 			</li>
 		</sec:authorize>
+		<sec:authorize access="hasRole('PROBATION_PAROLE_DOCUMENT_LIST') or hasRole('ADMIN')">
+			<c:if test="${not empty offender}">
+				<li>
+					<a href="${pageContext.request.contextPath}/probationParole/document/ppDocListingReport.html?offender=${offender.id}&reportFormat=PDF" class="newTab printLink"><fmt:message key="ppDocListingReportLinkLabel"/></a>
+				</li>
+			</c:if>
+		</sec:authorize>		
 	</ul>
 </fmt:bundle>

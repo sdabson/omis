@@ -36,6 +36,17 @@
 			</div>
 		</div>
 	</c:if>
+	<c:if test="${offenderProfileItemsProperties.earlyReleaseRequestProfileItemEnabled}">
+		<div class="foregroundUltraLight navItemContainer hoverable">
+			<div class="navItem">
+				<a href="${pageContext.request.contextPath}/earlyReleaseTracking/list.html?offender=${offenderSummary.id}">
+					<span>
+						<fmt:message key="earlyReleaseRequestLabel"/>
+					</span>
+				</a>
+			</div>
+		</div>
+	</c:if>
 	<c:if test="${offenderProfileItemsProperties.educationProfileItemEnabled}">
 		<div class="foregroundUltraLight navItemContainer hoverable">
 			<div class="navItem">

@@ -25,7 +25,8 @@ import omis.boardhearing.domain.BoardHearing;
  * Board hearing decision.
  *
  * @author Josh Divine
- * @version 0.1.0 (Jan 22, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public interface BoardHearingDecision extends Creatable, Updatable {
@@ -59,7 +60,8 @@ public interface BoardHearingDecision extends Creatable, Updatable {
 	void setHearing(BoardHearing hearing);
 
 	/**
-	 * Returns the board hearing decision category of the board hearing decision.
+	 * Returns the board hearing decision category of the board hearing
+	 * decision.
 	 * 
 	 * @return board hearing decision category
 	 */
@@ -71,6 +73,18 @@ public interface BoardHearingDecision extends Creatable, Updatable {
 	 * @param category board hearing decision category
 	 */
 	void setCategory(BoardHearingDecisionCategory category);
+	
+	/**
+	 * Returns the Ruling Details for the Board Hearing Decision.
+	 * @return rulingDetails - Ruling Details
+	 */
+	String getRulingDetails();
+	
+	/**
+	 * Sets the Ruling Details for the Board Hearing Decision.
+	 * @param rulingDetails - Ruling Details
+	 */
+	void setRulingDetails(String rulingDetails);
 	
 	/**
 	 * Compares {@code this} and {@code obj} for equality.

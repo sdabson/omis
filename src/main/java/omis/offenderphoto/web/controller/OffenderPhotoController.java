@@ -75,6 +75,7 @@ import omis.report.web.controller.delegate.ReportControllerDelegate;
  * @author Stephen Abson
  * @author Joel Norris
  * @author Josh Divine
+ * @author Sierra Haynes
  * @version 0.1.3 (Feb 12, 2018)
  * @since OMIS 3.0
  */
@@ -138,6 +139,14 @@ public class OffenderPhotoController {
 		= "/BasicInformation/Mugshots/Mugshot_Listing";
 	private static final String OFFENDER_PHOTO_DETAILS_REPORT_NAME 
 		= "/BasicInformation/Mugshots/Mugshot_Detail";
+	private static final String OFFENDER_BADGE_MSP_REPORT_NAME 
+	    = "/BasicInformation/Mugshots/OffenderBadges/offenderBadgeMSP";	
+	private static final String OFFENDER_BADGE_MWP_REPORT_NAME 
+        = "/BasicInformation/Mugshots/OffenderBadges/offenderBadgeMWP";	
+	private static final String OFFENDER_BADGE_PINE_REPORT_NAME 
+        = "/BasicInformation/Mugshots/OffenderBadges/offenderBadgePINE";	
+	private static final String OFFENDER_EXIT_BADGE_MSP_REPORT_NAME 
+        = "/BasicInformation/Mugshots/OffenderBadges/offenderExitBadgeMSP";		
 	
 	/* Report parameter names. */
 	
@@ -800,6 +809,106 @@ public class OffenderPhotoController {
 				Long.toString(association.getId()));
 		byte[] doc = this.reportRunner.runReport(
 				OFFENDER_PHOTO_DETAILS_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the msp badge for the specified offender.
+	 * 
+	 * @param association offender photo association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/offenderBadgeMSPReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('MSP_BADGE_REPORT') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportOffenderBadgeMSP(@RequestParam(
+			value = "association", required = true)
+			final OffenderPhotoAssociation association,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(OFFENDER_PHOTO_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(association.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				OFFENDER_BADGE_MSP_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the mwp badge for the specified offender.
+	 * 
+	 * @param association offender photo association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/offenderBadgeMWPReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('MWP_BADGE_REPORT') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportOffenderBadgeMWP(@RequestParam(
+			value = "association", required = true)
+			final OffenderPhotoAssociation association,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(OFFENDER_PHOTO_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(association.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				OFFENDER_BADGE_MWP_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the pine hills badge for the specified offender.
+	 * 
+	 * @param association offender photo association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/offenderBadgePINEReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PINE_BADGE_REPORT') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportOffenderBadgePINE(@RequestParam(
+			value = "association", required = true)
+			final OffenderPhotoAssociation association,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(OFFENDER_PHOTO_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(association.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				OFFENDER_BADGE_PINE_REPORT_NAME,
+				reportParamMap, reportFormat);
+		return this.reportControllerDelegate.constructReportResponseEntity(
+				doc, reportFormat);
+	}
+	
+	/**
+	 * Returns the exit badge msp for the specified offender.
+	 * 
+	 * @param association offender photo association
+	 * @param reportFormat report format
+	 * @return response entity with report
+	 */
+	@RequestMapping(value = "/offenderExitBadgeMSPReport.html",
+			method = RequestMethod.GET)
+	@PreAuthorize("hasRole('MSP_BADGE_REPORT') or hasRole('ADMIN')")
+	public ResponseEntity<byte []> reportOffenderExitBadgeMSP(@RequestParam(
+			value = "association", required = true)
+			final OffenderPhotoAssociation association,
+			@RequestParam(value = "reportFormat", required = true)
+			final ReportFormat reportFormat) {
+		Map<String, String> reportParamMap = new HashMap<String, String>();
+		reportParamMap.put(OFFENDER_PHOTO_DETAILS_ID_REPORT_PARAM_NAME,
+				Long.toString(association.getId()));
+		byte[] doc = this.reportRunner.runReport(
+				OFFENDER_EXIT_BADGE_MSP_REPORT_NAME,
 				reportParamMap, reportFormat);
 		return this.reportControllerDelegate.constructReportResponseEntity(
 				doc, reportFormat);

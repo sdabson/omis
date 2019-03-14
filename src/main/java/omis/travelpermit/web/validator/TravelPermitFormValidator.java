@@ -35,7 +35,7 @@ import org.springframework.validation.Validator;
  * 
  * @author Yidong Li
  * @author Sheronda Vaughn
- * @version 0.1.1 (May 22, 2018)
+ * @version 0.12 (March 1, 2019)
  * @since OMIS 3.0
  */
 public class TravelPermitFormValidator implements Validator {
@@ -139,6 +139,13 @@ public class TravelPermitFormValidator implements Validator {
 		if (travelPermitForm.getStartDate() == null) {
 			errors.rejectValue(START_DATE_PROPERTY_NAME,
 			START_DATE_EMPTY_ERROR_KEY);
+		}
+		if (travelPermitForm.getStartDate() != null
+				&& travelPermitForm.getEndDate() != null
+				&& travelPermitForm.getStartDate().getTime()
+					> travelPermitForm.getEndDate().getTime()) {
+			errors.rejectValue("startDate",
+					"dateRange.startDateGreaterThanEndDate");
 		}
 		if (travelPermitForm.getTripPurpose().isEmpty()
 			|| travelPermitForm.getTripPurpose().length()==0

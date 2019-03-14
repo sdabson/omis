@@ -55,4 +55,19 @@
 		and
 			earlyReleaseRequest != :earlyReleaseRequest
 	]]></query>
+	<query name="findEarlyReleaseRequestStatusByOffender"><![CDATA[
+		select requestStatus.name
+		from
+			omis.earlyreleasetracking.domain.EarlyReleaseRequest earlyReleaseRequest
+		inner join
+			earlyReleaseRequest.requestStatus requestStatus
+		inner join
+			earlyReleaseRequest.docket docket
+		inner join
+			docket.person offender
+		where
+			offender = :offender
+		order by
+			earlyReleaseRequest.requestDate desc
+	]]></query>
 </hibernate-mapping>

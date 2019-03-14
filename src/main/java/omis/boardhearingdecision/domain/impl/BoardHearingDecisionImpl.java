@@ -27,7 +27,8 @@ import omis.boardhearingdecision.domain.BoardHearingDecisionCategory;
  * Implementation of board hearing decision.
  * 
  * @author Josh Divine
- * @version 0.1.0 (Jan 22, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 13, 2019)
  * @since OMIS 3.0
  */
 public class BoardHearingDecisionImpl implements BoardHearingDecision {
@@ -39,6 +40,8 @@ public class BoardHearingDecisionImpl implements BoardHearingDecision {
 	private BoardHearing hearing;
 	
 	private BoardHearingDecisionCategory category;
+	
+	private String rulingDetails;
 	
 	private CreationSignature creationSignature;
 	
@@ -86,7 +89,19 @@ public class BoardHearingDecisionImpl implements BoardHearingDecision {
 	public void setCategory(final BoardHearingDecisionCategory category) {
 		this.category = category;
 	}
-
+	
+	/** {@inheritDoc} */
+	@Override
+	public String getRulingDetails() {
+		return this.rulingDetails;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public void setRulingDetails(final String rulingDetails) {
+		this.rulingDetails = rulingDetails;
+	}
+	
 	/**{@inheritDoc} */
 	@Override
 	public CreationSignature getCreationSignature() {
