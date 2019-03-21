@@ -122,6 +122,9 @@ public class ManageVictimAssociationController {
 	private static final String NOTES_ACTION_MENU_VIEW_NAME
 		= "victim/association/includes/victimAssociationNotesActionMenu";
 	
+	private static final String VICTIM_NOTES_ROW_ACTION_MENU_VIEW_NAME
+		= "victim/association/includes/victimAssociationNotesRowActionMenu";
+	
 	private static final String TELEPHONE_NUMBERS_ACTION_MENU_VIEW_NAME
 		= "victim/association/includes"
 				+ "/victimAssociationTelephoneNumbersActionMenu";
@@ -158,6 +161,9 @@ public class ManageVictimAssociationController {
 	
 	private static final String VICTIM_NOTE_ITEM_MODEL_KEY
 		= "victimNoteItem";
+	
+	private static final String VICTIM_NOTE_MODEL_KEY 
+		= "victimNote";
 
 	private static final String TELEPHONE_NUMBER_CATEGORIES_MODEL_KEY
 		= "telephoneNumberCategories";
@@ -178,6 +184,8 @@ public class ManageVictimAssociationController {
 		= "onlineAccountItemIndex";
 	
 	private static final String ADDRESSES_MODEL_KEY = "addresses";
+	
+	private static final String VICTIM_NOTE_OPERATION_MODEL_KEY = "operation";
 	
 	/* Fields names. */
 	
@@ -981,7 +989,7 @@ public class ManageVictimAssociationController {
 		}
 		return this.prepareListRedirect(offender, victim, redirectTarget);
 	}
-	
+
 	/* Helper methods. */
 	
 	// Prepares model and view to edit victim association
@@ -1336,6 +1344,27 @@ public class ManageVictimAssociationController {
 	}
 	
 	/**
+	 * Victim note row action menu. 
+	 * 
+	 * @param victimNote victim note
+	 * @return model and view
+	 */
+	@RequestMapping(value = "/associationNotesRowActionMenu.html", method = RequestMethod.GET)
+	public ModelAndView showNotesRowActionMenu(
+		@RequestParam(value = "note", required = false)
+		final VictimNote note,
+		@RequestParam(value = "operation", required = true)
+		final VictimNoteItemOperation operation,
+		@RequestParam(value = "itemIndex", required = true)
+		final Integer itemIndex) {				
+		ModelAndView mav = new ModelAndView(VICTIM_NOTES_ROW_ACTION_MENU_VIEW_NAME);
+		mav.addObject(VICTIM_NOTE_MODEL_KEY, note);
+		mav.addObject(VICTIM_NOTE_OPERATION_MODEL_KEY, operation);		
+		mav.addObject(VICTIM_NOTE_ITEM_INDEX_MODEL_KEY, itemIndex);
+		return mav;
+	}	
+	
+	/**
 	 * Returns telephone numbers action menu.
 	 * 
 	 * @return telephone numbers action menu
@@ -1378,8 +1407,8 @@ public class ManageVictimAssociationController {
 		mav.addObject(VICTIM_NOTE_ITEM_INDEX_MODEL_KEY, itemIndex);
 		mav.addObject(VICTIM_NOTE_ITEM_MODEL_KEY, victimNoteItem);
 		return mav;
-	}
-
+	}  
+	
 	/**
 	 * Returns fields to create victim association telephone number.
 	 * 

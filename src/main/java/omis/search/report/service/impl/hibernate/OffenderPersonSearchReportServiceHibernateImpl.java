@@ -31,7 +31,8 @@ import omis.search.util.PersonRegexUtility;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.1 (Feb 14, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Mar 20, 2019)
  * @since OMIS 3.0 
  */
 public class OffenderPersonSearchReportServiceHibernateImpl
@@ -67,6 +68,11 @@ public class OffenderPersonSearchReportServiceHibernateImpl
 			"findOffenderSearchById";
 
 	private static final String FIND_PERSON_SEARCH_BY_ID_PARAM = "id";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY =
+			"findOffenderNameBySsn";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM = "ssn";
 
 	/** constructor.
 	 * @param sessionFactory session factory. */
@@ -121,15 +127,27 @@ public class OffenderPersonSearchReportServiceHibernateImpl
 	public String getFindPersonNameByNameSearchParam() {
 		return FIND_PERSON_NAME_BY_NAME_SEARCH_PARAM;
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchQuery() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY;
+	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchParam() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM;
+	}
+	
 	/** Returns person names with associated offender search.
 	 * @param offenderNumber offender number string.
 	 * @return list of person names. */
 	public List<OffenderSearchResult> findPersonNamesByOffenderNumberSearch(
 			final Long offenderNumber) {
 		@SuppressWarnings("unchecked")
-		final
-		List<OffenderSearchResult> result = this.getSessionFactory().getCurrentSession()
+		final List<OffenderSearchResult> result = this.getSessionFactory()
+				.getCurrentSession()
 				.getNamedQuery(FIND_PERSON_NAME_BY_OFFENDER_NUMBER)
 				.setLong(FIND_PERSON_NAME_BY_OFFENDER_NUMBER_PARAMS, 
 						offenderNumber)
@@ -142,7 +160,7 @@ public class OffenderPersonSearchReportServiceHibernateImpl
 	/** {@inheritDoc} */
 	@Override
 	public List<OffenderSearchResult> findPersonNamesByUnspecified(
-			final String searchCriteria) {
+			final String searchCriteria, final Boolean includeSsn) {
 		List<OffenderSearchResult> result =
 				new ArrayList<OffenderSearchResult>();
 
@@ -150,7 +168,8 @@ public class OffenderPersonSearchReportServiceHibernateImpl
 			result = this.findPersonNamesByOffenderNumberSearch(
 					Long.valueOf(searchCriteria));
 		} else {
-			result = super.findPersonNamesByUnspecified(searchCriteria);
+			result = super.findPersonNamesByUnspecified(
+					searchCriteria, includeSsn);
 		}
 
 		return result;

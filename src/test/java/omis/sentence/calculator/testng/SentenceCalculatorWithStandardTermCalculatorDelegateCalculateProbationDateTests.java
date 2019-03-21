@@ -119,15 +119,26 @@ public class SentenceCalculatorWithStandardTermCalculatorDelegateCalculateProbat
 	 * Test calculation of probation discharge date on second in set of six
 	 * calculations.
 	 */
-	// Requires implementation of concurrent calculation - SA
+	// TODO Implementation of turn self in date calculation - SA
 	@Test(enabled = false)
-	public void testCalclatorOnSecondOfSix() {
+	public void testCalculatorOnSecondOfSix() {
 		SentenceCalculator calculator
-			= this.getSampleFactory().buildSampleOfSix(0);
+			= this.getSampleFactory().buildSampleOfSix(1);
 		Date expectedDate = this.parseDate("12/16/2013");
 		Date foundDate = calculator.calculateProbationDischargeDate();
 		assert expectedDate.equals(foundDate) : String.format(
 				"Wrong probation discharge date - %s expected; %s found",
 				this.formatDate(expectedDate), this.formatDate(foundDate));
+	}
+	
+	/**
+	 * Tests that {@code IllegalStateException} is thrown when trying to
+	 * calculate probation discharge date when initial sentence is missing
+	 * commencement date and turn self in date.
+	 */
+	@Test(expectedExceptions = {IllegalStateException.class})
+	public void testIllegalStateExceptionOnProbationDischargeDateCalculationWithMissingDates() {
+		this.getBuilderFactory().createBuilder()
+			.build().calculateProbationDischargeDate();
 	}
 }

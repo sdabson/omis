@@ -22,7 +22,8 @@
   - Author: Ryan Johns
   - Author: Sheronda Vaughn
   - Author: Josh Divine
-  - Version: 0.1.20 (Aug 29, 2018)
+  - Author: Annie Wahl
+  - Version: 0.1.21 (Mar 20, 2019)
   - Since: OMIS 3.0
   -->
 <!DOCTYPE hibernate-mapping PUBLIC
@@ -80,7 +81,26 @@
 	  WHERE p.id = :id
    ORDER BY p.name.lastName, p.name.firstName
 		]]></query>
-
+		
+	<query name="findPersonNameBySsn"><![CDATA[
+		SELECT new omis.search.report.PersonSearchResult(
+				p.name.id,
+				p.id,
+				name.firstName,
+				name.middleName,
+				name.lastName,
+				name.suffix)
+		FROM
+			omis.person.domain.Person p
+		inner join
+			p.name name
+		inner join
+			p.identity identity
+		WHERE
+			identity.socialSecurityNumber = :ssn
+		ORDER BY
+			p.name.lastName, p.name.firstName
+		]]></query>
 
 <!--   Offender/Name searches -->
 	<query name="findAllOffenderNameByFirstLastNameSearch"><![CDATA[
@@ -136,6 +156,26 @@
    ORDER BY o.name.lastName, o.name.firstName
 		]]></query>
 	
+	<query name="findOffenderNameBySsn"><![CDATA[
+		SELECT new omis.search.report.OffenderSearchResult(
+			o.name.id,
+			o.id,
+			o.offenderNumber,
+			name.firstName,
+			name.middleName,
+			name.lastName,
+			name.suffix)
+		FROM
+			omis.offender.domain.Offender o
+			inner join
+				o.name name
+			inner join
+				o.identity identity
+		WHERE
+			identity.socialSecurityNumber = :ssn
+		ORDER BY
+			o.name.lastName, o.name.firstName
+		]]></query>
 	
 <!--   User/Name searches -->
 	<query name="findUsersNamesByFirstLastNameSearch"><![CDATA[
@@ -215,4 +255,27 @@
 	 ORDER BY an.lastName, an.firstName
 		]]></query>
 
+	<query name="findUserNameBySsn"><![CDATA[
+		SELECT new omis.search.report.UserSearchResult(
+			ua.id,
+			user.id,
+			name.id,
+			name.firstName,
+			name.middleName,
+			name.lastName,
+			name.suffix,
+			ua.username)
+		FROM
+			omis.user.domain.UserAccount ua
+		inner join
+			ua.user user
+		inner join
+			user.name name
+		inner join
+			user.identity identity
+		WHERE
+			identity.socialSecurityNumber = :ssn
+		ORDER BY
+			name.lastName, name.firstName
+	]]></query>
 </hibernate-mapping>

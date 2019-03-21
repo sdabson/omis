@@ -18,6 +18,7 @@
 package omis.caseload.web.validator;
 
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import omis.caseload.web.form.ItemOperation;
@@ -28,21 +29,26 @@ import omis.caseload.web.form.OfficerCaseAssignmentNoteItem;
  * Officer case assignment form validator.
  * 
  * @author Josh Divine
- * @version 0.1.3 (Dec 6, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 19, 2019)
  * @since OMIS 3.0
  */
 public class OfficerCaseAssignmentFormValidator implements Validator {
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean supports(Class<?> clazz) {
+	public boolean supports(final Class<?> clazz) {
 		return OfficerCaseAssignmentForm.class.isAssignableFrom(clazz);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void validate(Object target, Errors errors) {
+	public void validate(final Object target, final Errors errors) {
 		OfficerCaseAssignmentForm form = (OfficerCaseAssignmentForm) target;
+		ValidationUtils.rejectIfEmpty(errors, "supervisionLevelCategory",
+				"officerCaseAssignment.supervisionLevelCategory.empty");
+		ValidationUtils.rejectIfEmpty(errors, "location",
+				"officerCaseAssignment.location.empty");
 		if (form.getSelectedOffender() == null) {
 			errors.rejectValue("selectedOffender", 
 					"officerCaseAssignment.offender.empty");

@@ -1,3 +1,20 @@
+/*
+ * OMIS - Offender Management Information System
+ * Copyright (C) 2011 - 2017 State of Montana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package omis.term.domain.component;
 
 import java.io.Serializable;
@@ -46,9 +63,9 @@ public class Term
 	 * @param term term to copy
 	 */
 	public Term(final Term term) {
-		this.years = term.years;
-		this.months = term.months;
-		this.days = term.days;
+		this.years = term.getYears();
+		this.months = term.getMonths();
+		this.days = term.getDays();
 	}
 	
 	/**
@@ -103,6 +120,124 @@ public class Term
 	 */
 	public Integer getDays() {
 		return this.days;
+	}
+	
+	/**
+	 * Returns whether {@code this} is longer than {@code term}.
+	 * 
+	 * <p>Returns {@code false} if the terms are equal.
+	 * 
+	 * <p>Functions symmetrically to {@link Term#shorterThan}.
+	 * 
+	 * @param term term to which to compare {@code this}
+	 * @return {@code true} if {@code this} is longer than {@code term};
+	 * {@code false} otherwise including if equal
+	 */
+	public boolean longerThan(final Term term) {
+		if (this.getYears() != null && term.getYears() != null) {
+			if (this.getYears() > term.getYears()) {
+				return true;
+			}
+		} else if (term.getYears() == null) {
+			if (this.getYears() != null) {
+				return true;
+			}
+		}
+		if (this.getMonths() != null && term.getMonths() != null) {
+			if (this.getMonths() > term.getMonths()) { 
+				return true;
+			}
+		} else if (term.getMonths() == null) {
+			if (this.getMonths() != null) {
+				return true;
+			}
+		}
+		if (this.getDays() != null && term.getDays() != null) {
+			if (this.getDays() > term.getDays()) {
+				return true;
+			}
+		} else if (term.getDays() == null) {
+			if (this.getDays() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns whether {@code this} is shorter than {@code term}.
+	 * 
+	 * <p>Returns {@code false} if terms are equal.
+	 * 
+	 * <p>Functions symmetrically to {@link Term#longerThan}.
+	 * 
+	 * @param term term to which to compare {@code this}
+	 * @return {@code true} if {@code this} is shorter than {@code term};
+	 * {@code false} otherwise including if equal
+	 */
+	public boolean shorterThan(final Term term) {
+		if (this.getYears() != null && term.getYears() != null) {
+			if (this.getYears() < term.getYears()) {
+				return true;
+			}
+		} else if (this.getYears() == null) {
+			if (term.getYears() != null) {
+				return true;
+			}
+		}
+		if (this.getMonths() != null && term.getMonths() != null) {
+			if (this.getMonths() < term.getMonths()) {
+				return true;
+			}
+		} else if (this.getMonths() == null) {
+			if (term.getMonths() != null) {
+				return true;
+			}
+		}
+		if (this.getDays() != null && term.getDays() != null) {
+			if (this.getDays() < term.getDays()) {
+				return true;
+			}
+		} else if (this.getDays() == null) {
+			if (term.getDays() != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns difference between {@code this} and {@code term}.
+	 * 
+	 * @param term term
+	 * @return difference between {@code this} and {@code term}
+	 */
+	public Term difference(final Term term) {
+		int years;
+		int months;
+		int days;
+		if (this.getYears() != null && term.getYears() != null) {
+			years = this.getYears() - term.getYears();
+		} else if (term.getYears() != null) {
+			years = 0 - term.getYears();
+		} else {
+			years = this.getYears();
+		}
+		if (this.getMonths() != null && term.getMonths() != null) {
+			months = this.getMonths() - term.getMonths();
+		} else if (term.getMonths() != null) {
+			months = 0 - term.getMonths();
+		} else {
+			months = this.getMonths();
+		}
+		if (this.getDays() != null && term.getDays() != null) {
+			days = this.getDays() - term.getDays();
+		} else if (term.getDays() != null) {
+			days = 0 - term.getDays();
+		} else {
+			days = this.getDays();
+		}
+		return new Term(years, months, days);
 	}
 	
 	/**

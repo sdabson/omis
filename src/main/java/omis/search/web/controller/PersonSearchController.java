@@ -13,6 +13,7 @@ import omis.user.service.UserAccountService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,7 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 /** Search for person operations.
  * @author Ryan Johns
- * @version 0.1.0 (Apr 10, 2013)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 19, 2019)
  * @since OMIS 3.0 */
 @Controller
 @RequestMapping("/personSearch")
@@ -69,7 +71,12 @@ public class PersonSearchController {
 	public List<PersonSearchResult> searchByNonSpecified(
 			@RequestParam(value = "searchCriteria", required = true)
 				final String searchCriteria) throws IOException {
-		return this.personSearchReportService.findPersonNamesByUnspecified(searchCriteria);
+		Boolean includeSsn = false;
+		if (this.hasRole("OFFENDER_SSN_VIEW") || this.hasRole("ADMIN")) {
+			includeSsn = true;
+		}
+		return this.personSearchReportService.findPersonNamesByUnspecified(
+				searchCriteria, includeSsn);
 	}
 
 	/** returns list of offender.
@@ -80,9 +87,12 @@ public class PersonSearchController {
 			@RequestParam(value = "searchCriteria", required = true)
 			final String searchCriteria) throws IOException {
 		final ModelMap map = new ModelMap();
-
+		Boolean includeSsn = false;
+		if (this.hasRole("OFFENDER_SSN_VIEW") || this.hasRole("ADMIN")) {
+			includeSsn = true;
+		}
 		map.put("offenders", this.offenderSearchReportService.
-				findPersonNamesByUnspecified(searchCriteria));
+				findPersonNamesByUnspecified(searchCriteria, includeSsn));
 		return new ModelAndView("search/offenderSearch/includes/listUl", map);
 	}
 
@@ -95,9 +105,12 @@ public class PersonSearchController {
 	public List<OffenderSearchResult>  searchOffenderByNonSpecified(
 			@RequestParam(value = "searchCriteria", required = true)
 			final String searchCriteria) throws IOException {
-
+		Boolean includeSsn = false;
+		if (this.hasRole("OFFENDER_SSN_VIEW") || this.hasRole("ADMIN")) {
+			includeSsn = true;
+		}
 		return this.offenderSearchReportService
-				.findPersonNamesByUnspecified(searchCriteria);
+				.findPersonNamesByUnspecified(searchCriteria, includeSsn);
 	}
 
 
@@ -112,9 +125,12 @@ public class PersonSearchController {
 			@RequestParam(value = "searchCriteria", required = true)
 			final String searchCriteria) throws IOException {
 		final ModelMap map = new ModelMap();
-
+		Boolean includeSsn = false;
+		if (this.hasRole("OFFENDER_SSN_VIEW") || this.hasRole("ADMIN")) {
+			includeSsn = true;
+		}
 		map.put("offenders", this.offenderSearchReportService
-					.findPersonNamesByUnspecified(searchCriteria));
+					.findPersonNamesByUnspecified(searchCriteria, includeSsn));
 
 		return new ModelAndView("search/offenderSearch/list", map);
 
@@ -190,10 +206,22 @@ public class PersonSearchController {
 	@RequestMapping("/currentUserAssignment.json")
 	@ResponseBody
 	public UserSearchResult findCurrentUser() {
-		System.out.println(SecurityContextHolder.getContext()
-		.getAuthentication().getName());
+		/*System.out.println(SecurityContextHolder.getContext()
+				.getAuthentication().getName());*/
 		return this.userSearchReportService.findById(this.userAccountService
 				.findByUsername(SecurityContextHolder.getContext()
 				.getAuthentication().getName()).getId());
+	}
+	
+	// Returns whether the current user has the specified role
+	private boolean hasRole(final String role) {
+		for (GrantedAuthority authority :
+				SecurityContextHolder.getContext().getAuthentication()
+					.getAuthorities()) {
+			if (role.equals(authority.getAuthority())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

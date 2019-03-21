@@ -17,6 +17,8 @@
  */
 package omis.sentence.calculator.impl;
 
+import java.util.Objects;
+
 import omis.sentence.calculator.SentenceCalculator;
 import omis.sentence.calculator.SentenceCalculator.Builder;
 import omis.sentence.calculator.SentenceCalculatorBuilderFactory;
@@ -42,6 +44,8 @@ public class SentenceCalculatorBuilderFactoryImpl
 	 */
 	public SentenceCalculatorBuilderFactoryImpl(
 			final TermCalculatorDelegate termCalculatorDelegate) {
+		Objects.requireNonNull(termCalculatorDelegate,
+				"Term calculator delegate required");
 		this.termCalculatorDelegate = termCalculatorDelegate;
 	}
 	

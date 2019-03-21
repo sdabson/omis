@@ -6,7 +6,8 @@ import omis.search.report.UserSearchResult;
 
 /** Offender person search report service.
  * @author Ryan Johns
- * @version 0.1.0 (Jan 7, 2013)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 20, 2019)
  * @since OMIS 3.0 */
 public interface UserPersonSearchReportService {
 
@@ -17,9 +18,10 @@ public interface UserPersonSearchReportService {
 
 	/** find users' names by unspecified search criteria.
 	 * @param searchCriteria search criteria string.
+	 * @param includeSsn whether to include ssn search
 	 * @return list of offender names. */
 	List<UserSearchResult> findPersonNamesByUnspecified(
-			final String searchCriteria);
+			final String searchCriteria, final Boolean includeSsn);
 
 	/** Returns users' names with specified name search criteria.
 	 * @param name1 first or last

@@ -40,16 +40,12 @@ public class CourtDocumentAssociationFormValidator
 	
 	/* Field names */
 	
-	private static final String DOCKET_FIELD_NAME = "docket";
-	
 	private static final String DATE_FIELD_NAME = "date";
 	
 	private static final String TITLE_FIELD_NAME = "title";
 	
 	/* Message keys */
-	
-	private static final String DOCKET_REQUIRED_MSG = "docket.empty";
-	
+		
 	private static final String DATE_REQUIRED_MSG = "date.empty";
 	
 	private static final String TITLE_REQUIRED_MSG = 
@@ -73,8 +69,6 @@ public class CourtDocumentAssociationFormValidator
 	public void validate(final Object obj, final Errors errors) {
 		final CourtDocumentAssociationForm courtDocumentAssociationForm = 
 			(CourtDocumentAssociationForm) obj;
-		ValidationUtils.rejectIfEmpty(errors, DOCKET_FIELD_NAME,
-				DOCKET_REQUIRED_MSG);
 		ValidationUtils.rejectIfEmpty(errors, DATE_FIELD_NAME, 
 				DATE_REQUIRED_MSG);
 		ValidationUtils.rejectIfEmpty(errors, TITLE_FIELD_NAME, 

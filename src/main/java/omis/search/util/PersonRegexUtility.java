@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.2 (Aug 29, 2018)
+ * @author Annie Wahl
+ * @version 0.1.3 (Mar 19, 2019)
  * @since OMIS 3.0
  */
 public final class PersonRegexUtility {
@@ -39,6 +40,8 @@ public final class PersonRegexUtility {
 	private static final String OFFENDERNUMBER = "^[0-9]+$";
 	
 	private static final String NAME = "^[a-zA-Z\\-]+(?:,*\\s*)$";
+	
+	private static final String SSN = "^\\d{3}-?\\d{2}-?\\d{4}$";
 
 	private PersonRegexUtility() { }
 
@@ -86,5 +89,17 @@ public final class PersonRegexUtility {
 		final Pattern name = Pattern.compile(NAME);
 
 		return name.matcher(compare).matches();
+	}
+	
+	/**
+	 * Determine if a string is a SSN.
+	 * 
+	 * @param compare comparison criteria.
+	 * @return is SSN string
+	 */
+	public static boolean isSsn(final String compare) {
+		final Pattern ssnPattern = Pattern.compile(SSN);
+		
+		return ssnPattern.matcher(compare).matches();
 	}
 }

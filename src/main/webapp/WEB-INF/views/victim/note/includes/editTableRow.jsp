@@ -7,14 +7,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <fmt:setBundle var="commonBundle" basename="omis.msgs.common"/>
-<tr id="noteItems[${victimNoteItemIndex}].row">
-	<td>
-		<a id="noteItems[${victimNoteItemIndex}].removeLink" class="removeLink" href="${pageContext.request.contextPath}/victim/association/removeNote.html"><span class="linkLabel" title="<fmt:message key='removeLink' bundle='${commonBundle}'/>"><fmt:message key="removeLink" bundle="${commonBundle}"/></span></a>
-		<c:if test="${'UPDATE' eq victimNoteItem.operation.name}">
-			<a id="noteItems[${victimNoteItemIndex}].disassociateLink" class="linkLink" href="${pageContext.request.contextPath}/victim/association/disassociateNote.html"><span class="linkLabel" title="<fmt:message key='disassociateLink' bundle='${commonBundle}'/>"><fmt:message key="disassociateLink" bundle="${commonBundle}"/></span></a>
-		</c:if>
-		<input id="noteItems[${victimNoteItemIndex}].operation" type="hidden" name="noteItems[${victimNoteItemIndex}].operation" value="${victimNoteItem.operation.name}"/>
-		<input type="hidden" name="noteItems[${victimNoteItemIndex}].note" value="${victimNoteItem.note.id}"/>
+<c:set var="removeRow" value="${'REMOVE' eq operation.name ? 'removeRow' : ''}"/>
+<tr id="noteItems[${victimNoteItemIndex}].row" class="${removeRow}">
+	<td>	
+		<input type="hidden" id="noteItemOperation${victimNoteItemIndex}" name="noteItems[${victimNoteItemIndex}].operation" value="${victimNoteItem.operation.name}"/>
+		<input type="hidden"  id="noteItem${victimNoteItemIndex}Note" name="noteItems[${victimNoteItemIndex}].note" value="${victimNoteItem.note.id}"/> 
+		<input type="hidden" name="noteItems[${victimNoteItemIndex}].association" value="${victimNoteItem.association.id}"/> 
+		<a class="actionMenuItem rowActionMenuLinks"
+				id="noteItem${victimNoteItemIndex}SummaryActionMenuLink"
+				href="${pageContext.request.contextPath}/victim/association/associationNotesRowActionMenu.html?note=${victimNoteItem.note.id}&amp;operation=${victimNoteItem.operation.name}&amp;itemIndex=${victimNoteItemIndex}"></a>
 	</td>
 	<td>
 		<select name="noteItems[${victimNoteItemIndex}].category">
@@ -38,7 +39,7 @@
 		</td>
 	</c:if>
 	<td>
-		<input id="noteItems[${victimNoteItemIndex}].date" name="noteItems[${victimNoteItemIndex}].date" type="text" class="date" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${victimNoteItem.date}'/>"/>
+		<input id="noteItemsDate${victimNoteItemIndex}" name="noteItems[${victimNoteItemIndex}].date" type="text" class="date" value="<fmt:formatDate pattern='MM/dd/yyyy' value='${victimNoteItem.date}'/>"/>
 		<form:errors path="noteItems[${victimNoteItemIndex}].date" cssClass="error"/>
 	</td>
 	<td>

@@ -27,7 +27,8 @@ import omis.search.report.service.PersonSearchReportService;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.1 (Feb 14, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Mar 20, 2019)
  * @since OMIS 3.0 
  */
 public class PersonSearchReportServiceHibernateImpl
@@ -35,8 +36,9 @@ public class PersonSearchReportServiceHibernateImpl
 	implements PersonSearchReportService {
 
 	private static final String
-	FIND_BY_FIRST_LAST_NAME_SEARCH_QUERY_NAME =
+		FIND_BY_FIRST_LAST_NAME_SEARCH_QUERY_NAME =
 			"findAllNameByFirstLastNameSearch";
+	
 	private static final String[] FIND_BY_FIRST_LAST_NAME_SEARCH_PARAMS =
 			{"name1" , "name2"};
 
@@ -57,6 +59,11 @@ public class PersonSearchReportServiceHibernateImpl
 			"findPersonSearchById";
 
 	private static final String FIND_PERSON_SEARCH_BY_ID_PARAM = "id";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY =
+			"findPersonNameBySsn";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM = "ssn";
 
 	/** constructor.
 	 * @param sessionFactory session factory. */
@@ -109,5 +116,17 @@ public class PersonSearchReportServiceHibernateImpl
 	@Override
 	public String getFindPersonNameByNameSearchParam() {
 		return FIND_PERSON_NAME_BY_NAME_SEARCH_PARAM;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchQuery() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchParam() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM;
 	}
 }

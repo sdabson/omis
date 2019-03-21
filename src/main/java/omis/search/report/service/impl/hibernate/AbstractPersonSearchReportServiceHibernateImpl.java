@@ -19,9 +19,7 @@ package omis.search.report.service.impl.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.hibernate.SessionFactory;
-
 import omis.search.report.PersonSearchResult;
 import omis.search.util.PersonRegexUtility;
 
@@ -30,7 +28,8 @@ import omis.search.util.PersonRegexUtility;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.2 (Aug 29, 2018)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 19, 2019)
  * @since OMIS 3.0
  * @param <T> personSearchResult 
  */
@@ -70,6 +69,14 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 	 * @return params. */
 	public abstract String getFindPersonNameByNameSearchParam();
 
+	/** find by ssn search query name.
+	 * @return name. */
+	public abstract String getFindPersonNameBySsnSearchQuery();
+
+	/** find by ssn search param names.
+	 * @return params. */
+	public abstract String getFindPersonNameBySsnSearchParam();
+	
 	/** sets the session factory.
 	 * @param sessionFactory session factory. */
 	public void setSessionFactory(final SessionFactory sessionFactory) {
@@ -78,13 +85,16 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 
 	/** gets the session factory.
 	 * @return sessionFactory session factory. */
-	protected SessionFactory getSessionFactory() { return this.sessionFactory; }
+	protected SessionFactory getSessionFactory() {
+		return this.sessionFactory;
+	}
 
 	/** find person names by unspecified search criteria.
 	 * @param searchCriteria search criteria string.
+	 * @param includeSsn whether to include ssn search
 	 * @return collection of persons. */
 	public List<T> findPersonNamesByUnspecified(
-			final String searchCriteria) {
+			final String searchCriteria, final Boolean includeSsn) {
 		List<T> result = new ArrayList<T>();
 
 		if (PersonRegexUtility.isFirstLast(searchCriteria)) {
@@ -100,6 +110,9 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 		} else if (PersonRegexUtility.isName(searchCriteria)) {
 			final String[] name = searchCriteria.split("[\\s,]+");
 			return this.findPersonNamesByLastName(name[0]);
+		} else if (PersonRegexUtility.isSsn(searchCriteria) && includeSsn) {
+			final String ssn = searchCriteria.replace("-", "");
+			return this.findPersonNamesBySsn(ssn);
 		}
 
 		return result;
@@ -112,8 +125,7 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 	public List<T> findPersonNamesByNameSearch(final String name1,
 			final String name2) {
 		@SuppressWarnings("unchecked")
-		final
-		List<T> result = this.sessionFactory.getCurrentSession()
+		final List<T> result = this.sessionFactory.getCurrentSession()
 				.getNamedQuery(this.getFindByFirstLastNameSearchQuery())
 				.setParameter(this.getFindByFirstLastNameSearchParams()[0], 
 						name1)
@@ -133,17 +145,16 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 	public List<T> findPersonNamesByNameSearch(final String first,
 			final String middle, final String last) {
 		@SuppressWarnings("unchecked")
-		final
-		List<T> result = this.sessionFactory.getCurrentSession()
-				.getNamedQuery(this.getFindByFirstMiddleLastNameSearchQuery())
-				.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[0],
-						first)
-				.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[1],
-						middle)
-				.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[2],
-						last)
-				.setReadOnly(true)
-				.list();
+		final List<T> result = this.sessionFactory.getCurrentSession()
+			.getNamedQuery(this.getFindByFirstMiddleLastNameSearchQuery())
+			.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[0],
+					first)
+			.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[1],
+					middle)
+			.setParameter(this.getFindByFirstMiddleLastNameSearchParams()[2],
+					last)
+			.setReadOnly(true)
+			.list();
 
 		return result;
 	}
@@ -153,10 +164,24 @@ public abstract class AbstractPersonSearchReportServiceHibernateImpl
 	 * @return list of person names. */
 	public List<T> findPersonNamesByLastName(final String name) {
 		@SuppressWarnings("unchecked")
-		final
-		List<T> result = this.sessionFactory.getCurrentSession()
+		final List<T> result = this.sessionFactory.getCurrentSession()
 				.getNamedQuery(this.getFindPersonNameByNameSearchQuery())
 				.setString(this.getFindPersonNameByNameSearchParam(), name)
+				.setReadOnly(true)
+				.list();
+
+		return result;
+	}
+	
+
+	/** Returns person names with ssn equaling search criteria.
+	 * @param ssn social security number.
+	 * @return list of person names. */
+	public List<T> findPersonNamesBySsn(final String ssn) {
+		@SuppressWarnings("unchecked")
+		final List<T> result = this.sessionFactory.getCurrentSession()
+				.getNamedQuery(this.getFindPersonNameBySsnSearchQuery())
+				.setString(this.getFindPersonNameBySsnSearchParam(), ssn)
 				.setReadOnly(true)
 				.list();
 

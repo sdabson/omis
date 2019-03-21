@@ -31,7 +31,8 @@ import omis.search.util.PersonRegexUtility;
  * 
  * @author Ryan Johns
  * @author Josh Divine
- * @version 0.1.1 (Feb 14, 2018)
+ * @author Annie Wahl
+ * @version 0.1.2 (Mar 20, 2019)
  * @since OMIS 3.0 
  */
 public class UserPersonSearchReportServiceHibernateImpl
@@ -65,6 +66,11 @@ public class UserPersonSearchReportServiceHibernateImpl
 	private static final String FIND_PERSON_SEARCH_BY_ID = "findUserSearchById";
 
 	private static final String FIND_PERSON_SEARCH_BY_ID_PARAM = "id";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY =
+			"findUserNameBySsn";
+	
+	private static final String FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM = "ssn";
 
 	/** constructor.
 	 * @param sessionFactory session factory. */
@@ -112,14 +118,25 @@ public class UserPersonSearchReportServiceHibernateImpl
 	public String getFindPersonNameByNameSearchParam() {
 		return FIND_BY_NAME_SEARCH_CRITERIA_PARAM;
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchQuery() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_QUERY;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String getFindPersonNameBySsnSearchParam() {
+		return FIND_PERSON_NAME_BY_SSN_SEARCH_PARAM;
+	}
 
 	/** {@inheritDoc} */
 	@Override
 	public List<UserSearchResult> findPersonNamesByUsernameSearch(
 			final String username) {
 		@SuppressWarnings("unchecked")
-		final
-		List<UserSearchResult> result = this.getSessionFactory()
+		final List<UserSearchResult> result = this.getSessionFactory()
 				.getCurrentSession()
 				.getNamedQuery(FIND_BY_USERNAME_SEARCH_QUERY)
 				.setParameter(FIND_BY_USERNAME_SEARCH_QUERY_PARAM, username)
@@ -137,7 +154,7 @@ public class UserPersonSearchReportServiceHibernateImpl
 		if (PersonRegexUtility.isUserName(searchCriteria)) {
 			result = this.findPersonNamesByUsernameSearch(searchCriteria);
 		} else {
-			result = super.findPersonNamesByUnspecified(searchCriteria);
+			result = super.findPersonNamesByUnspecified(searchCriteria, false);
 		}
 		return result;
 	}

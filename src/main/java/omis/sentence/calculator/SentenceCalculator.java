@@ -115,7 +115,7 @@ public class SentenceCalculator {
 		// First builder in a chain - if this is first, first is set to this
 		private final Builder first;
 		
-		/// 
+		// Whether consecutive to previous calculator in chain 
 		private final boolean consecutive;
 		
 		// Next builder in chain
@@ -496,9 +496,22 @@ public class SentenceCalculator {
 				current = current.next;
 			} else {
 				
-				// TODO Implement concurrent calculation - SA
-				throw new UnsupportedOperationException(
-						"Concurrent sentence calculators not yet implemented");
+				// One strategy - determine if current term is longer than
+				// previous, if so, add the difference
+				if (current.previous != null) {
+					if (current.prisonTerm.longerThan(
+							current.previous.prisonTerm)) {
+						
+						// Calculate difference and add it
+						throw new UnsupportedOperationException(
+								"Not yet implemented");
+					}
+				} else {
+					prisonDischargeDate
+						= this.calculateTermDischargeDate(current.prisonTerm,
+								prisonDischargeDate);
+				}
+				current = current.next;
 			}
 		}
 		

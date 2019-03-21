@@ -17,10 +17,6 @@
  */
 package omis.sentence.calculator.testng;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import omis.sentence.calculator.SentenceCalculatorBuilderFactory;
 import omis.sentence.calculator.impl.SentenceCalculatorBuilderFactoryImpl;
 import omis.sentence.calculator.util.test.SentenceCalculatorSampleFactory;
@@ -37,51 +33,8 @@ import omis.term.service.delegate.TermCalculatorDelegateStandard;
  * @version 0.1.0 (March 14, 2019)
  * @since OMIS 3.0 
  */
-abstract class AbstractSentenceCalculatorWithStandardTermCalculatorDelegateTests {
-	
-	// Note that this test is not meant to be configured - custom date parsing
-	// and formatting is therefore necessary. Configured unit tests should use
-	// a date parser that uses the application's custom date editor (at the
-	// time of writing, this is DateUtility - switch to this if this test is
-	// ever configured) - SA
-	private static final String DATE_FORMAT = "MM/dd/yyyy";
-	
-	
-	/**
-	 * Parses date text in {@code MM/dd/yyyy} format.
-	 * 
-	 * <p>This is only intended for use outside of a managed context. In managed
-	 * contexts, use DateUtility instead.
-	 * 
-	 * @param dateText date text
-	 * @return parsed date
-	 */
-	protected Date parseDate(final String dateText) {
-		try {
-			
-			// See comment for DATE_FORMAT constant above
-			return new SimpleDateFormat(DATE_FORMAT).parse(dateText);
-		} catch (ParseException e) {
-			throw new IllegalArgumentException(
-					String.format("Date %s not in %s format",
-							dateText, DATE_FORMAT));
-		}
-	}
-	
-	/**
-	 * Formats date in {@code MM/dd/yyyy}.
-	 * 
-	 * <p>This is only intended for use outside of a managed context. In managed
-	 * contexts, use DateUtility instead.
-	 * 
-	 * @param date date
-	 * @return date as formatted text
-	 */
-	protected String formatDate(final Date date) {
-		
-		// See comment for DATE_FORMAT constant above
-		return new SimpleDateFormat(DATE_FORMAT).format(date);
-	}
+abstract class AbstractSentenceCalculatorWithStandardTermCalculatorDelegateTests
+		extends AbstractSentenceCalculatorTests {
 	
 	/**
 	 * Returns builder factory for standard calculations.

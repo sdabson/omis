@@ -17,48 +17,54 @@
  */
 package omis.sentence.calculator.testng;
 
+import java.util.Date;
+
 import org.testng.annotations.Test;
 
 import omis.sentence.calculator.SentenceCalculator;
 import omis.term.domain.component.Term;
 
 /**
- * Tests sentence calculator with standard term calculator delegate.
- * 
- * <p>The test cases in this test class should be placed in a class for each
- * target operation. 
- * 
+ * Tests for calculation of prison discharge date using standard term calculator
+ * delegate. 
+ *
  * @author Stephen Abson
- * @version 0.1.0 (March 1, 2019)
+ * @version 0.1.0 (March 14, 2019)
  * @since OMIS 3.0
  */
 @Test(groups = {"sentence", "calculator"})
-public class SentenceCalculatorWithStandardTermCalculatorDelegateTests
+public class SentenceCalculatorWithStandardTermCalculatorDelegateCalculatePrisonDischargeDate
 		extends AbstractSentenceCalculatorWithStandardTermCalculatorDelegateTests {
-	
-	/** Tests prison days calculation. */
-	public void testPrisonDaysCalculation() {
+
+	/** Tests prison term calculation with leap year. */
+	public void testWithLeapYear() {
 		SentenceCalculator calculator
 			= this.getBuilderFactory().createBuilder()
 				.withPrisonTerm(new Term(3, 0, 0))
+				.withSentenceCommencementDate(this.parseDate("03/11/2005"))
 				.build();
-		int actual = calculator.calculatePrisonDays();
-		int expected = 1095;
-		assert actual == expected : String.format(
-				"Prison days not calculated correctly - %d expected; %d found",
-				expected, actual);
+		Date actual = calculator.calculatePrisonDischargeDate();
+		Date expected = this.parseDate("03/10/2008");
+		assert actual.equals(expected) : String.format(
+				"Prison discharge date not calculated correctly - %s expected;"
+						+ " %s actual",
+				this.formatDate(expected),
+				this.formatDate(actual));
 	}
 	
-	/** Tests probation days calculation. */
-	public void testProbationDaysCalculation() {
+	/** Tests prison term calculation with leap year. */
+	public void testWithTwoLeapYears() {
 		SentenceCalculator calculator
 			= this.getBuilderFactory().createBuilder()
-				.withProbationTerm(new Term(2, 0, 0))
+				.withPrisonTerm(new Term(5, 0, 0))
+				.withSentenceCommencementDate(this.parseDate("01/06/2008"))
 				.build();
-		int actual = calculator.calculateProbationDays();
-		int expected = 730;
-		assert actual == expected : String.format(
-			"Probation days not calculated correctly - %d expected; %d found",
-			expected, actual);
+		Date actual = calculator.calculatePrisonDischargeDate();
+		Date expected = this.parseDate("01/04/2013");
+		assert actual.equals(expected) : String.format(
+				"Prison discharge date not calculated correctly - %s expected;"
+						+ " %s actual",
+				this.formatDate(expected),
+				this.formatDate(actual));
 	}
 }

@@ -6,7 +6,8 @@ import omis.search.report.PersonSearchResult;
 
 /** Service for person searches.
  * @author Ryan Johns
- * @version 0.1.0 (Nov 13, 2013)
+ * @author Annie Wahl
+ * @version 0.1.1 (Mar 20, 2019)
  * @since OMIS 3.0 */
 public interface PersonSearchReportService {
 
@@ -17,9 +18,10 @@ public interface PersonSearchReportService {
 
 	/** find person names by unspecified search criteria.
 	 * @param searchCriteria search criteria string.
+	 * @param includeSsn whether to include ssn search
 	 * @return collection of persons. */
 	List<PersonSearchResult> findPersonNamesByUnspecified(
-			final String searchCriteria);
+			final String searchCriteria, final Boolean includeSsn);
 
 	/** Returns person names with specified name search criteria.
 	 * @param name1 first or last
